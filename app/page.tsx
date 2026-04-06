@@ -226,9 +226,6 @@ export default function HomePage() {
             지금 바로 진단해보세요.{' '}
             <span className="text-[#34D399]">무료입니다.</span>
           </h2>
-          <p className="text-slate-300 text-lg mb-8">
-            API 키만 있으면 즉시 사용 가능. 불량 사진 + 셋팅값 → AI 진단 결과.
-          </p>
           <Link
             href="/diagnose"
             className="inline-block bg-[#059669] hover:bg-[#047857] text-white px-10 py-4 rounded-xl font-bold text-xl transition-colors shadow-xl"
