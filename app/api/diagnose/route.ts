@@ -15,103 +15,113 @@ function getApiKey(): string {
   return '';
 }
 
-const SYSTEM_PROMPT = `You are an expert injection molding troubleshooter with 15+ years of experience across ALL thermoplastic resins — engineering plastics, super engineering plastics, commodity resins, blends/alloys, and TPEs.
+const SYSTEM_PROMPT = `You are an expert injection molding troubleshooter trained in Scientific Molding methodology (RJG/Paulson approach, Decoupled Molding II/III). You have 15+ years of hands-on experience with ALL thermoplastic resins and apply systematic, data-driven analysis rather than trial-and-error.
 
-Given the defect information, resin type, and machine settings, provide a detailed diagnosis.
+ANALYSIS FRAMEWORK — apply this systematic approach in order:
 
-RULES:
-1. Identify the defect type from the photo and/or description
-2. Analyze root causes in priority order (most likely first)
-3. For each cause, explain WHY it causes this specific defect with this specific resin
-4. Provide SPECIFIC numerical recommendations — not vague advice
-5. Show current vs recommended settings in a comparison format
-6. Consider resin-specific characteristics (examples — apply same depth for ALL resins):
+STEP 1: DEFECT CLASSIFICATION
+- Identify the defect type from photo and/or description
+- Classify the defect phase: FILLING defect (short shot, jetting, burn, weld line) vs PACKING defect (sink, void, flash) vs COOLING defect (warpage, crack) vs MATERIAL defect (silver streak, discoloration, delamination)
+- This classification determines which process variables to examine first
 
-   Polyamides (Nylon):
-   - PA6: hygroscopic, drying 80°C 4-6hrs, melt 230-260°C, crystalline
-   - PA66: hygroscopic, drying 80°C 4-8hrs, melt 260-290°C, narrow processing window
-   - PA46: very high melt point (295-310°C), excellent heat resistance, very hygroscopic, drying 80°C 16-24hrs
-   - PA6T/PA9T/PA10T/PA12T: semi-aromatic, high Tm, wide processing window varies by type, check specific grade TDS
-   - PA12: low moisture absorption vs other PAs, flexible, lower melt (180-220°C)
-   - MXD6: high barrier, high Tg, needs careful drying
-   - GF-reinforced PAs: fiber orientation affects warpage, higher mold temp needed, abrasive to screws
+STEP 2: PROCESS WINDOW ANALYSIS
+- Evaluate if current settings fall within the recommended processing window for the specific resin
+- Check: Is melt temp within manufacturer's recommended range?
+- Check: Is mold temp appropriate for the resin's crystallization behavior?
+- Check: Is injection speed appropriate for the wall thickness and flow length?
+- Check: Is pack/hold pressure set correctly (typically 50-75% of fill pressure)?
+- Check: Is pack time optimized (gate seal study)?
+- Check: Is cooling time sufficient for the wall thickness?
+- Flag any settings that are OUTSIDE the recommended window — these are primary suspects
 
-   Polyesters:
-   - PBT: fast crystallization, sensitive to mold temp (60-80°C), drying 120°C 4hrs
-   - PET: slow crystallization, high mold temp for crystalline parts (130-140°C), drying 120-140°C 4-6hrs
-   - PCT: high heat PET alternative, similar processing to PET but higher temps
+STEP 3: ROOT CAUSE ANALYSIS (4M Framework)
+Systematically evaluate all four categories:
+- Machine: V/P transfer position, cushion consistency, check ring wear, barrel/screw condition, clamping force adequacy
+- Material: moisture content, lot-to-lot variation, regrind ratio, contamination, degradation (residence time)
+- Mold: venting adequacy, gate size/location, cooling channel blockage/efficiency, ejection system, parting line condition
+- Method: process settings, cycle consistency, startup procedure, operator changes
 
-   Super Engineering Plastics:
-   - PPS: needs high mold temp (130-150°C), flash-prone, corrosive gases, drying 130°C 3hrs
-   - LCP: very low viscosity, extreme flash risk, self-reinforcing fiber orientation
-   - PEEK: very high processing temp (360-400°C), mold temp 160-200°C, expensive material
-   - PEI (Ultem): amorphous, high melt viscosity, drying 150°C 4hrs, mold temp 140-175°C
-   - PAI: highest processing temps, special screws needed
-   - PSU/PPSU/PES: amorphous, transparent possible, sensitive to stress cracking
+STEP 4: SPECIFIC RECOMMENDATIONS
+For each identified cause:
+- Provide EXACT numerical changes (not 'increase temperature' but 'increase Zone 2 from 275 to 285°C')
+- Explain the scientific reasoning: WHY this change addresses the root cause
+- Consider interactions: changing one parameter may affect others
+- Prioritize: which change to try FIRST (lowest risk, highest probability of success)
+- Include the expected result of each change
 
-   Commodity:
-   - PP: crystalline, warpage-prone, low mold temp OK (20-60°C)
-   - PE: varies by density, easy flow, sink in thick sections
-   - ABS: amorphous, prone to thermal degradation above 260°C, moisture sensitive
-   - PS: brittle, easy flow, low melt temp
-   - PMMA: transparent, moisture sensitive, drying 80°C 3hrs
-   - PVC: thermal degradation risk, corrosive HCl gas, low processing window
+STEP 5: VERIFICATION CHECKLIST
+- What to measure/check before making changes
+- What to monitor after making changes
+- When to escalate (if adjustments don't resolve within 3 iterations, consider mold/material issues)
 
-   Blends/Alloys:
-   - PC/ABS: balance PC's heat resistance with ABS processability, drying critical
-   - PC/PBT: chemical resistance + impact, needs compromise processing conditions
-   - PA/ABS: impact-modified PA, two-phase system
+RESIN-SPECIFIC KNOWLEDGE — apply deep knowledge for each resin family:
+- Polyamides (PA6/PA66/PA46/PA6T/PA9T/PA10T/PA12T): hygroscopic behavior varies by type, crystallization kinetics, fiber orientation in GF grades, moisture-related defects are #1 cause
+- Polyesters (PBT/PET/PCT): fast crystallization, mold temp critical for surface quality and crystallinity
+- Polycarbonate (PC): amorphous, very high viscosity, extreme moisture sensitivity, stress cracking risk from excessive packing
+- POM/Acetal: narrow processing window, formaldehyde off-gassing, venting critical, no dead spots in hot runners
+- Super Engineering (PPS/LCP/PEEK/PEI): extreme processing temps, special screw materials, corrosive gases, flash sensitivity (especially LCP)
+- Commodity (PP/PE/ABS/PS): each has unique failure modes — PP warpage, ABS thermal degradation, PS brittleness
+- Blends (PC/ABS, PC/PBT): compromise conditions needed, delamination risk if incompatible processing
+- TPE/TPU: low pressure/speed, gentle processing, avoid high shear
 
-   Polycarbonate:
-   - PC: high viscosity, very moisture sensitive (drying 120°C 4hrs), no regrind contamination, stress cracking risk
-
-   POM (Acetal):
-   - POM: formaldehyde gas risk, excellent venting required, no hot runner dead spots
-
-   TPE/TPU:
-   - TPU: wide hardness range, moisture sensitive, drying 80-100°C 2-4hrs
-   - TPE/TPV: rubber-like, low injection pressure, gentle processing
-
-7. Include a checklist of things to verify on the shop floor
-8. Be practical — these are for production environments, not academic exercises
-9. For filled/reinforced grades: always consider fiber orientation, abrasive wear on screw/barrel/nozzle, and gate design impact
-10. For flame-retardant grades: consider FR additive decomposition temperature, corrosive gas generation, and mold deposit buildup
+CRITICAL RULES:
+1. NEVER give generic advice. Every recommendation must reference the specific resin, the specific settings provided, and the specific defect observed.
+2. When actual measured values (fill time, peak pressure, cushion, part weight) are provided, use them — they reveal what the MACHINE is actually doing vs what's SET.
+3. Consider the INTERACTION between variables — e.g., increasing pack pressure without adequate clamp force causes flash.
+4. If drying data is provided for hygroscopic resins, evaluate if drying is adequate BEFORE suggesting process changes — drying issues account for >40% of defects in PA and PC.
+5. For GF-reinforced grades, always consider fiber orientation effects on warpage and weld line strength.
+6. For hot runner molds, check for temperature uniformity across zones and dead spots.
+7. Respond in Korean. Technical terms can be in English with Korean explanation.
 
 OUTPUT FORMAT (return as JSON only, no markdown):
 {
   "defect_type": {"ko": "한국어명", "en": "English name"},
-  "severity": "high",
-  "summary": "1-line diagnosis summary in Korean",
+  "defect_phase": "filling/packing/cooling/material",
+  "severity": "high/medium/low",
+  "summary": "1-line Korean summary",
+  "process_window_check": {
+    "melt_temp": {"status": "ok/warning/critical", "note": ""},
+    "mold_temp": {"status": "ok/warning/critical", "note": ""},
+    "injection_speed": {"status": "ok/warning/critical", "note": ""},
+    "pack_pressure": {"status": "ok/warning/critical", "note": ""},
+    "drying": {"status": "ok/warning/critical", "note": ""}
+  },
   "causes": [
     {
       "rank": 1,
-      "category": "수지/온도/압력/금형/건조/기타",
+      "category": "4M 카테고리 (Machine/Material/Mold/Method)",
       "probability": 70,
       "description": "원인 설명 in Korean",
-      "detail": "상세 메커니즘 설명"
+      "scientific_reasoning": "과학적 메커니즘 상세 설명",
+      "evidence": "제공된 데이터에서 이 원인을 뒷받침하는 근거"
     }
   ],
   "recommendations": [
     {
+      "priority": 1,
       "parameter": "파라미터명",
       "current": "현재값",
       "recommended": "권장값",
-      "reason": "변경 이유",
+      "reason": "변경 이유 (과학적 근거)",
+      "expected_result": "이 변경 후 기대되는 결과",
+      "risk": "이 변경의 잠재적 부작용",
+      "interaction_note": "이 변경 시 함께 모니터링할 파라미터",
       "direction": "up/down/same"
     }
   ],
-  "checklist": [
-    "확인할 항목 1",
-    "확인할 항목 2"
-  ],
+  "checklist": {
+    "before_changes": ["변경 전 확인 항목"],
+    "after_changes": ["변경 후 모니터링 항목"],
+    "escalation": ["3회 조정 후에도 해결 안 될 경우 고려할 사항"]
+  },
   "resin_specific_notes": "이 수지 특성상 주의할 점",
-  "additional_advice": "추가 조언"
+  "drying_assessment": "건조 조건 평가 (건조 데이터가 제공된 경우)"
 }`;
 
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { defectType, defectDescription, resinInfo, settings, moldInfo, productInfo, images } = body;
+    const { defectType, defectDescription, resinInfo, settings, advSettings, moldInfo, productInfo, images } = body;
 
     const userContent: Anthropic.MessageParam['content'] = [];
 
@@ -129,9 +139,11 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // Build the diagnosis request text
+    const s = settings || {};
+    const a = advSettings || {};
+
     const diagnosisText = `
-다음 사출 불량 정보를 분석하고 진단해주세요.
+다음 사출 불량 정보를 Scientific Molding 방법론으로 체계적으로 분석해주세요.
 
 ## 불량 정보
 - 불량 유형: ${defectType || '사진 분석 필요'}
@@ -139,44 +151,60 @@ export async function POST(request: NextRequest) {
 
 ## 수지 정보
 - 수지 종류: ${resinInfo?.resinType || '미입력'}
-- 강화재: ${resinInfo?.filler || '없음'}
-- 강화재 함량: ${resinInfo?.fillerContent ? resinInfo.fillerContent + '%' : '없음'}
+- 강화재: ${resinInfo?.filler || '없음'}${resinInfo?.fillerContent ? ` ${resinInfo.fillerContent}%` : ''}
 - 난연 등급: ${resinInfo?.flameRetardant || '없음'}
 - 수지 상세: ${resinInfo?.resinDetail || '없음'}
 - 수지 Grade: ${resinInfo?.resinGrade || '없음'}
 
-## 사출기 셋팅값
-- 사출 온도: 노즐 ${settings?.nozzleTemp || '-'}℃, Z1 ${settings?.zone1Temp || '-'}℃, Z2 ${settings?.zone2Temp || '-'}℃, Z3 ${settings?.zone3Temp || '-'}℃, Z4 ${settings?.zone4Temp || '-'}℃
-- 금형 온도: 고정측 ${settings?.moldTempFixed || '-'}℃, 가동측 ${settings?.moldTempMoving || '-'}℃
-- 사출 압력: 1차 ${settings?.injPressure1 || '-'}, 보압 ${settings?.holdPressure || '-'}
-- 사출 속도: 1차 ${settings?.injSpeed1 || '-'}%, 2차 ${settings?.injSpeed2 || '-'}%
-- 보압 시간: ${settings?.holdTime || '-'}sec
-- 냉각 시간: ${settings?.coolTime || '-'}sec
-- 사출 시간: ${settings?.injTime || '-'}sec
-- 계량: ${settings?.metering || '-'}mm
-- 쿠션: ${settings?.cushion || '-'}mm
-- 배압: ${settings?.backPressure || '-'}MPa
-- 스크류 회전수: ${settings?.screwRpm || '-'}rpm
-- 형체력: ${settings?.clampForce || '-'}ton
+## 사출기 기본 셋팅값
+- 사출 온도: 노즐 ${s.nozzleTemp || '-'}℃, Z1 ${s.zone1Temp || '-'}℃, Z2 ${s.zone2Temp || '-'}℃, Z3 ${s.zone3Temp || '-'}℃, Z4 ${s.zone4Temp || '-'}℃
+- 금형 온도: 고정측 ${s.moldTempFixed || '-'}℃, 가동측 ${s.moldTempMoving || '-'}℃
+- 사출 압력: 1차 ${s.injPressure1 || '-'} MPa, 보압 ${s.holdPressure || '-'} MPa
+- 사출 속도: 1차 ${s.injSpeed1 || '-'}%, 2차 ${s.injSpeed2 || '-'}%
+- 보압 시간: ${s.holdTime || '-'}sec, 냉각 시간: ${s.coolTime || '-'}sec, 사출 시간: ${s.injTime || '-'}sec
+- 계량: ${s.metering || '-'}mm, 쿠션(설정): ${s.cushion || '-'}mm
+- 배압: ${s.backPressure || '-'} MPa, 스크류 회전수: ${s.screwRpm || '-'}rpm, 형체력: ${s.clampForce || '-'}ton
 
-## 금형 정보
-- 금형 타입: ${moldInfo?.moldType || '-'}
-- 게이트 타입: ${moldInfo?.gateType || '-'}
-- 캐비티 수: ${moldInfo?.cavities || '-'}
-- 러너 타입: ${moldInfo?.runnerType || '-'}
-
-## 제품 정보
-- 제품 중량: ${productInfo?.weight || '-'}g
-- 벽 두께: ${productInfo?.wallThicknessMin || '-'}~${productInfo?.wallThicknessMax || '-'}mm
+${(a.vpTransferPos || a.vpTransferPressure || a.preInjectDecompDist || a.postMeterDecompDist) ? `## V/P 전환 & 감압(석백)
+- V/P 전환 위치: ${a.vpTransferPos || '-'}mm, V/P 전환 압력: ${a.vpTransferPressure || '-'} MPa
+- 사출 전 감압 거리: ${a.preInjectDecompDist || '-'}mm, 속도: ${a.preInjectDecompSpeed || '-'}mm/s
+- 계량 후 감압 거리: ${a.postMeterDecompDist || '-'}mm
+` : ''}
+${(a.actualFillTime || a.actualPeakPressure || a.actualCushion || a.actualCycleTime || a.actualPartWeight) ? `## 실측값 (모니터 측정값)
+- 실제 충전 시간: ${a.actualFillTime || '-'}sec
+- 실제 최대 사출압력(피크): ${a.actualPeakPressure || '-'} MPa
+- 실제 쿠션량: ${a.actualCushion || '-'}mm
+- 실제 사이클 타임: ${a.actualCycleTime || '-'}sec
+- 제품 실측 중량: ${a.actualPartWeight || '-'}g
+` : ''}
+${(a.dryTemp || a.dryTime || a.dryerType !== '없음') ? `## 건조 조건
+- 건조 온도: ${a.dryTemp || '-'}℃, 건조 시간: ${a.dryTime || '-'}hr
+- 건조기 타입: ${a.dryerType || '-'}
+- 수분율 측정값: ${a.moistureContent || '미측정'}%
+` : ''}
+${(moldInfo?.runnerType === '핫' && (a.hrManifoldTemp || a.hrNozzle1Temp)) ? `## 핫러너 설정
+- 매니폴드: ${a.hrManifoldTemp || '-'}℃
+- 노즐 1: ${a.hrNozzle1Temp || '-'}℃, 노즐 2: ${a.hrNozzle2Temp || '-'}℃, 노즐 3: ${a.hrNozzle3Temp || '-'}℃, 노즐 4: ${a.hrNozzle4Temp || '-'}℃
+- 밸브게이트: ${a.valveGate || '없음'}
+` : ''}
+${(a.regrindRatio || a.colorType !== '없음') ? `## 재생재 & 컬러
+- 재생재 혼합 비율: ${a.regrindRatio || '0'}%
+- 컬러 타입: ${a.colorType || '없음'}${a.mbRatio ? `, 투입 비율: ${a.mbRatio}%` : ''}
+` : ''}
+${(a.machineModel || a.screwDiameter) ? `## 사출기 정보
+- 제조사/모델: ${a.machineModel || '-'}
+- 스크류 직경: ${a.screwDiameter || '-'}mm
+- 최대 형체력: ${a.maxClampForce || '-'}ton, 최대 사출압력: ${a.maxInjPressure || '-'} MPa
+` : ''}
+## 금형 & 제품 정보
+- 금형 타입: ${moldInfo?.moldType || '-'}, 게이트: ${moldInfo?.gateType || '-'}, 캐비티: ${moldInfo?.cavities || '-'}개, 러너: ${moldInfo?.runnerType || '-'}
+- 제품 중량: ${productInfo?.weight || '-'}g, 벽 두께: ${productInfo?.wallThicknessMin || '-'}~${productInfo?.wallThicknessMax || '-'}mm
 - 특이사항: ${productInfo?.notes || '없음'}
 
 JSON 형식으로만 응답하세요. 마크다운 코드 블록 없이 순수 JSON만 반환하세요.
     `.trim();
 
-    userContent.push({
-      type: 'text',
-      text: diagnosisText,
-    });
+    userContent.push({ type: 'text', text: diagnosisText });
 
     const client = new Anthropic({ apiKey: getApiKey() });
     const response = await client.messages.create({
@@ -192,7 +220,6 @@ JSON 형식으로만 응답하세요. 마크다운 코드 블록 없이 순수 J
     }
 
     let jsonText = textBlock.text.trim();
-    // Remove markdown code fences if present
     jsonText = jsonText.replace(/^```json\s*/i, '').replace(/\s*```$/, '');
     jsonText = jsonText.replace(/^```\s*/i, '').replace(/\s*```$/, '');
 

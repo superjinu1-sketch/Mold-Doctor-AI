@@ -14,25 +14,40 @@ interface ImageFile {
 
 interface DiagnosisResult {
   defect_type: { ko: string; en: string };
+  defect_phase?: 'filling' | 'packing' | 'cooling' | 'material';
   severity: 'high' | 'medium' | 'low';
   summary: string;
+  process_window_check?: {
+    melt_temp?: { status: 'ok' | 'warning' | 'critical'; note: string };
+    mold_temp?: { status: 'ok' | 'warning' | 'critical'; note: string };
+    injection_speed?: { status: 'ok' | 'warning' | 'critical'; note: string };
+    pack_pressure?: { status: 'ok' | 'warning' | 'critical'; note: string };
+    drying?: { status: 'ok' | 'warning' | 'critical'; note: string };
+  };
   causes: {
     rank: number;
     category: string;
     probability: number;
     description: string;
-    detail: string;
+    detail?: string;
+    scientific_reasoning?: string;
+    evidence?: string;
   }[];
   recommendations: {
+    priority?: number;
     parameter: string;
     current: string;
     recommended: string;
     reason: string;
+    expected_result?: string;
+    risk?: string;
+    interaction_note?: string;
     direction?: 'up' | 'down' | 'same';
   }[];
-  checklist: string[];
+  checklist: string[] | { before_changes: string[]; after_changes: string[]; escalation: string[] };
   resin_specific_notes: string;
-  additional_advice: string;
+  drying_assessment?: string;
+  additional_advice?: string;
 }
 
 // --- Constants ---
@@ -123,6 +138,16 @@ function DiagnoseContent() {
   const [result, setResult] = useState<DiagnosisResult | null>(null);
   const [error, setError] = useState('');
   const [checkedItems, setCheckedItems] = useState<Set<number>>(new Set());
+  const [showAdvanced, setShowAdvanced] = useState(false);
+  const [advSettings, setAdvSettings] = useState({
+    vpTransferPos: '', vpTransferPressure: '',
+    preInjectDecompDist: '', preInjectDecompSpeed: '', postMeterDecompDist: '',
+    actualFillTime: '', actualPeakPressure: '', actualCushion: '', actualCycleTime: '', actualPartWeight: '',
+    dryTemp: '', dryTime: '', dryerType: '없음', moistureContent: '',
+    hrManifoldTemp: '', hrNozzle1Temp: '', hrNozzle2Temp: '', hrNozzle3Temp: '', hrNozzle4Temp: '', valveGate: '없음',
+    regrindRatio: '', colorType: '없음', mbRatio: '',
+    machineModel: '', screwDiameter: '', maxClampForce: '', maxInjPressure: '',
+  });
   const [isDragging, setIsDragging] = useState(false);
   const [isExtractingSettings, setIsExtractingSettings] = useState(false);
   const [extractMsg, setExtractMsg] = useState('');
@@ -227,6 +252,9 @@ function DiagnoseContent() {
   const setSetting = (key: string, value: string) => {
     setSettings(prev => ({ ...prev, [key]: value }));
   };
+  const setAdvSetting = (key: string, value: string) => {
+    setAdvSettings(prev => ({ ...prev, [key]: value }));
+  };
 
   const loadSample = () => {
     setDefectType(SAMPLE_DATA.defectType);
@@ -271,6 +299,7 @@ function DiagnoseContent() {
           filler, fillerContent, flameRetardant, flameRetardantType, resinDetail, resinGrade,
         },
         settings,
+        advSettings,
         moldInfo: { moldType, gateType, cavities, runnerType },
         productInfo: { weight, wallThicknessMin, wallThicknessMax, notes: productNotes },
         images: images.map(img => ({ data: img.base64, mediaType: img.mediaType })),
@@ -594,6 +623,162 @@ function DiagnoseContent() {
               ))}
             </div>
           </div>
+
+          {/* Advanced Settings Toggle */}
+          <div className="mt-5">
+            <button
+              type="button"
+              onClick={() => setShowAdvanced(!showAdvanced)}
+              className="flex items-center gap-2 text-sm font-medium text-slate-500 hover:text-slate-700 transition-colors"
+            >
+              <svg className={`w-4 h-4 transition-transform ${showAdvanced ? 'rotate-90' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              </svg>
+              고급 설정 {showAdvanced ? '접기' : '펼치기'} (V/P전환·감압·실측값·건조·핫러너·재생재·사출기 정보)
+            </button>
+
+            {showAdvanced && (
+              <div className="mt-4 space-y-5 border-t border-slate-100 pt-5">
+
+                {/* V/P 전환 & 감압 */}
+                <div>
+                  <div className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">V/P 전환 & 감압(석백)</div>
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                    {[
+                      { key: 'vpTransferPos', label: 'V/P 전환 위치', placeholder: 'mm' },
+                      { key: 'vpTransferPressure', label: 'V/P 전환 압력', placeholder: 'MPa' },
+                      { key: 'preInjectDecompDist', label: '사출 전 감압 거리', placeholder: 'mm' },
+                      { key: 'preInjectDecompSpeed', label: '사출 전 감압 속도', placeholder: 'mm/s' },
+                      { key: 'postMeterDecompDist', label: '계량 후 감압 거리', placeholder: 'mm' },
+                    ].map(({ key, label, placeholder }) => (
+                      <div key={key}>
+                        <div className="text-xs text-slate-500 mb-1">{label}</div>
+                        <input type="text" inputMode="numeric" className={inputCls} placeholder={placeholder} value={advSettings[key as keyof typeof advSettings]} onChange={(e) => setAdvSetting(key, e.target.value)} />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* 실측값 */}
+                <div>
+                  <div className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">실제 측정값 (모니터에서 읽은 값)</div>
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                    {[
+                      { key: 'actualFillTime', label: '실제 충전 시간', placeholder: 'sec' },
+                      { key: 'actualPeakPressure', label: '최대 사출압력(피크)', placeholder: 'MPa' },
+                      { key: 'actualCushion', label: '실제 쿠션량', placeholder: 'mm' },
+                      { key: 'actualCycleTime', label: '실제 사이클 타임', placeholder: 'sec' },
+                      { key: 'actualPartWeight', label: '제품 실측 중량', placeholder: 'g' },
+                    ].map(({ key, label, placeholder }) => (
+                      <div key={key}>
+                        <div className="text-xs text-slate-500 mb-1">{label}</div>
+                        <input type="text" inputMode="numeric" className={inputCls} placeholder={placeholder} value={advSettings[key as keyof typeof advSettings]} onChange={(e) => setAdvSetting(key, e.target.value)} />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* 건조 */}
+                <div>
+                  <div className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">건조 조건</div>
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                    <div>
+                      <div className="text-xs text-slate-500 mb-1">건조 온도</div>
+                      <input type="text" inputMode="numeric" className={inputCls} placeholder="℃" value={advSettings.dryTemp} onChange={(e) => setAdvSetting('dryTemp', e.target.value)} />
+                    </div>
+                    <div>
+                      <div className="text-xs text-slate-500 mb-1">건조 시간</div>
+                      <input type="text" inputMode="numeric" className={inputCls} placeholder="hr" value={advSettings.dryTime} onChange={(e) => setAdvSetting('dryTime', e.target.value)} />
+                    </div>
+                    <div>
+                      <div className="text-xs text-slate-500 mb-1">건조기 타입</div>
+                      <select className={inputCls} value={advSettings.dryerType} onChange={(e) => setAdvSetting('dryerType', e.target.value)}>
+                        {['없음', '제습식', '열풍식'].map(t => <option key={t}>{t}</option>)}
+                      </select>
+                    </div>
+                    <div>
+                      <div className="text-xs text-slate-500 mb-1">수분율 측정값</div>
+                      <input type="text" inputMode="numeric" className={inputCls} placeholder="%" value={advSettings.moistureContent} onChange={(e) => setAdvSetting('moistureContent', e.target.value)} />
+                    </div>
+                  </div>
+                </div>
+
+                {/* 핫러너 (핫러너 금형일 때) */}
+                {(moldType === '핫러너' || runnerType === '핫') && (
+                  <div>
+                    <div className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">핫러너 설정</div>
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                      {[
+                        { key: 'hrManifoldTemp', label: '매니폴드' },
+                        { key: 'hrNozzle1Temp', label: '노즐 1' },
+                        { key: 'hrNozzle2Temp', label: '노즐 2' },
+                        { key: 'hrNozzle3Temp', label: '노즐 3' },
+                        { key: 'hrNozzle4Temp', label: '노즐 4' },
+                      ].map(({ key, label }) => (
+                        <div key={key}>
+                          <div className="text-xs text-slate-500 mb-1">{label} (℃)</div>
+                          <input type="text" inputMode="numeric" className={inputCls} placeholder="℃" value={advSettings[key as keyof typeof advSettings]} onChange={(e) => setAdvSetting(key, e.target.value)} />
+                        </div>
+                      ))}
+                      <div>
+                        <div className="text-xs text-slate-500 mb-1">밸브게이트</div>
+                        <select className={inputCls} value={advSettings.valveGate} onChange={(e) => setAdvSetting('valveGate', e.target.value)}>
+                          {['없음', '있음'].map(t => <option key={t}>{t}</option>)}
+                        </select>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* 재생재/컬러 */}
+                <div>
+                  <div className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">재생재 & 컬러</div>
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                    <div>
+                      <div className="text-xs text-slate-500 mb-1">재생재 혼합 비율</div>
+                      <input type="text" inputMode="numeric" className={inputCls} placeholder="%" value={advSettings.regrindRatio} onChange={(e) => setAdvSetting('regrindRatio', e.target.value)} />
+                    </div>
+                    <div>
+                      <div className="text-xs text-slate-500 mb-1">컬러 타입</div>
+                      <select className={inputCls} value={advSettings.colorType} onChange={(e) => setAdvSetting('colorType', e.target.value)}>
+                        {['없음', '마스터배치', '액상컬러', '분체컬러'].map(t => <option key={t}>{t}</option>)}
+                      </select>
+                    </div>
+                    {advSettings.colorType !== '없음' && (
+                      <div>
+                        <div className="text-xs text-slate-500 mb-1">컬러 투입 비율</div>
+                        <input type="text" inputMode="numeric" className={inputCls} placeholder="%" value={advSettings.mbRatio} onChange={(e) => setAdvSetting('mbRatio', e.target.value)} />
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* 사출기 정보 */}
+                <div>
+                  <div className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">사출기 정보 (선택)</div>
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                    <div className="md:col-span-2">
+                      <div className="text-xs text-slate-500 mb-1">사출기 제조사/모델</div>
+                      <input type="text" className={inputCls} placeholder="예: Fanuc 100T, Engel 150" value={advSettings.machineModel} onChange={(e) => setAdvSetting('machineModel', e.target.value)} />
+                    </div>
+                    <div>
+                      <div className="text-xs text-slate-500 mb-1">스크류 직경</div>
+                      <input type="text" inputMode="numeric" className={inputCls} placeholder="mm" value={advSettings.screwDiameter} onChange={(e) => setAdvSetting('screwDiameter', e.target.value)} />
+                    </div>
+                    <div>
+                      <div className="text-xs text-slate-500 mb-1">최대 형체력</div>
+                      <input type="text" inputMode="numeric" className={inputCls} placeholder="ton" value={advSettings.maxClampForce} onChange={(e) => setAdvSetting('maxClampForce', e.target.value)} />
+                    </div>
+                    <div>
+                      <div className="text-xs text-slate-500 mb-1">최대 사출압력</div>
+                      <input type="text" inputMode="numeric" className={inputCls} placeholder="MPa" value={advSettings.maxInjPressure} onChange={(e) => setAdvSetting('maxInjPressure', e.target.value)} />
+                    </div>
+                  </div>
+                </div>
+
+              </div>
+            )}
+          </div>
         </section>
 
         {/* STEP 2c: Mold & Product Info */}
@@ -703,6 +888,37 @@ function DiagnoseContent() {
                 </button>
               </div>
               <p className="text-slate-600 text-base leading-relaxed bg-slate-50 rounded-lg p-4">{result.summary}</p>
+
+              {/* Defect phase + process window */}
+              {result.defect_phase && (
+                <div className="mt-4 flex flex-wrap gap-2">
+                  <span className="text-xs px-2 py-1 rounded-full bg-blue-100 text-blue-700 font-medium">
+                    {result.defect_phase === 'filling' ? '충전(Filling) 불량' :
+                     result.defect_phase === 'packing' ? '보압(Packing) 불량' :
+                     result.defect_phase === 'cooling' ? '냉각(Cooling) 불량' : '재료(Material) 불량'}
+                  </span>
+                </div>
+              )}
+              {result.process_window_check && (
+                <div className="mt-4">
+                  <div className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">프로세스 윈도우 체크</div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                    {Object.entries(result.process_window_check).map(([key, val]) => {
+                      if (!val) return null;
+                      const labelMap: Record<string, string> = { melt_temp: '용융 온도', mold_temp: '금형 온도', injection_speed: '사출 속도', pack_pressure: '보압', drying: '건조' };
+                      const colorMap = { ok: 'bg-green-50 border-green-200 text-green-700', warning: 'bg-amber-50 border-amber-200 text-amber-700', critical: 'bg-red-50 border-red-200 text-red-700' };
+                      const iconMap = { ok: '✓', warning: '⚠', critical: '✕' };
+                      const c = colorMap[val.status] || colorMap.warning;
+                      return (
+                        <div key={key} className={`flex items-start gap-2 text-xs p-2 rounded-lg border ${c}`}>
+                          <span className="font-bold shrink-0">{iconMap[val.status]} {labelMap[key] || key}</span>
+                          <span>{val.note}</span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* Causes */}
@@ -729,13 +945,14 @@ function DiagnoseContent() {
                       />
                     </div>
                     <span className={`inline-block text-xs px-2 py-0.5 rounded-full font-medium mb-2 ${
-                      cause.category === '건조' ? 'bg-blue-100 text-blue-700' :
-                      cause.category === '온도' ? 'bg-red-100 text-red-700' :
-                      cause.category === '압력' ? 'bg-amber-100 text-amber-700' :
-                      cause.category === '금형' ? 'bg-purple-100 text-purple-700' :
+                      cause.category?.includes('Material') || cause.category === '건조' || cause.category === '수지' ? 'bg-blue-100 text-blue-700' :
+                      cause.category?.includes('Machine') || cause.category === '온도' || cause.category === '압력' ? 'bg-red-100 text-red-700' :
+                      cause.category?.includes('Mold') || cause.category === '금형' ? 'bg-purple-100 text-purple-700' :
+                      cause.category?.includes('Method') ? 'bg-amber-100 text-amber-700' :
                       'bg-slate-100 text-slate-700'
                     }`}>{cause.category}</span>
-                    <p className="text-slate-500 text-sm">{cause.detail}</p>
+                    <p className="text-slate-600 text-sm mb-1">{cause.detail || cause.scientific_reasoning}</p>
+                    {cause.evidence && <p className="text-xs text-slate-400 bg-slate-50 rounded px-2 py-1">근거: {cause.evidence}</p>}
                   </div>
                 ))}
               </div>
@@ -801,49 +1018,69 @@ function DiagnoseContent() {
                           </div>
                         </div>
                       </div>
-                      <p className="text-xs text-slate-500">{rec.reason}</p>
+                      <p className="text-xs text-slate-500 mb-1">{rec.reason}</p>
+                      {rec.expected_result && <p className="text-xs text-green-700 bg-green-50 rounded px-2 py-1">기대 효과: {rec.expected_result}</p>}
+                      {rec.risk && <p className="text-xs text-amber-700 bg-amber-50 rounded px-2 py-1 mt-1">주의: {rec.risk}</p>}
                     </div>
                   );
                 })}
               </div>
+
+              {/* Desktop table — expected_result column */}
             </div>
 
             {/* Checklist */}
             <div className="bg-white rounded-2xl p-4 sm:p-6 shadow-sm border border-slate-200">
               <h3 className="text-lg font-bold text-[#1E293B] mb-4">현장 체크리스트</h3>
-              <div className="space-y-3">
-                {result.checklist.map((item, i) => (
-                  <label
-                    key={i}
-                    className={`flex items-start gap-3 cursor-pointer p-3 rounded-lg transition-colors ${
-                      checkedItems.has(i) ? 'bg-green-50 line-through text-slate-400' : 'hover:bg-slate-50'
-                    }`}
-                  >
-                    <input
-                      type="checkbox"
-                      className="mt-0.5 w-5 h-5 rounded accent-[#059669]"
-                      checked={checkedItems.has(i)}
-                      onChange={() => {
-                        setCheckedItems(prev => {
-                          const next = new Set(prev);
-                          if (next.has(i)) next.delete(i); else next.add(i);
-                          return next;
-                        });
-                      }}
-                    />
-                    <span className="text-sm text-slate-700">{item}</span>
-                  </label>
-                ))}
-              </div>
+              {Array.isArray(result.checklist) ? (
+                <div className="space-y-2">
+                  {(result.checklist as string[]).map((item, i) => (
+                    <label key={i} className={`flex items-start gap-3 cursor-pointer p-3 rounded-lg transition-colors ${checkedItems.has(i) ? 'bg-green-50 line-through text-slate-400' : 'hover:bg-slate-50'}`}>
+                      <input type="checkbox" className="mt-0.5 w-5 h-5 rounded accent-[#059669]" checked={checkedItems.has(i)} onChange={() => { setCheckedItems(prev => { const n = new Set(prev); n.has(i) ? n.delete(i) : n.add(i); return n; }); }} />
+                      <span className="text-sm text-slate-700">{item}</span>
+                    </label>
+                  ))}
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {[
+                    { key: 'before_changes', label: '변경 전 확인', color: 'text-blue-700', bg: 'bg-blue-50', border: 'border-blue-200' },
+                    { key: 'after_changes', label: '변경 후 모니터링', color: 'text-green-700', bg: 'bg-green-50', border: 'border-green-200' },
+                    { key: 'escalation', label: '에스컬레이션 기준', color: 'text-red-700', bg: 'bg-red-50', border: 'border-red-200' },
+                  ].map(({ key, label, color, bg, border }) => {
+                    const items = (result.checklist as Record<string, string[]>)[key] || [];
+                    if (!items.length) return null;
+                    return (
+                      <div key={key} className={`rounded-xl p-3 border ${bg} ${border}`}>
+                        <div className={`text-xs font-bold uppercase tracking-wider mb-2 ${color}`}>{label}</div>
+                        <div className="space-y-1">
+                          {items.map((item, i) => (
+                            <div key={i} className="flex items-start gap-2 text-sm text-slate-700">
+                              <span className={`shrink-0 font-bold ${color}`}>·</span>
+                              <span>{item}</span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
             </div>
 
             {/* Additional Notes */}
-            {(result.resin_specific_notes || result.additional_advice) && (
-              <div className="bg-[#1E293B] text-white rounded-2xl p-6">
+            {(result.resin_specific_notes || result.drying_assessment || result.additional_advice) && (
+              <div className="bg-[#1E293B] text-white rounded-2xl p-4 sm:p-6 space-y-4">
                 {result.resin_specific_notes && (
-                  <div className="mb-4">
+                  <div>
                     <h3 className="font-bold text-[#34D399] mb-2">수지 특성 주의사항</h3>
                     <p className="text-slate-300 text-sm leading-relaxed">{result.resin_specific_notes}</p>
+                  </div>
+                )}
+                {result.drying_assessment && (
+                  <div>
+                    <h3 className="font-bold text-blue-400 mb-2">건조 조건 평가</h3>
+                    <p className="text-slate-300 text-sm leading-relaxed">{result.drying_assessment}</p>
                   </div>
                 )}
                 {result.additional_advice && (
