@@ -78,14 +78,14 @@ export default function HomePage() {
   return (
     <div>
       {/* Hero Section */}
-      <section className="bg-gradient-to-br from-[#1E293B] to-[#0F172A] text-white py-20 px-4">
-        <div className="max-w-7xl mx-auto grid md:grid-cols-2 gap-12 items-center">
+      <section className="bg-gradient-to-br from-[#1E293B] to-[#0F172A] text-white py-14 sm:py-20 px-4">
+        <div className="max-w-7xl mx-auto grid md:grid-cols-2 gap-10 md:gap-12 items-center">
           <div>
-            <div className="inline-flex items-center gap-2 bg-[#059669]/20 text-[#34D399] text-sm font-medium px-3 py-1 rounded-full mb-6">
+            <div className="inline-flex items-center gap-2 bg-[#059669]/20 text-[#34D399] text-sm font-medium px-3 py-1 rounded-full mb-5">
               <span className="w-2 h-2 bg-[#34D399] rounded-full animate-pulse"></span>
               AI 기반 실시간 진단
             </div>
-            <h1 className="text-4xl md:text-5xl font-bold leading-tight mb-6">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold leading-tight mb-5">
               사출 불량,{' '}
               <span className="text-[#34D399]">사진 한 장이면</span>{' '}
               원인을 찾아드립니다

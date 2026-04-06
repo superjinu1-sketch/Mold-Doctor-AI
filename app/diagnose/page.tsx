@@ -327,7 +327,7 @@ function DiagnoseContent() {
   const labelCls = "block text-sm font-medium text-slate-700 mb-1";
 
   return (
-    <div className="max-w-5xl mx-auto px-4 py-8">
+    <div className="max-w-5xl mx-auto px-3 sm:px-4 py-6 sm:py-8">
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-[#1E293B] mb-2">사출 불량 AI 진단</h1>
         <p className="text-slate-500">불량 정보와 성형 조건을 입력하면 AI가 원인과 해결책을 알려드립니다.</p>
@@ -348,7 +348,7 @@ function DiagnoseContent() {
 
       <div className="space-y-6">
         {/* STEP 1: Defect Info */}
-        <section className="bg-white rounded-2xl p-6 shadow-sm border border-slate-200">
+        <section className="bg-white rounded-2xl p-4 sm:p-6 shadow-sm border border-slate-200">
           <h2 className="text-lg font-bold text-[#1E293B] mb-5 flex items-center gap-2">
             <span className="bg-[#059669] text-white w-7 h-7 rounded-full flex items-center justify-center text-sm font-bold">1</span>
             불량 정보 입력
@@ -358,7 +358,7 @@ function DiagnoseContent() {
           <div className="mb-5">
             <label className={labelCls}>불량 사진 업로드 (최대 5장)</label>
             <div
-              className={`border-2 border-dashed rounded-xl p-8 text-center cursor-pointer transition-colors ${
+              className={`border-2 border-dashed rounded-xl p-5 sm:p-8 text-center cursor-pointer transition-colors ${
                 isDragging ? 'border-[#059669] bg-green-50' : 'border-slate-300 hover:border-[#059669]'
               }`}
               onDragOver={(e) => { e.preventDefault(); setIsDragging(true); }}
@@ -400,7 +400,7 @@ function DiagnoseContent() {
           {/* Defect type */}
           <div className="mb-4">
             <label className={labelCls}>불량 유형 선택 (선택 사항 — AI가 사진으로 판단)</label>
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
               {DEFECT_TYPES.map((type) => (
                 <button
                   key={type}
@@ -439,7 +439,7 @@ function DiagnoseContent() {
         </section>
 
         {/* STEP 2: Resin Info */}
-        <section className="bg-white rounded-2xl p-6 shadow-sm border border-slate-200">
+        <section className="bg-white rounded-2xl p-4 sm:p-6 shadow-sm border border-slate-200">
           <h2 className="text-lg font-bold text-[#1E293B] mb-5 flex items-center gap-2">
             <span className="bg-[#059669] text-white w-7 h-7 rounded-full flex items-center justify-center text-sm font-bold">2</span>
             수지 정보
@@ -499,8 +499,8 @@ function DiagnoseContent() {
         </section>
 
         {/* STEP 2b: Machine Settings */}
-        <section className="bg-white rounded-2xl p-6 shadow-sm border border-slate-200">
-          <div className="flex items-center justify-between mb-5">
+        <section className="bg-white rounded-2xl p-4 sm:p-6 shadow-sm border border-slate-200">
+          <div className="flex flex-wrap items-center justify-between gap-3 mb-5">
             <h2 className="text-lg font-bold text-[#1E293B] flex items-center gap-2">
               <span className="bg-[#059669] text-white w-7 h-7 rounded-full flex items-center justify-center text-sm font-bold">3</span>
               사출기 셋팅값
@@ -509,7 +509,7 @@ function DiagnoseContent() {
               type="button"
               onClick={() => settingsImageRef.current?.click()}
               disabled={isExtractingSettings}
-              className="flex items-center gap-2 bg-blue-50 hover:bg-blue-100 disabled:bg-slate-100 text-blue-700 disabled:text-slate-400 border border-blue-300 disabled:border-slate-200 px-3 py-2 rounded-lg text-sm font-medium transition-colors"
+              className="flex items-center gap-2 bg-blue-50 hover:bg-blue-100 disabled:bg-slate-100 text-blue-700 disabled:text-slate-400 border border-blue-300 disabled:border-slate-200 px-3 py-2 rounded-lg text-sm font-medium transition-colors whitespace-nowrap"
             >
               {isExtractingSettings ? (
                 <>
@@ -546,7 +546,7 @@ function DiagnoseContent() {
           <div className="space-y-5">
             <div>
               <label className={labelCls}>사출 온도 (℃)</label>
-              <div className="grid grid-cols-5 gap-2">
+              <div className="grid grid-cols-3 sm:grid-cols-5 gap-2">
                 {[
                   { key: 'nozzleTemp', label: '노즐' },
                   { key: 'zone1Temp', label: 'Zone1' },
@@ -572,7 +572,7 @@ function DiagnoseContent() {
                 ))}
               </div>
             </div>
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
               {[
                 { key: 'injPressure1', label: '사출압력 1차', placeholder: 'MPa' },
                 { key: 'holdPressure', label: '보압', placeholder: 'MPa' },
@@ -597,7 +597,7 @@ function DiagnoseContent() {
         </section>
 
         {/* STEP 2c: Mold & Product Info */}
-        <section className="bg-white rounded-2xl p-6 shadow-sm border border-slate-200">
+        <section className="bg-white rounded-2xl p-4 sm:p-6 shadow-sm border border-slate-200">
           <h2 className="text-lg font-bold text-[#1E293B] mb-5 flex items-center gap-2">
             <span className="bg-slate-400 text-white w-7 h-7 rounded-full flex items-center justify-center text-sm font-bold">4</span>
             금형 & 제품 정보 <span className="text-slate-400 text-sm font-normal">(선택)</span>
@@ -681,12 +681,12 @@ function DiagnoseContent() {
         {result && (
           <div ref={resultRef} className="space-y-5">
             {/* Summary Card */}
-            <div className="bg-white rounded-2xl p-6 shadow-sm border border-slate-200">
-              <div className="flex items-start justify-between mb-4">
+            <div className="bg-white rounded-2xl p-4 sm:p-6 shadow-sm border border-slate-200">
+              <div className="flex flex-wrap items-start justify-between gap-3 mb-4">
                 <div>
-                  <h2 className="text-2xl font-bold text-[#1E293B]">
+                  <h2 className="text-xl sm:text-2xl font-bold text-[#1E293B]">
                     {result.defect_type.ko}
-                    <span className="text-slate-400 text-base font-normal ml-2">({result.defect_type.en})</span>
+                    <span className="text-slate-400 text-sm sm:text-base font-normal ml-2">({result.defect_type.en})</span>
                   </h2>
                   <div className="flex items-center gap-3 mt-2">
                     <SeverityBadge severity={result.severity} />
@@ -694,7 +694,7 @@ function DiagnoseContent() {
                 </div>
                 <button
                   onClick={handleSavePDF}
-                  className="flex items-center gap-2 bg-[#1E293B] hover:bg-slate-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+                  className="flex items-center gap-2 bg-[#1E293B] hover:bg-slate-700 text-white px-3 py-2 rounded-lg text-sm font-medium transition-colors whitespace-nowrap"
                 >
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
@@ -706,19 +706,19 @@ function DiagnoseContent() {
             </div>
 
             {/* Causes */}
-            <div className="bg-white rounded-2xl p-6 shadow-sm border border-slate-200">
+            <div className="bg-white rounded-2xl p-4 sm:p-6 shadow-sm border border-slate-200">
               <h3 className="text-lg font-bold text-[#1E293B] mb-4">원인 분석</h3>
               <div className="space-y-4">
                 {result.causes.map((cause) => (
                   <div key={cause.rank} className="border border-slate-200 rounded-xl p-4">
-                    <div className="flex items-center justify-between mb-3">
-                      <div className="flex items-center gap-3">
-                        <span className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold text-white ${
+                    <div className="flex items-start justify-between gap-2 mb-3">
+                      <div className="flex items-center gap-2 flex-1 min-w-0">
+                        <span className={`shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold text-white ${
                           cause.rank === 1 ? 'bg-red-500' : cause.rank === 2 ? 'bg-amber-500' : 'bg-slate-400'
                         }`}>{cause.rank}</span>
-                        <span className="font-semibold text-slate-700">{cause.description}</span>
+                        <span className="font-semibold text-slate-700 text-sm sm:text-base">{cause.description}</span>
                       </div>
-                      <span className={`text-sm font-bold px-2 py-1 rounded ${
+                      <span className={`shrink-0 text-sm font-bold px-2 py-1 rounded ${
                         cause.rank === 1 ? 'bg-red-50 text-red-600' : cause.rank === 2 ? 'bg-amber-50 text-amber-600' : 'bg-slate-50 text-slate-600'
                       }`}>{cause.probability}%</span>
                     </div>
@@ -741,10 +741,12 @@ function DiagnoseContent() {
               </div>
             </div>
 
-            {/* Recommendations Table */}
-            <div className="bg-white rounded-2xl p-6 shadow-sm border border-slate-200">
+            {/* Recommendations */}
+            <div className="bg-white rounded-2xl p-4 sm:p-6 shadow-sm border border-slate-200">
               <h3 className="text-lg font-bold text-[#1E293B] mb-4">해결 방안 — 셋팅 비교</h3>
-              <div className="overflow-x-auto">
+
+              {/* Desktop table */}
+              <div className="hidden sm:block overflow-x-auto">
                 <table className="w-full text-sm">
                   <thead>
                     <tr className="bg-slate-50 text-slate-600">
@@ -774,10 +776,40 @@ function DiagnoseContent() {
                   </tbody>
                 </table>
               </div>
+
+              {/* Mobile cards */}
+              <div className="sm:hidden space-y-3">
+                {result.recommendations.map((rec, i) => {
+                  const changed = rec.current !== rec.recommended && rec.direction !== 'same';
+                  return (
+                    <div key={i} className={`rounded-xl p-3 border ${changed ? 'bg-amber-50 border-amber-200' : 'bg-slate-50 border-slate-200'}`}>
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="font-semibold text-slate-700 text-sm">{rec.parameter}</span>
+                        {changed && <span className="text-xs bg-amber-200 text-amber-800 px-2 py-0.5 rounded-full font-medium">변경 필요</span>}
+                      </div>
+                      <div className="flex items-center gap-3 mb-2">
+                        <div className="flex-1 text-center bg-white rounded-lg p-2 border border-slate-200">
+                          <div className="text-xs text-slate-400 mb-0.5">현재값</div>
+                          <div className="text-sm text-slate-600 font-medium">{rec.current || '-'}</div>
+                        </div>
+                        <div className="text-slate-400">→</div>
+                        <div className="flex-1 text-center bg-white rounded-lg p-2 border border-[#059669]/30">
+                          <div className="text-xs text-slate-400 mb-0.5">권장값</div>
+                          <div className="text-sm font-bold text-[#1E293B] flex items-center justify-center gap-1">
+                            <DirectionArrow direction={rec.direction} />
+                            {rec.recommended}
+                          </div>
+                        </div>
+                      </div>
+                      <p className="text-xs text-slate-500">{rec.reason}</p>
+                    </div>
+                  );
+                })}
+              </div>
             </div>
 
             {/* Checklist */}
-            <div className="bg-white rounded-2xl p-6 shadow-sm border border-slate-200">
+            <div className="bg-white rounded-2xl p-4 sm:p-6 shadow-sm border border-slate-200">
               <h3 className="text-lg font-bold text-[#1E293B] mb-4">현장 체크리스트</h3>
               <div className="space-y-3">
                 {result.checklist.map((item, i) => (
