@@ -141,6 +141,7 @@ function DiagnoseContent() {
   const [wallThicknessMax, setWallThicknessMax] = useState('');
   const [productNotes, setProductNotes] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [streamText, setStreamText] = useState('');
   const [result, setResult] = useState<DiagnosisResult | null>(null);
   const [error, setError] = useState('');
   const [checkedItems, setCheckedItems] = useState<Set<number>>(new Set());
@@ -302,6 +303,7 @@ function DiagnoseContent() {
 
   const handleDiagnose = async () => {
     setIsLoading(true);
+    setStreamText('');
     setError('');
     setResult(null);
     setCheckedItems(new Set());
@@ -333,8 +335,28 @@ function DiagnoseContent() {
         throw new Error(err.error || '진단 실패');
       }
 
-      const data = await res.json();
+      // Stream reading
+      const reader = res.body?.getReader();
+      const decoder = new TextDecoder();
+      let accumulated = '';
+
+      if (reader) {
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          const chunk = decoder.decode(value, { stream: true });
+          accumulated += chunk;
+          setStreamText(accumulated);
+        }
+      }
+
+      // Parse final JSON
+      let jsonText = accumulated.trim()
+        .replace(/^```json\s*/i, '').replace(/\s*```$/, '')
+        .replace(/^```\s*/i, '').replace(/\s*```$/, '');
+      const data = JSON.parse(jsonText);
       setResult(data);
+      setStreamText('');
 
       // Save to localStorage
       const history = JSON.parse(localStorage.getItem('diagnoseHistory') || '[]');
@@ -923,6 +945,23 @@ function DiagnoseContent() {
         {error && (
           <div className="bg-red-50 border border-red-300 text-red-700 rounded-xl p-4 text-sm">
             {error}
+          </div>
+        )}
+
+        {/* Streaming progress */}
+        {isLoading && streamText && (
+          <div className="bg-white rounded-2xl p-4 sm:p-6 shadow-sm border border-slate-200">
+            <div className="flex items-center gap-2 mb-3">
+              <svg className="animate-spin w-4 h-4 text-[#059669]" fill="none" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
+              </svg>
+              <span className="text-sm font-medium text-[#059669]">AI 분석 중...</span>
+            </div>
+            <div className="text-xs text-slate-400 font-mono bg-slate-50 rounded-lg p-3 max-h-32 overflow-hidden relative">
+              <div className="line-clamp-6">{streamText.slice(-500)}</div>
+              <div className="absolute bottom-0 left-0 right-0 h-8 bg-gradient-to-t from-slate-50 to-transparent" />
+            </div>
           </div>
         )}
 

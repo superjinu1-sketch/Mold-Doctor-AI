@@ -247,29 +247,39 @@ JSON 형식으로만 응답하세요. 마크다운 코드 블록 없이 순수 J
     userContent.push({ type: 'text', text: diagnosisText });
 
     const client = new Anthropic({ apiKey: getApiKey() });
-    const response = await client.messages.create({
-      model: 'claude-sonnet-4-6',
-      max_tokens: 8192,
-      system: SYSTEM_PROMPT,
-      messages: [{ role: 'user', content: userContent }],
+
+    const encoder = new TextEncoder();
+    const stream = new ReadableStream({
+      async start(controller) {
+        try {
+          const anthropicStream = client.messages.stream({
+            model: 'claude-sonnet-4-6',
+            max_tokens: 5000,
+            system: SYSTEM_PROMPT,
+            messages: [{ role: 'user', content: userContent }],
+          });
+
+          for await (const chunk of anthropicStream) {
+            if (chunk.type === 'content_block_delta' && chunk.delta.type === 'text_delta') {
+              controller.enqueue(encoder.encode(chunk.delta.text));
+            }
+          }
+          controller.close();
+        } catch (err) {
+          controller.error(err);
+        }
+      },
     });
 
-    const textBlock = response.content.find((b) => b.type === 'text');
-    if (!textBlock || textBlock.type !== 'text') {
-      return NextResponse.json({ error: '응답을 받지 못했습니다.' }, { status: 500 });
-    }
-
-    let jsonText = textBlock.text.trim();
-    jsonText = jsonText.replace(/^```json\s*/i, '').replace(/\s*```$/, '');
-    jsonText = jsonText.replace(/^```\s*/i, '').replace(/\s*```$/, '');
-
-    const result = JSON.parse(jsonText);
-    return NextResponse.json(result);
+    return new Response(stream, {
+      headers: {
+        'Content-Type': 'text/plain; charset=utf-8',
+        'Transfer-Encoding': 'chunked',
+        'X-Content-Type-Options': 'nosniff',
+      },
+    });
   } catch (error) {
     console.error('Diagnose API error:', error);
-    if (error instanceof SyntaxError) {
-      return NextResponse.json({ error: 'AI 응답 파싱 오류가 발생했습니다.' }, { status: 500 });
-    }
     return NextResponse.json(
       { error: error instanceof Error ? error.message : '진단 중 오류가 발생했습니다.' },
       { status: 500 }
