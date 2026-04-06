@@ -124,8 +124,46 @@ function DiagnoseContent() {
   const [error, setError] = useState('');
   const [checkedItems, setCheckedItems] = useState<Set<number>>(new Set());
   const [isDragging, setIsDragging] = useState(false);
+  const [isExtractingSettings, setIsExtractingSettings] = useState(false);
+  const [extractMsg, setExtractMsg] = useState('');
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const settingsImageRef = useRef<HTMLInputElement>(null);
   const resultRef = useRef<HTMLDivElement>(null);
+
+  const handleSettingsImage = async (file: File) => {
+    if (!file.type.startsWith('image/')) return;
+    setIsExtractingSettings(true);
+    setExtractMsg('');
+    try {
+      const base64 = await new Promise<string>((resolve) => {
+        const reader = new FileReader();
+        reader.onload = (e) => resolve((e.target?.result as string).split(',')[1]);
+        reader.readAsDataURL(file);
+      });
+      const res = await fetch('/api/extract-settings', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ image: { data: base64, mediaType: file.type } }),
+      });
+      if (!res.ok) throw new Error('추출 실패');
+      const extracted = await res.json();
+      setSettings(prev => {
+        const updated = { ...prev };
+        for (const key of Object.keys(extracted)) {
+          if (key in updated && extracted[key]) {
+            (updated as Record<string, string>)[key] = extracted[key];
+          }
+        }
+        return updated;
+      });
+      const filled = Object.values(extracted).filter(Boolean).length;
+      setExtractMsg(`✓ ${filled}개 항목을 자동으로 입력했습니다.`);
+    } catch {
+      setExtractMsg('추출 실패. 사출기 화면이 잘 보이는 사진을 사용해주세요.');
+    } finally {
+      setIsExtractingSettings(false);
+    }
+  };
 
   // Pre-select defect type from URL param
   useEffect(() => {
@@ -462,10 +500,49 @@ function DiagnoseContent() {
 
         {/* STEP 2b: Machine Settings */}
         <section className="bg-white rounded-2xl p-6 shadow-sm border border-slate-200">
-          <h2 className="text-lg font-bold text-[#1E293B] mb-5 flex items-center gap-2">
-            <span className="bg-[#059669] text-white w-7 h-7 rounded-full flex items-center justify-center text-sm font-bold">3</span>
-            사출기 셋팅값
-          </h2>
+          <div className="flex items-center justify-between mb-5">
+            <h2 className="text-lg font-bold text-[#1E293B] flex items-center gap-2">
+              <span className="bg-[#059669] text-white w-7 h-7 rounded-full flex items-center justify-center text-sm font-bold">3</span>
+              사출기 셋팅값
+            </h2>
+            <button
+              type="button"
+              onClick={() => settingsImageRef.current?.click()}
+              disabled={isExtractingSettings}
+              className="flex items-center gap-2 bg-blue-50 hover:bg-blue-100 disabled:bg-slate-100 text-blue-700 disabled:text-slate-400 border border-blue-300 disabled:border-slate-200 px-3 py-2 rounded-lg text-sm font-medium transition-colors"
+            >
+              {isExtractingSettings ? (
+                <>
+                  <svg className="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
+                  </svg>
+                  읽는 중...
+                </>
+              ) : (
+                <>
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/>
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/>
+                  </svg>
+                  사진으로 자동 입력
+                </>
+              )}
+            </button>
+            <input
+              ref={settingsImageRef}
+              type="file"
+              accept="image/*"
+              capture="environment"
+              className="hidden"
+              onChange={(e) => e.target.files?.[0] && handleSettingsImage(e.target.files[0])}
+            />
+          </div>
+          {extractMsg && (
+            <div className={`mb-4 text-sm px-3 py-2 rounded-lg ${extractMsg.startsWith('✓') ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-600'}`}>
+              {extractMsg}
+            </div>
+          )}
           <div className="space-y-5">
             <div>
               <label className={labelCls}>사출 온도 (℃)</label>
