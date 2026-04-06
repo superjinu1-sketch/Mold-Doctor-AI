@@ -48,6 +48,12 @@ interface DiagnosisResult {
   resin_specific_notes: string;
   drying_assessment?: string;
   additional_advice?: string;
+  mold_analysis?: {
+    gate_assessment: string;
+    cooling_assessment: string;
+    design_risk_factors: string[];
+    recommendations: string[];
+  };
 }
 
 // --- Constants ---
@@ -148,11 +154,14 @@ function DiagnoseContent() {
     regrindRatio: '', colorType: '없음', mbRatio: '',
     machineModel: '', screwDiameter: '', maxClampForce: '', maxInjPressure: '',
   });
+  const [moldDrawings, setMoldDrawings] = useState<ImageFile[]>([]);
+  const [isDraggingDrawing, setIsDraggingDrawing] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
   const [isExtractingSettings, setIsExtractingSettings] = useState(false);
   const [extractMsg, setExtractMsg] = useState('');
   const fileInputRef = useRef<HTMLInputElement>(null);
   const settingsImageRef = useRef<HTMLInputElement>(null);
+  const moldDrawingInputRef = useRef<HTMLInputElement>(null);
   const resultRef = useRef<HTMLDivElement>(null);
 
   const handleSettingsImage = async (file: File) => {
@@ -200,7 +209,7 @@ function DiagnoseContent() {
   }, [searchParams]);
 
   const processFile = useCallback(async (file: File): Promise<ImageFile | null> => {
-    if (!file.type.startsWith('image/')) return null;
+    if (!file.type.startsWith('image/') && file.type !== 'application/pdf') return null;
     return new Promise((resolve) => {
       const reader = new FileReader();
       reader.onload = (e) => {
@@ -209,7 +218,7 @@ function DiagnoseContent() {
         resolve({
           id: Math.random().toString(36).slice(2),
           file,
-          preview: dataUrl,
+          preview: file.type === 'application/pdf' ? '' : dataUrl,
           base64,
           mediaType: file.type,
         });
@@ -217,6 +226,13 @@ function DiagnoseContent() {
       reader.readAsDataURL(file);
     });
   }, []);
+
+  const addMoldDrawings = useCallback(async (files: FileList | File[]) => {
+    const fileArray = Array.from(files).filter(f => f.type.startsWith('image/') || f.type === 'application/pdf');
+    const processed = await Promise.all(fileArray.map(processFile));
+    const valid = processed.filter(Boolean) as ImageFile[];
+    setMoldDrawings(prev => [...prev, ...valid].slice(0, 3));
+  }, [processFile]);
 
   const addImages = useCallback(async (files: FileList | File[]) => {
     const fileArray = Array.from(files);
@@ -303,6 +319,7 @@ function DiagnoseContent() {
         moldInfo: { moldType, gateType, cavities, runnerType },
         productInfo: { weight, wallThicknessMin, wallThicknessMax, notes: productNotes },
         images: images.map(img => ({ data: img.base64, mediaType: img.mediaType })),
+        moldDrawings: moldDrawings.map(img => ({ data: img.base64, mediaType: img.mediaType })),
       };
 
       const res = await fetch('/api/diagnose', {
@@ -829,6 +846,53 @@ function DiagnoseContent() {
               <label className={labelCls}>제품 특이사항</label>
               <input type="text" className={inputCls} placeholder="예: 인서트, 이중사출, 보스, 리브 등" value={productNotes} onChange={(e) => setProductNotes(e.target.value)} />
             </div>
+
+            {/* Mold Drawing Upload */}
+            <div className="sm:col-span-2 mt-2">
+              <label className={labelCls}>금형 도면 업로드 <span className="text-slate-400 font-normal">(선택 · 최대 3장)</span></label>
+              <div
+                className={`border-2 border-dashed rounded-xl p-4 sm:p-5 text-center cursor-pointer transition-colors ${
+                  isDraggingDrawing ? 'border-[#059669] bg-green-50' : 'border-slate-300 hover:border-[#059669]'
+                }`}
+                onDragOver={(e) => { e.preventDefault(); setIsDraggingDrawing(true); }}
+                onDragLeave={() => setIsDraggingDrawing(false)}
+                onDrop={(e) => { e.preventDefault(); setIsDraggingDrawing(false); addMoldDrawings(e.dataTransfer.files); }}
+                onClick={() => moldDrawingInputRef.current?.click()}
+              >
+                <svg className="w-8 h-8 mx-auto mb-2 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+                <p className="text-slate-600 text-sm font-medium">금형 도면, 제품 3D 캡처, 게이트/러너 레이아웃 이미지를 올려주세요</p>
+                <p className="text-slate-400 text-xs mt-1">AI가 금형 구조를 분석하여 불량 원인 진단에 반영합니다 · JPG, PNG, PDF</p>
+                <input
+                  ref={moldDrawingInputRef}
+                  type="file"
+                  accept="image/*,application/pdf"
+                  multiple
+                  className="hidden"
+                  onChange={(e) => e.target.files && addMoldDrawings(e.target.files)}
+                />
+              </div>
+              {moldDrawings.length > 0 && (
+                <div className="flex gap-2 mt-2 flex-wrap">
+                  {moldDrawings.map((d) => (
+                    <div key={d.id} className="relative flex items-center gap-1 bg-slate-100 rounded-lg px-2 py-1.5 border border-slate-200">
+                      {d.preview ? (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img src={d.preview} alt="도면" className="w-10 h-10 object-cover rounded" />
+                      ) : (
+                        <div className="w-10 h-10 bg-red-100 rounded flex items-center justify-center text-xs font-bold text-red-600">PDF</div>
+                      )}
+                      <span className="text-xs text-slate-600 max-w-[80px] truncate">{d.file.name}</span>
+                      <button
+                        onClick={(e) => { e.stopPropagation(); setMoldDrawings(prev => prev.filter(x => x.id !== d.id)); }}
+                        className="ml-1 text-slate-400 hover:text-red-500"
+                      >×</button>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
         </section>
 
@@ -1067,6 +1131,58 @@ function DiagnoseContent() {
                 </div>
               )}
             </div>
+
+            {/* Mold Analysis */}
+            {result.mold_analysis && (
+              <div className="bg-white rounded-2xl p-4 sm:p-6 shadow-sm border border-purple-200">
+                <h3 className="text-lg font-bold text-[#1E293B] mb-4 flex items-center gap-2">
+                  <svg className="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                  </svg>
+                  금형 도면 분석
+                </h3>
+                <div className="space-y-3">
+                  {result.mold_analysis.gate_assessment && (
+                    <div className="bg-purple-50 rounded-xl p-3 border border-purple-100">
+                      <div className="text-xs font-bold text-purple-700 uppercase tracking-wider mb-1">게이트 평가</div>
+                      <p className="text-sm text-slate-700">{result.mold_analysis.gate_assessment}</p>
+                    </div>
+                  )}
+                  {result.mold_analysis.cooling_assessment && (
+                    <div className="bg-blue-50 rounded-xl p-3 border border-blue-100">
+                      <div className="text-xs font-bold text-blue-700 uppercase tracking-wider mb-1">냉각 효율 평가</div>
+                      <p className="text-sm text-slate-700">{result.mold_analysis.cooling_assessment}</p>
+                    </div>
+                  )}
+                  {result.mold_analysis.design_risk_factors?.length > 0 && (
+                    <div className="bg-amber-50 rounded-xl p-3 border border-amber-100">
+                      <div className="text-xs font-bold text-amber-700 uppercase tracking-wider mb-2">설계 위험 요소</div>
+                      <div className="space-y-1">
+                        {result.mold_analysis.design_risk_factors.map((r, i) => (
+                          <div key={i} className="flex items-start gap-2 text-sm text-slate-700">
+                            <span className="shrink-0 text-amber-500 font-bold">!</span>
+                            <span>{r}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                  {result.mold_analysis.recommendations?.length > 0 && (
+                    <div className="bg-green-50 rounded-xl p-3 border border-green-100">
+                      <div className="text-xs font-bold text-green-700 uppercase tracking-wider mb-2">금형 수정 제안</div>
+                      <div className="space-y-1">
+                        {result.mold_analysis.recommendations.map((r, i) => (
+                          <div key={i} className="flex items-start gap-2 text-sm text-slate-700">
+                            <span className="shrink-0 text-green-600 font-bold">→</span>
+                            <span>{r}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
 
             {/* Additional Notes */}
             {(result.resin_specific_notes || result.drying_assessment || result.additional_advice) && (

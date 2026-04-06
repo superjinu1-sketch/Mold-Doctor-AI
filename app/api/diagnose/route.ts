@@ -72,6 +72,14 @@ CRITICAL RULES:
 5. For GF-reinforced grades, always consider fiber orientation effects on warpage and weld line strength.
 6. For hot runner molds, check for temperature uniformity across zones and dead spots.
 7. Respond in Korean. Technical terms can be in English with Korean explanation.
+8. MOLD DRAWING ANALYSIS — if mold drawings/CAD images are provided, analyze:
+   - Gate location: relationship between gate position and defect location (distance, flow path length)
+   - Runner balance: for multi-cavity molds, assess filling balance risk
+   - Cooling channels: cooling efficiency near the defect area
+   - Wall thickness variation: abrupt thickness changes and their relation to defect location
+   - Vent locations: adequacy of gas escape paths, trapped air risk
+   - Ejector positions: relation to ejection-related defects (crack, whitening, warpage)
+   Include mold analysis results in the 'mold_analysis' field of the JSON output.
 
 OUTPUT FORMAT (return as JSON only, no markdown):
 {
@@ -115,17 +123,23 @@ OUTPUT FORMAT (return as JSON only, no markdown):
     "escalation": ["3회 조정 후에도 해결 안 될 경우 고려할 사항"]
   },
   "resin_specific_notes": "이 수지 특성상 주의할 점",
-  "drying_assessment": "건조 조건 평가 (건조 데이터가 제공된 경우)"
+  "drying_assessment": "건조 조건 평가 (건조 데이터가 제공된 경우)",
+  "mold_analysis": {
+    "gate_assessment": "게이트 위치/크기 평가 (도면 제공 시)",
+    "cooling_assessment": "냉각 효율 평가 (도면 제공 시)",
+    "design_risk_factors": ["설계상 위험 요소들"],
+    "recommendations": ["금형 수정 제안 — 있을 경우"]
+  }
 }`;
 
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { defectType, defectDescription, resinInfo, settings, advSettings, moldInfo, productInfo, images } = body;
+    const { defectType, defectDescription, resinInfo, settings, advSettings, moldInfo, productInfo, images, moldDrawings } = body;
 
     const userContent: Anthropic.MessageParam['content'] = [];
 
-    // Add images if provided
+    // Add defect images
     if (images && images.length > 0) {
       for (const img of images) {
         userContent.push({
@@ -136,6 +150,32 @@ export async function POST(request: NextRequest) {
             data: img.data,
           },
         });
+      }
+    }
+
+    // Add mold drawings (images or PDFs)
+    if (moldDrawings && moldDrawings.length > 0) {
+      userContent.push({ type: 'text', text: '--- 아래는 금형 도면/레이아웃 이미지입니다 ---' });
+      for (const drawing of moldDrawings) {
+        if (drawing.mediaType === 'application/pdf') {
+          userContent.push({
+            type: 'document',
+            source: {
+              type: 'base64',
+              media_type: 'application/pdf',
+              data: drawing.data,
+            },
+          } as Anthropic.Messages.DocumentBlockParam);
+        } else {
+          userContent.push({
+            type: 'image',
+            source: {
+              type: 'base64',
+              media_type: drawing.mediaType as 'image/jpeg' | 'image/png' | 'image/gif' | 'image/webp',
+              data: drawing.data,
+            },
+          });
+        }
       }
     }
 
