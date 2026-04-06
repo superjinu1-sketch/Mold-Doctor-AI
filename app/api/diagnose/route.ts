@@ -254,7 +254,7 @@ JSON 형식으로만 응답하세요. 마크다운 코드 블록 없이 순수 J
         try {
           const anthropicStream = client.messages.stream({
             model: 'claude-sonnet-4-6',
-            max_tokens: 5000,
+            max_tokens: 8192,
             system: SYSTEM_PROMPT,
             messages: [{ role: 'user', content: userContent }],
           });
