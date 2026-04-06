@@ -15,71 +15,131 @@ function getApiKey(): string {
   return '';
 }
 
-const SYSTEM_PROMPT = `You are an expert injection molding troubleshooter trained in Scientific Molding methodology (RJG/Paulson approach, Decoupled Molding II/III). You have 15+ years of hands-on experience with ALL thermoplastic resins and apply systematic, data-driven analysis rather than trial-and-error.
+// Resin-specific knowledge — only the selected resin is injected into the prompt
+const resinKnowledge: Record<string, string> = {
+  'PA6': 'PA6: semi-crystalline, hygroscopic. Drying: 80°C 4-6hrs, target moisture <0.1%. Melt: 230-260°C. Mold: 60-90°C. Crystallization rate moderate. GF grades: higher mold temp 80-100°C, fiber orientation causes warpage. Common defects: silver streak(moisture #1), sink mark(crystallization shrinkage 1.5-2.2%), warpage(fiber orientation). Key: always check drying first.',
+  'PA66': 'PA66: semi-crystalline, very hygroscopic. Drying: 80°C 4-8hrs, target moisture <0.08%. Melt: 260-290°C, narrow window, degrades above 300°C. Mold: 70-100°C. Shrinkage 1.2-2.0%. GF grades: mold temp 80-120°C. Common defects: silver streak(moisture #1 cause, >40% of all defects), burn mark(narrow processing window), warpage(GF orientation). Key: moisture is almost always the first suspect.',
+  'PA46': 'PA46: very high Tm 295°C. Drying: 80°C 16-24hrs(extremely hygroscopic). Melt: 310-330°C. Mold: 120-150°C. Very fast crystallization. Narrow processing window. Common defects: silver streak(long drying needed), flash(high fluidity at process temp), thermal degradation. Key: drying time is 3-4x longer than PA66.',
+  'PA6T': 'PA6T(PPA): semi-aromatic, Tm 310-325°C. Drying: 120°C 4-6hrs. Melt: 320-340°C. Mold: 130-150°C. High heat resistance. Common defects: flash(high fluidity), burn(high temp processing), short shot(fast solidification). Key: mold temp critical for surface quality.',
+  'PA9T': 'PA9T: semi-aromatic, Tm 300-310°C. Drying: 120°C 4hrs, low moisture absorption vs other PAs. Melt: 310-330°C. Mold: 120-140°C. Excellent flow. Common defects: flash(very good flow), weld line weakness. Key: easier to process than PA6T, less moisture sensitive.',
+  'PA10T': 'PA10T: semi-aromatic, Tm 310°C. Drying: 100°C 4hrs. Melt: 310-340°C. Mold: 120-150°C. Bio-based option. Similar processing to PA9T. Key: check specific grade TDS as properties vary significantly.',
+  'PA12T': 'PA12T: semi-aromatic, Tm 300°C. Drying: 80-100°C 4hrs. Melt: 300-330°C. Mold: 110-140°C. Good dimensional stability. Key: lower moisture absorption than aliphatic PAs.',
+  'PA12': 'PA12: semi-crystalline, low moisture absorption. Drying: 70-80°C 4hrs(less critical than PA6/66). Melt: 180-220°C. Mold: 40-70°C. Flexible, low shrinkage 0.5-1.5%. Common defects: sink mark, warpage(less than PA6/66). Key: most forgiving PA to process.',
+  'PA610': 'PA610: semi-crystalline, moderate moisture absorption. Drying: 80°C 4-6hrs. Melt: 220-240°C. Mold: 60-90°C. Good balance of properties. Key: less hygroscopic than PA6/66, similar processing approach.',
+  'PA612': 'PA612: semi-crystalline, low moisture absorption. Drying: 80°C 4hrs. Melt: 220-240°C. Mold: 60-90°C. Better dimensional stability than PA6. Key: low moisture absorption similar to PA12.',
+  'PA1010': 'PA1010: bio-based, semi-crystalline. Drying: 80°C 4hrs. Melt: 200-220°C. Mold: 60-80°C. Low moisture absorption, excellent chemical resistance. Key: sustainable option, process similar to PA12.',
+  'PA6/66': 'PA6/66 copolymer: semi-crystalline. Drying: 80°C 4-6hrs. Melt: 240-270°C. Mold: 60-90°C. Intermediate properties between PA6 and PA66. Key: broader processing window than PA66.',
+  'MXD6': 'MXD6: semi-crystalline, high Tg, high barrier. Drying: 120°C 4-6hrs. Melt: 240-270°C. Mold: 100-140°C. Used in barrier applications. Key: higher mold temp needed for good crystallinity.',
+  'PBT': 'PBT: semi-crystalline, fast crystallization. Drying: 120°C 4hrs, target moisture <0.03%. Melt: 230-270°C. Mold: 60-80°C(amorphous surface)/80-100°C(crystalline surface). Shrinkage 1.5-2.2%. Common defects: warpage(fast uneven crystallization), sink mark, flash(good fluidity). Key: mold temp dramatically affects surface quality and crystallinity.',
+  'PET': 'PET: semi-crystalline, slow crystallization. Drying: 120-140°C 4-6hrs, target moisture <0.02%. Melt: 260-290°C. Mold: 130-140°C(crystalline)/20-30°C(amorphous/transparent). Shrinkage varies with crystallinity. Common defects: moisture defects, acetaldehyde generation(overheating). Key: mold temp controls crystalline vs amorphous state.',
+  'PCT': 'PCT: semi-crystalline, higher heat than PBT/PET. Drying: 120°C 4hrs. Melt: 280-310°C. Mold: 100-130°C. Better heat resistance than PBT. Key: similar to PBT but higher processing temperatures.',
+  'PEN': 'PEN: semi-crystalline, high barrier, high Tg. Drying: 120°C 4hrs. Melt: 270-290°C. Mold: 80-120°C. Key: higher performance than PET, used in specialty applications.',
+  'PC': 'PC: amorphous, transparent possible. Drying: 120°C 3-4hrs, target moisture <0.02%. Melt: 280-320°C. Mold: 80-120°C. Very high viscosity. Zero shrinkage compensation from crystallization. Common defects: silver streak(moisture), stress cracking(overpacking), splay, yellowing(overheating). Key: never mix regrind from other resins, extreme moisture sensitivity, stress cracking from excessive pack pressure.',
+  'POM(아세탈)': 'POM: semi-crystalline(acetal). Drying: optional but recommended 80°C 2hrs. Melt: 190-210°C, degrades above 220°C releasing formaldehyde. Mold: 80-100°C. Shrinkage 1.8-2.5%(high). Common defects: sink mark(high shrinkage), formaldehyde deposits(overheating), center-gated void. Key: excellent venting required(formaldehyde gas), no dead spots in hot runners, narrow processing window.',
+  'PPE/PPO': 'PPE/PPO: amorphous, usually alloyed. Drying: 80-100°C 2-4hrs. Melt: 260-300°C. Mold: 80-100°C. Key: pure PPE rarely processed alone, usually as PPE/PS or m-PPE alloy.',
+  'm-PPE': 'm-PPE(modified PPE): amorphous. Drying: 80°C 2-4hrs. Melt: 260-300°C. Mold: 80-100°C. Good hydrolytic stability. Key: better processability than pure PPE, similar to PC in handling.',
+  'PPS': 'PPS: semi-crystalline, super engineering. Drying: 130°C 3hrs. Melt: 300-340°C. Mold: 130-150°C. Generates corrosive gases. Very flash-prone. Shrinkage 0.1-0.5%(with GF). Common defects: flash(#1 issue, very low viscosity at process temp), gas corrosion on mold surface, weld line weakness. Key: frequent mold cleaning needed(corrosive deposits), high mold temp essential for crystallization.',
+  'LCP': 'LCP: liquid crystal polymer. Drying: 120°C 4hrs. Melt: 280-350°C(grade dependent). Mold: 80-120°C. Self-reinforcing fiber structure. Extremely low viscosity. Shrinkage 0.1-0.5% but highly anisotropic. Common defects: flash(extreme #1, can flash into 5-micron gaps), weld line(near zero strength), warpage(anisotropic). Key: gate design and fill pattern are everything, flash is almost unavoidable without optimized tooling.',
+  'PEEK': 'PEEK: semi-crystalline, highest performance. Drying: 150°C 3-4hrs. Melt: 360-400°C. Mold: 160-200°C. Very expensive material. Common defects: poor surface(insufficient mold temp), amorphous surface(mold too cold), degradation(above 400°C). Key: minimize purging waste(expensive resin), special high-temp screw/barrel needed.',
+  'PEI(Ultem)': 'PEI(Ultem): amorphous, high performance. Drying: 150°C 4-6hrs. Melt: 340-370°C. Mold: 140-175°C. Transparent amber color. Very high melt viscosity. Common defects: short shot(high viscosity), stress cracking, moisture splay. Key: very high melt viscosity requires high injection pressure.',
+  'PAI': 'PAI: highest performance thermoplastic. Drying: 120°C 16hrs minimum. Melt: 330-370°C. Mold: 200-230°C. Requires post-cure. Key: special equipment and processing expertise required.',
+  'PI(폴리이미드)': 'PI: highest thermal performance. Processing varies by type. Key: usually requires specialized processing, consult TDS for each grade.',
+  'PSU': 'PSU(Polysulfone): amorphous, transparent. Drying: 120°C 4hrs. Melt: 330-380°C. Mold: 80-120°C. Common defects: stress cracking, splay(moisture). Key: chemical resistance but sensitive to certain solvents.',
+  'PPSU': 'PPSU: amorphous, highest PSU family. Drying: 150°C 4hrs. Melt: 340-380°C. Mold: 100-140°C. Key: sterilizable, medical applications, better hydrolytic stability than PSU.',
+  'PES': 'PES: amorphous. Drying: 150°C 4hrs. Melt: 340-380°C. Mold: 100-140°C. Key: similar to PPSU, high temperature performance.',
+  'PTFE': 'PTFE: not typically injection molded. Key: use compression sintering or RAM extrusion, not conventional IM.',
+  'FEP': 'FEP: fluoropolymer, excellent chemical resistance. Melt: 300-380°C. Special equipment needed. Key: highly corrosive, requires specialized screws and barrels.',
+  'PFA': 'PFA: fluoropolymer. Melt: 340-380°C. Similar to FEP but higher temperature. Key: extremely corrosive to standard equipment.',
+  'ETFE': 'ETFE: fluoropolymer, better processability than PTFE/FEP. Melt: 280-330°C. Key: less corrosive than other fluoropolymers but still requires special equipment.',
+  'PP': 'PP: semi-crystalline, commodity. Drying: usually not required. Melt: 200-250°C. Mold: 20-60°C. Shrinkage 1.5-2.5%(high, anisotropic with fiber). Common defects: warpage(#1 issue, uneven crystallization), sink mark(thick sections), flow marks. Key: warpage is the dominant issue, mold temp uniformity critical.',
+  'PE(HDPE)': 'HDPE: semi-crystalline, commodity. Drying: not required. Melt: 200-250°C. Mold: 20-60°C. High shrinkage 1.5-3.0%. Common defects: warpage, sink mark. Key: similar to PP but lower stiffness.',
+  'PE(LDPE)': 'LDPE: semi-crystalline, flexible. Drying: not required. Melt: 160-210°C. Mold: 20-50°C. Common defects: sink mark, warpage. Key: very flexible, low melting point.',
+  'PE(LLDPE)': 'LLDPE: semi-crystalline. Drying: not required. Melt: 180-240°C. Mold: 20-60°C. Key: better impact than HDPE, used in film/flexible parts.',
+  'PS': 'PS: amorphous, brittle. Drying: usually not required. Melt: 180-240°C. Mold: 20-50°C. Low shrinkage 0.3-0.6%. Common defects: cracking(brittle), flow lines, burn marks(poor venting). Key: easy to process but very brittle.',
+  'ABS': 'ABS: amorphous. Drying: 80°C 2-4hrs. Melt: 210-250°C, degrades above 260°C. Mold: 40-80°C. Low shrinkage 0.4-0.7%. Common defects: splay/silver(moisture or degradation), gloss variation(mold temp), weld line visibility. Key: prone to thermal degradation at high temps, turn yellow/brown if overheated.',
+  'SAN': 'SAN: amorphous, transparent. Drying: 80°C 2-4hrs. Melt: 200-260°C. Mold: 40-80°C. Key: similar to ABS but transparent, more brittle.',
+  'ASA': 'ASA: amorphous, UV resistant. Drying: 80°C 2-4hrs. Melt: 220-260°C. Mold: 50-80°C. Key: outdoor UV stability better than ABS, similar processing.',
+  'PMMA(아크릴)': 'PMMA: amorphous, transparent(acrylic). Drying: 80°C 3-4hrs. Melt: 220-260°C. Mold: 50-80°C. Common defects: silver streak(moisture), crazing, bubbles, haze. Key: optical clarity requires careful drying and clean processing.',
+  'PVC': 'PVC: amorphous, thermal degradation risk. Drying: usually not required. Melt: 160-200°C, degrades above 210°C releasing HCl. Mold: 20-50°C. Common defects: discoloration(overheating), burn marks. Key: narrow processing window, corrosive HCl gas, requires specialized equipment.',
+  'PC/ABS': 'PC/ABS: amorphous blend. Drying: 100-110°C 3-4hrs. Melt: 240-280°C. Mold: 60-90°C. Compromise between PC and ABS properties. Common defects: splay(moisture), delamination(incompatible processing), color streaks. Key: drying is critical, processing window narrower than either component alone.',
+  'PC/PBT': 'PC/PBT: blend. Drying: 120°C 4hrs. Melt: 250-280°C. Mold: 60-90°C. Chemical resistance + impact. Key: needs compromise processing, PBT crystallization can cause surface issues.',
+  'PA/ABS': 'PA/ABS: two-phase blend. Drying: 80°C 4hrs. Melt: 240-270°C. Mold: 60-80°C. Impact-modified PA. Key: PA phase is hygroscopic, drying critical.',
+  'PA/PP': 'PA/PP: blend with compatibilizer. Drying: 80°C 4hrs. Melt: 230-260°C. Mold: 60-80°C. Key: potential delamination if processing is incorrect.',
+  'PPE/PA': 'PPE/PA(Noryl GTX type): blend. Drying: 100°C 4hrs. Melt: 270-300°C. Mold: 80-100°C. Key: good combination of PPE heat resistance and PA chemical resistance.',
+  'PBT/ABS': 'PBT/ABS: blend. Drying: 120°C 3hrs. Melt: 240-270°C. Mold: 60-80°C. Key: good surface quality, chemical resistance, process at lower end to avoid ABS degradation.',
+  'TPU': 'TPU: thermoplastic elastomer. Drying: 80-100°C 2-4hrs. Melt: 180-230°C(varies with hardness). Mold: 30-50°C. Common defects: bubbles(moisture), stringing, surface defects. Key: gentle processing, low shear, moisture sensitive.',
+  'TPE': 'TPE: thermoplastic elastomer(general). Drying: per grade TDS. Melt: 180-220°C. Mold: 20-50°C. Key: low injection speed and pressure, gentle processing.',
+  'TPC': 'TPC: thermoplastic copolyester elastomer. Drying: 100°C 4hrs. Melt: 220-250°C. Mold: 30-60°C. Key: good oil/chemical resistance.',
+  'TPA': 'TPA: thermoplastic polyamide elastomer. Drying: 80°C 4hrs. Melt: 200-240°C. Key: similar to TPU but PA-based, moisture sensitive.',
+  'TPEE': 'TPEE: thermoplastic polyester elastomer. Drying: 100°C 4hrs. Melt: 210-240°C. Mold: 30-60°C. Key: good flex fatigue resistance.',
+  'TPV': 'TPV: thermoplastic vulcanizate. Drying: not usually required. Melt: 180-220°C. Key: rubber-like, requires low shear processing.',
+  'TPO': 'TPO: thermoplastic olefin. Drying: not required. Melt: 180-230°C. Mold: 20-50°C. Key: automotive bumper/trim applications, good impact at low temp.',
+  'default': 'General thermoplastic. Check material TDS for specific processing conditions. Apply standard troubleshooting: verify drying, check melt temp vs recommended range, evaluate mold temp, review fill pattern.',
+};
 
-ANALYSIS FRAMEWORK — apply this systematic approach in order:
+function getResinKnowledge(resinType: string): string {
+  if (!resinType) return resinKnowledge['default'];
+  // Direct match
+  if (resinKnowledge[resinType]) return resinKnowledge[resinType];
+  // Blend: combine both components (e.g. "PC/PBT")
+  const blendMatch = resinType.match(/^([A-Za-z0-9()]+)\/([A-Za-z0-9()]+)$/);
+  if (blendMatch) {
+    const a = resinKnowledge[blendMatch[1]] || '';
+    const b = resinKnowledge[blendMatch[2]] || '';
+    if (a || b) return [a, b].filter(Boolean).join('\n');
+  }
+  // Partial match (e.g. "PA6 GF30%" → "PA6")
+  const partialKey = Object.keys(resinKnowledge).find(k => resinType.startsWith(k));
+  if (partialKey) return resinKnowledge[partialKey];
+  return resinKnowledge['default'];
+}
+
+function buildSystemPrompt(resinType: string): string {
+  const resinNote = getResinKnowledge(resinType);
+  return `You are an expert injection molding troubleshooter trained in Scientific Molding methodology (RJG/Paulson approach, Decoupled Molding II/III). You have 15+ years of hands-on experience and apply systematic, data-driven analysis rather than trial-and-error.
+
+RESIN IN USE: ${resinType || 'Unknown'}
+RESIN KNOWLEDGE:
+${resinNote}
+
+ANALYSIS FRAMEWORK — apply in order:
 
 STEP 1: DEFECT CLASSIFICATION
-- Identify the defect type from photo and/or description
-- Classify the defect phase: FILLING defect (short shot, jetting, burn, weld line) vs PACKING defect (sink, void, flash) vs COOLING defect (warpage, crack) vs MATERIAL defect (silver streak, discoloration, delamination)
-- This classification determines which process variables to examine first
+- Identify defect type from photo and/or description
+- Classify phase: FILLING (short shot, jetting, burn, weld line) / PACKING (sink, void, flash) / COOLING (warpage, crack) / MATERIAL (silver streak, discoloration, delamination)
 
 STEP 2: PROCESS WINDOW ANALYSIS
-- Evaluate if current settings fall within the recommended processing window for the specific resin
-- Check: Is melt temp within manufacturer's recommended range?
-- Check: Is mold temp appropriate for the resin's crystallization behavior?
-- Check: Is injection speed appropriate for the wall thickness and flow length?
-- Check: Is pack/hold pressure set correctly (typically 50-75% of fill pressure)?
-- Check: Is pack time optimized (gate seal study)?
-- Check: Is cooling time sufficient for the wall thickness?
-- Flag any settings that are OUTSIDE the recommended window — these are primary suspects
+- Is melt temp within the resin's recommended range?
+- Is mold temp appropriate for this resin's crystallization behavior?
+- Is injection speed appropriate for wall thickness and flow length?
+- Is pack/hold pressure correct (typically 50-75% of fill pressure)?
+- Is cooling time sufficient?
+- Flag settings OUTSIDE the recommended window — these are primary suspects
 
 STEP 3: ROOT CAUSE ANALYSIS (4M Framework)
-Systematically evaluate all four categories:
-- Machine: V/P transfer position, cushion consistency, check ring wear, barrel/screw condition, clamping force adequacy
-- Material: moisture content, lot-to-lot variation, regrind ratio, contamination, degradation (residence time)
-- Mold: venting adequacy, gate size/location, cooling channel blockage/efficiency, ejection system, parting line condition
-- Method: process settings, cycle consistency, startup procedure, operator changes
+- Machine: V/P transfer, cushion consistency, check ring wear, clamp force adequacy
+- Material: moisture content, regrind ratio, contamination, degradation
+- Mold: venting, gate size/location, cooling efficiency, ejection system
+- Method: process settings, cycle consistency, startup procedure
 
 STEP 4: SPECIFIC RECOMMENDATIONS
-For each identified cause:
-- Provide EXACT numerical changes (not 'increase temperature' but 'increase Zone 2 from 275 to 285°C')
-- Explain the scientific reasoning: WHY this change addresses the root cause
-- Consider interactions: changing one parameter may affect others
-- Prioritize: which change to try FIRST (lowest risk, highest probability of success)
-- Include the expected result of each change
+- EXACT numerical changes (e.g. 'increase Zone 2 from 275 to 285°C', not vague)
+- Scientific reasoning for each change
+- Prioritize: lowest risk, highest probability first
+- Note parameter interactions
 
 STEP 5: VERIFICATION CHECKLIST
-- What to measure/check before making changes
-- What to monitor after making changes
-- When to escalate (if adjustments don't resolve within 3 iterations, consider mold/material issues)
-
-RESIN-SPECIFIC KNOWLEDGE — apply deep knowledge for each resin family:
-- Polyamides (PA6/PA66/PA46/PA6T/PA9T/PA10T/PA12T): hygroscopic behavior varies by type, crystallization kinetics, fiber orientation in GF grades, moisture-related defects are #1 cause
-- Polyesters (PBT/PET/PCT): fast crystallization, mold temp critical for surface quality and crystallinity
-- Polycarbonate (PC): amorphous, very high viscosity, extreme moisture sensitivity, stress cracking risk from excessive packing
-- POM/Acetal: narrow processing window, formaldehyde off-gassing, venting critical, no dead spots in hot runners
-- Super Engineering (PPS/LCP/PEEK/PEI): extreme processing temps, special screw materials, corrosive gases, flash sensitivity (especially LCP)
-- Commodity (PP/PE/ABS/PS): each has unique failure modes — PP warpage, ABS thermal degradation, PS brittleness
-- Blends (PC/ABS, PC/PBT): compromise conditions needed, delamination risk if incompatible processing
-- TPE/TPU: low pressure/speed, gentle processing, avoid high shear
+- Before changes / after changes / escalation criteria
 
 CRITICAL RULES:
-1. NEVER give generic advice. Every recommendation must reference the specific resin, the specific settings provided, and the specific defect observed.
-2. When actual measured values (fill time, peak pressure, cushion, part weight) are provided, use them — they reveal what the MACHINE is actually doing vs what's SET.
-3. Consider the INTERACTION between variables — e.g., increasing pack pressure without adequate clamp force causes flash.
-4. If drying data is provided for hygroscopic resins, evaluate if drying is adequate BEFORE suggesting process changes — drying issues account for >40% of defects in PA and PC.
-5. For GF-reinforced grades, always consider fiber orientation effects on warpage and weld line strength.
-6. For hot runner molds, check for temperature uniformity across zones and dead spots.
-7. Respond in Korean. Technical terms can be in English with Korean explanation.
-8. MOLD DRAWING ANALYSIS — if mold drawings/CAD images are provided, analyze:
-   - Gate location: relationship between gate position and defect location (distance, flow path length)
-   - Runner balance: for multi-cavity molds, assess filling balance risk
-   - Cooling channels: cooling efficiency near the defect area
-   - Wall thickness variation: abrupt thickness changes and their relation to defect location
-   - Vent locations: adequacy of gas escape paths, trapped air risk
-   - Ejector positions: relation to ejection-related defects (crack, whitening, warpage)
-   Include mold analysis results in the 'mold_analysis' field of the JSON output.
+1. Every recommendation must reference this specific resin, the settings provided, and the defect observed.
+2. When actual measured values (fill time, peak pressure, cushion, part weight) are provided, use them.
+3. Consider parameter interactions.
+4. For hygroscopic resins, evaluate drying FIRST.
+5. For GF-reinforced grades, consider fiber orientation effects.
+6. For hot runner molds, check zone temperature uniformity and dead spots.
+7. Respond in Korean. Technical terms may be in English with Korean explanation.
+8. MOLD DRAWING ANALYSIS — if mold drawings are provided, analyze: gate location vs defect, runner balance, cooling near defect area, wall thickness variation, vent locations, ejector positions. Include in 'mold_analysis' field.
 
 OUTPUT FORMAT (return as JSON only, no markdown):
 {
@@ -138,6 +198,7 @@ OUTPUT FORMAT (return as JSON only, no markdown):
     "recommendations": ["금형 수정 제안 — 있을 경우"]
   }
 }`;
+}
 
 export async function POST(request: NextRequest) {
   try {
@@ -262,7 +323,7 @@ JSON 형식으로만 응답하세요. 마크다운 코드 블록 없이 순수 J
           const anthropicStream = client.messages.stream({
             model: 'claude-sonnet-4-6',
             max_tokens: 8192,
-            system: SYSTEM_PROMPT,
+            system: buildSystemPrompt(resinInfo?.resinType || ''),
             messages: [{ role: 'user', content: userContent }],
           });
 
