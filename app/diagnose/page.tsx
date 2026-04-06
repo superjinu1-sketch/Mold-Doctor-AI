@@ -75,22 +75,96 @@ const RESIN_OPTIONS = [
   { group: '기타', options: ['기타 (직접 입력)'] },
 ];
 
-const SAMPLE_DATA = {
-  defectType: '은줄 (Silver Streak)',
-  defectDescription: '제품 표면에 은색 줄무늬가 발생. 5샷에 1번꼴로 발생하며 게이트 부근에서 시작됨.',
-  resinType: 'PA66',
-  filler: 'GF(유리섬유)',
-  fillerContent: '33',
-  resinDetail: 'PA66 GF33% 할로겐프리 난연',
-  nozzleTemp: '285', zone1Temp: '280', zone2Temp: '275', zone3Temp: '265', zone4Temp: '255',
-  moldTempFixed: '80', moldTempMoving: '80',
-  injPressure1: '120', holdPressure: '80',
-  injSpeed1: '60', injSpeed2: '40',
-  holdTime: '8', coolTime: '15', injTime: '3',
-  metering: '85', cushion: '5', backPressure: '5', screwRpm: '80',
-  moldType: '2판', gateType: '사이드', cavities: '4', runnerType: '콜드',
-  weight: '45', wallThicknessMin: '1.5', wallThicknessMax: '3.0',
-};
+const SAMPLE_CASES = [
+  {
+    label: 'PA66 GF33% — 은줄',
+    defectType: '은줄 (Silver Streak)',
+    defectDescription: '제품 표면에 은색 줄무늬 발생. 5샷에 1번꼴, 게이트 부근에서 시작됨.',
+    resinType: 'PA66', filler: 'GF(유리섬유)', fillerContent: '33', flameRetardant: '없음', flameRetardantThickness: '미입력', flameRetardantType: '해당없음', resinDetail: 'PA66 GF33%', resinGrade: '',
+    nozzleTemp: '285', zone1Temp: '280', zone2Temp: '275', zone3Temp: '265', zone4Temp: '255',
+    moldTempFixed: '80', moldTempMoving: '80', injPressure1: '120', holdPressure: '80',
+    injSpeed1: '60', injSpeed2: '40', holdTime: '8', coolTime: '15', injTime: '3',
+    metering: '85', cushion: '5', backPressure: '5', screwRpm: '80', clampForce: '',
+    moldType: '2판', gateType: '사이드', cavities: '4', runnerType: '콜드', weight: '45', wallThicknessMin: '1.5', wallThicknessMax: '3.0',
+  },
+  {
+    label: 'PC — 크랙',
+    defectType: '크랙 (Crack)',
+    defectDescription: '이젝터 핀 주변에 크랙 발생. 이형 후 2~3분 내에 나타남. 투명 PC 제품.',
+    resinType: 'PC', filler: '없음', fillerContent: '', flameRetardant: 'UL94 V-0', flameRetardantThickness: '1.6', flameRetardantType: '할로겐프리', resinDetail: 'PC 투명', resinGrade: 'Covestro Makrolon 2405',
+    nozzleTemp: '310', zone1Temp: '305', zone2Temp: '295', zone3Temp: '285', zone4Temp: '275',
+    moldTempFixed: '90', moldTempMoving: '85', injPressure1: '150', holdPressure: '120',
+    injSpeed1: '70', injSpeed2: '50', holdTime: '12', coolTime: '25', injTime: '4',
+    metering: '60', cushion: '4', backPressure: '8', screwRpm: '60', clampForce: '180',
+    moldType: '2판', gateType: '핀포인트', cavities: '2', runnerType: '핫', weight: '120', wallThicknessMin: '2.0', wallThicknessMax: '4.0',
+  },
+  {
+    label: 'POM — 싱크마크',
+    defectType: '싱크마크 (Sink Mark)',
+    defectDescription: '보스(boss) 반대면 표면에 싱크마크 발생. 두께 4mm 구간 집중.',
+    resinType: 'POM(아세탈)', filler: '없음', fillerContent: '', flameRetardant: '없음', flameRetardantThickness: '미입력', flameRetardantType: '해당없음', resinDetail: 'POM Homo', resinGrade: 'Polyplastics Duracon M90',
+    nozzleTemp: '200', zone1Temp: '195', zone2Temp: '190', zone3Temp: '185', zone4Temp: '180',
+    moldTempFixed: '90', moldTempMoving: '90', injPressure1: '130', holdPressure: '100',
+    injSpeed1: '55', injSpeed2: '35', holdTime: '15', coolTime: '30', injTime: '5',
+    metering: '70', cushion: '6', backPressure: '6', screwRpm: '70', clampForce: '120',
+    moldType: '3판', gateType: '핀포인트', cavities: '8', runnerType: '콜드', weight: '30', wallThicknessMin: '2.5', wallThicknessMax: '4.5',
+  },
+  {
+    label: 'PP GF20% — 휨/변형',
+    defectType: '휨/변형 (Warpage)',
+    defectDescription: '냉각 후 평판형 제품이 대각선 방향으로 1.5mm 이상 휨. 4캐비티 중 유독 2번 캐비티에서 심함.',
+    resinType: 'PP', filler: 'GF(유리섬유)', fillerContent: '20', flameRetardant: '없음', flameRetardantThickness: '미입력', flameRetardantType: '해당없음', resinDetail: 'PP GF20%', resinGrade: '',
+    nozzleTemp: '240', zone1Temp: '235', zone2Temp: '228', zone3Temp: '220', zone4Temp: '210',
+    moldTempFixed: '40', moldTempMoving: '40', injPressure1: '100', holdPressure: '65',
+    injSpeed1: '80', injSpeed2: '55', holdTime: '10', coolTime: '20', injTime: '3',
+    metering: '110', cushion: '8', backPressure: '4', screwRpm: '90', clampForce: '200',
+    moldType: '2판', gateType: '사이드', cavities: '4', runnerType: '콜드', weight: '80', wallThicknessMin: '2.0', wallThicknessMax: '3.5',
+  },
+  {
+    label: 'ABS — 변색',
+    defectType: '변색 (Discoloration)',
+    defectDescription: '제품 끝부분 및 웰드라인 부근 황변. 특히 사이클 정지 후 재가동 첫 5샷에 심함.',
+    resinType: 'ABS', filler: '없음', fillerContent: '', flameRetardant: 'UL94 V-0', flameRetardantThickness: '1.6', flameRetardantType: '할로겐', resinDetail: 'ABS V-0', resinGrade: 'LG Chem Starex HG0660',
+    nozzleTemp: '255', zone1Temp: '250', zone2Temp: '245', zone3Temp: '238', zone4Temp: '230',
+    moldTempFixed: '65', moldTempMoving: '60', injPressure1: '110', holdPressure: '75',
+    injSpeed1: '65', injSpeed2: '45', holdTime: '9', coolTime: '18', injTime: '3',
+    metering: '75', cushion: '5', backPressure: '7', screwRpm: '75', clampForce: '150',
+    moldType: '2판', gateType: '사이드', cavities: '4', runnerType: '콜드', weight: '55', wallThicknessMin: '1.8', wallThicknessMax: '3.0',
+  },
+  {
+    label: 'PPS GF40% — 플래시',
+    defectType: '플래시 (Flash)',
+    defectDescription: '파팅라인 전체 구간에 얇은 버(flash) 발생. 형체력 올려도 개선 안됨.',
+    resinType: 'PPS', filler: 'GF(유리섬유)', fillerContent: '40', flameRetardant: '없음', flameRetardantThickness: '미입력', flameRetardantType: '해당없음', resinDetail: 'PPS GF40%', resinGrade: 'Toray A504X90',
+    nozzleTemp: '320', zone1Temp: '315', zone2Temp: '310', zone3Temp: '305', zone4Temp: '295',
+    moldTempFixed: '140', moldTempMoving: '135', injPressure1: '160', holdPressure: '110',
+    injSpeed1: '75', injSpeed2: '50', holdTime: '10', coolTime: '20', injTime: '4',
+    metering: '65', cushion: '5', backPressure: '5', screwRpm: '55', clampForce: '250',
+    moldType: '2판', gateType: '필름', cavities: '2', runnerType: '콜드', weight: '90', wallThicknessMin: '1.0', wallThicknessMax: '2.5',
+  },
+  {
+    label: 'PBT GF30% — 웰드라인',
+    defectType: '웰드라인 (Weld Line)',
+    defectDescription: '2개 게이트 합류 지점에 뚜렷한 웰드라인. 외관 불량 및 강도 저하 의심.',
+    resinType: 'PBT', filler: 'GF(유리섬유)', fillerContent: '30', flameRetardant: 'UL94 V-0', flameRetardantThickness: '0.8', flameRetardantType: '할로겐프리', resinDetail: 'PBT GF30% V-0', resinGrade: 'BASF Ultradur B4300 G6',
+    nozzleTemp: '260', zone1Temp: '255', zone2Temp: '248', zone3Temp: '240', zone4Temp: '235',
+    moldTempFixed: '80', moldTempMoving: '75', injPressure1: '140', holdPressure: '95',
+    injSpeed1: '70', injSpeed2: '50', holdTime: '10', coolTime: '18', injTime: '3',
+    metering: '80', cushion: '6', backPressure: '6', screwRpm: '65', clampForce: '160',
+    moldType: '2판', gateType: '사이드', cavities: '4', runnerType: '핫', weight: '60', wallThicknessMin: '1.5', wallThicknessMax: '3.0',
+  },
+  {
+    label: 'PC/ABS — 미성형',
+    defectType: '미성형 (Short Shot)',
+    defectDescription: '제품 끝단부 2군데에서 미충전. 사출 압력 올리면 플래시 발생.',
+    resinType: 'PC/ABS', filler: '없음', fillerContent: '', flameRetardant: 'UL94 V-0', flameRetardantThickness: '1.5', flameRetardantType: '할로겐프리', resinDetail: 'PC/ABS V-0 HF', resinGrade: 'Bayer Bayblend T85',
+    nozzleTemp: '265', zone1Temp: '260', zone2Temp: '252', zone3Temp: '245', zone4Temp: '240',
+    moldTempFixed: '75', moldTempMoving: '70', injPressure1: '145', holdPressure: '95',
+    injSpeed1: '85', injSpeed2: '60', holdTime: '10', coolTime: '20', injTime: '4',
+    metering: '90', cushion: '5', backPressure: '8', screwRpm: '65', clampForce: '200',
+    moldType: '2판', gateType: '핀포인트', cavities: '4', runnerType: '핫', weight: '70', wallThicknessMin: '1.2', wallThicknessMax: '2.8',
+  },
+];
 
 // --- Severity Badge ---
 function SeverityBadge({ severity }: { severity: string }) {
@@ -275,32 +349,36 @@ function DiagnoseContent() {
     setAdvSettings(prev => ({ ...prev, [key]: value }));
   };
 
-  const loadSample = () => {
-    setDefectType(SAMPLE_DATA.defectType);
-    setDefectDescription(SAMPLE_DATA.defectDescription);
-    setResinType(SAMPLE_DATA.resinType);
-    setFiller(SAMPLE_DATA.filler);
-    setFillerContent(SAMPLE_DATA.fillerContent);
-    setResinDetail(SAMPLE_DATA.resinDetail);
+  const loadSample = (idx: number) => {
+    const d = SAMPLE_CASES[idx];
+    setDefectType(d.defectType);
+    setDefectDescription(d.defectDescription);
+    setResinType(d.resinType);
+    setFiller(d.filler);
+    setFillerContent(d.fillerContent);
+    setFlameRetardant(d.flameRetardant);
+    setFlameRetardantThickness(d.flameRetardantThickness);
+    setFlameRetardantType(d.flameRetardantType);
+    setResinDetail(d.resinDetail);
+    setResinGrade(d.resinGrade);
     setSettings({
-      nozzleTemp: SAMPLE_DATA.nozzleTemp, zone1Temp: SAMPLE_DATA.zone1Temp,
-      zone2Temp: SAMPLE_DATA.zone2Temp, zone3Temp: SAMPLE_DATA.zone3Temp,
-      zone4Temp: SAMPLE_DATA.zone4Temp,
-      moldTempFixed: SAMPLE_DATA.moldTempFixed, moldTempMoving: SAMPLE_DATA.moldTempMoving,
-      injPressure1: SAMPLE_DATA.injPressure1, holdPressure: SAMPLE_DATA.holdPressure,
-      injSpeed1: SAMPLE_DATA.injSpeed1, injSpeed2: SAMPLE_DATA.injSpeed2,
-      holdTime: SAMPLE_DATA.holdTime, coolTime: SAMPLE_DATA.coolTime,
-      injTime: SAMPLE_DATA.injTime, metering: SAMPLE_DATA.metering,
-      cushion: SAMPLE_DATA.cushion, backPressure: SAMPLE_DATA.backPressure,
-      screwRpm: SAMPLE_DATA.screwRpm, clampForce: '',
+      nozzleTemp: d.nozzleTemp, zone1Temp: d.zone1Temp,
+      zone2Temp: d.zone2Temp, zone3Temp: d.zone3Temp, zone4Temp: d.zone4Temp,
+      moldTempFixed: d.moldTempFixed, moldTempMoving: d.moldTempMoving,
+      injPressure1: d.injPressure1, holdPressure: d.holdPressure,
+      injSpeed1: d.injSpeed1, injSpeed2: d.injSpeed2,
+      holdTime: d.holdTime, coolTime: d.coolTime, injTime: d.injTime,
+      metering: d.metering, cushion: d.cushion, backPressure: d.backPressure,
+      screwRpm: d.screwRpm, clampForce: d.clampForce,
     });
-    setMoldType(SAMPLE_DATA.moldType);
-    setGateType(SAMPLE_DATA.gateType);
-    setCavities(SAMPLE_DATA.cavities);
-    setRunnerType(SAMPLE_DATA.runnerType);
-    setWeight(SAMPLE_DATA.weight);
-    setWallThicknessMin(SAMPLE_DATA.wallThicknessMin);
-    setWallThicknessMax(SAMPLE_DATA.wallThicknessMax);
+    setMoldType(d.moldType);
+    setGateType(d.gateType);
+    setCavities(d.cavities);
+    setRunnerType(d.runnerType);
+    setWeight(d.weight);
+    setWallThicknessMin(d.wallThicknessMin);
+    setWallThicknessMax(d.wallThicknessMax);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const handleDiagnose = async () => {
@@ -403,17 +481,25 @@ function DiagnoseContent() {
         <p className="text-slate-500">불량 정보와 성형 조건을 입력하면 AI가 원인과 해결책을 알려드립니다.</p>
       </div>
 
-      {/* Sample button */}
-      <div className="mb-6 flex justify-end">
-        <button
-          onClick={loadSample}
-          className="flex items-center gap-2 bg-amber-50 hover:bg-amber-100 text-amber-700 border border-amber-300 px-4 py-2 rounded-lg text-sm font-medium transition-colors"
-        >
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      {/* Sample cases */}
+      <div className="mb-6 bg-amber-50 border border-amber-200 rounded-xl p-4">
+        <div className="flex items-center gap-2 mb-3">
+          <svg className="w-4 h-4 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
           </svg>
-          샘플로 테스트
-        </button>
+          <span className="text-amber-700 font-semibold text-sm">샘플 케이스로 빠른 테스트</span>
+        </div>
+        <div className="flex flex-wrap gap-2">
+          {SAMPLE_CASES.map((c, i) => (
+            <button
+              key={i}
+              onClick={() => loadSample(i)}
+              className="bg-white hover:bg-amber-100 text-amber-800 border border-amber-300 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors whitespace-nowrap"
+            >
+              {c.label}
+            </button>
+          ))}
+        </div>
       </div>
 
       <div className="space-y-6">
