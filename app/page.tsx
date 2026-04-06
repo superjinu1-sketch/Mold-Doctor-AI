@@ -91,8 +91,7 @@ export default function HomePage() {
               원인을 찾아드립니다
             </h1>
             <p className="text-slate-300 text-lg mb-8 leading-relaxed">
-              AI + 엔지니어링플라스틱 10년 경험. 셋팅값 입력하면 해결 조건까지.
-              사출 10년차 엔지니어가 옆에 있는 것처럼.
+              불량 사진과 셋팅값을 입력하면 AI가 원인과 해결책을 알려드립니다.
             </p>
             <div className="flex flex-col sm:flex-row gap-4">
               <Link
