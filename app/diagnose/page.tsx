@@ -122,7 +122,7 @@ function DiagnoseContent() {
   const [filler, setFiller] = useState('없음');
   const [fillerContent, setFillerContent] = useState('');
   const [flameRetardant, setFlameRetardant] = useState('없음');
-  const [flameRetardantThickness, setFlameRetardantThickness] = useState('');
+  const [flameRetardantThickness, setFlameRetardantThickness] = useState('미입력');
   const [flameRetardantType, setFlameRetardantType] = useState('해당없음');
   const [resinDetail, setResinDetail] = useState('');
   const [resinGrade, setResinGrade] = useState('');
@@ -553,14 +553,9 @@ function DiagnoseContent() {
             </div>
             <div>
               <label className={labelCls}>난연 인증 두께 (mm)</label>
-              <input
-                type="text"
-                inputMode="decimal"
-                className={inputCls}
-                placeholder="예: 0.8, 1.6, 3.2"
-                value={flameRetardantThickness}
-                onChange={(e) => setFlameRetardantThickness(e.target.value)}
-              />
+              <select className={inputCls} value={flameRetardantThickness} onChange={(e) => setFlameRetardantThickness(e.target.value)}>
+                {['미입력', '0.4', '0.75', '0.8', '1.0', '1.5', '1.6', '2.0', '3.0', '3.2'].map(t => <option key={t}>{t}</option>)}
+              </select>
             </div>
             <div>
               <label className={labelCls}>난연 타입</label>
