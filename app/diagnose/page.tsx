@@ -122,6 +122,7 @@ function DiagnoseContent() {
   const [filler, setFiller] = useState('없음');
   const [fillerContent, setFillerContent] = useState('');
   const [flameRetardant, setFlameRetardant] = useState('없음');
+  const [flameRetardantThickness, setFlameRetardantThickness] = useState('');
   const [flameRetardantType, setFlameRetardantType] = useState('해당없음');
   const [resinDetail, setResinDetail] = useState('');
   const [resinGrade, setResinGrade] = useState('');
@@ -315,7 +316,7 @@ function DiagnoseContent() {
         defectDescription,
         resinInfo: {
           resinType: resinType === '기타 (직접 입력)' ? customResin : resinType,
-          filler, fillerContent, flameRetardant, flameRetardantType, resinDetail, resinGrade,
+          filler, fillerContent, flameRetardant, flameRetardantThickness, flameRetardantType, resinDetail, resinGrade,
         },
         settings,
         advSettings,
@@ -549,6 +550,17 @@ function DiagnoseContent() {
               <select className={inputCls} value={flameRetardant} onChange={(e) => setFlameRetardant(e.target.value)}>
                 {['없음', 'UL94 V-0', 'UL94 V-1', 'UL94 V-2', 'UL94 HB', 'UL94 5VA', 'UL94 5VB'].map(f => <option key={f}>{f}</option>)}
               </select>
+            </div>
+            <div>
+              <label className={labelCls}>난연 인증 두께 (mm)</label>
+              <input
+                type="text"
+                inputMode="decimal"
+                className={inputCls}
+                placeholder="예: 0.8, 1.6, 3.2"
+                value={flameRetardantThickness}
+                onChange={(e) => setFlameRetardantThickness(e.target.value)}
+              />
             </div>
             <div>
               <label className={labelCls}>난연 타입</label>
