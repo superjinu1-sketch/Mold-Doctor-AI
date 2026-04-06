@@ -220,38 +220,6 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Target Users */}
-      <section className="py-20 px-4 bg-white">
-        <div className="max-w-7xl mx-auto">
-          <h2 className="text-3xl font-bold text-[#1E293B] text-center mb-12">이런 분들을 위해 만들었습니다</h2>
-          <div className="grid md:grid-cols-3 gap-8">
-            {[
-              {
-                emoji: '🏭',
-                title: '사출 엔지니어',
-                desc: '경험이 부족해도 10년차처럼 트러블슈팅. 현장에서 바로 쓸 수 있는 실용적인 해결책.',
-              },
-              {
-                emoji: '💼',
-                title: '원재료 영업담당',
-                desc: '고객 현장에서 바로 기술 지원. 불량 사진 한 장으로 즉각적인 솔루션 제공.',
-              },
-              {
-                emoji: '🌏',
-                title: '글로벌 업체 한국 담당',
-                desc: '혼자서 영업+기술 다 커버. 소수 인원으로 효율적인 기술 지원 가능.',
-              },
-            ].map((user) => (
-              <div key={user.title} className="bg-[#F8FAFC] rounded-xl p-8 border border-slate-200">
-                <div className="text-5xl mb-4">{user.emoji}</div>
-                <h3 className="text-xl font-bold text-[#1E293B] mb-3">{user.title}</h3>
-                <p className="text-slate-500 leading-relaxed">{user.desc}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
       {/* CTA Section */}
       <section className="py-20 px-4 bg-[#1E293B] text-white">
         <div className="max-w-3xl mx-auto text-center">
