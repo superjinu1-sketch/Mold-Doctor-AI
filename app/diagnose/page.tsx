@@ -45,6 +45,7 @@ interface DiagnosisResult {
     direction?: 'up' | 'down' | 'same';
   }[];
   checklist: string[] | { before_changes: string[]; after_changes: string[]; escalation: string[] };
+  top5_actions?: { step: number; action: string; why: string }[];
   resin_specific_notes: string;
   drying_assessment?: string;
   additional_advice?: string;
@@ -1023,6 +1024,39 @@ function DiagnoseContent() {
                 </div>
               )}
             </div>
+
+            {/* Top 5 Actions */}
+            {result.top5_actions && result.top5_actions.length > 0 && (
+              <div className="bg-gradient-to-br from-[#1E293B] to-[#0F172A] rounded-2xl p-4 sm:p-6 shadow-lg">
+                <h3 className="text-white font-bold text-lg mb-4 flex items-center gap-2">
+                  <span className="bg-[#059669] text-white text-xs px-2 py-1 rounded-full font-bold">즉시 실행</span>
+                  최우선 조치 5가지
+                </h3>
+                <div className="space-y-3">
+                  {result.top5_actions.map((item) => {
+                    const colors = [
+                      { ring: 'bg-red-500', badge: 'bg-red-500/20 text-red-300 border-red-500/30' },
+                      { ring: 'bg-orange-500', badge: 'bg-orange-500/20 text-orange-300 border-orange-500/30' },
+                      { ring: 'bg-amber-500', badge: 'bg-amber-500/20 text-amber-300 border-amber-500/30' },
+                      { ring: 'bg-blue-500', badge: 'bg-blue-500/20 text-blue-300 border-blue-500/30' },
+                      { ring: 'bg-slate-500', badge: 'bg-slate-500/20 text-slate-300 border-slate-500/30' },
+                    ];
+                    const c = colors[(item.step - 1) % colors.length];
+                    return (
+                      <div key={item.step} className={`flex gap-3 p-3 rounded-xl border ${c.badge}`}>
+                        <div className={`shrink-0 w-7 h-7 rounded-full ${c.ring} flex items-center justify-center text-white text-sm font-bold`}>
+                          {item.step}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-white font-semibold text-sm leading-snug">{item.action}</p>
+                          <p className="text-slate-400 text-xs mt-1">{item.why}</p>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
 
             {/* Causes */}
             <div className="bg-white rounded-2xl p-4 sm:p-6 shadow-sm border border-slate-200">

@@ -122,6 +122,13 @@ OUTPUT FORMAT (return as JSON only, no markdown):
     "after_changes": ["변경 후 모니터링 항목"],
     "escalation": ["3회 조정 후에도 해결 안 될 경우 고려할 사항"]
   },
+  "top5_actions": [
+    {"step": 1, "action": "즉시 해야 할 가장 중요한 조치 (구체적 수치 포함)", "why": "이 조치가 최우선인 이유"},
+    {"step": 2, "action": "두 번째 조치", "why": "이유"},
+    {"step": 3, "action": "세 번째 조치", "why": "이유"},
+    {"step": 4, "action": "네 번째 조치", "why": "이유"},
+    {"step": 5, "action": "다섯 번째 조치", "why": "이유"}
+  ],
   "resin_specific_notes": "이 수지 특성상 주의할 점",
   "drying_assessment": "건조 조건 평가 (건조 데이터가 제공된 경우)",
   "mold_analysis": {
