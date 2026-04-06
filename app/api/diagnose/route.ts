@@ -4,6 +4,7 @@ import fs from 'fs';
 import path from 'path';
 
 function getApiKey(): string {
+  if (process.env.ANTHROPIC_API_KEY) return process.env.ANTHROPIC_API_KEY;
   try {
     const content = fs.readFileSync(path.join(process.cwd(), '.env.local'), 'utf-8');
     for (const line of content.split('\n')) {
@@ -11,7 +12,7 @@ function getApiKey(): string {
       if (match) return match[1].trim();
     }
   } catch { /* ignore */ }
-  return process.env.ANTHROPIC_API_KEY || '';
+  return '';
 }
 
 const SYSTEM_PROMPT = `You are an expert injection molding troubleshooter with 15+ years of experience across ALL thermoplastic resins — engineering plastics, super engineering plastics, commodity resins, blends/alloys, and TPEs.
