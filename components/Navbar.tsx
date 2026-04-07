@@ -81,6 +81,7 @@ export default function Navbar() {
             {/* Mobile: hamburger */}
             <div className="md:hidden flex items-center gap-2">
               <button
+                type="button"
                 className="p-2 rounded-lg hover:bg-white/10"
                 onClick={() => setMenuOpen(!menuOpen)}
                 aria-label="메뉴 열기"
@@ -136,7 +137,7 @@ export default function Navbar() {
                 </svg>
                 Anthropic API 키 설정
               </h2>
-              <button onClick={() => setKeyModalOpen(false)} className="text-slate-400 hover:text-slate-600 text-2xl leading-none">×</button>
+              <button type="button" onClick={() => setKeyModalOpen(false)} className="text-slate-400 hover:text-slate-600 text-2xl leading-none" aria-label="닫기">×</button>
             </div>
 
             {/* Current status */}
@@ -192,6 +193,7 @@ export default function Navbar() {
 
             <div className="flex gap-3">
               <button
+                type="button"
                 onClick={handleSave}
                 disabled={!apiKey.trim() || saving}
                 className="flex-1 bg-[#059669] hover:bg-[#047857] disabled:bg-slate-300 text-white py-3 rounded-xl font-bold transition-colors"
@@ -199,6 +201,7 @@ export default function Navbar() {
                 {saving ? '저장 중...' : '저장하기'}
               </button>
               <button
+                type="button"
                 onClick={() => setKeyModalOpen(false)}
                 className="px-4 border border-slate-300 text-slate-600 hover:bg-slate-50 rounded-xl font-medium transition-colors"
               >

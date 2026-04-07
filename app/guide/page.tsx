@@ -364,6 +364,7 @@ export default function GuidePage() {
             }`}
           >
             <button
+              type="button"
               className="w-full flex items-center justify-between p-5 text-left"
               onClick={() => toggle(defect.id)}
             >
