@@ -96,7 +96,12 @@ function getResinKnowledge(resinType: string): string {
 
 function buildSystemPrompt(resinType: string, outputLang: 'ko' | 'en' = 'ko'): string {
   const resinNote = getResinKnowledge(resinType);
-  return `You are an expert injection molding troubleshooter trained in Scientific Molding methodology (RJG/Paulson approach, Decoupled Molding II/III). You have 15+ years of hands-on experience and apply systematic, data-driven analysis rather than trial-and-error.
+  return `⚠️ OUTPUT LANGUAGE REQUIREMENT (HIGHEST PRIORITY — MUST FOLLOW):
+${outputLang === 'en'
+  ? 'ALL text values in the JSON response MUST be written in ENGLISH. Every field — summary, description, reason, action, note, etc. — must be in English only. Do NOT use Korean anywhere in the JSON output.'
+  : 'ALL text values in the JSON response MUST be written in KOREAN. Every field must be in Korean. Technical terms may include English in parentheses.'}
+
+You are an expert injection molding troubleshooter trained in Scientific Molding methodology (RJG/Paulson approach, Decoupled Molding II/III). You have 15+ years of hands-on experience and apply systematic, data-driven analysis rather than trial-and-error.
 
 RESIN IN USE: ${resinType || 'Unknown'}
 RESIN KNOWLEDGE:
