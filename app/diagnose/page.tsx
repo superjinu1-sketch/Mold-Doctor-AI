@@ -216,6 +216,7 @@ function DiagnoseContent() {
   const [wallThicknessMin, setWallThicknessMin] = useState('');
   const [wallThicknessMax, setWallThicknessMax] = useState('');
   const [productNotes, setProductNotes] = useState('');
+  const [outputLang, setOutputLang] = useState<'ko' | 'en'>('ko');
   const [isLoading, setIsLoading] = useState(false);
   const [streamText, setStreamText] = useState('');
   const [result, setResult] = useState<DiagnosisResult | null>(null);
@@ -402,6 +403,7 @@ function DiagnoseContent() {
         productInfo: { weight, wallThicknessMin, wallThicknessMax, notes: productNotes },
         images: images.map(img => ({ data: img.base64, mediaType: img.mediaType })),
         moldDrawings: moldDrawings.map(img => ({ data: img.base64, mediaType: img.mediaType })),
+        outputLang,
       };
 
       const res = await fetch('/api/diagnose', {
@@ -476,9 +478,26 @@ function DiagnoseContent() {
 
   return (
     <div className="max-w-5xl mx-auto px-3 sm:px-4 py-6 sm:py-8">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-[#1E293B] mb-2">사출 불량 AI 진단</h1>
-        <p className="text-slate-500">불량 정보와 성형 조건을 입력하면 AI가 원인과 해결책을 알려드립니다.</p>
+      <div className="mb-8 flex items-start justify-between gap-4">
+        <div>
+          <h1 className="text-3xl font-bold text-[#1E293B] mb-2">사출 불량 AI 진단</h1>
+          <p className="text-slate-500">{outputLang === 'ko' ? '불량 정보와 성형 조건을 입력하면 AI가 원인과 해결책을 알려드립니다.' : 'Enter defect info and molding conditions — AI will diagnose causes and solutions.'}</p>
+        </div>
+        {/* Language toggle */}
+        <div className="flex items-center gap-1 bg-slate-100 rounded-xl p-1 shrink-0 mt-1">
+          <button
+            onClick={() => setOutputLang('ko')}
+            className={`px-3 py-1.5 rounded-lg text-sm font-semibold transition-all ${outputLang === 'ko' ? 'bg-white text-[#059669] shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
+          >
+            🇰🇷 한국어
+          </button>
+          <button
+            onClick={() => setOutputLang('en')}
+            className={`px-3 py-1.5 rounded-lg text-sm font-semibold transition-all ${outputLang === 'en' ? 'bg-white text-[#059669] shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
+          >
+            🇺🇸 English
+          </button>
+        </div>
       </div>
 
       {/* Sample cases */}
@@ -1067,8 +1086,8 @@ function DiagnoseContent() {
               <div className="flex flex-wrap items-start justify-between gap-3 mb-4">
                 <div>
                   <h2 className="text-xl sm:text-2xl font-bold text-[#1E293B]">
-                    {result.defect_type.ko}
-                    <span className="text-slate-400 text-sm sm:text-base font-normal ml-2">({result.defect_type.en})</span>
+                    {outputLang === 'en' ? result.defect_type.en : result.defect_type.ko}
+                    <span className="text-slate-400 text-sm sm:text-base font-normal ml-2">({outputLang === 'en' ? result.defect_type.ko : result.defect_type.en})</span>
                   </h2>
                   <div className="flex items-center gap-3 mt-2">
                     <SeverityBadge severity={result.severity} />

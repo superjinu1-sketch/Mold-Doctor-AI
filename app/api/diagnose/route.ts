@@ -94,7 +94,7 @@ function getResinKnowledge(resinType: string): string {
   return resinKnowledge['default'];
 }
 
-function buildSystemPrompt(resinType: string): string {
+function buildSystemPrompt(resinType: string, outputLang: 'ko' | 'en' = 'ko'): string {
   const resinNote = getResinKnowledge(resinType);
   return `You are an expert injection molding troubleshooter trained in Scientific Molding methodology (RJG/Paulson approach, Decoupled Molding II/III). You have 15+ years of hands-on experience and apply systematic, data-driven analysis rather than trial-and-error.
 
@@ -138,7 +138,7 @@ CRITICAL RULES:
 4. For hygroscopic resins, evaluate drying FIRST.
 5. For GF-reinforced grades, consider fiber orientation effects.
 6. For hot runner molds, check zone temperature uniformity and dead spots.
-7. Respond in Korean. Technical terms may be in English with Korean explanation.
+7. OUTPUT LANGUAGE: ${outputLang === 'en' ? 'Respond entirely in English. All text values in the JSON must be in English.' : 'Respond in Korean. Technical terms may be in English with Korean explanation in parentheses.'}
 8. MOLD DRAWING ANALYSIS — if mold drawings are provided, analyze: gate location vs defect, runner balance, cooling near defect area, wall thickness variation, vent locations, ejector positions. Include in 'mold_analysis' field.
 9. FLAME RETARDANCY & THICKNESS — if a flame retardant grade and certification thickness are provided, evaluate whether the product's actual wall thickness matches the certified thickness. Thinner walls typically require V-0 at thinner certification (e.g., 0.4mm vs 0.8mm). Thicker walls may relax the flame retardant additive loading but can increase sink/void risk. Flag mismatches between certified thickness and actual wall thickness in resin_specific_notes.
 
@@ -216,13 +216,14 @@ OUTPUT FORMAT (return as JSON only, no markdown):
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { defectType, defectDescription, resinInfo, settings, advSettings, moldInfo, productInfo, images, moldDrawings }: {
+    const { defectType, defectDescription, resinInfo, settings, advSettings, moldInfo, productInfo, images, moldDrawings, outputLang }: {
   defectType?: string; defectDescription?: string;
   resinInfo?: { resinType?: string; filler?: string; fillerContent?: string; flameRetardant?: string; flameRetardantThickness?: string; flameRetardantType?: string; resinDetail?: string; resinGrade?: string };
   settings?: Record<string, string>; advSettings?: Record<string, string>;
   moldInfo?: Record<string, string>; productInfo?: Record<string, string>;
   images?: { mediaType: string; data: string }[];
   moldDrawings?: { mediaType: string; data: string }[];
+  outputLang?: 'ko' | 'en';
 } = body;
 
     const userContent: Anthropic.MessageParam['content'] = [];
@@ -343,7 +344,7 @@ JSON 형식으로만 응답하세요. 마크다운 코드 블록 없이 순수 J
           const anthropicStream = client.messages.stream({
             model: 'claude-sonnet-4-6',
             max_tokens: 8192,
-            system: buildSystemPrompt(resinInfo?.resinType || ''),
+            system: buildSystemPrompt(resinInfo?.resinType || '', outputLang || 'ko'),
             messages: [{ role: 'user', content: userContent }],
           });
 
