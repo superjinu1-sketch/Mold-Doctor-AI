@@ -24,7 +24,9 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: '이미지가 없습니다.' }, { status: 400 });
     }
 
-    const client = new Anthropic({ apiKey: getApiKey() });
+    const apiKey = getApiKey();
+    if (!apiKey) return NextResponse.json({ error: 'API 키가 설정되지 않았습니다.' }, { status: 401 });
+    const client = new Anthropic({ apiKey });
     const response = await client.messages.create({
       model: 'claude-sonnet-4-6',
       max_tokens: 1024,
@@ -80,8 +82,12 @@ export async function POST(request: NextRequest) {
     jsonText = jsonText.replace(/^```json\s*/i, '').replace(/\s*```$/, '');
     jsonText = jsonText.replace(/^```\s*/i, '').replace(/\s*```$/, '');
 
-    const result = JSON.parse(jsonText);
-    return NextResponse.json(result);
+    try {
+      const result = JSON.parse(jsonText);
+      return NextResponse.json(result);
+    } catch {
+      return NextResponse.json({ error: '이미지 분석 결과를 파싱할 수 없습니다. 다시 시도해주세요.' }, { status: 422 });
+    }
   } catch (error) {
     console.error('Analyze image API error:', error);
     return NextResponse.json(

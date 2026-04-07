@@ -226,11 +226,18 @@ export async function POST(request: NextRequest) {
   outputLang?: 'ko' | 'en';
 } = body;
 
+    // Validate outputLang
+    const lang: 'ko' | 'en' = outputLang === 'en' ? 'en' : 'ko';
+
+    // Limit image arrays to prevent token overflow
+    const safeImages = (images || []).slice(0, 5);
+    const safeDrawings = (moldDrawings || []).slice(0, 3);
+
     const userContent: Anthropic.MessageParam['content'] = [];
 
     // Add defect images
-    if (images && images.length > 0) {
-      for (const img of images) {
+    if (safeImages.length > 0) {
+      for (const img of safeImages) {
         userContent.push({
           type: 'image',
           source: {
@@ -243,9 +250,9 @@ export async function POST(request: NextRequest) {
     }
 
     // Add mold drawings (images or PDFs)
-    if (moldDrawings && moldDrawings.length > 0) {
+    if (safeDrawings.length > 0) {
       userContent.push({ type: 'text', text: '--- 아래는 금형 도면/레이아웃 이미지입니다 ---' });
-      for (const drawing of moldDrawings) {
+      for (const drawing of safeDrawings) {
         if (drawing.mediaType === 'application/pdf') {
           userContent.push({
             type: 'document',
@@ -335,7 +342,11 @@ JSON 형식으로만 응답하세요. 마크다운 코드 블록 없이 순수 J
 
     userContent.push({ type: 'text', text: diagnosisText });
 
-    const client = new Anthropic({ apiKey: getApiKey() });
+    const apiKey = getApiKey();
+    if (!apiKey) {
+      return NextResponse.json({ error: 'API 키가 설정되지 않았습니다. Vercel 환경 변수 또는 .env.local 파일에 ANTHROPIC_API_KEY를 설정해주세요.' }, { status: 401 });
+    }
+    const client = new Anthropic({ apiKey });
 
     const encoder = new TextEncoder();
     const stream = new ReadableStream({
@@ -344,7 +355,7 @@ JSON 형식으로만 응답하세요. 마크다운 코드 블록 없이 순수 J
           const anthropicStream = client.messages.stream({
             model: 'claude-sonnet-4-6',
             max_tokens: 8192,
-            system: buildSystemPrompt(resinInfo?.resinType || '', outputLang || 'ko'),
+            system: buildSystemPrompt(resinInfo?.resinType || '', lang),
             messages: [{ role: 'user', content: userContent }],
           });
 

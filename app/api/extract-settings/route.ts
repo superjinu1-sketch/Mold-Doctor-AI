@@ -20,7 +20,9 @@ export async function POST(request: NextRequest) {
     const { image } = await request.json();
     if (!image) return NextResponse.json({ error: '이미지가 없습니다.' }, { status: 400 });
 
-    const client = new Anthropic({ apiKey: getApiKey() });
+    const apiKey = getApiKey();
+    if (!apiKey) return NextResponse.json({ error: 'API 키가 설정되지 않았습니다.' }, { status: 401 });
+    const client = new Anthropic({ apiKey });
     const response = await client.messages.create({
       model: 'claude-sonnet-4-6',
       max_tokens: 1024,
@@ -95,8 +97,12 @@ export async function POST(request: NextRequest) {
       .replace(/^```json\s*/i, '').replace(/\s*```$/, '')
       .replace(/^```\s*/i, '').replace(/\s*```$/, '');
 
-    const result = JSON.parse(jsonText);
-    return NextResponse.json(result);
+    try {
+      const result = JSON.parse(jsonText);
+      return NextResponse.json(result);
+    } catch {
+      return NextResponse.json({ error: 'AI 응답을 파싱할 수 없습니다. 사출기 화면이 선명한 사진을 사용해주세요.' }, { status: 422 });
+    }
   } catch (error) {
     return NextResponse.json(
       { error: error instanceof Error ? error.message : '셋팅값 추출 실패' },

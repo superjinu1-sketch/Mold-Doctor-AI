@@ -413,8 +413,9 @@ function DiagnoseContent() {
       });
 
       if (!res.ok) {
-        const err = await res.json();
-        throw new Error(err.error || '진단 실패');
+        let errMsg = '진단 실패';
+        try { const err = await res.json(); errMsg = err.error || errMsg; } catch { /* HTML 에러 페이지 등 무시 */ }
+        throw new Error(errMsg);
       }
 
       // Stream reading
@@ -423,12 +424,15 @@ function DiagnoseContent() {
       let accumulated = '';
 
       if (reader) {
-        while (true) {
-          const { done, value } = await reader.read();
-          if (done) break;
-          const chunk = decoder.decode(value, { stream: true });
-          accumulated += chunk;
-          setStreamText(accumulated);
+        try {
+          while (true) {
+            const { done, value } = await reader.read();
+            if (done) break;
+            accumulated += decoder.decode(value, { stream: true });
+            setStreamText(accumulated);
+          }
+        } finally {
+          reader.releaseLock();
         }
       }
 
@@ -436,14 +440,22 @@ function DiagnoseContent() {
       let jsonText = accumulated.trim()
         .replace(/^```json\s*/i, '').replace(/\s*```$/, '')
         .replace(/^```\s*/i, '').replace(/\s*```$/, '');
-      const data = JSON.parse(jsonText);
+      let data: DiagnosisResult;
+      try {
+        data = JSON.parse(jsonText);
+      } catch {
+        throw new Error(`AI 응답 파싱 실패. 다시 시도해주세요.\n(응답 길이: ${jsonText.length}자)`);
+      }
       setResult(data);
       setStreamText('');
 
       // Save to localStorage
-      const history = JSON.parse(localStorage.getItem('diagnoseHistory') || '[]');
-      history.unshift({ ...data, timestamp: new Date().toISOString(), id: Date.now() });
-      localStorage.setItem('diagnoseHistory', JSON.stringify(history.slice(0, 20)));
+      try {
+        const raw = typeof window !== 'undefined' ? localStorage.getItem('diagnoseHistory') : null;
+        const history = JSON.parse(raw || '[]');
+        history.unshift({ ...data, timestamp: new Date().toISOString(), id: Date.now() });
+        localStorage.setItem('diagnoseHistory', JSON.stringify(history.slice(0, 20)));
+      } catch { /* localStorage 비활성화 또는 용량 초과 시 무시 */ }
 
       // Scroll to result
       setTimeout(() => resultRef.current?.scrollIntoView({ behavior: 'smooth' }), 100);
