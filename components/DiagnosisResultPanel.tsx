@@ -6,6 +6,7 @@ interface DiagnosisResult {
   defect_type: { ko: string; en: string };
   defect_phase?: 'filling' | 'packing' | 'cooling' | 'material';
   severity: 'high' | 'medium' | 'low';
+  tier?: 'simple' | 'complex';
   summary: string;
   process_window_check?: {
     melt_temp?: { status: 'ok' | 'warning' | 'critical'; note: string };
@@ -91,6 +92,11 @@ export default function DiagnosisResultPanel({ result, onSavePDF }: Props) {
             </h2>
             <div className="flex items-center gap-3 mt-2">
               <SeverityBadge severity={result.severity} />
+              {/* TODO: complex → "심층 분석 (Pro)" 배지 (보라) 로 변경 예정 */}
+              {result.tier === 'complex'
+                ? <span className="px-3 py-1 rounded-full text-sm font-bold bg-orange-100 text-orange-700 border border-orange-300">복합 분석</span>
+                : <span className="px-3 py-1 rounded-full text-sm font-bold bg-green-100 text-green-700 border border-green-300">기본 분석</span>
+              }
             </div>
           </div>
           <button

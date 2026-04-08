@@ -94,7 +94,47 @@ function getResinKnowledge(resinType: string): string {
   return resinKnowledge['default'];
 }
 
-function buildSystemPrompt(resinType: string): string {
+// TODO: Tier 2 subagent 구현
+// - Agent A: 사진 정밀 분석 (불량 위치, 패턴, 심각도)
+// - Agent B: 수지 특성 검증 (가공 윈도우 벗어남 여부)
+// - Agent C: 유사 사례 검색 (knowledge DB + 사용자 기록)
+// - Agent D: 금형 도면 분석 (게이트/냉각/벤트 평가)
+// - Final Agent: 4개 결과 종합 → 최종 진단
+// 트리거: tier === 'complex' && user.plan === 'pro'
+
+interface ComplexityInput {
+  defectDescription?: string;
+  moldDrawings?: unknown[];
+  images?: unknown[];
+  advSettings?: Record<string, string>;
+}
+
+function classifyComplexity(input: ComplexityInput): 'simple' | 'complex' {
+  let score = 0;
+
+  if (input.defectDescription?.includes('간헐적') ||
+      input.defectDescription?.includes('특정 캐비티') ||
+      input.defectDescription?.includes('시간대') ||
+      input.defectDescription?.includes('때만')) score += 3;
+
+  if (input.defectDescription?.includes('조건 변경해도') ||
+      input.defectDescription?.includes('해결 안') ||
+      input.defectDescription?.includes('계속')) score += 3;
+
+  if ((input.moldDrawings?.length ?? 0) > 0) score += 2;
+
+  if ((input.images?.length ?? 0) >= 3) score += 1;
+
+  if (input.advSettings?.hrManifoldTemp) score += 2;
+
+  if (Number(input.advSettings?.regrindRatio ?? 0) > 0) score += 1;
+
+  if (input.advSettings?.actualFillTime && input.advSettings?.injSpeed1) score += 1;
+
+  return score >= 5 ? 'complex' : 'simple';
+}
+
+function buildSystemPrompt(resinType: string, tier: 'simple' | 'complex' = 'simple'): string {
   const resinNote = getResinKnowledge(resinType);
   return `You are an expert injection molding troubleshooter trained in Scientific Molding methodology (RJG/Paulson approach, Decoupled Molding II/III). You have 15+ years of hands-on experience and apply systematic, data-driven analysis rather than trial-and-error.
 
@@ -131,7 +171,14 @@ STEP 4: SPECIFIC RECOMMENDATIONS
 STEP 5: VERIFICATION CHECKLIST
 - Before changes / after changes / escalation criteria
 
-CRITICAL RULES:
+${tier === 'complex' ? `COMPLEX CASE INSTRUCTIONS (복합 원인 케이스):
+이 케이스는 복합 원인 가능성이 높습니다.
+단순 원인(건조, 온도)으로 결론 내리지 마세요.
+간헐적 패턴, 특정 위치, 시간대 변화 등 숨은 단서를 분석하세요.
+금형 구조적 원인과 소재 상호작용도 반드시 검토하세요.
+최소 3개 이상의 가능한 원인을 제시하고 각각의 확률을 부여하세요.
+
+` : ''}CRITICAL RULES:
 1. Every recommendation must reference this specific resin, the settings provided, and the defect observed.
 2. When actual measured values (fill time, peak pressure, cushion, part weight) are provided, use them.
 3. Consider parameter interactions.
@@ -228,6 +275,15 @@ export async function POST(request: NextRequest) {
     // Limit image arrays to prevent token overflow
     const safeImages = (images || []).slice(0, 5);
     const safeDrawings = (moldDrawings || []).slice(0, 3);
+
+    // Classify complexity for 2-tier system
+    const tier = classifyComplexity({
+      defectDescription,
+      moldDrawings: safeDrawings,
+      images: safeImages,
+      advSettings,
+    });
+    const maxTokens = tier === 'complex' ? 2500 : 1500;
 
     const userContent: Anthropic.MessageParam['content'] = [];
 
@@ -350,8 +406,8 @@ JSON 형식으로만 응답하세요. 마크다운 코드 블록 없이 순수 J
         try {
           const anthropicStream = client.messages.stream({
             model: 'claude-sonnet-4-6',
-            max_tokens: 8192,
-            system: buildSystemPrompt(resinInfo?.resinType || ''),
+            max_tokens: maxTokens,
+            system: buildSystemPrompt(resinInfo?.resinType || '', tier),
             messages: [{ role: 'user', content: userContent }],
           });
 
@@ -372,6 +428,7 @@ JSON 형식으로만 응답하세요. 마크다운 코드 블록 없이 순수 J
         'Content-Type': 'text/plain; charset=utf-8',
         'Transfer-Encoding': 'chunked',
         'X-Content-Type-Options': 'nosniff',
+        'X-Diagnosis-Tier': tier,
       },
     });
   } catch (error) {

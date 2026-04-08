@@ -17,6 +17,7 @@ interface DiagnosisResult {
   defect_type: { ko: string; en: string };
   defect_phase?: 'filling' | 'packing' | 'cooling' | 'material';
   severity: 'high' | 'medium' | 'low';
+  tier?: 'simple' | 'complex';
   summary: string;
   process_window_check?: {
     melt_temp?: { status: 'ok' | 'warning' | 'critical'; note: string };
@@ -404,6 +405,8 @@ function DiagnoseContent() {
         throw new Error(errMsg);
       }
 
+      const diagnosisTier = (res.headers.get('X-Diagnosis-Tier') || 'simple') as 'simple' | 'complex';
+
       // Stream reading
       const reader = res.body?.getReader();
       const decoder = new TextDecoder();
@@ -432,6 +435,7 @@ function DiagnoseContent() {
       } catch {
         throw new Error(`AI 응답 파싱 실패. 다시 시도해주세요.\n(응답 길이: ${jsonText.length}자)`);
       }
+      data.tier = diagnosisTier;
       setResult(data);
       setStreamText('');
 
@@ -593,10 +597,11 @@ function DiagnoseContent() {
             <label className={labelCls}>불량 상황 설명 (선택)</label>
             <textarea
               className={`${inputCls} h-24 resize-none`}
-              placeholder="예: 5샷에 1번꼴로 발생, 특정 부위에서만, 오후에 심해짐..."
+              placeholder="예: 5샷에 1번꼴로 발생, 특정 부위에서만, 오후에 심해짐, 조건 바꿔도 안 됨..."
               value={defectDescription}
               onChange={(e) => setDefectDescription(e.target.value)}
             />
+            <p className="mt-1 text-xs text-slate-400">상세하게 작성할수록 정확한 진단이 가능합니다</p>
           </div>
         </section>
 
