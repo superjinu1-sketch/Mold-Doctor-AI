@@ -65,11 +65,10 @@ function DirectionArrow({ direction }: { direction?: string }) {
 
 interface Props {
   result: DiagnosisResult;
-  outputLang: 'ko' | 'en';
   onSavePDF: () => void;
 }
 
-export default function DiagnosisResultPanel({ result, outputLang, onSavePDF }: Props) {
+export default function DiagnosisResultPanel({ result, onSavePDF }: Props) {
   const [checkedItems, setCheckedItems] = useState<Set<number>>(new Set());
 
   const toggleCheck = (i: number) => {
@@ -87,8 +86,8 @@ export default function DiagnosisResultPanel({ result, outputLang, onSavePDF }: 
         <div className="flex flex-wrap items-start justify-between gap-3 mb-4">
           <div>
             <h2 className="text-xl sm:text-2xl font-bold text-[#1E293B]">
-              {outputLang === 'en' ? result.defect_type.en : result.defect_type.ko}
-              <span className="text-slate-400 text-sm sm:text-base font-normal ml-2">({outputLang === 'en' ? result.defect_type.ko : result.defect_type.en})</span>
+              {result.defect_type.ko}
+              <span className="text-slate-400 text-sm sm:text-base font-normal ml-2">({result.defect_type.en})</span>
             </h2>
             <div className="flex items-center gap-3 mt-2">
               <SeverityBadge severity={result.severity} />
