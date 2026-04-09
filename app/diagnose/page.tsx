@@ -13,11 +13,24 @@ interface ImageFile {
   mediaType: string;
 }
 
+interface ActionTaken {
+  recommendation: string;
+  done: boolean;
+  result: string;
+}
+
+interface FollowUpHistoryItem {
+  round: number;
+  timestamp: string;
+  changeDescription: string;
+}
+
 interface DiagnosisResult {
   defect_type: { ko: string; en: string };
   defect_phase?: 'filling' | 'packing' | 'cooling' | 'material';
   severity: 'high' | 'medium' | 'low';
   tier?: 'simple' | 'complex';
+  round?: number;
   summary: string;
   process_window_check?: {
     melt_temp?: { status: 'ok' | 'warning' | 'critical'; note: string };
@@ -206,6 +219,17 @@ function DiagnoseContent() {
   const [result, setResult] = useState<DiagnosisResult | null>(null);
   const [error, setError] = useState('');
 
+  // Follow-up state
+  const [round, setRound] = useState(1);
+  const [diagnosisId, setDiagnosisId] = useState<string>('');
+  const [showFollowUpForm, setShowFollowUpForm] = useState(false);
+  const [followUpActions, setFollowUpActions] = useState<ActionTaken[]>([]);
+  const [followUpChange, setFollowUpChange] = useState('');
+  const [followUpNotes, setFollowUpNotes] = useState('');
+  const [followUpImages, setFollowUpImages] = useState<ImageFile[]>([]);
+  const [followUpHistory, setFollowUpHistory] = useState<FollowUpHistoryItem[]>([]);
+  const [previousDiagnosis, setPreviousDiagnosis] = useState<{ causes: DiagnosisResult['causes']; recommendations: DiagnosisResult['recommendations'] } | null>(null);
+
   const [showAdvanced, setShowAdvanced] = useState(false);
   const [advSettings, setAdvSettings] = useState({
     vpTransferPos: '', vpTransferPressure: '',
@@ -225,6 +249,7 @@ function DiagnoseContent() {
   const settingsImageRef = useRef<HTMLInputElement>(null);
   const moldDrawingInputRef = useRef<HTMLInputElement>(null);
   const resultRef = useRef<HTMLDivElement>(null);
+  const followUpFormRef = useRef<HTMLDivElement>(null);
 
   const handleSettingsImage = async (file: File) => {
     if (!file.type.startsWith('image/')) return;
@@ -378,6 +403,7 @@ function DiagnoseContent() {
     setResult(null);
 
     try {
+      const isFollowUp = round > 1 && previousDiagnosis !== null;
       const payload = {
         defectType: defectType === '기타 (직접 입력)' ? customDefect : defectType,
         defectDescription,
@@ -389,8 +415,15 @@ function DiagnoseContent() {
         advSettings,
         moldInfo: { moldType, gateType, cavities, runnerType },
         productInfo: { weight, wallThicknessMin, wallThicknessMax, notes: productNotes },
-        images: images.map(img => ({ data: img.base64, mediaType: img.mediaType })),
+        images: [...images, ...followUpImages].map(img => ({ data: img.base64, mediaType: img.mediaType })),
         moldDrawings: moldDrawings.map(img => ({ data: img.base64, mediaType: img.mediaType })),
+        ...(isFollowUp && {
+          isFollowUp: true,
+          round,
+          previousDiagnosis,
+          actionsTaken: followUpActions,
+          changeDescription: followUpChange + (followUpNotes ? `\n${followUpNotes}` : ''),
+        }),
       };
 
       const res = await fetch('/api/diagnose', {
@@ -406,6 +439,7 @@ function DiagnoseContent() {
       }
 
       const diagnosisTier = (res.headers.get('X-Diagnosis-Tier') || 'simple') as 'simple' | 'complex';
+      const diagnosisRound = Number(res.headers.get('X-Diagnosis-Round') || round);
 
       // Stream reading
       const reader = res.body?.getReader();
@@ -436,14 +470,26 @@ function DiagnoseContent() {
         throw new Error(`AI 응답 파싱 실패. 다시 시도해주세요.\n(응답 길이: ${jsonText.length}자)`);
       }
       data.tier = diagnosisTier;
+      data.round = diagnosisRound;
       setResult(data);
       setStreamText('');
+      setShowFollowUpForm(false);
+
+      // Update follow-up history for timeline
+      if (round > 1) {
+        setFollowUpHistory(prev => [
+          ...prev.filter(h => h.round < diagnosisRound),
+          { round: diagnosisRound - 1, timestamp: new Date().toISOString(), changeDescription: followUpChange },
+        ]);
+      }
 
       // Save to localStorage
+      const newId = String(Date.now());
+      setDiagnosisId(newId);
       try {
         const raw = typeof window !== 'undefined' ? localStorage.getItem('diagnoseHistory') : null;
         const history = JSON.parse(raw || '[]');
-        history.unshift({ ...data, timestamp: new Date().toISOString(), id: Date.now() });
+        history.unshift({ ...data, timestamp: new Date().toISOString(), id: newId, round: diagnosisRound });
         localStorage.setItem('diagnoseHistory', JSON.stringify(history.slice(0, 20)));
       } catch { /* localStorage 비활성화 또는 용량 초과 시 무시 */ }
 
@@ -474,6 +520,48 @@ function DiagnoseContent() {
       alert('PDF 저장 중 오류가 발생했습니다.');
     }
   };
+
+  const handleResolved = () => {
+    try {
+      const raw = typeof window !== 'undefined' ? localStorage.getItem('diagnoseHistory') : null;
+      const history = JSON.parse(raw || '[]');
+      const idx = history.findIndex((h: { id: string }) => h.id === diagnosisId);
+      if (idx !== -1) {
+        history[idx].resolved = true;
+        history[idx].resolvedAt = new Date().toISOString();
+        localStorage.setItem('diagnoseHistory', JSON.stringify(history));
+      }
+    } catch { /* ignore */ }
+    alert('해결된 사례로 기록되었습니다.');
+  };
+
+  const handleStartFollowUp = () => {
+    if (!result) return;
+    const actions: ActionTaken[] = result.recommendations.map(rec => ({
+      recommendation: `${rec.parameter}: ${rec.current} → ${rec.recommended}`,
+      done: false,
+      result: '',
+    }));
+    setPreviousDiagnosis({ causes: result.causes, recommendations: result.recommendations });
+    setFollowUpActions(actions);
+    setFollowUpChange('');
+    setFollowUpNotes('');
+    setFollowUpImages([]);
+    setShowFollowUpForm(true);
+    setRound(prev => prev + 1);
+    setTimeout(() => followUpFormRef.current?.scrollIntoView({ behavior: 'smooth' }), 100);
+  };
+
+  const handleFollowUpSubmit = async () => {
+    await handleDiagnose();
+  };
+
+  const addFollowUpImages = useCallback(async (files: FileList | File[]) => {
+    const fileArray = Array.from(files);
+    const processed = await Promise.all(fileArray.map(processFile));
+    const valid = processed.filter(Boolean) as ImageFile[];
+    setFollowUpImages(prev => [...prev, ...valid].slice(0, 5));
+  }, [processFile]);
 
   const inputCls = "w-full border border-slate-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#059669] focus:border-transparent";
   const labelCls = "block text-sm font-medium text-slate-700 mb-1";
@@ -1078,9 +1166,137 @@ function DiagnoseContent() {
           <div ref={resultRef}>
             <DiagnosisResultPanel
               result={result}
-
               onSavePDF={handleSavePDF}
+              round={round}
+              followUpHistory={followUpHistory}
+              onResolved={handleResolved}
+              onStartFollowUp={handleStartFollowUp}
             />
+          </div>
+        )}
+
+        {/* Follow-up Form */}
+        {showFollowUpForm && result && (
+          <div ref={followUpFormRef} className="bg-white rounded-2xl p-4 sm:p-6 shadow-sm border-2 border-orange-300 space-y-5">
+            <div className="flex items-center gap-2 mb-1">
+              <span className="bg-orange-500 text-white text-xs font-bold px-2 py-1 rounded-full">{round}차 후속 진단</span>
+              <h3 className="text-lg font-bold text-[#1E293B]">후속 진단 정보 입력</h3>
+            </div>
+
+            {/* 조치 체크리스트 */}
+            <div>
+              <label className={labelCls}>어떤 조치를 했나요?</label>
+              <div className="space-y-2 mt-1">
+                {followUpActions.map((action, i) => (
+                  <div key={i} className="border border-slate-200 rounded-xl p-3">
+                    <label className="flex items-start gap-3 cursor-pointer">
+                      <input
+                        type="checkbox"
+                        className="mt-0.5 w-5 h-5 rounded accent-[#059669] shrink-0"
+                        checked={action.done}
+                        onChange={() => setFollowUpActions(prev => prev.map((a, j) => j === i ? { ...a, done: !a.done } : a))}
+                      />
+                      <span className={`text-sm flex-1 ${action.done ? 'text-slate-700 font-medium' : 'text-slate-400'}`}>{action.recommendation}</span>
+                    </label>
+                    {action.done && (
+                      <select
+                        className="mt-2 ml-8 text-sm border border-slate-200 rounded-lg px-2 py-1.5 bg-slate-50"
+                        value={action.result}
+                        onChange={(e) => setFollowUpActions(prev => prev.map((a, j) => j === i ? { ...a, result: e.target.value } : a))}
+                      >
+                        <option value="">결과 선택...</option>
+                        <option value="완전 해결">완전 해결</option>
+                        <option value="부분 개선">부분 개선 (빈도 줄었지만 아직 발생)</option>
+                        <option value="변화 없음">변화 없음</option>
+                        <option value="오히려 악화">오히려 악화됨</option>
+                      </select>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* 전반적 변화 */}
+            <div>
+              <label className={labelCls}>전반적인 조치 후 변화</label>
+              <select className={inputCls} value={followUpChange} onChange={(e) => setFollowUpChange(e.target.value)}>
+                <option value="">선택해주세요...</option>
+                <option value="개선됨 (빈도 줄었지만 아직 발생)">개선됨 (빈도 줄었지만 아직 발생)</option>
+                <option value="변화 없음">변화 없음</option>
+                <option value="오히려 악화됨">오히려 악화됨</option>
+                <option value="다른 불량이 새로 발생">다른 불량이 새로 발생</option>
+              </select>
+            </div>
+
+            {/* 추가 관찰 사항 */}
+            <div>
+              <label className={labelCls}>추가 관찰 사항 (선택)</label>
+              <textarea
+                className={`${inputCls} h-20 resize-none`}
+                placeholder="예: 건조 연장 후 은줄 빈도가 줄었지만 5번에 1번은 여전히 발생..."
+                value={followUpNotes}
+                onChange={(e) => setFollowUpNotes(e.target.value)}
+              />
+            </div>
+
+            {/* 조치 후 사진 업로드 */}
+            <div>
+              <label className={labelCls}>조치 후 불량 사진 (선택)</label>
+              <div
+                className="border-2 border-dashed border-slate-300 rounded-xl p-4 text-center cursor-pointer hover:border-[#059669] transition-colors"
+                onClick={() => {
+                  const input = document.createElement('input');
+                  input.type = 'file';
+                  input.accept = 'image/*';
+                  input.multiple = true;
+                  input.onchange = (e) => {
+                    const files = (e.target as HTMLInputElement).files;
+                    if (files) addFollowUpImages(files);
+                  };
+                  input.click();
+                }}
+              >
+                <p className="text-sm text-slate-500">사진 클릭하여 업로드</p>
+                {followUpImages.length > 0 && (
+                  <div className="flex gap-2 mt-2 justify-center flex-wrap">
+                    {followUpImages.map(img => (
+                      <div key={img.id} className="relative">
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img src={img.preview} alt="" className="w-16 h-16 object-cover rounded-lg border" />
+                        <button
+                          type="button"
+                          onClick={(e) => { e.stopPropagation(); setFollowUpImages(prev => prev.filter(i => i.id !== img.id)); }}
+                          className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white rounded-full text-xs flex items-center justify-center"
+                        >×</button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* 셋팅 변경 안내 */}
+            <div className="bg-slate-50 rounded-xl p-3 border border-slate-200">
+              <p className="text-xs text-slate-500 font-medium">변경된 셋팅값이 있으면 위의 사출기 셋팅 폼에서 직접 수정 후 후속 진단을 시작하세요.</p>
+            </div>
+
+            <div className="flex gap-3">
+              <button
+                type="button"
+                onClick={() => { setShowFollowUpForm(false); setRound(prev => Math.max(1, prev - 1)); }}
+                className="px-4 py-3 rounded-xl border border-slate-300 text-slate-600 text-sm font-medium hover:bg-slate-50 transition-colors"
+              >
+                취소
+              </button>
+              <button
+                type="button"
+                onClick={handleFollowUpSubmit}
+                disabled={isLoading}
+                className="flex-1 bg-orange-500 hover:bg-orange-600 disabled:opacity-50 text-white font-bold py-3 px-6 rounded-xl transition-colors"
+              >
+                {isLoading ? 'AI 분석 중...' : `${round}차 후속 진단 시작`}
+              </button>
+            </div>
           </div>
         )}
       </div>

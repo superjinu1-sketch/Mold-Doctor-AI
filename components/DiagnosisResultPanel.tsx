@@ -64,12 +64,22 @@ function DirectionArrow({ direction }: { direction?: string }) {
   return <span className="text-green-500 font-bold">✓</span>;
 }
 
+interface FollowUpHistoryItem {
+  round: number;
+  timestamp: string;
+  changeDescription: string;
+}
+
 interface Props {
   result: DiagnosisResult;
   onSavePDF: () => void;
+  round?: number;
+  followUpHistory?: FollowUpHistoryItem[];
+  onResolved?: () => void;
+  onStartFollowUp?: () => void;
 }
 
-export default function DiagnosisResultPanel({ result, onSavePDF }: Props) {
+export default function DiagnosisResultPanel({ result, onSavePDF, round = 1, followUpHistory = [], onResolved, onStartFollowUp }: Props) {
   const [checkedItems, setCheckedItems] = useState<Set<number>>(new Set());
 
   const toggleCheck = (i: number) => {
@@ -80,8 +90,53 @@ export default function DiagnosisResultPanel({ result, onSavePDF }: Props) {
     });
   };
 
+  const roundBadge = round === 1
+    ? { label: '1차 진단', cls: 'bg-blue-100 text-blue-700 border border-blue-300' }
+    : round === 2
+    ? { label: '2차 후속 진단', cls: 'bg-orange-100 text-orange-700 border border-orange-300' }
+    : { label: `${round}차 심층 진단`, cls: 'bg-red-100 text-red-700 border border-red-300' };
+
   return (
     <div className="space-y-5">
+      {/* Follow-up Timeline */}
+      {followUpHistory.length > 0 && (
+        <div className="bg-white rounded-2xl p-4 shadow-sm border border-slate-200 overflow-x-auto">
+          <div className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-3">진단 이력</div>
+          <div className="flex items-center gap-2 min-w-max">
+            {followUpHistory.map((h, i) => (
+              <div key={i} className="flex items-center gap-2">
+                <div className="text-center">
+                  <div className={`px-2 py-1 rounded-full text-xs font-bold ${h.round === 1 ? 'bg-blue-100 text-blue-700' : h.round === 2 ? 'bg-orange-100 text-orange-700' : 'bg-red-100 text-red-700'}`}>
+                    {h.round}차 진단
+                  </div>
+                  {h.changeDescription && (
+                    <div className="text-xs text-slate-400 mt-1 max-w-[100px] truncate" title={h.changeDescription}>
+                      조치: {h.changeDescription}
+                    </div>
+                  )}
+                </div>
+                {i < followUpHistory.length - 1 && <span className="text-slate-300 font-bold">→</span>}
+              </div>
+            ))}
+            <div className="flex items-center gap-2">
+              <span className="text-slate-300 font-bold">→</span>
+              <div className={`px-2 py-1 rounded-full text-xs font-bold ${roundBadge.cls}`}>{roundBadge.label}</div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 3차+ 전문가 상담 권장 배너 */}
+      {round >= 3 && (
+        <div className="bg-red-50 border border-red-200 rounded-2xl p-4 flex items-start gap-3">
+          <span className="text-red-500 text-xl shrink-0">⚠</span>
+          <div>
+            <p className="font-bold text-red-700 text-sm">{round}차 반복 진단 — 전문가 상담 권장</p>
+            <p className="text-red-600 text-xs mt-1">성형 조건 조정으로 해결이 어려운 단계입니다. 금형 정밀 점검, 사출기 기계적 점검, 또는 소재 변경을 검토하세요.</p>
+          </div>
+        </div>
+      )}
+
       {/* Summary Card */}
       <div className="bg-white rounded-2xl p-4 sm:p-6 shadow-sm border border-slate-200">
         <div className="flex flex-wrap items-start justify-between gap-3 mb-4">
@@ -90,8 +145,9 @@ export default function DiagnosisResultPanel({ result, onSavePDF }: Props) {
               {result.defect_type.ko}
               <span className="text-slate-400 text-sm sm:text-base font-normal ml-2">({result.defect_type.en})</span>
             </h2>
-            <div className="flex items-center gap-3 mt-2">
+            <div className="flex items-center gap-3 mt-2 flex-wrap">
               <SeverityBadge severity={result.severity} />
+              <span className={`px-3 py-1 rounded-full text-sm font-bold ${roundBadge.cls}`}>{roundBadge.label}</span>
               {/* TODO: complex → "심층 분석 (Pro)" 배지 (보라) 로 변경 예정 */}
               {result.tier === 'complex'
                 ? <span className="px-3 py-1 rounded-full text-sm font-bold bg-orange-100 text-orange-700 border border-orange-300">복합 분석</span>
@@ -394,6 +450,30 @@ export default function DiagnosisResultPanel({ result, onSavePDF }: Props) {
           )}
         </div>
       )}
+
+      {/* Follow-up Actions */}
+      {/* TODO: Free: 1차 진단만 무료 / Pro: 후속 진단 무제한 */}
+      <div className="bg-white rounded-2xl p-4 sm:p-6 shadow-sm border border-slate-200">
+        <div className="text-sm font-bold text-slate-600 mb-3">조치 결과가 어떻게 됐나요?</div>
+        <div className="flex flex-col sm:flex-row gap-3">
+          <button
+            type="button"
+            onClick={onResolved}
+            className="flex-1 flex items-center justify-center gap-2 bg-green-50 hover:bg-green-100 text-green-700 border border-green-300 px-4 py-3 rounded-xl text-sm font-bold transition-colors"
+          >
+            <span className="text-lg">✓</span>
+            해결됨
+          </button>
+          <button
+            type="button"
+            onClick={onStartFollowUp}
+            className="flex-1 flex items-center justify-center gap-2 bg-orange-50 hover:bg-orange-100 text-orange-700 border border-orange-300 px-4 py-3 rounded-xl text-sm font-bold transition-colors"
+          >
+            <span className="text-lg">→</span>
+            해결 안 됨 — 후속 진단
+          </button>
+        </div>
+      </div>
     </div>
   );
 }

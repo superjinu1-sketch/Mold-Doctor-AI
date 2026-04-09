@@ -134,7 +134,7 @@ function classifyComplexity(input: ComplexityInput): 'simple' | 'complex' {
   return score >= 5 ? 'complex' : 'simple';
 }
 
-function buildSystemPrompt(resinType: string, tier: 'simple' | 'complex' = 'simple'): string {
+function buildSystemPrompt(resinType: string, tier: 'simple' | 'complex' = 'simple', round: number = 1): string {
   const resinNote = getResinKnowledge(resinType);
   return `You are an expert injection molding troubleshooter trained in Scientific Molding methodology (RJG/Paulson approach, Decoupled Molding II/III). You have 15+ years of hands-on experience and apply systematic, data-driven analysis rather than trial-and-error.
 
@@ -177,6 +177,23 @@ ${tier === 'complex' ? `COMPLEX CASE INSTRUCTIONS (복합 원인 케이스):
 간헐적 패턴, 특정 위치, 시간대 변화 등 숨은 단서를 분석하세요.
 금형 구조적 원인과 소재 상호작용도 반드시 검토하세요.
 최소 3개 이상의 가능한 원인을 제시하고 각각의 확률을 부여하세요.
+
+` : ''}${round >= 2 ? `FOLLOW-UP DIAGNOSIS INSTRUCTIONS (후속 진단):
+이것은 ${round}차 후속 진단입니다. 이전 진단과 조치 결과를 반드시 참고하세요.
+분석 규칙:
+1. 이미 시도해서 효과 없었던 조치는 다시 추천하지 마세요
+2. 부분 개선된 조치는 방향이 맞다는 뜻 — 더 강하게 조정하거나 보조 조치를 추가하세요
+3. 1차 진단에서 미처 고려하지 못한 원인을 탐색하세요: 금형 구조적 원인(벤트/게이트/냉각), 소재 로트 변화, 사출기 기계적 문제(체크링/스크류 마모), 환경 요인(습도/온도)
+4. 1차가 material/method 원인이었다면, 2차는 machine/mold 원인을 우선 검토하세요
+
+` : ''}${round >= 3 ? `REPEAT DIAGNOSIS ALERT (3차+ 반복 진단):
+이 케이스는 3회 이상 반복 진단입니다. 일반적인 성형 조건 조정으로는 해결이 어려운 상태입니다.
+다음을 반드시 검토하세요:
+- 사출기 기계적 점검: 체크링 마모, 스크류 마모, 히터 열화
+- 금형 정밀 점검: 벤트 막힘, 냉각 라인 스케일, PL면 마모
+- 소재 변경 검토: 같은 수지의 다른 등급 또는 다른 제조사
+- 금형 설계 변경: 게이트 위치/크기, 러너 밸런스
+'조건을 더 바꿔보세요'가 아니라 근본 원인 해결을 제시하세요.
 
 ` : ''}CRITICAL RULES:
 1. Every recommendation must reference this specific resin, the settings provided, and the defect observed.
@@ -263,14 +280,24 @@ OUTPUT FORMAT (return as JSON only, no markdown):
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { defectType, defectDescription, resinInfo, settings, advSettings, moldInfo, productInfo, images, moldDrawings }: {
+    const {
+      defectType, defectDescription, resinInfo, settings, advSettings, moldInfo, productInfo, images, moldDrawings,
+      isFollowUp, previousDiagnosis, actionsTaken, changeDescription, round: bodyRound,
+    }: {
   defectType?: string; defectDescription?: string;
   resinInfo?: { resinType?: string; filler?: string; fillerContent?: string; flameRetardant?: string; flameRetardantThickness?: string; flameRetardantType?: string; resinDetail?: string; resinGrade?: string };
   settings?: Record<string, string>; advSettings?: Record<string, string>;
   moldInfo?: Record<string, string>; productInfo?: Record<string, string>;
   images?: { mediaType: string; data: string }[];
   moldDrawings?: { mediaType: string; data: string }[];
+  isFollowUp?: boolean;
+  previousDiagnosis?: { causes: { description: string; probability: number }[]; recommendations: { parameter: string; current: string; recommended: string }[] };
+  actionsTaken?: { recommendation: string; done: boolean; result?: string }[];
+  changeDescription?: string;
+  round?: number;
 } = body;
+
+    const round = Number(bodyRound) || 1;
 
     // Limit image arrays to prevent token overflow
     const safeImages = (images || []).slice(0, 5);
@@ -283,7 +310,7 @@ export async function POST(request: NextRequest) {
       images: safeImages,
       advSettings,
     });
-    const maxTokens = tier === 'complex' ? 2500 : 1500;
+    const maxTokens = (tier === 'complex' || round >= 2) ? 2500 : 1500;
 
     const userContent: Anthropic.MessageParam['content'] = [];
 
@@ -389,6 +416,23 @@ ${(a.machineModel || a.screwDiameter) ? `## 사출기 정보
 - 제품 중량: ${productInfo?.weight || '-'}g, 벽 두께: ${productInfo?.wallThicknessMin || '-'}~${productInfo?.wallThicknessMax || '-'}mm
 - 특이사항: ${productInfo?.notes || '없음'}
 
+${isFollowUp && previousDiagnosis ? `
+## 후속 진단 정보 (${round}차 Follow-up)
+### 이전 진단 원인
+${previousDiagnosis.causes.map(c => `- ${c.description} (${c.probability}%)`).join('\n')}
+
+### 이전 AI 추천사항
+${previousDiagnosis.recommendations.map(r => `- ${r.parameter}: ${r.current} → ${r.recommended}`).join('\n')}
+
+### 실행한 조치와 결과
+${(actionsTaken || []).filter(a => a.done).map(a => `- ✓ ${a.recommendation}: ${a.result || '결과 미기재'}`).join('\n') || '없음'}
+
+### 아직 미실행 조치
+${(actionsTaken || []).filter(a => !a.done).map(a => `- ✗ ${a.recommendation}`).join('\n') || '없음'}
+
+### 조치 후 변화 관찰
+${changeDescription || '없음'}
+` : ''}
 JSON 형식으로만 응답하세요. 마크다운 코드 블록 없이 순수 JSON만 반환하세요.
     `.trim();
 
@@ -407,7 +451,7 @@ JSON 형식으로만 응답하세요. 마크다운 코드 블록 없이 순수 J
           const anthropicStream = client.messages.stream({
             model: 'claude-sonnet-4-6',
             max_tokens: maxTokens,
-            system: buildSystemPrompt(resinInfo?.resinType || '', tier),
+            system: buildSystemPrompt(resinInfo?.resinType || '', tier, round),
             messages: [{ role: 'user', content: userContent }],
           });
 
@@ -429,6 +473,7 @@ JSON 형식으로만 응답하세요. 마크다운 코드 블록 없이 순수 J
         'Transfer-Encoding': 'chunked',
         'X-Content-Type-Options': 'nosniff',
         'X-Diagnosis-Tier': tier,
+        'X-Diagnosis-Round': String(round),
       },
     });
   } catch (error) {
