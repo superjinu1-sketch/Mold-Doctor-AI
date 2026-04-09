@@ -80,7 +80,7 @@ const DEFECT_TYPES = [
 ];
 
 const RESIN_OPTIONS = [
-  { group: '폴리아미드 (나일론)', options: ['PA6', 'PA66', 'PA46', 'PA6T', 'PA9T', 'PA10T', 'PA12T', 'PA12', 'PA610', 'PA612', 'PA1010', 'PA6/66', 'MXD6'] },
+  { group: '폴리아미드 (나일론)', options: ['PA6', 'PA66', 'PA46', 'PA410', 'PA4T', 'PA6T', 'PA9T', 'PA10T', 'PA12T', 'PA12', 'PA610', 'PA612', 'PA1010', 'PA6/66', 'MXD6'] },
   { group: '폴리에스터', options: ['PBT', 'PET', 'PCT', 'PEN'] },
   { group: '엔지니어링 플라스틱 기타', options: ['PC', 'POM(아세탈)', 'PPE/PPO', 'm-PPE'] },
   { group: '슈퍼 엔지니어링 플라스틱', options: ['PPS', 'LCP', 'PEEK', 'PEI(Ultem)', 'PAI', 'PI(폴리이미드)', 'PSU', 'PPSU', 'PES', 'PTFE', 'FEP', 'PFA', 'ETFE'] },
@@ -178,6 +178,39 @@ const SAMPLE_CASES = [
     injSpeed1: '85', injSpeed2: '60', holdTime: '10', coolTime: '20', injTime: '4',
     metering: '90', cushion: '5', backPressure: '8', screwRpm: '65', clampForce: '200',
     moldType: '2판', gateType: '핀포인트', cavities: '4', runnerType: '핫', weight: '70', wallThicknessMin: '1.2', wallThicknessMax: '2.8',
+  },
+  {
+    label: 'PA46 GF30% — 은줄/블리스터',
+    defectType: '은줄 (Silver Streak)',
+    defectDescription: '성형 직후에는 양품이나 리플로우 솔더링(260℃) 후 표면에 블리스터 발생. 일부 샷에서는 성형 시에도 은줄 발생.',
+    resinType: 'PA46', filler: 'GF(유리섬유)', fillerContent: '30', flameRetardant: '없음', flameRetardantThickness: '미입력', flameRetardantType: '해당없음', resinDetail: 'PA46 GF30% (Stanyl TW341)', resinGrade: '',
+    nozzleTemp: '310', zone1Temp: '305', zone2Temp: '300', zone3Temp: '290', zone4Temp: '280',
+    moldTempFixed: '120', moldTempMoving: '120', injPressure1: '100', holdPressure: '65',
+    injSpeed1: '60', injSpeed2: '', holdTime: '5', coolTime: '10', injTime: '',
+    metering: '', cushion: '', backPressure: '5', screwRpm: '100', clampForce: '',
+    moldType: '2판', gateType: '핀포인트', cavities: '32', runnerType: '핫', weight: '1.5', wallThicknessMin: '0.5', wallThicknessMax: '1.2',
+  },
+  {
+    label: 'PA410 GF30% — 싱크마크',
+    defectType: '싱크마크 (Sink Mark)',
+    defectDescription: '보스 부위에 싱크마크 발생. 보압 올려도 개선 미미. 금형 온도 낮추면 표면 광택이 떨어짐.',
+    resinType: 'PA410', filler: 'GF(유리섬유)', fillerContent: '30', flameRetardant: '없음', flameRetardantThickness: '미입력', flameRetardantType: '해당없음', resinDetail: 'PA410 GF30% (EcoPaXX Q-HG6)', resinGrade: '',
+    nozzleTemp: '290', zone1Temp: '285', zone2Temp: '280', zone3Temp: '275', zone4Temp: '265',
+    moldTempFixed: '60', moldTempMoving: '60', injPressure1: '110', holdPressure: '75',
+    injSpeed1: '55', injSpeed2: '', holdTime: '6', coolTime: '15', injTime: '',
+    metering: '', cushion: '', backPressure: '5', screwRpm: '80', clampForce: '',
+    moldType: '2판', gateType: '사이드', cavities: '4', runnerType: '콜드', weight: '35', wallThicknessMin: '1.5', wallThicknessMax: '4.0',
+  },
+  {
+    label: 'PA4T GF30% — 플래시/블리스터',
+    defectType: '플래시 (Flash)',
+    defectDescription: '박벽 커넥터 성형 시 PL면에 미세 플래시 발생. 형체력 올려도 잡히지 않음. 일부 캐비티에서 리플로우 솔더링 후 블리스터도 발생.',
+    resinType: 'PA4T', filler: 'GF(유리섬유)', fillerContent: '30', flameRetardant: '없음', flameRetardantThickness: '미입력', flameRetardantType: '해당없음', resinDetail: 'PA4T GF30% (ForTii T11)', resinGrade: '',
+    nozzleTemp: '340', zone1Temp: '335', zone2Temp: '330', zone3Temp: '320', zone4Temp: '310',
+    moldTempFixed: '140', moldTempMoving: '140', injPressure1: '130', holdPressure: '80',
+    injSpeed1: '75', injSpeed2: '', holdTime: '3', coolTime: '8', injTime: '',
+    metering: '', cushion: '', backPressure: '5', screwRpm: '80', clampForce: '',
+    moldType: '2판', gateType: '핀포인트', cavities: '64', runnerType: '핫', weight: '0.8', wallThicknessMin: '0.3', wallThicknessMax: '0.8',
   },
 ];
 
