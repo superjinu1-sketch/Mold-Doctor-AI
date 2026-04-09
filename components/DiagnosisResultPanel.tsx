@@ -46,6 +46,7 @@ interface DiagnosisResult {
     design_risk_factors: string[];
     recommendations: string[];
   };
+  raw_response?: string;
 }
 
 function SeverityBadge({ severity }: { severity: string }) {
@@ -199,8 +200,22 @@ export default function DiagnosisResultPanel({ result, onSavePDF, round = 1, fol
         )}
       </div>
 
+      {/* Raw response fallback */}
+      {result.raw_response && (
+        <div className="bg-white rounded-2xl p-4 sm:p-6 shadow-sm border border-amber-200">
+          <h3 className="text-lg font-bold text-[#1E293B] mb-3 flex items-center gap-2">
+            <span className="text-amber-500">⚠</span>
+            AI 분석 결과
+          </h3>
+          <p className="text-xs text-slate-400 mb-3">AI가 구조화된 JSON 대신 텍스트로 응답했습니다. 아래 내용을 참고하세요.</p>
+          <pre className="text-sm text-slate-700 whitespace-pre-wrap bg-slate-50 rounded-xl p-4 border border-slate-200 overflow-x-auto leading-relaxed">
+            {result.raw_response}
+          </pre>
+        </div>
+      )}
+
       {/* Top 5 Actions */}
-      {result.top5_actions && result.top5_actions.length > 0 && (
+      {!result.raw_response && result.top5_actions && result.top5_actions.length > 0 && (
         <div className="bg-gradient-to-br from-[#1E293B] to-[#0F172A] rounded-2xl p-4 sm:p-6 shadow-lg">
           <h3 className="text-white font-bold text-lg mb-4 flex items-center gap-2">
             <span className="bg-[#059669] text-white text-xs px-2 py-1 rounded-full font-bold">즉시 실행</span>
@@ -233,7 +248,7 @@ export default function DiagnosisResultPanel({ result, onSavePDF, round = 1, fol
       )}
 
       {/* Causes */}
-      <div className="bg-white rounded-2xl p-4 sm:p-6 shadow-sm border border-slate-200">
+      {!result.raw_response && (<div className="bg-white rounded-2xl p-4 sm:p-6 shadow-sm border border-slate-200">
         <h3 className="text-lg font-bold text-[#1E293B] mb-4">원인 분석</h3>
         <div className="space-y-4">
           {result.causes.map((cause) => (
@@ -267,10 +282,10 @@ export default function DiagnosisResultPanel({ result, onSavePDF, round = 1, fol
             </div>
           ))}
         </div>
-      </div>
+      </div>)}
 
       {/* Recommendations */}
-      <div className="bg-white rounded-2xl p-4 sm:p-6 shadow-sm border border-slate-200">
+      {!result.raw_response && (<div className="bg-white rounded-2xl p-4 sm:p-6 shadow-sm border border-slate-200">
         <h3 className="text-lg font-bold text-[#1E293B] mb-4">해결 방안 — 셋팅 비교</h3>
         {/* Desktop table */}
         <div className="hidden sm:block overflow-x-auto">
@@ -334,10 +349,10 @@ export default function DiagnosisResultPanel({ result, onSavePDF, round = 1, fol
             );
           })}
         </div>
-      </div>
+      </div>)}
 
       {/* Checklist */}
-      <div className="bg-white rounded-2xl p-4 sm:p-6 shadow-sm border border-slate-200">
+      {!result.raw_response && (<div className="bg-white rounded-2xl p-4 sm:p-6 shadow-sm border border-slate-200">
         <h3 className="text-lg font-bold text-[#1E293B] mb-4">현장 체크리스트</h3>
         {Array.isArray(result.checklist) ? (
           <div className="space-y-2">
@@ -373,10 +388,10 @@ export default function DiagnosisResultPanel({ result, onSavePDF, round = 1, fol
             })}
           </div>
         )}
-      </div>
+      </div>)}
 
       {/* Mold Analysis */}
-      {result.mold_analysis && (
+      {!result.raw_response && result.mold_analysis && (
         <div className="bg-white rounded-2xl p-4 sm:p-6 shadow-sm border border-purple-200">
           <h3 className="text-lg font-bold text-[#1E293B] mb-4 flex items-center gap-2">
             <svg className="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -428,7 +443,7 @@ export default function DiagnosisResultPanel({ result, onSavePDF, round = 1, fol
       )}
 
       {/* Additional Notes */}
-      {(result.resin_specific_notes || result.drying_assessment || result.additional_advice) && (
+      {!result.raw_response && (result.resin_specific_notes || result.drying_assessment || result.additional_advice) && (
         <div className="bg-[#1E293B] text-white rounded-2xl p-4 sm:p-6 space-y-4">
           {result.resin_specific_notes && (
             <div>

@@ -70,6 +70,40 @@ interface DiagnosisResult {
     design_risk_factors: string[];
     recommendations: string[];
   };
+  raw_response?: string;
+}
+
+// --- Helpers ---
+function parseAIResponse(rawText: string): DiagnosisResult {
+  let text = rawText.trim();
+
+  // 1. backtick 제거
+  text = text.replace(/```json\s*/g, '').replace(/```\s*/g, '');
+
+  // 2. JSON 부분만 추출 (첫 { ~ 마지막 })
+  const firstBrace = text.indexOf('{');
+  const lastBrace = text.lastIndexOf('}');
+  if (firstBrace !== -1 && lastBrace !== -1 && lastBrace > firstBrace) {
+    text = text.substring(firstBrace, lastBrace + 1);
+  }
+
+  // 3. 파싱 시도
+  try {
+    return JSON.parse(text) as DiagnosisResult;
+  } catch {
+    // 4. fallback: 텍스트 그대로 표시
+    return {
+      defect_type: { ko: '분석 완료', en: 'Analysis Complete' },
+      defect_phase: undefined,
+      severity: 'medium',
+      summary: 'AI가 구조화된 형식 대신 텍스트로 응답했습니다.',
+      raw_response: rawText,
+      causes: [],
+      recommendations: [],
+      checklist: { before_changes: [], after_changes: [], escalation: [] },
+      resin_specific_notes: '',
+    };
+  }
 }
 
 // --- Constants ---
@@ -493,15 +527,7 @@ function DiagnoseContent() {
       }
 
       // Parse final JSON
-      let jsonText = accumulated.trim()
-        .replace(/^```json\s*/i, '').replace(/\s*```$/, '')
-        .replace(/^```\s*/i, '').replace(/\s*```$/, '');
-      let data: DiagnosisResult;
-      try {
-        data = JSON.parse(jsonText);
-      } catch {
-        throw new Error(`AI 응답 파싱 실패. 다시 시도해주세요.\n(응답 길이: ${jsonText.length}자)`);
-      }
+      const data = parseAIResponse(accumulated);
       data.tier = diagnosisTier;
       data.round = diagnosisRound;
       setResult(data);
