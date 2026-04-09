@@ -1,0 +1,16 @@
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Read|Write|Edit",
+        "command": "bash -c 'echo \"$CLAUDE_TOOL_INPUT\" | grep -qi \"\\.env\" && echo \"BLOCKED: .env 파일 접근 금지\" && exit 1 || exit 0'"
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Write|Edit",
+        "command": "bash -c 'echo \"$CLAUDE_TOOL_INPUT\" | grep -qi \"\\.tsx\\|\\.ts\" && cd \"$CLAUDE_PROJECT_DIR\" && npx tsc --noEmit --pretty 2>&1 | head -30 || exit 0'"
+      }
+    ]
+  }
+}

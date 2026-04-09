@@ -74,35 +74,41 @@ interface DiagnosisResult {
 }
 
 // --- Helpers ---
-function parseAIResponse(rawText: string): DiagnosisResult {
+function parseAIResponse(rawText: string) {
   let text = rawText.trim();
 
-  // 1. backtick 제거
-  text = text.replace(/```json\s*/g, '').replace(/```\s*/g, '');
+  // backtick 제거
+  text = text.replace(/```json\s*/gi, '').replace(/```\s*/gi, '');
 
-  // 2. JSON 부분만 추출 (첫 { ~ 마지막 })
+  // JSON 앞뒤의 설명 텍스트 제거 — { 부터 } 까지만 추출
   const firstBrace = text.indexOf('{');
   const lastBrace = text.lastIndexOf('}');
-  if (firstBrace !== -1 && lastBrace !== -1 && lastBrace > firstBrace) {
+  if (firstBrace !== -1 && lastBrace > firstBrace) {
     text = text.substring(firstBrace, lastBrace + 1);
   }
 
-  // 3. 파싱 시도
+  // JSON 내부 줄바꿈을 이스케이프 (문자열 값 안의 실제 줄바꿈)
+  text = text.replace(/(?<=:\s*"[^"]*)\n(?=[^"]*")/g, '\\n');
+
   try {
-    return JSON.parse(text) as DiagnosisResult;
+    return JSON.parse(text);
   } catch {
-    // 4. fallback: 텍스트 그대로 표시
-    return {
-      defect_type: { ko: '분석 완료', en: 'Analysis Complete' },
-      defect_phase: undefined,
-      severity: 'medium',
-      summary: 'AI가 구조화된 형식 대신 텍스트로 응답했습니다.',
-      raw_response: rawText,
-      causes: [],
-      recommendations: [],
-      checklist: { before_changes: [], after_changes: [], escalation: [] },
-      resin_specific_notes: '',
-    };
+    // regex가 안 먹힐 때: 단순하게 모든 줄바꿈 처리
+    try {
+      const lines = text.split('\n').map(l => l.trim()).join(' ');
+      return JSON.parse(lines);
+    } catch {
+      return {
+        defect_type: { ko: '분석 완료', en: 'Analysis Complete' },
+        defect_phase: 'unknown',
+        severity: 'medium',
+        summary: 'AI가 구조화된 형식 대신 텍스트로 응답했습니다.',
+        raw_response: rawText,
+        causes: [],
+        recommendations: [],
+        checklist: { before_changes: [], after_changes: [], escalation: [] },
+      };
+    }
   }
 }
 
@@ -282,7 +288,6 @@ function DiagnoseContent() {
   const [productNotes, setProductNotes] = useState('');
 
   const [isLoading, setIsLoading] = useState(false);
-  const [streamText, setStreamText] = useState('');
   const [result, setResult] = useState<DiagnosisResult | null>(null);
   const [error, setError] = useState('');
 
@@ -465,7 +470,6 @@ function DiagnoseContent() {
       return;
     }
     setIsLoading(true);
-    setStreamText('');
     setError('');
     setResult(null);
 
@@ -508,30 +512,10 @@ function DiagnoseContent() {
       const diagnosisTier = (res.headers.get('X-Diagnosis-Tier') || 'simple') as 'simple' | 'complex';
       const diagnosisRound = Number(res.headers.get('X-Diagnosis-Round') || round);
 
-      // Stream reading
-      const reader = res.body?.getReader();
-      const decoder = new TextDecoder();
-      let accumulated = '';
-
-      if (reader) {
-        try {
-          while (true) {
-            const { done, value } = await reader.read();
-            if (done) break;
-            accumulated += decoder.decode(value, { stream: true });
-            setStreamText(accumulated);
-          }
-        } finally {
-          reader.releaseLock();
-        }
-      }
-
-      // Parse final JSON
-      const data = parseAIResponse(accumulated);
+      const data = await res.json();
       data.tier = diagnosisTier;
       data.round = diagnosisRound;
       setResult(data);
-      setStreamText('');
       setShowFollowUpForm(false);
 
       // Update follow-up history for timeline
@@ -1203,22 +1187,6 @@ function DiagnoseContent() {
           </div>
         )}
 
-        {/* Streaming progress */}
-        {isLoading && streamText && (
-          <div className="bg-white rounded-2xl p-4 sm:p-6 shadow-sm border border-slate-200">
-            <div className="flex items-center gap-2 mb-3">
-              <svg className="animate-spin w-4 h-4 text-[#059669]" fill="none" viewBox="0 0 24 24">
-                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
-                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
-              </svg>
-              <span className="text-sm font-medium text-[#059669]">AI 분석 중...</span>
-            </div>
-            <div className="text-xs text-slate-400 font-mono bg-slate-50 rounded-lg p-3 max-h-32 overflow-hidden relative">
-              <div className="line-clamp-6">{streamText.slice(-500)}</div>
-              <div className="absolute bottom-0 left-0 right-0 h-8 bg-gradient-to-t from-slate-50 to-transparent" />
-            </div>
-          </div>
-        )}
 
         {/* Results */}
         {result && (

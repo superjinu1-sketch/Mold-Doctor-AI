@@ -3,6 +3,22 @@ import { NextRequest, NextResponse } from 'next/server';
 import fs from 'fs';
 import path from 'path';
 
+// JSON 문자열 값 안의 실제 줄바꿈을 공백으로 치환 (문자 단위 파싱)
+function sanitizeJsonNewlines(text: string): string {
+  let out = '';
+  let inString = false;
+  let escaped = false;
+  for (let i = 0; i < text.length; i++) {
+    const ch = text[i];
+    if (escaped) { out += ch; escaped = false; continue; }
+    if (ch === '\\') { out += ch; escaped = true; continue; }
+    if (ch === '"') { inString = !inString; out += ch; continue; }
+    if (inString && (ch === '\n' || ch === '\r')) { out += ' '; continue; }
+    out += ch;
+  }
+  return out;
+}
+
 function getApiKey(): string {
   if (process.env.ANTHROPIC_API_KEY) return process.env.ANTHROPIC_API_KEY;
   try {
@@ -312,7 +328,7 @@ export async function POST(request: NextRequest) {
       images: safeImages,
       advSettings,
     });
-    const maxTokens = (tier === 'complex' || round >= 2) ? 2500 : 1500;
+    const maxTokens = (tier === 'complex' || round >= 2) ? 4000 : 3000;
 
     const userContent: Anthropic.MessageParam['content'] = [];
 
@@ -436,6 +452,7 @@ ${(actionsTaken || []).filter(a => !a.done).map(a => `- ✗ ${a.recommendation}`
 ${changeDescription || '없음'}
 ` : ''}
 JSON 형식으로만 응답하세요. 마크다운 코드 블록 없이 순수 JSON만 반환하세요.
+CRITICAL: Your entire response must be ONLY the JSON object. No text before or after. No markdown. No explanation. Start with { and end with }. All string values must be on a single line — no line breaks inside string values.
     `.trim();
 
     userContent.push({ type: 'text', text: diagnosisText });
@@ -446,34 +463,47 @@ JSON 형식으로만 응답하세요. 마크다운 코드 블록 없이 순수 J
     }
     const client = new Anthropic({ apiKey });
 
-    const encoder = new TextEncoder();
-    const stream = new ReadableStream({
-      async start(controller) {
-        try {
-          const anthropicStream = client.messages.stream({
-            model: 'claude-sonnet-4-6',
-            max_tokens: maxTokens,
-            system: buildSystemPrompt(resinInfo?.resinType || '', tier, round),
-            messages: [{ role: 'user', content: userContent }],
-          });
-
-          for await (const chunk of anthropicStream) {
-            if (chunk.type === 'content_block_delta' && chunk.delta.type === 'text_delta') {
-              controller.enqueue(encoder.encode(chunk.delta.text));
-            }
-          }
-          controller.close();
-        } catch (err) {
-          controller.error(err);
-        }
-      },
+    const response = await client.messages.create({
+      model: 'claude-sonnet-4-6',
+      max_tokens: maxTokens,
+      system: buildSystemPrompt(resinInfo?.resinType || '', tier, round),
+      messages: [{ role: 'user', content: userContent }],
     });
 
-    return new Response(stream, {
+    const rawText = response.content[0].type === 'text' ? response.content[0].text : '';
+
+    let result;
+    try {
+      // 1차: JSON 문자열 내부 줄바꿈 제거 후 파싱
+      const sanitized = sanitizeJsonNewlines(rawText);
+      result = JSON.parse(sanitized);
+    } catch {
+      try {
+        // 2차: { } 블록 추출 후 sanitize 재시도
+        const match = rawText.match(/\{[\s\S]*\}/);
+        if (!match) throw new Error('No JSON');
+        result = JSON.parse(sanitizeJsonNewlines(match[0]));
+      } catch {
+        // 3차: 핵심 필드만 regex로 추출, raw_response fallback
+        const getText = (key: string) => {
+          const m = rawText.match(new RegExp(`"${key}"\\s*:\\s*"([^"]*)"`, 'i'));
+          return m ? m[1] : '';
+        };
+        result = {
+          defect_type: { ko: getText('ko') || '분석 완료', en: getText('en') || 'Analysis Complete' },
+          defect_phase: getText('defect_phase') || 'unknown',
+          severity: getText('severity') || 'medium',
+          summary: getText('summary') || '분석 결과를 확인하세요',
+          raw_response: rawText,
+          causes: [],
+          recommendations: [],
+          checklist: { before_changes: [], after_changes: [], escalation: [] },
+        };
+      }
+    }
+
+    return NextResponse.json(result, {
       headers: {
-        'Content-Type': 'text/plain; charset=utf-8',
-        'Transfer-Encoding': 'chunked',
-        'X-Content-Type-Options': 'nosniff',
         'X-Diagnosis-Tier': tier,
         'X-Diagnosis-Round': String(round),
       },

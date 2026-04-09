@@ -83,6 +83,17 @@ interface Props {
 export default function DiagnosisResultPanel({ result, onSavePDF, round = 1, followUpHistory = [], onResolved, onStartFollowUp }: Props) {
   const [checkedItems, setCheckedItems] = useState<Set<number>>(new Set());
 
+  // 안전 변수 — 모든 필드 접근은 여기서만
+  const defectTypeKo = result?.defect_type?.ko || '분석 완료';
+  const defectTypeEn = result?.defect_type?.en || 'Analysis Complete';
+  const severity = result?.severity || 'medium';
+  const summary = result?.summary || '';
+  const causes = result?.causes || [];
+  const recommendations = result?.recommendations || [];
+  const checklist = result?.checklist || { before_changes: [], after_changes: [], escalation: [] };
+  const processWindow = result?.process_window_check || {};
+  const hasRawResponse = !!result?.raw_response;
+
   const toggleCheck = (i: number) => {
     setCheckedItems(prev => {
       const n = new Set(prev);
@@ -96,6 +107,57 @@ export default function DiagnosisResultPanel({ result, onSavePDF, round = 1, fol
     : round === 2
     ? { label: '2차 후속 진단', cls: 'bg-orange-100 text-orange-700 border border-orange-300' }
     : { label: `${round}차 심층 진단`, cls: 'bg-red-100 text-red-700 border border-red-300' };
+
+  /* raw_response fallback: 구조화 JSON 파싱 실패 시 */
+  if (hasRawResponse) {
+    return (
+      <div className="space-y-5">
+        {/* 헤더 */}
+        <div className="bg-white rounded-2xl p-4 sm:p-6 shadow-sm border border-amber-200">
+          <div className="flex flex-wrap items-start justify-between gap-3 mb-4">
+            <div>
+              <h2 className="text-xl sm:text-2xl font-bold text-[#1E293B]">
+                {defectTypeKo}
+                <span className="text-slate-400 text-sm sm:text-base font-normal ml-2">({defectTypeEn})</span>
+              </h2>
+              <div className="flex items-center gap-3 mt-2 flex-wrap">
+                <SeverityBadge severity={severity} />
+                <span className={`px-3 py-1 rounded-full text-sm font-bold ${roundBadge.cls}`}>{roundBadge.label}</span>
+              </div>
+            </div>
+            <button type="button" onClick={onSavePDF}
+              className="flex items-center gap-2 bg-[#1E293B] hover:bg-slate-700 text-white px-3 py-2 rounded-lg text-sm font-medium transition-colors whitespace-nowrap">
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              </svg>
+              PDF 저장
+            </button>
+          </div>
+          <div className="flex items-center gap-2 text-amber-600 text-sm mb-3">
+            <span>⚠</span>
+            <span>AI가 구조화된 JSON 대신 텍스트로 응답했습니다. 아래 내용을 참고하세요.</span>
+          </div>
+          <pre className="text-sm text-slate-700 whitespace-pre-wrap bg-slate-50 rounded-xl p-4 border border-slate-200 overflow-x-auto leading-relaxed">
+            {result?.raw_response}
+          </pre>
+        </div>
+        {/* Follow-up Actions */}
+        <div className="bg-white rounded-2xl p-4 sm:p-6 shadow-sm border border-slate-200">
+          <div className="text-sm font-bold text-slate-600 mb-3">조치 결과가 어떻게 됐나요?</div>
+          <div className="flex flex-col sm:flex-row gap-3">
+            <button type="button" onClick={onResolved}
+              className="flex-1 flex items-center justify-center gap-2 bg-green-50 hover:bg-green-100 text-green-700 border border-green-300 px-4 py-3 rounded-xl text-sm font-bold transition-colors">
+              <span className="text-lg">✓</span>해결됨
+            </button>
+            <button type="button" onClick={onStartFollowUp}
+              className="flex-1 flex items-center justify-center gap-2 bg-orange-50 hover:bg-orange-100 text-orange-700 border border-orange-300 px-4 py-3 rounded-xl text-sm font-bold transition-colors">
+              <span className="text-lg">→</span>해결 안 됨 — 후속 진단
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-5">
@@ -143,14 +205,14 @@ export default function DiagnosisResultPanel({ result, onSavePDF, round = 1, fol
         <div className="flex flex-wrap items-start justify-between gap-3 mb-4">
           <div>
             <h2 className="text-xl sm:text-2xl font-bold text-[#1E293B]">
-              {result.defect_type.ko}
-              <span className="text-slate-400 text-sm sm:text-base font-normal ml-2">({result.defect_type.en})</span>
+              {defectTypeKo}
+              <span className="text-slate-400 text-sm sm:text-base font-normal ml-2">({defectTypeEn})</span>
             </h2>
             <div className="flex items-center gap-3 mt-2 flex-wrap">
-              <SeverityBadge severity={result.severity} />
+              <SeverityBadge severity={severity} />
               <span className={`px-3 py-1 rounded-full text-sm font-bold ${roundBadge.cls}`}>{roundBadge.label}</span>
               {/* TODO: complex → "심층 분석 (Pro)" 배지 (보라) 로 변경 예정 */}
-              {result.tier === 'complex'
+              {result?.tier === 'complex'
                 ? <span className="px-3 py-1 rounded-full text-sm font-bold bg-orange-100 text-orange-700 border border-orange-300">복합 분석</span>
                 : <span className="px-3 py-1 rounded-full text-sm font-bold bg-green-100 text-green-700 border border-green-300">기본 분석</span>
               }
@@ -167,9 +229,9 @@ export default function DiagnosisResultPanel({ result, onSavePDF, round = 1, fol
             PDF 저장
           </button>
         </div>
-        <p className="text-slate-600 text-base leading-relaxed bg-slate-50 rounded-lg p-4">{result.summary}</p>
+        <p className="text-slate-600 text-base leading-relaxed bg-slate-50 rounded-lg p-4">{summary}</p>
 
-        {result.defect_phase && (
+        {result?.defect_phase && (
           <div className="mt-4 flex flex-wrap gap-2">
             <span className="text-xs px-2 py-1 rounded-full bg-blue-100 text-blue-700 font-medium">
               {result.defect_phase === 'filling' ? '충전(Filling) 불량' :
@@ -178,19 +240,19 @@ export default function DiagnosisResultPanel({ result, onSavePDF, round = 1, fol
             </span>
           </div>
         )}
-        {result.process_window_check && (
+        {Object.keys(processWindow).length > 0 && (
           <div className="mt-4">
             <div className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">프로세스 윈도우 체크</div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-              {Object.entries(result.process_window_check).map(([key, val]) => {
+              {Object.entries(processWindow).map(([key, val]) => {
                 if (!val) return null;
                 const labelMap: Record<string, string> = { melt_temp: '용융 온도', mold_temp: '금형 온도', injection_speed: '사출 속도', pack_pressure: '보압', drying: '건조' };
                 const colorMap = { ok: 'bg-green-50 border-green-200 text-green-700', warning: 'bg-amber-50 border-amber-200 text-amber-700', critical: 'bg-red-50 border-red-200 text-red-700' };
                 const iconMap = { ok: '✓', warning: '⚠', critical: '✕' };
-                const c = colorMap[val.status] || colorMap.warning;
+                const c = colorMap[val.status as keyof typeof colorMap] || colorMap.warning;
                 return (
                   <div key={key} className={`flex items-start gap-2 text-xs p-2 rounded-lg border ${c}`}>
-                    <span className="font-bold shrink-0">{iconMap[val.status]} {labelMap[key] || key}</span>
+                    <span className="font-bold shrink-0">{iconMap[val.status as keyof typeof iconMap]} {labelMap[key] || key}</span>
                     <span>{val.note}</span>
                   </div>
                 );
@@ -200,22 +262,8 @@ export default function DiagnosisResultPanel({ result, onSavePDF, round = 1, fol
         )}
       </div>
 
-      {/* Raw response fallback */}
-      {result.raw_response && (
-        <div className="bg-white rounded-2xl p-4 sm:p-6 shadow-sm border border-amber-200">
-          <h3 className="text-lg font-bold text-[#1E293B] mb-3 flex items-center gap-2">
-            <span className="text-amber-500">⚠</span>
-            AI 분석 결과
-          </h3>
-          <p className="text-xs text-slate-400 mb-3">AI가 구조화된 JSON 대신 텍스트로 응답했습니다. 아래 내용을 참고하세요.</p>
-          <pre className="text-sm text-slate-700 whitespace-pre-wrap bg-slate-50 rounded-xl p-4 border border-slate-200 overflow-x-auto leading-relaxed">
-            {result.raw_response}
-          </pre>
-        </div>
-      )}
-
       {/* Top 5 Actions */}
-      {!result.raw_response && result.top5_actions && result.top5_actions.length > 0 && (
+      {result?.top5_actions && result.top5_actions.length > 0 && (
         <div className="bg-gradient-to-br from-[#1E293B] to-[#0F172A] rounded-2xl p-4 sm:p-6 shadow-lg">
           <h3 className="text-white font-bold text-lg mb-4 flex items-center gap-2">
             <span className="bg-[#059669] text-white text-xs px-2 py-1 rounded-full font-bold">즉시 실행</span>
@@ -248,115 +296,119 @@ export default function DiagnosisResultPanel({ result, onSavePDF, round = 1, fol
       )}
 
       {/* Causes */}
-      {!result.raw_response && (<div className="bg-white rounded-2xl p-4 sm:p-6 shadow-sm border border-slate-200">
-        <h3 className="text-lg font-bold text-[#1E293B] mb-4">원인 분석</h3>
-        <div className="space-y-4">
-          {result.causes.map((cause) => (
-            <div key={cause.rank} className="border border-slate-200 rounded-xl p-4">
-              <div className="flex items-start justify-between gap-2 mb-3">
-                <div className="flex items-center gap-2 flex-1 min-w-0">
-                  <span className={`shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold text-white ${
-                    cause.rank === 1 ? 'bg-red-500' : cause.rank === 2 ? 'bg-amber-500' : 'bg-slate-400'
-                  }`}>{cause.rank}</span>
-                  <span className="font-semibold text-slate-700 text-sm sm:text-base">{cause.description}</span>
+      {causes.length > 0 && (
+        <div className="bg-white rounded-2xl p-4 sm:p-6 shadow-sm border border-slate-200">
+          <h3 className="text-lg font-bold text-[#1E293B] mb-4">원인 분석</h3>
+          <div className="space-y-4">
+            {causes.map((cause) => (
+              <div key={cause.rank} className="border border-slate-200 rounded-xl p-4">
+                <div className="flex items-start justify-between gap-2 mb-3">
+                  <div className="flex items-center gap-2 flex-1 min-w-0">
+                    <span className={`shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold text-white ${
+                      cause.rank === 1 ? 'bg-red-500' : cause.rank === 2 ? 'bg-amber-500' : 'bg-slate-400'
+                    }`}>{cause.rank}</span>
+                    <span className="font-semibold text-slate-700 text-sm sm:text-base">{cause.description}</span>
+                  </div>
+                  <span className={`shrink-0 text-sm font-bold px-2 py-1 rounded ${
+                    cause.rank === 1 ? 'bg-red-50 text-red-600' : cause.rank === 2 ? 'bg-amber-50 text-amber-600' : 'bg-slate-50 text-slate-600'
+                  }`}>{cause.probability}%</span>
                 </div>
-                <span className={`shrink-0 text-sm font-bold px-2 py-1 rounded ${
-                  cause.rank === 1 ? 'bg-red-50 text-red-600' : cause.rank === 2 ? 'bg-amber-50 text-amber-600' : 'bg-slate-50 text-slate-600'
-                }`}>{cause.probability}%</span>
+                <div className="w-full bg-slate-200 rounded-full h-2 mb-3">
+                  <div
+                    className={`h-2 rounded-full ${cause.rank === 1 ? 'bg-red-500' : cause.rank === 2 ? 'bg-amber-500' : 'bg-slate-400'}`}
+                    style={{ width: `${cause.probability}%` }}
+                  />
+                </div>
+                <span className={`inline-block text-xs px-2 py-0.5 rounded-full font-medium mb-2 ${
+                  cause.category?.includes('Material') || cause.category === '건조' || cause.category === '수지' ? 'bg-blue-100 text-blue-700' :
+                  cause.category?.includes('Machine') || cause.category === '온도' || cause.category === '압력' ? 'bg-red-100 text-red-700' :
+                  cause.category?.includes('Mold') || cause.category === '금형' ? 'bg-purple-100 text-purple-700' :
+                  cause.category?.includes('Method') ? 'bg-amber-100 text-amber-700' :
+                  'bg-slate-100 text-slate-700'
+                }`}>{cause.category}</span>
+                <p className="text-slate-600 text-sm mb-1">{cause.detail || cause.scientific_reasoning}</p>
+                {cause.evidence && <p className="text-xs text-slate-400 bg-slate-50 rounded px-2 py-1">근거: {cause.evidence}</p>}
               </div>
-              <div className="w-full bg-slate-200 rounded-full h-2 mb-3">
-                <div
-                  className={`h-2 rounded-full ${cause.rank === 1 ? 'bg-red-500' : cause.rank === 2 ? 'bg-amber-500' : 'bg-slate-400'}`}
-                  style={{ width: `${cause.probability}%` }}
-                />
-              </div>
-              <span className={`inline-block text-xs px-2 py-0.5 rounded-full font-medium mb-2 ${
-                cause.category?.includes('Material') || cause.category === '건조' || cause.category === '수지' ? 'bg-blue-100 text-blue-700' :
-                cause.category?.includes('Machine') || cause.category === '온도' || cause.category === '압력' ? 'bg-red-100 text-red-700' :
-                cause.category?.includes('Mold') || cause.category === '금형' ? 'bg-purple-100 text-purple-700' :
-                cause.category?.includes('Method') ? 'bg-amber-100 text-amber-700' :
-                'bg-slate-100 text-slate-700'
-              }`}>{cause.category}</span>
-              <p className="text-slate-600 text-sm mb-1">{cause.detail || cause.scientific_reasoning}</p>
-              {cause.evidence && <p className="text-xs text-slate-400 bg-slate-50 rounded px-2 py-1">근거: {cause.evidence}</p>}
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
-      </div>)}
+      )}
 
       {/* Recommendations */}
-      {!result.raw_response && (<div className="bg-white rounded-2xl p-4 sm:p-6 shadow-sm border border-slate-200">
-        <h3 className="text-lg font-bold text-[#1E293B] mb-4">해결 방안 — 셋팅 비교</h3>
-        {/* Desktop table */}
-        <div className="hidden sm:block overflow-x-auto">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="bg-slate-50 text-slate-600">
-                <th className="text-left px-4 py-3 font-semibold rounded-l-lg">파라미터</th>
-                <th className="text-center px-4 py-3 font-semibold">현재값</th>
-                <th className="text-center px-4 py-3 font-semibold">권장값</th>
-                <th className="text-left px-4 py-3 font-semibold rounded-r-lg">변경 이유</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-100">
-              {result.recommendations.map((rec, i) => {
-                const changed = rec.current !== rec.recommended && rec.direction !== 'same';
-                return (
-                  <tr key={i} className={changed ? 'bg-amber-50' : ''}>
-                    <td className="px-4 py-3 font-medium text-slate-700">{rec.parameter}</td>
-                    <td className="px-4 py-3 text-center text-slate-500">{rec.current || '-'}</td>
-                    <td className="px-4 py-3 text-center font-bold text-[#1E293B]">
-                      <span className="flex items-center justify-center gap-1">
+      {recommendations.length > 0 && (
+        <div className="bg-white rounded-2xl p-4 sm:p-6 shadow-sm border border-slate-200">
+          <h3 className="text-lg font-bold text-[#1E293B] mb-4">해결 방안 — 셋팅 비교</h3>
+          {/* Desktop table */}
+          <div className="hidden sm:block overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="bg-slate-50 text-slate-600">
+                  <th className="text-left px-4 py-3 font-semibold rounded-l-lg">파라미터</th>
+                  <th className="text-center px-4 py-3 font-semibold">현재값</th>
+                  <th className="text-center px-4 py-3 font-semibold">권장값</th>
+                  <th className="text-left px-4 py-3 font-semibold rounded-r-lg">변경 이유</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-100">
+                {recommendations.map((rec, i) => {
+                  const changed = rec.current !== rec.recommended && rec.direction !== 'same';
+                  return (
+                    <tr key={i} className={changed ? 'bg-amber-50' : ''}>
+                      <td className="px-4 py-3 font-medium text-slate-700">{rec.parameter}</td>
+                      <td className="px-4 py-3 text-center text-slate-500">{rec.current || '-'}</td>
+                      <td className="px-4 py-3 text-center font-bold text-[#1E293B]">
+                        <span className="flex items-center justify-center gap-1">
+                          <DirectionArrow direction={rec.direction} />
+                          {rec.recommended}
+                        </span>
+                      </td>
+                      <td className="px-4 py-3 text-slate-600">{rec.reason}</td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+          {/* Mobile cards */}
+          <div className="sm:hidden space-y-3">
+            {recommendations.map((rec, i) => {
+              const changed = rec.current !== rec.recommended && rec.direction !== 'same';
+              return (
+                <div key={i} className={`rounded-xl p-3 border ${changed ? 'bg-amber-50 border-amber-200' : 'bg-slate-50 border-slate-200'}`}>
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="font-semibold text-slate-700 text-sm">{rec.parameter}</span>
+                    {changed && <span className="text-xs bg-amber-200 text-amber-800 px-2 py-0.5 rounded-full font-medium">변경 필요</span>}
+                  </div>
+                  <div className="flex items-center gap-3 mb-2">
+                    <div className="flex-1 text-center bg-white rounded-lg p-2 border border-slate-200">
+                      <div className="text-xs text-slate-400 mb-0.5">현재값</div>
+                      <div className="text-sm text-slate-600 font-medium">{rec.current || '-'}</div>
+                    </div>
+                    <div className="text-slate-400">→</div>
+                    <div className="flex-1 text-center bg-white rounded-lg p-2 border border-[#059669]/30">
+                      <div className="text-xs text-slate-400 mb-0.5">권장값</div>
+                      <div className="text-sm font-bold text-[#1E293B] flex items-center justify-center gap-1">
                         <DirectionArrow direction={rec.direction} />
                         {rec.recommended}
-                      </span>
-                    </td>
-                    <td className="px-4 py-3 text-slate-600">{rec.reason}</td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        </div>
-        {/* Mobile cards */}
-        <div className="sm:hidden space-y-3">
-          {result.recommendations.map((rec, i) => {
-            const changed = rec.current !== rec.recommended && rec.direction !== 'same';
-            return (
-              <div key={i} className={`rounded-xl p-3 border ${changed ? 'bg-amber-50 border-amber-200' : 'bg-slate-50 border-slate-200'}`}>
-                <div className="flex items-center justify-between mb-2">
-                  <span className="font-semibold text-slate-700 text-sm">{rec.parameter}</span>
-                  {changed && <span className="text-xs bg-amber-200 text-amber-800 px-2 py-0.5 rounded-full font-medium">변경 필요</span>}
-                </div>
-                <div className="flex items-center gap-3 mb-2">
-                  <div className="flex-1 text-center bg-white rounded-lg p-2 border border-slate-200">
-                    <div className="text-xs text-slate-400 mb-0.5">현재값</div>
-                    <div className="text-sm text-slate-600 font-medium">{rec.current || '-'}</div>
-                  </div>
-                  <div className="text-slate-400">→</div>
-                  <div className="flex-1 text-center bg-white rounded-lg p-2 border border-[#059669]/30">
-                    <div className="text-xs text-slate-400 mb-0.5">권장값</div>
-                    <div className="text-sm font-bold text-[#1E293B] flex items-center justify-center gap-1">
-                      <DirectionArrow direction={rec.direction} />
-                      {rec.recommended}
+                      </div>
                     </div>
                   </div>
+                  <p className="text-xs text-slate-500 mb-1">{rec.reason}</p>
+                  {rec.expected_result && <p className="text-xs text-green-700 bg-green-50 rounded px-2 py-1">기대 효과: {rec.expected_result}</p>}
+                  {rec.risk && <p className="text-xs text-amber-700 bg-amber-50 rounded px-2 py-1 mt-1">주의: {rec.risk}</p>}
                 </div>
-                <p className="text-xs text-slate-500 mb-1">{rec.reason}</p>
-                {rec.expected_result && <p className="text-xs text-green-700 bg-green-50 rounded px-2 py-1">기대 효과: {rec.expected_result}</p>}
-                {rec.risk && <p className="text-xs text-amber-700 bg-amber-50 rounded px-2 py-1 mt-1">주의: {rec.risk}</p>}
-              </div>
-            );
-          })}
+              );
+            })}
+          </div>
         </div>
-      </div>)}
+      )}
 
       {/* Checklist */}
-      {!result.raw_response && (<div className="bg-white rounded-2xl p-4 sm:p-6 shadow-sm border border-slate-200">
+      <div className="bg-white rounded-2xl p-4 sm:p-6 shadow-sm border border-slate-200">
         <h3 className="text-lg font-bold text-[#1E293B] mb-4">현장 체크리스트</h3>
-        {Array.isArray(result.checklist) ? (
+        {Array.isArray(checklist) ? (
           <div className="space-y-2">
-            {(result.checklist as string[]).map((item, i) => (
+            {(checklist as string[]).map((item, i) => (
               <label key={i} className={`flex items-start gap-3 cursor-pointer p-3 rounded-lg transition-colors ${checkedItems.has(i) ? 'bg-green-50 line-through text-slate-400' : 'hover:bg-slate-50'}`}>
                 <input type="checkbox" className="mt-0.5 w-5 h-5 rounded accent-[#059669]" checked={checkedItems.has(i)} onChange={() => toggleCheck(i)} />
                 <span className="text-sm text-slate-700">{item}</span>
@@ -370,28 +422,28 @@ export default function DiagnosisResultPanel({ result, onSavePDF, round = 1, fol
               { key: 'after_changes', label: '변경 후 모니터링', color: 'text-green-700', bg: 'bg-green-50', border: 'border-green-200' },
               { key: 'escalation', label: '에스컬레이션 기준', color: 'text-red-700', bg: 'bg-red-50', border: 'border-red-200' },
             ].map(({ key, label, color, bg, border }) => {
-              const items = (result.checklist as Record<string, string[]>)[key] || [];
+              const items = (checklist as Record<string, string[]>)[key] ?? [];
               if (!items.length) return null;
-              return (
-                <div key={key} className={`rounded-xl p-3 border ${bg} ${border}`}>
-                  <div className={`text-xs font-bold uppercase tracking-wider mb-2 ${color}`}>{label}</div>
-                  <div className="space-y-1">
-                    {items.map((item, i) => (
-                      <div key={i} className="flex items-start gap-2 text-sm text-slate-700">
-                        <span className={`shrink-0 font-bold ${color}`}>·</span>
-                        <span>{item}</span>
-                      </div>
-                    ))}
+                return (
+                  <div key={key} className={`rounded-xl p-3 border ${bg} ${border}`}>
+                    <div className={`text-xs font-bold uppercase tracking-wider mb-2 ${color}`}>{label}</div>
+                    <div className="space-y-1">
+                      {items.map((item, i) => (
+                        <div key={i} className="flex items-start gap-2 text-sm text-slate-700">
+                          <span className={`shrink-0 font-bold ${color}`}>·</span>
+                          <span>{item}</span>
+                        </div>
+                      ))}
+                    </div>
                   </div>
-                </div>
-              );
+                );
             })}
           </div>
         )}
-      </div>)}
+      </div>
 
       {/* Mold Analysis */}
-      {!result.raw_response && result.mold_analysis && (
+      {result?.mold_analysis && (
         <div className="bg-white rounded-2xl p-4 sm:p-6 shadow-sm border border-purple-200">
           <h3 className="text-lg font-bold text-[#1E293B] mb-4 flex items-center gap-2">
             <svg className="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -412,11 +464,11 @@ export default function DiagnosisResultPanel({ result, onSavePDF, round = 1, fol
                 <p className="text-sm text-slate-700">{result.mold_analysis.cooling_assessment}</p>
               </div>
             )}
-            {result.mold_analysis.design_risk_factors?.length > 0 && (
+            {(result.mold_analysis.design_risk_factors?.length ?? 0) > 0 && (
               <div className="bg-amber-50 rounded-xl p-3 border border-amber-100">
                 <div className="text-xs font-bold text-amber-700 uppercase tracking-wider mb-2">설계 위험 요소</div>
                 <div className="space-y-1">
-                  {result.mold_analysis.design_risk_factors.map((r, i) => (
+                  {result.mold_analysis.design_risk_factors?.map((r, i) => (
                     <div key={i} className="flex items-start gap-2 text-sm text-slate-700">
                       <span className="shrink-0 text-amber-500 font-bold">!</span>
                       <span>{r}</span>
@@ -425,11 +477,11 @@ export default function DiagnosisResultPanel({ result, onSavePDF, round = 1, fol
                 </div>
               </div>
             )}
-            {result.mold_analysis.recommendations?.length > 0 && (
+            {(result.mold_analysis.recommendations?.length ?? 0) > 0 && (
               <div className="bg-green-50 rounded-xl p-3 border border-green-100">
                 <div className="text-xs font-bold text-green-700 uppercase tracking-wider mb-2">금형 수정 제안</div>
                 <div className="space-y-1">
-                  {result.mold_analysis.recommendations.map((r, i) => (
+                  {result.mold_analysis.recommendations?.map((r, i) => (
                     <div key={i} className="flex items-start gap-2 text-sm text-slate-700">
                       <span className="shrink-0 text-green-600 font-bold">→</span>
                       <span>{r}</span>
@@ -443,21 +495,21 @@ export default function DiagnosisResultPanel({ result, onSavePDF, round = 1, fol
       )}
 
       {/* Additional Notes */}
-      {!result.raw_response && (result.resin_specific_notes || result.drying_assessment || result.additional_advice) && (
+      {(result?.resin_specific_notes || result?.drying_assessment || result?.additional_advice) && (
         <div className="bg-[#1E293B] text-white rounded-2xl p-4 sm:p-6 space-y-4">
-          {result.resin_specific_notes && (
+          {result?.resin_specific_notes && (
             <div>
               <h3 className="font-bold text-[#34D399] mb-2">수지 특성 주의사항</h3>
               <p className="text-slate-300 text-sm leading-relaxed">{result.resin_specific_notes}</p>
             </div>
           )}
-          {result.drying_assessment && (
+          {result?.drying_assessment && (
             <div>
               <h3 className="font-bold text-blue-400 mb-2">건조 조건 평가</h3>
               <p className="text-slate-300 text-sm leading-relaxed">{result.drying_assessment}</p>
             </div>
           )}
-          {result.additional_advice && (
+          {result?.additional_advice && (
             <div>
               <h3 className="font-bold text-amber-400 mb-2">추가 조언</h3>
               <p className="text-slate-300 text-sm leading-relaxed">{result.additional_advice}</p>

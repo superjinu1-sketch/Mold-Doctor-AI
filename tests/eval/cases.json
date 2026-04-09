@@ -1,0 +1,262 @@
+[
+  {
+    "id": "case-001",
+    "source": "기본 사례",
+    "title": "PA66 GF30 은줄 — 건조 부족",
+    "difficulty": "basic",
+    "input": {
+      "defect_type": "은줄 (Silver Streak)",
+      "resin_type": "PA66",
+      "resin_detail": "PA66 GF30%",
+      "machine_settings": {
+        "nozzle_temp": 290, "zone1_temp": 285, "zone2_temp": 280, "zone3_temp": 270, "zone4_temp": 260,
+        "mold_temp_fixed": 80, "mold_temp_moving": 80,
+        "injection_pressure": 120, "holding_pressure": 80,
+        "injection_speed_1": 65, "back_pressure": 3, "screw_rpm": 150,
+        "drying_temp": 80, "drying_time": 2
+      }
+    },
+    "expected": {
+      "root_cause": "건조 부족 (2시간은 PA66에 불충분, 4~8시간 필요)",
+      "key_recommendations": ["건조 시간 연장 4~8시간", "배압 증가 3→5~8MPa"],
+      "expected_phase": "material",
+      "severity": "medium"
+    }
+  },
+  {
+    "id": "case-002",
+    "source": "기본 사례",
+    "title": "POM 버닝 — 과열 + 벤트 부족",
+    "difficulty": "basic",
+    "input": {
+      "defect_type": "버닝/가스마크 (Burn Mark)",
+      "resin_type": "POM",
+      "resin_detail": "POM 호모폴리머",
+      "machine_settings": {
+        "nozzle_temp": 215, "zone1_temp": 210, "zone2_temp": 205, "zone3_temp": 200, "zone4_temp": 190,
+        "mold_temp_fixed": 90, "mold_temp_moving": 90,
+        "injection_pressure": 100, "holding_pressure": 70,
+        "injection_speed_1": 80, "back_pressure": 5, "screw_rpm": 120
+      },
+      "mold_info": { "mold_type": "2판", "gate_type": "핀포인트", "cavity_count": 4 }
+    },
+    "expected": {
+      "root_cause": "POM 가공온도 초과(210℃ 이상 포름알데히드 분해) + 사출속도 과다로 가스 압축",
+      "key_recommendations": ["노즐 온도 215→205℃ 감소", "사출속도 80→50~60% 감소", "벤트 추가/청소"],
+      "expected_phase": "filling",
+      "severity": "high"
+    }
+  },
+  {
+    "id": "case-003",
+    "source": "기본 사례",
+    "title": "PP 휨변형 — 냉각 불균일",
+    "difficulty": "basic",
+    "input": {
+      "defect_type": "휨/변형 (Warpage)",
+      "resin_type": "PP",
+      "resin_detail": "PP 호모폴리머",
+      "machine_settings": {
+        "nozzle_temp": 230, "zone1_temp": 225, "zone2_temp": 220, "zone3_temp": 215, "zone4_temp": 210,
+        "mold_temp_fixed": 40, "mold_temp_moving": 55,
+        "injection_pressure": 80, "holding_pressure": 50,
+        "injection_speed_1": 60, "cooling_time": 12
+      },
+      "product_info": { "wall_thickness_min": 1.5, "wall_thickness_max": 4.0 }
+    },
+    "expected": {
+      "root_cause": "금형 양면 온도차 15℃ + 벽두께 편차 큼 → 불균일 수축",
+      "key_recommendations": ["금형 양면 온도 균일화 (차이 5℃ 이내)", "냉각시간 연장", "보압 프로파일 최적화"],
+      "expected_phase": "cooling",
+      "severity": "medium"
+    }
+  },
+  {
+    "id": "case-004",
+    "source": "기본 사례",
+    "title": "PBT 싱크마크 — 보압 부족",
+    "difficulty": "basic",
+    "input": {
+      "defect_type": "싱크마크 (Sink Mark)",
+      "resin_type": "PBT",
+      "resin_detail": "PBT 비강화",
+      "machine_settings": {
+        "nozzle_temp": 250, "zone1_temp": 245, "zone2_temp": 240, "zone3_temp": 235, "zone4_temp": 230,
+        "mold_temp_fixed": 70, "mold_temp_moving": 70,
+        "injection_pressure": 100, "holding_pressure": 25,
+        "holding_time": 3, "cooling_time": 15
+      },
+      "product_info": { "wall_thickness_max": 5.0, "product_weight": 85 }
+    },
+    "expected": {
+      "root_cause": "보압이 사출압의 25%로 너무 낮음 + 보압시간 3초는 gate seal 전 종료",
+      "key_recommendations": ["보압 25→50~60MPa (사출압의 50~60%)", "보압시간 3→8~12초", "게이트 크기 확인"],
+      "expected_phase": "packing",
+      "severity": "medium"
+    }
+  },
+  {
+    "id": "case-005",
+    "source": "기본 사례",
+    "title": "LCP 플래시 — 소재 특성",
+    "difficulty": "basic",
+    "input": {
+      "defect_type": "플래시 (Flash)",
+      "resin_type": "LCP",
+      "resin_detail": "LCP GF30%",
+      "machine_settings": {
+        "nozzle_temp": 320, "zone1_temp": 315, "zone2_temp": 310, "zone3_temp": 300, "zone4_temp": 290,
+        "mold_temp_fixed": 100, "mold_temp_moving": 100,
+        "injection_pressure": 80, "holding_pressure": 50,
+        "injection_speed_1": 60, "clamp_force": 150
+      },
+      "mold_info": { "gate_type": "사이드", "cavity_count": 8 }
+    },
+    "expected": {
+      "root_cause": "LCP 극저점도로 5미크론 틈새에도 플래시 발생. 금형 PL면 정밀도와 형체력이 핵심",
+      "key_recommendations": ["형체력 증가", "금형 PL면 재연마", "사출압력 최소화", "VP전환 위치 최적화"],
+      "expected_phase": "packing",
+      "severity": "medium"
+    }
+  },
+
+  {
+    "id": "case-006",
+    "source": "고난이도 — 복합 원인",
+    "title": "PA6 GF15 간헐적 은줄 — 건조 정상인데 발생",
+    "difficulty": "hard",
+    "description": "건조 조건 정상(80℃, 6시간, 제습식). 은줄이 오후에만 간헐적 발생. 오전에는 양품.",
+    "input": {
+      "defect_type": "은줄 (Silver Streak)",
+      "resin_type": "PA6",
+      "resin_detail": "PA6 GF15%",
+      "machine_settings": {
+        "nozzle_temp": 250, "zone1_temp": 245, "zone2_temp": 240, "zone3_temp": 235, "zone4_temp": 225,
+        "mold_temp_fixed": 80, "mold_temp_moving": 80,
+        "injection_pressure": 100, "holding_pressure": 65,
+        "injection_speed_1": 55, "back_pressure": 5, "screw_rpm": 180,
+        "drying_temp": 80, "drying_time": 6, "dryer_type": "제습식"
+      },
+      "defect_description": "오후 2시 이후 5샷 중 1샷 꼴로 은줄 발생. 오전에는 전혀 없음."
+    },
+    "expected": {
+      "root_cause": "스크류 RPM 과다(180rpm)로 전단발열 → 수지 분해 가스 발생. 오전에는 금형/배럴 온도 안정 전이라 발생 안 하다가 오후 열 축적되면서 분해 온도 도달. 건조 문제가 아님.",
+      "key_recommendations": ["스크류 RPM 180→100~120으로 감소", "배압 5→8MPa 증가로 가스 배출", "Zone1 온도 245→235℃로 감소", "체류시간 확인 (사이클 대비 계량량)"],
+      "expected_phase": "material",
+      "severity": "medium",
+      "trap": "건조 조건이 정상이므로 건조를 원인으로 지목하면 오진. 시간대별 패턴이 핵심 단서."
+    }
+  },
+  {
+    "id": "case-007",
+    "source": "고난이도 — 오진 유발",
+    "title": "PC 크랙 — 싱크마크 해결하려다 발생",
+    "difficulty": "hard",
+    "description": "싱크마크 해결을 위해 보압을 계속 올렸더니 이형 후 24시간 뒤에 크랙 발생. 성형 직후에는 양품.",
+    "input": {
+      "defect_type": "크랙 (Crack)",
+      "resin_type": "PC",
+      "resin_detail": "PC 투명",
+      "machine_settings": {
+        "nozzle_temp": 290, "zone1_temp": 285, "zone2_temp": 280, "zone3_temp": 275, "zone4_temp": 270,
+        "mold_temp_fixed": 90, "mold_temp_moving": 90,
+        "injection_pressure": 130, "holding_pressure": 110,
+        "holding_time": 12, "injection_speed_1": 50,
+        "drying_temp": 120, "drying_time": 4
+      },
+      "defect_description": "성형 직후 외관 양호. 24시간 후 보스 근처에서 크랙 발생. 이전에 싱크마크 때문에 보압을 80→110MPa로 올린 상태."
+    },
+    "expected": {
+      "root_cause": "과보압(오버팩킹)으로 잔류응력 과다. PC는 잔류응력에 매우 민감 → 24시간 뒤 환경응력균열(ESC) 발생. 보압 110MPa은 사출압의 85%로 과다.",
+      "key_recommendations": ["보압 110→80~90MPa로 감소 (사출압의 60~70%)", "금형온도 90→100~110℃로 증가 (응력 완화)", "보압시간 단축 검토", "싱크마크는 보압 대신 금형온도 증가로 해결"],
+      "expected_phase": "packing",
+      "severity": "high",
+      "trap": "크랙의 일반적 원인인 수분/이형 문제가 아님. 24시간 지연 발현이 핵심 단서 — 잔류응력 문제."
+    }
+  },
+  {
+    "id": "case-008",
+    "source": "고난이도 — 금형 원인",
+    "title": "PA66 GF33 특정 캐비티만 미성형 — 핫러너 불균일",
+    "difficulty": "hard",
+    "description": "8캐비티 핫러너 금형. 3번, 7번 캐비티만 간헐적 미성형. 다른 캐비티는 정상. 성형 조건 변경해도 해결 안 됨.",
+    "input": {
+      "defect_type": "미성형 (Short Shot)",
+      "resin_type": "PA66",
+      "resin_detail": "PA66 GF33%",
+      "machine_settings": {
+        "nozzle_temp": 285, "zone1_temp": 280, "zone2_temp": 275, "zone3_temp": 265, "zone4_temp": 255,
+        "mold_temp_fixed": 90, "mold_temp_moving": 90,
+        "injection_pressure": 140, "holding_pressure": 90,
+        "injection_speed_1": 70, "back_pressure": 8,
+        "drying_temp": 80, "drying_time": 6
+      },
+      "mold_info": { "mold_type": "2판", "gate_type": "밸브", "cavity_count": 8, "runner_type": "핫" },
+      "defect_description": "8캐비티 중 3번, 7번만 간헐적 미성형. 사출압 올려도, 속도 올려도 해결 안 됨. 다른 6개 캐비티는 완벽."
+    },
+    "expected": {
+      "root_cause": "핫러너 3번, 7번 노즐의 히터 열화 또는 온도 센서 오류 → 실제 온도가 설정보다 낮음 → GF33% 소재의 유동성 부족으로 미성형. 성형 조건 문제가 아니라 금형(핫러너) 문제.",
+      "key_recommendations": ["핫러너 3번, 7번 존 온도를 개별 확인 (실측 vs 설정)", "핫러너 히터 저항값 측정 (열화 확인)", "밸브게이트 동작 확인 (개폐 타이밍)", "매니폴드 내부 막힘/탄화 확인"],
+      "expected_phase": "filling",
+      "severity": "high",
+      "trap": "성형 조건(압력, 속도)을 올려도 해결 안 되는 게 핵심 단서. 특정 캐비티만 = 금형 문제."
+    }
+  },
+  {
+    "id": "case-009",
+    "source": "고난이도 — 소재 상호작용",
+    "title": "PC/ABS 색상 불균일 + 표면 얼룩 — 마스터배치 분산 불량",
+    "difficulty": "hard",
+    "description": "PC/ABS에 블랙 마스터배치 3% 투입. 표면에 회색 줄무늬(색상 얼룩)가 불규칙하게 발생. 마스터배치 없는 내추럴 컬러에서는 문제없음.",
+    "input": {
+      "defect_type": "변색 (Discoloration)",
+      "resin_type": "PC/ABS",
+      "resin_detail": "PC/ABS (PC 70%)",
+      "machine_settings": {
+        "nozzle_temp": 260, "zone1_temp": 255, "zone2_temp": 250, "zone3_temp": 245, "zone4_temp": 240,
+        "mold_temp_fixed": 70, "mold_temp_moving": 70,
+        "injection_pressure": 90, "holding_pressure": 60,
+        "injection_speed_1": 55, "back_pressure": 3, "screw_rpm": 80,
+        "drying_temp": 100, "drying_time": 4
+      },
+      "color_info": { "masterbatch_ratio": 3, "masterbatch_type": "마스터배치" },
+      "defect_description": "블랙 마스터배치 3% 투입 시 표면에 회색 줄무늬. 내추럴 컬러에서는 문제없음. 마스터배치 변경해도 동일."
+    },
+    "expected": {
+      "root_cause": "배압 3MPa 너무 낮아 마스터배치 분산 불량 + PC/ABS는 PC의 높은 점도 때문에 일반 ABS보다 혼합이 어려움. 마스터배치의 캐리어 레진이 ABS 기반일 경우 PC 상과의 상용성 문제도 있음.",
+      "key_recommendations": ["배압 3→10~15MPa로 대폭 증가", "스크류 RPM 80→60~70으로 감소 (전단 + 체류시간 밸런스)", "노즐 온도 260→270℃로 증가 (유동성 개선)", "마스터배치 캐리어를 PC/ABS 기반으로 변경 검토", "사전 텀블러 혼합 후 투입"],
+      "expected_phase": "material",
+      "severity": "medium",
+      "trap": "변색이지만 열분해가 아님. 내추럴에서 문제없다는 것이 핵심 단서 — 소재 자체가 아니라 마스터배치 분산 문제."
+    }
+  },
+  {
+    "id": "case-010",
+    "source": "고난이도 — 복합 원인 + 위치 의존",
+    "title": "PPS GF40 웰드라인 강도 부족 — 사출 조건으로 해결 불가",
+    "difficulty": "hard",
+    "description": "PPS GF40% 커넥터 부품. 웰드라인 자체는 보이지 않지만, 웰드라인 위치에서 조립 시 파단. 외관상 양품인데 기계적 강도가 부족.",
+    "input": {
+      "defect_type": "웰드라인 (Weld Line)",
+      "resin_type": "PPS",
+      "resin_detail": "PPS GF40% 리니어",
+      "machine_settings": {
+        "nozzle_temp": 320, "zone1_temp": 315, "zone2_temp": 310, "zone3_temp": 300, "zone4_temp": 290,
+        "mold_temp_fixed": 140, "mold_temp_moving": 140,
+        "injection_pressure": 120, "holding_pressure": 80,
+        "injection_speed_1": 70, "back_pressure": 5,
+        "drying_temp": 130, "drying_time": 3
+      },
+      "mold_info": { "mold_type": "2판", "gate_type": "사이드", "cavity_count": 2 },
+      "product_info": { "wall_thickness_min": 1.0, "wall_thickness_max": 2.0 },
+      "defect_description": "외관상 웰드라인 거의 안 보임. 하지만 조립 중 특정 위치에서 파단 발생. 인장 시험 시 웰드부 강도가 비웰드부의 30% 수준."
+    },
+    "expected": {
+      "root_cause": "PPS GF40%에서 웰드라인 부위는 섬유가 수지 흐름 방향으로 배향되지 못하고 평행하게 놓여 강도가 급격히 저하. 외관은 괜찮아 보여도 내부 섬유 배향이 문제. 사출 조건만으로는 한계가 있음 — 금형 게이트 위치 변경이 근본 대책.",
+      "key_recommendations": ["금형온도 140→150~160℃로 증가 (웰드 융착 개선)", "사출속도 70→85%로 증가 (유동선단 온도 유지)", "게이트 위치 변경 검토 (웰드라인을 비응력 부위로 이동)", "오버플로우 탭 추가 (웰드부 초기 수지 배출)", "GF 함량 감소(30%) 또는 장섬유(LFT) 검토"],
+      "expected_phase": "filling",
+      "severity": "high",
+      "trap": "외관 양품이라 성형 조건으로 해결하려 하지만, GF 고함량 소재의 웰드는 사출 조건 최적화만으로 한계. 금형 설계 변경이 필요한 케이스."
+    }
+  }
+]

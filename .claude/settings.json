@@ -1,0 +1,10 @@
+{
+  "enableAllProjectMcpServers": true,
+  "permissions": {
+    "deny": [
+      "Read(.env*)",
+      "Write(.env*)",
+      "Edit(.env*)"
+    ]
+  }
+}
