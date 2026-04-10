@@ -1198,6 +1198,8 @@ function DiagnoseContent() {
               followUpHistory={followUpHistory}
               onResolved={handleResolved}
               onStartFollowUp={handleStartFollowUp}
+              resinType={resinType === '기타 (직접 입력)' ? customResin : resinType}
+              machineSettings={{ ...settings, ...advSettings }}
             />
           </div>
         )}
