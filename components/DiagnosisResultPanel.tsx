@@ -23,6 +23,8 @@ interface DiagnosisResult {
     detail?: string;
     scientific_reasoning?: string;
     evidence?: string;
+    elimination?: string;
+    verification?: string;
   }[];
   recommendations: {
     priority?: number;
@@ -63,6 +65,99 @@ function DirectionArrow({ direction }: { direction?: string }) {
   if (direction === 'up') return <span className="text-red-500 font-bold">↑</span>;
   if (direction === 'down') return <span className="text-blue-500 font-bold">↓</span>;
   return <span className="text-green-500 font-bold">✓</span>;
+}
+
+type CauseItem = DiagnosisResult['causes'][number];
+
+function CauseCard({ cause }: { cause: CauseItem }) {
+  const [openPanel, setOpenPanel] = useState<string | null>('scientific_reasoning');
+  const toggle = (key: string) => setOpenPanel(prev => prev === key ? null : key);
+
+  const rankColor = cause.rank === 1 ? 'bg-red-500' : cause.rank === 2 ? 'bg-amber-500' : 'bg-slate-400';
+  const rankBg = cause.rank === 1 ? 'bg-red-50 text-red-600' : cause.rank === 2 ? 'bg-amber-50 text-amber-600' : 'bg-slate-50 text-slate-600';
+  const catColor =
+    cause.category?.includes('Material') || cause.category === '건조' || cause.category === '수지' ? 'bg-blue-100 text-blue-700' :
+    cause.category?.includes('Machine') || cause.category === '온도' || cause.category === '압력' ? 'bg-red-100 text-red-700' :
+    cause.category?.includes('Mold') || cause.category === '금형' ? 'bg-purple-100 text-purple-700' :
+    cause.category?.includes('Method') ? 'bg-amber-100 text-amber-700' :
+    'bg-slate-100 text-slate-700';
+
+  const panels: { key: string; label: string; icon: string; value: string | undefined; headerCls: string; bodyCls: string }[] = [
+    {
+      key: 'scientific_reasoning',
+      label: '왜?',
+      icon: '🔬',
+      value: cause.scientific_reasoning || cause.detail,
+      headerCls: 'bg-blue-50 hover:bg-blue-100 text-blue-700',
+      bodyCls: 'bg-blue-50 border-blue-200 text-blue-900',
+    },
+    {
+      key: 'evidence',
+      label: '근거',
+      icon: '📊',
+      value: cause.evidence,
+      headerCls: 'bg-emerald-50 hover:bg-emerald-100 text-emerald-700',
+      bodyCls: 'bg-emerald-50 border-emerald-200 text-emerald-900',
+    },
+    {
+      key: 'elimination',
+      label: '다른 원인 배제',
+      icon: '✕',
+      value: cause.elimination,
+      headerCls: 'bg-amber-50 hover:bg-amber-100 text-amber-700',
+      bodyCls: 'bg-amber-50 border-amber-200 text-amber-900',
+    },
+    {
+      key: 'verification',
+      label: '현장 확인법',
+      icon: '✓',
+      value: cause.verification,
+      headerCls: 'bg-purple-50 hover:bg-purple-100 text-purple-700',
+      bodyCls: 'bg-purple-50 border-purple-200 text-purple-900',
+    },
+  ].filter(p => p.value);
+
+  return (
+    <div className="border border-slate-200 rounded-xl p-4">
+      <div className="flex items-start justify-between gap-2 mb-3">
+        <div className="flex items-center gap-2 flex-1 min-w-0">
+          <span className={`shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold text-white ${rankColor}`}>
+            {cause.rank}
+          </span>
+          <span className="font-semibold text-slate-700 text-sm sm:text-base">{cause.description}</span>
+        </div>
+        <span className={`shrink-0 text-sm font-bold px-2 py-1 rounded ${rankBg}`}>{cause.probability}%</span>
+      </div>
+      <div className="w-full bg-slate-200 rounded-full h-2 mb-3">
+        <div className={`h-2 rounded-full ${rankColor}`} style={{ width: `${cause.probability}%` }} />
+      </div>
+      <span className={`inline-block text-xs px-2 py-0.5 rounded-full font-medium mb-3 ${catColor}`}>{cause.category}</span>
+      {panels.length > 0 && (
+        <div className="space-y-1">
+          {panels.map(({ key, label, icon, value, headerCls, bodyCls }) => (
+            <div key={key} className="rounded-lg overflow-hidden">
+              <button
+                type="button"
+                onClick={() => toggle(key)}
+                className={`w-full flex items-center justify-between px-3 py-2 text-xs font-semibold transition-colors ${headerCls}`}
+              >
+                <span className="flex items-center gap-1.5">
+                  <span>{icon}</span>
+                  <span>{label}</span>
+                </span>
+                <span className={`text-xs transition-transform inline-block ${openPanel === key ? 'rotate-180' : ''}`}>▾</span>
+              </button>
+              {openPanel === key && (
+                <div className={`px-3 py-2.5 text-xs leading-relaxed border-x border-b rounded-b-lg ${bodyCls}`}>
+                  {value}
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
 }
 
 interface ChatMessage {
@@ -489,34 +584,7 @@ export default function DiagnosisResultPanel({ result, onSavePDF, round = 1, fol
           <h3 className="text-lg font-bold text-[#1E293B] mb-4">원인 분석</h3>
           <div className="space-y-4">
             {causes.map((cause) => (
-              <div key={cause.rank} className="border border-slate-200 rounded-xl p-4">
-                <div className="flex items-start justify-between gap-2 mb-3">
-                  <div className="flex items-center gap-2 flex-1 min-w-0">
-                    <span className={`shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold text-white ${
-                      cause.rank === 1 ? 'bg-red-500' : cause.rank === 2 ? 'bg-amber-500' : 'bg-slate-400'
-                    }`}>{cause.rank}</span>
-                    <span className="font-semibold text-slate-700 text-sm sm:text-base">{cause.description}</span>
-                  </div>
-                  <span className={`shrink-0 text-sm font-bold px-2 py-1 rounded ${
-                    cause.rank === 1 ? 'bg-red-50 text-red-600' : cause.rank === 2 ? 'bg-amber-50 text-amber-600' : 'bg-slate-50 text-slate-600'
-                  }`}>{cause.probability}%</span>
-                </div>
-                <div className="w-full bg-slate-200 rounded-full h-2 mb-3">
-                  <div
-                    className={`h-2 rounded-full ${cause.rank === 1 ? 'bg-red-500' : cause.rank === 2 ? 'bg-amber-500' : 'bg-slate-400'}`}
-                    style={{ width: `${cause.probability}%` }}
-                  />
-                </div>
-                <span className={`inline-block text-xs px-2 py-0.5 rounded-full font-medium mb-2 ${
-                  cause.category?.includes('Material') || cause.category === '건조' || cause.category === '수지' ? 'bg-blue-100 text-blue-700' :
-                  cause.category?.includes('Machine') || cause.category === '온도' || cause.category === '압력' ? 'bg-red-100 text-red-700' :
-                  cause.category?.includes('Mold') || cause.category === '금형' ? 'bg-purple-100 text-purple-700' :
-                  cause.category?.includes('Method') ? 'bg-amber-100 text-amber-700' :
-                  'bg-slate-100 text-slate-700'
-                }`}>{cause.category}</span>
-                <p className="text-slate-600 text-sm mb-1">{cause.detail || cause.scientific_reasoning}</p>
-                {cause.evidence && <p className="text-xs text-slate-400 bg-slate-50 rounded px-2 py-1">근거: {cause.evidence}</p>}
-              </div>
+              <CauseCard key={cause.rank} cause={cause} />
             ))}
           </div>
         </div>

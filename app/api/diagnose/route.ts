@@ -174,11 +174,32 @@ STEP 2: PROCESS WINDOW ANALYSIS
 - Is cooling time sufficient?
 - Flag settings OUTSIDE the recommended window — these are primary suspects
 
-STEP 3: ROOT CAUSE ANALYSIS (4M Framework)
-- Machine: V/P transfer, cushion consistency, check ring wear, clamp force adequacy
-- Material: moisture content, regrind ratio, contamination, degradation
-- Mold: venting, gate size/location, cooling efficiency, ejection system
-- Method: process settings, cycle consistency, startup procedure
+STEP 3: ROOT CAUSE ANALYSIS — 분석 깊이 규칙
+
+당신은 10년 이상 경력의 사출 성형 트러블슈팅 전문가이다. 사용자는 이미 기본 원인(건조 부족, 보압 부족 등)을 안다. 뻔한 분석은 쓸모없다.
+
+각 원인에 반드시 다음 4가지를 포함하라:
+
+1. MECHANISM (scientific_reasoning) — 왜 이 설정에서 이 불량이 발생하는지 물리화학적 메커니즘
+   나쁜 예: "건조 부족으로 은줄 발생"
+   좋은 예: "PA66의 평형 수분율은 RH50%에서 2.5%. 열풍식 80°C/8hr는 노점 관리 불가 → 수분율 0.1%+ 잔류. 사출 시 280°C+에서 아미드 결합 가수분해 → CO2/NH3 가스 → 은줄"
+
+2. EVIDENCE (evidence) — 사용자가 입력한 구체적 수치를 직접 인용해 이 원인을 뒷받침
+   나쁜 예: "온도가 높다"
+   좋은 예: "입력 노즐 310°C > PA66 GF33% 권장 280-300°C 상한 초과. Zone1(305)→Zone2(300) 순구배 설정으로 배럴 후반 체류시간 증가 → 열분해 위험"
+
+3. ELIMINATION (elimination) — 왜 이 원인이 1순위이고 다른 원인보다 가능성이 높은지
+   좋은 예: "사출속도 60%는 PA66 적정 범위, 금형온도 80°C도 PA66 권장 범위 내 → 전단발열/결로 가능성 낮음. 건조 조건이 유일한 프로세스 윈도우 이탈 항목이므로 1순위"
+
+4. VERIFICATION (verification) — 현장에서 즉시 이 원인이 맞는지 확인하는 방법 (수치 기준 포함)
+   좋은 예: "호퍼 투입 직전 수지 수분 측정. 0.05% 이하 → 건조 원인 아님, 2순위 확인. 0.1% 이상 → 제습식 건조기로 교체, 80°C 4hr 재건조 후 재시도. 은줄 즉시 사라지면 확진"
+
+추가 규칙:
+- 사용자가 입력한 수치를 반드시 인용 ("310°C", "60%" 등 — "온도가 높다" 절대 금지)
+- probability 높은 원인부터 정렬, 1순위 선정 논리적 근거 명시
+- 원인 간 상호작용 가능하면 언급 (예: 건조 부족 + 배럴 과열이 동시 작용 시 은줄 더 심화)
+- moldInfo(게이트 타입, 캐비티 수, 러너 타입)가 입력된 경우 원인 분석에 반영
+- 4M 프레임워크: Machine(V/P 전환, 쿠션, 체크링), Material(수분, 재분쇄율, 오염), Mold(벤팅, 게이트, 냉각), Method(설정값, 사이클 일관성)
 
 STEP 4: SPECIFIC RECOMMENDATIONS
 - EXACT numerical changes (e.g. 'increase Zone 2 from 275 to 285°C', not vague)
@@ -225,7 +246,7 @@ ${tier === 'complex' ? `COMPLEX CASE INSTRUCTIONS (복합 원인 케이스):
 9. FLAME RETARDANCY & THICKNESS — if a flame retardant grade and certification thickness are provided, evaluate whether the product's actual wall thickness matches the certified thickness. Thinner walls typically require V-0 at thinner certification (e.g., 0.4mm vs 0.8mm). Thicker walls may relax the flame retardant additive loading but can increase sink/void risk. Flag mismatches between certified thickness and actual wall thickness in resin_specific_notes.
 
 OUTPUT LENGTH LIMITS — strictly enforce to prevent truncation:
-- causes: max 3 items. description max 40 chars. scientific_reasoning max 60 chars. evidence max 40 chars.
+- causes: max 3 items. description max 60 chars. scientific_reasoning max 150 chars. evidence max 120 chars. elimination max 120 chars. verification max 150 chars.
 - recommendations: max 5 items. reason max 50 chars. expected_result max 40 chars. risk max 40 chars. interaction_note max 40 chars.
 - checklist each array: max 3 items, each max 40 chars.
 - top5_actions: exactly 5. action max 50 chars. why max 40 chars.
@@ -254,9 +275,11 @@ OUTPUT FORMAT (return as JSON only, no markdown):
       "rank": 1,
       "category": "4M 카테고리 (Machine/Material/Mold/Method)",
       "probability": 70,
-      "description": "원인 설명 in Korean",
-      "scientific_reasoning": "과학적 메커니즘 상세 설명",
-      "evidence": "제공된 데이터에서 이 원인을 뒷받침하는 근거"
+      "description": "원인 설명 — 구체적, 수치 포함",
+      "scientific_reasoning": "왜 이 설정에서 이 불량이 발생하는지 물리화학적 메커니즘 (수치 인용 필수)",
+      "evidence": "사용자 입력 데이터에서 이 원인을 뒷받침하는 구체적 증거 (수치 직접 인용)",
+      "elimination": "왜 이 원인이 1순위이고 다른 원인보다 가능성이 높은지 논리적 근거",
+      "verification": "현장에서 즉시 이 원인을 확인하는 구체적 방법 (판정 기준 수치 포함)"
     }
   ],
   "recommendations": [
@@ -328,7 +351,7 @@ export async function POST(request: NextRequest) {
       images: safeImages,
       advSettings,
     });
-    const maxTokens = (tier === 'complex' || round >= 2) ? 4000 : 3000;
+    const maxTokens = (tier === 'complex' || round >= 2) ? 5000 : 4000;
 
     const userContent: Anthropic.MessageParam['content'] = [];
 
