@@ -317,6 +317,7 @@ function DiagnoseContent() {
   const [isDragging, setIsDragging] = useState(false);
   const [isExtractingSettings, setIsExtractingSettings] = useState(false);
   const [extractMsg, setExtractMsg] = useState('');
+  const [extractedFields, setExtractedFields] = useState<Set<string>>(new Set());
   const fileInputRef = useRef<HTMLInputElement>(null);
   const settingsImageRef = useRef<HTMLInputElement>(null);
   const moldDrawingInputRef = useRef<HTMLInputElement>(null);
@@ -340,17 +341,19 @@ function DiagnoseContent() {
       });
       if (!res.ok) throw new Error('추출 실패');
       const extracted = await res.json();
+      const filledKeys: string[] = [];
       setSettings(prev => {
         const updated = { ...prev };
         for (const key of Object.keys(extracted)) {
           if (key in updated && extracted[key]) {
             (updated as Record<string, string>)[key] = extracted[key];
+            filledKeys.push(key);
           }
         }
         return updated;
       });
-      const filled = Object.values(extracted).filter(Boolean).length;
-      setExtractMsg(`✓ ${filled}개 항목을 자동으로 입력했습니다.`);
+      setExtractedFields(new Set(filledKeys));
+      setExtractMsg(`✓ ${filledKeys.length}개 항목 자동 입력 완료 — 확인 후 수정하세요.`);
     } catch {
       setExtractMsg('추출 실패. 사출기 화면이 잘 보이는 사진을 사용해주세요.');
     } finally {
@@ -426,6 +429,7 @@ function DiagnoseContent() {
 
   const setSetting = (key: string, value: string) => {
     setSettings(prev => ({ ...prev, [key]: value }));
+    setExtractedFields(prev => { const n = new Set(prev); n.delete(key); return n; });
   };
   const setAdvSetting = (key: string, value: string) => {
     setAdvSettings(prev => ({ ...prev, [key]: value }));
@@ -608,6 +612,10 @@ function DiagnoseContent() {
 
   const inputCls = "w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2.5 text-sm text-white placeholder:text-white/25 focus:outline-none focus:ring-2 focus:ring-[#00E887]/30 focus:border-[#00E887]/40";
   const labelCls = "block text-sm font-medium text-white/50 mb-1";
+  // 자동 추출 필드: 초록 tint + "확인 요망" 구분. 수동 편집 시 일반 스타일로 복귀.
+  const settingInputCls = (key: string) => extractedFields.has(key)
+    ? "w-full bg-[#00E887]/10 border border-[#00E887]/40 rounded-lg px-3 py-3 text-sm text-white placeholder:text-white/25 focus:outline-none focus:ring-2 focus:ring-[#00E887]/40 focus:border-[#00E887]/60"
+    : "w-full bg-white/5 border border-white/10 rounded-lg px-3 py-3 text-sm text-white placeholder:text-white/25 focus:outline-none focus:ring-2 focus:ring-[#00E887]/30 focus:border-[#00E887]/40";
 
   return (
     <div className="max-w-5xl mx-auto px-3 sm:px-4 py-6 sm:py-8">
@@ -804,32 +812,35 @@ function DiagnoseContent() {
 
         {/* STEP 2b: Machine Settings */}
         <section className="bg-white/[0.03] rounded-2xl p-4 sm:p-6 border border-white/8">
-          <div className="flex flex-wrap items-center justify-between gap-3 mb-5">
-            <h2 className="text-lg font-bold text-[#1E293B] flex items-center gap-2">
-              <span className="bg-[#00E887] text-black w-7 h-7 rounded-full flex items-center justify-center text-sm font-bold">3</span>
-              사출기 셋팅값
-            </h2>
+          <h2 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
+            <span className="bg-[#00E887] text-black w-7 h-7 rounded-full flex items-center justify-center text-sm font-bold shrink-0">3</span>
+            사출기 셋팅값
+          </h2>
+
+          {/* ★ 1급 기능: 사출기 화면 촬영 자동 입력 */}
+          <div className="mb-5">
             <button
               type="button"
               onClick={() => settingsImageRef.current?.click()}
               disabled={isExtractingSettings}
-              className="flex items-center gap-2 bg-blue-50 hover:bg-blue-100 disabled:bg-slate-100 text-blue-700 disabled:text-slate-400 border border-blue-300 disabled:border-slate-200 px-3 py-2 rounded-lg text-sm font-medium transition-colors whitespace-nowrap"
+              className="w-full flex items-center justify-center gap-3 bg-[#00E887] hover:bg-[#00E887]/90 active:bg-[#00E887]/80 disabled:bg-white/10 text-black disabled:text-white/30 font-bold text-base py-4 rounded-xl transition-colors shadow-[0_0_20px_rgba(0,232,135,0.15)] min-h-[56px]"
             >
               {isExtractingSettings ? (
                 <>
-                  <svg className="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24">
+                  <svg className="animate-spin w-5 h-5 shrink-0" fill="none" viewBox="0 0 24 24">
                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
                     <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
                   </svg>
-                  읽는 중...
+                  셋팅값 읽는 중...
                 </>
               ) : (
                 <>
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-6 h-6 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/>
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/>
                   </svg>
-                  사진으로 자동 입력
+                  <span>📷 사출기 화면 찍어 자동 입력</span>
+                  <span className="text-black/50 text-sm font-normal hidden sm:inline">— 19개 항목</span>
                 </>
               )}
             </button>
@@ -841,12 +852,16 @@ function DiagnoseContent() {
               className="hidden"
               onChange={(e) => e.target.files?.[0] && handleSettingsImage(e.target.files[0])}
             />
+            {extractMsg && (
+              <div className={`mt-2 text-sm px-4 py-3 rounded-xl flex items-start gap-2 ${extractMsg.startsWith('✓') ? 'bg-[#00E887]/10 border border-[#00E887]/20 text-[#00E887]' : 'bg-red-500/10 border border-red-500/20 text-red-400'}`}>
+                <span className="shrink-0 mt-0.5">{extractMsg.startsWith('✓') ? '✓' : '!'}</span>
+                <span>{extractMsg.startsWith('✓') ? extractMsg.slice(2) : extractMsg}</span>
+              </div>
+            )}
+            {extractedFields.size > 0 && (
+              <p className="mt-1.5 text-xs text-[#00E887]/60 text-center">초록 테두리 항목 = 자동 입력됨 · 수정하면 표시 사라짐</p>
+            )}
           </div>
-          {extractMsg && (
-            <div className={`mb-4 text-sm px-3 py-2 rounded-lg ${extractMsg.startsWith('✓') ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-600'}`}>
-              {extractMsg}
-            </div>
-          )}
           <div className="space-y-5">
             <div>
               <label className={labelCls}>사출 온도 (℃)</label>
@@ -859,8 +874,8 @@ function DiagnoseContent() {
                   { key: 'zone4Temp', label: 'Zone4' },
                 ].map(({ key, label }) => (
                   <div key={key}>
-                    <div className="text-xs text-slate-500 mb-1 text-center">{label}</div>
-                    <input type="text" inputMode="numeric" className={inputCls} placeholder="℃" value={settings[key as keyof typeof settings]} onChange={(e) => setSetting(key, e.target.value)} />
+                    <div className={`text-xs mb-1 text-center ${extractedFields.has(key) ? 'text-[#00E887]/70 font-semibold' : 'text-white/40'}`}>{label}{extractedFields.has(key) && ' ✓'}</div>
+                    <input type="text" inputMode="numeric" className={settingInputCls(key)} placeholder="℃" value={settings[key as keyof typeof settings]} onChange={(e) => setSetting(key, e.target.value)} />
                   </div>
                 ))}
               </div>
@@ -870,8 +885,8 @@ function DiagnoseContent() {
               <div className="grid grid-cols-2 gap-2">
                 {[{ key: 'moldTempFixed', label: '고정측' }, { key: 'moldTempMoving', label: '가동측' }].map(({ key, label }) => (
                   <div key={key}>
-                    <div className="text-xs text-slate-500 mb-1">{label}</div>
-                    <input type="text" inputMode="numeric" className={inputCls} placeholder="℃" value={settings[key as keyof typeof settings]} onChange={(e) => setSetting(key, e.target.value)} />
+                    <div className={`text-xs mb-1 ${extractedFields.has(key) ? 'text-[#00E887]/70 font-semibold' : 'text-white/40'}`}>{label}{extractedFields.has(key) && ' ✓'}</div>
+                    <input type="text" inputMode="numeric" className={settingInputCls(key)} placeholder="℃" value={settings[key as keyof typeof settings]} onChange={(e) => setSetting(key, e.target.value)} />
                   </div>
                 ))}
               </div>
@@ -892,8 +907,8 @@ function DiagnoseContent() {
                 { key: 'clampForce', label: '형체력', placeholder: 'ton' },
               ].map(({ key, label, placeholder }) => (
                 <div key={key}>
-                  <div className="text-xs text-slate-500 mb-1">{label}</div>
-                  <input type="text" inputMode="numeric" className={inputCls} placeholder={placeholder} value={settings[key as keyof typeof settings]} onChange={(e) => setSetting(key, e.target.value)} />
+                  <div className={`text-xs mb-1 ${extractedFields.has(key) ? 'text-[#00E887]/70 font-semibold' : 'text-white/40'}`}>{label}{extractedFields.has(key) && ' ✓'}</div>
+                  <input type="text" inputMode="numeric" className={settingInputCls(key)} placeholder={placeholder} value={settings[key as keyof typeof settings]} onChange={(e) => setSetting(key, e.target.value)} />
                 </div>
               ))}
             </div>
