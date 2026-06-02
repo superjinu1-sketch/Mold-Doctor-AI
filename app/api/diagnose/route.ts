@@ -1,5 +1,6 @@
 import Anthropic from '@anthropic-ai/sdk';
 import { NextRequest, NextResponse } from 'next/server';
+import { downscaleBase64 } from '@/lib/downscale';
 
 // JSON 문자열 값 안의 실제 줄바꿈을 공백으로 치환 (문자 단위 파싱)
 function sanitizeJsonNewlines(text: string): string {
@@ -142,19 +143,18 @@ function classifyComplexity(input: ComplexityInput): 'simple' | 'complex' {
   return score >= 5 ? 'complex' : 'simple';
 }
 
-function buildSystemPrompt(resinType: string, tier: 'simple' | 'complex' = 'simple', round: number = 1): string {
-  const resinNote = getResinKnowledge(resinType);
-  return `You are an expert injection molding troubleshooter trained in Scientific Molding methodology (RJG/Paulson approach, Decoupled Molding II/III). You have 15+ years of hands-on experience and apply systematic, data-driven analysis rather than trial-and-error.
-
-RESIN IN USE: ${resinType || 'Unknown'}
-RESIN KNOWLEDGE:
-${resinNote}
+// Fixed framework text — cached across requests (resin/tier/round independent)
+const FIXED_FRAMEWORK = `You are an expert injection molding troubleshooter trained in Scientific Molding methodology (RJG/Paulson approach, Decoupled Molding II/III). You have 15+ years of hands-on experience and apply systematic, data-driven analysis rather than trial-and-error.
 
 ANALYSIS FRAMEWORK — apply in order:
 
 STEP 1: DEFECT CLASSIFICATION
 - Identify defect type from photo and/or description
 - Classify phase: FILLING (short shot, jetting, burn, weld line) / PACKING (sink, void, flash) / COOLING (warpage, crack) / MATERIAL (silver streak, discoloration, delamination)
+IMAGE QUALITY CHECK (evaluate before any other step):
+- If the image shows a molded part but NO clear defect pattern → defect_type.en = "No_Defect_Detected", causes = [], recommendations = [], summary = "불량 형상 미검출. 의심 부위 확대 촬영 권장."
+- If the image is a solid color / too blurry / overexposed / unrelated to injection molding → defect_type.en = "Image_Unreadable", causes = [], recommendations = [], summary = "이미지 판독 불가. 밝은 곳에서 불량 부위 선명하게 재촬영 필요."
+- For No_Defect_Detected / Image_Unreadable: do NOT force-map process settings to a defect. Return only defect_type, severity="low", summary, causes=[], recommendations=[], empty checklist/top5_actions.
 
 STEP 2: PROCESS WINDOW ANALYSIS
 - Is melt temp within the resin's recommended range?
@@ -200,31 +200,7 @@ STEP 4: SPECIFIC RECOMMENDATIONS
 STEP 5: VERIFICATION CHECKLIST
 - Before changes / after changes / escalation criteria
 
-${tier === 'complex' ? `COMPLEX CASE INSTRUCTIONS (복합 원인 케이스):
-이 케이스는 복합 원인 가능성이 높습니다.
-단순 원인(건조, 온도)으로 결론 내리지 마세요.
-간헐적 패턴, 특정 위치, 시간대 변화 등 숨은 단서를 분석하세요.
-금형 구조적 원인과 소재 상호작용도 반드시 검토하세요.
-최소 3개 이상의 가능한 원인을 제시하고 각각의 확률을 부여하세요.
-
-` : ''}${round >= 2 ? `FOLLOW-UP ANALYSIS INSTRUCTIONS (후속 추정):
-이것은 ${round}차 후속 추정입니다. 이전 추정과 조치 결과를 반드시 참고하세요.
-분석 규칙:
-1. 이미 시도해서 효과 없었던 조치는 다시 추천하지 마세요
-2. 부분 개선된 조치는 방향이 맞다는 뜻 — 더 강하게 조정하거나 보조 조치를 추가하세요
-3. 1차 추정에서 미처 고려하지 못한 원인을 탐색하세요: 금형 구조적 원인(벤트/게이트/냉각), 소재 로트 변화, 사출기 기계적 문제(체크링/스크류 마모), 환경 요인(습도/온도)
-4. 1차가 material/method 원인이었다면, 2차는 machine/mold 원인을 우선 검토하세요
-
-` : ''}${round >= 3 ? `REPEAT ANALYSIS ALERT (3차+ 반복 추정):
-이 케이스는 3회 이상 반복 추정입니다. 일반적인 성형 조건 조정으로는 해결이 어려운 상태입니다.
-다음을 반드시 검토하세요:
-- 사출기 기계적 점검: 체크링 마모, 스크류 마모, 히터 열화
-- 금형 정밀 점검: 벤트 막힘, 냉각 라인 스케일, PL면 마모
-- 소재 변경 검토: 같은 수지의 다른 등급 또는 다른 제조사
-- 금형 설계 변경: 게이트 위치/크기, 러너 밸런스
-'조건을 더 바꿔보세요'가 아니라 근본 원인 해결을 제시하세요.
-
-` : ''}CRITICAL RULES:
+CRITICAL RULES:
 1. Every recommendation must reference this specific resin, the settings provided, and the defect observed.
 2. When actual measured values (fill time, peak pressure, cushion, part weight) are provided, use them.
 3. Consider parameter interactions.
@@ -251,7 +227,7 @@ Be concise. Korean only where specified. No extra explanation outside JSON.
 OUTPUT FORMAT (return as JSON only, no markdown):
 {
   "defect_type": {"ko": "한국어명", "en": "English name"},
-  "defect_phase": "filling/packing/cooling/material",
+  "defect_phase": "filling/packing/cooling/material/none",
   "severity": "high/medium/low",
   "summary": "1-line Korean summary",
   "process_window_check": {
@@ -307,6 +283,41 @@ OUTPUT FORMAT (return as JSON only, no markdown):
     "recommendations": ["금형 수정 제안 — 있을 경우"]
   }
 }`;
+
+// buildSystemBlocks: returns [fixed(cached), variable] for cache_control
+function buildSystemBlocks(resinType: string, tier: 'simple' | 'complex' = 'simple', round: number = 1): Anthropic.TextBlockParam[] {
+  const resinNote = getResinKnowledge(resinType);
+
+  const variableText = [
+    `RESIN IN USE: ${resinType || 'Unknown'}`,
+    `RESIN KNOWLEDGE:\n${resinNote}`,
+    tier === 'complex' ? `\nCOMPLEX CASE INSTRUCTIONS (복합 원인 케이스):
+이 케이스는 복합 원인 가능성이 높습니다.
+단순 원인(건조, 온도)으로 결론 내리지 마세요.
+간헐적 패턴, 특정 위치, 시간대 변화 등 숨은 단서를 분석하세요.
+금형 구조적 원인과 소재 상호작용도 반드시 검토하세요.
+최소 3개 이상의 가능한 원인을 제시하고 각각의 확률을 부여하세요.` : '',
+    round >= 2 ? `\nFOLLOW-UP ANALYSIS INSTRUCTIONS (후속 추정):
+이것은 ${round}차 후속 추정입니다. 이전 추정과 조치 결과를 반드시 참고하세요.
+분석 규칙:
+1. 이미 시도해서 효과 없었던 조치는 다시 추천하지 마세요
+2. 부분 개선된 조치는 방향이 맞다는 뜻 — 더 강하게 조정하거나 보조 조치를 추가하세요
+3. 1차 추정에서 미처 고려하지 못한 원인을 탐색하세요: 금형 구조적 원인(벤트/게이트/냉각), 소재 로트 변화, 사출기 기계적 문제(체크링/스크류 마모), 환경 요인(습도/온도)
+4. 1차가 material/method 원인이었다면, 2차는 machine/mold 원인을 우선 검토하세요` : '',
+    round >= 3 ? `\nREPEAT ANALYSIS ALERT (3차+ 반복 추정):
+이 케이스는 3회 이상 반복 추정입니다. 일반적인 성형 조건 조정으로는 해결이 어려운 상태입니다.
+다음을 반드시 검토하세요:
+- 사출기 기계적 점검: 체크링 마모, 스크류 마모, 히터 열화
+- 금형 정밀 점검: 벤트 막힘, 냉각 라인 스케일, PL면 마모
+- 소재 변경 검토: 같은 수지의 다른 등급 또는 다른 제조사
+- 금형 설계 변경: 게이트 위치/크기, 러너 밸런스
+'조건을 더 바꿔보세요'가 아니라 근본 원인 해결을 제시하세요.` : '',
+  ].filter(Boolean).join('\n\n');
+
+  return [
+    { type: 'text' as const, text: FIXED_FRAMEWORK, cache_control: { type: 'ephemeral' as const } },
+    { type: 'text' as const, text: variableText },
+  ];
 }
 
 export async function POST(request: NextRequest) {
@@ -332,8 +343,16 @@ export async function POST(request: NextRequest) {
     const round = Number(bodyRound) || 1;
 
     // Limit image arrays to prevent token overflow
-    const safeImages = (images || []).slice(0, 5);
-    const safeDrawings = (moldDrawings || []).slice(0, 3);
+    const rawImages = (images || []).slice(0, 5);
+    const rawDrawings = (moldDrawings || []).slice(0, 3);
+
+    // Downscale images (long side → 1024px, EXIF rotate, JPEG q80)
+    const [safeImages, safeDrawings] = await Promise.all([
+      Promise.all(rawImages.map(img => downscaleBase64(img.data, img.mediaType).then(s => ({ ...img, ...s })))),
+      Promise.all(rawDrawings.map(d => d.mediaType !== 'application/pdf'
+        ? downscaleBase64(d.data, d.mediaType).then(s => ({ ...d, ...s }))
+        : Promise.resolve(d))),
+    ]);
 
     // Classify complexity for 2-tier system
     const tier = classifyComplexity({
@@ -481,7 +500,7 @@ CRITICAL: Your entire response must be ONLY the JSON object. No text before or a
     const response = await client.messages.create({
       model: 'claude-sonnet-4-6',
       max_tokens: maxTokens,
-      system: buildSystemPrompt(resinInfo?.resinType || '', tier, round),
+      system: buildSystemBlocks(resinInfo?.resinType || '', tier, round),
       messages: [{ role: 'user', content: userContent }],
     });
 

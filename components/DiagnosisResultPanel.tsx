@@ -379,6 +379,44 @@ export default function DiagnosisResultPanel({ result, onSavePDF, round = 1, fol
     ? { label: '2차 후속 추정', cls: 'bg-orange-500/15 text-orange-400 border border-orange-500/30' }
     : { label: `${round}차 심층 추정`, cls: 'bg-red-500/15 text-red-400 border border-red-500/30' };
 
+  /* Image_Unreadable: 판독 불가 이미지 */
+  if (defectTypeEn === 'Image_Unreadable') {
+    return (
+      <div className="bg-[#0D1117] border border-amber-500/30 rounded-2xl p-6 sm:p-8 text-center space-y-4">
+        <div className="text-5xl">📷</div>
+        <h2 className="text-lg font-bold text-amber-400">이미지 판독 불가</h2>
+        <p className="text-white/60 text-sm leading-relaxed">
+          밝은 곳에서 불량 부위를 선명하게 재촬영해 주세요.<br />
+          단색·흐린 사진·사출 제품 무관 이미지는 분석할 수 없습니다.
+        </p>
+        <p className="text-white/30 text-xs">{summary}</p>
+        <button type="button" onClick={onResolved}
+          className="mx-auto mt-2 flex items-center gap-2 bg-amber-500/15 hover:bg-amber-500/20 text-amber-300 border border-amber-500/30 px-5 py-2.5 rounded-xl text-sm font-bold transition-colors">
+          사진 교체 후 재시도
+        </button>
+      </div>
+    );
+  }
+
+  /* No_Defect_Detected: 불량 미검출 */
+  if (defectTypeEn === 'No_Defect_Detected') {
+    return (
+      <div className="bg-[#0D1117] border border-[#00E887]/20 rounded-2xl p-6 sm:p-8 text-center space-y-4">
+        <div className="text-5xl">✅</div>
+        <h2 className="text-lg font-bold text-[#00E887]">불량 미검출</h2>
+        <p className="text-white/60 text-sm leading-relaxed">
+          이 이미지에서 불량 형상이 검출되지 않았습니다.<br />
+          의심되는 부위를 확대 촬영하거나 다른 각도 사진을 추가하세요.
+        </p>
+        <p className="text-white/30 text-xs">{summary}</p>
+        <button type="button" onClick={onResolved}
+          className="mx-auto mt-2 flex items-center gap-2 bg-[#00E887]/10 hover:bg-[#00E887]/15 text-[#00E887] border border-[#00E887]/30 px-5 py-2.5 rounded-xl text-sm font-bold transition-colors">
+          사진 추가 후 재시도
+        </button>
+      </div>
+    );
+  }
+
   /* raw_response fallback: 구조화 JSON 파싱 실패 시 */
   if (hasRawResponse) {
     return (

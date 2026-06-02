@@ -1191,6 +1191,7 @@ function DiagnoseContent() {
         {/* Results */}
         {result && (
           <div ref={resultRef}>
+            {/* Image_Unreadable / No_Defect_Detected: DiagnosisResultPanel 내부에서 특수 UI 렌더링 */}
             <DiagnosisResultPanel
               result={result}
               onSavePDF={handleSavePDF}
@@ -1204,8 +1205,10 @@ function DiagnoseContent() {
           </div>
         )}
 
-        {/* Follow-up Form */}
-        {showFollowUpForm && result && (
+        {/* Follow-up Form — 특수 케이스(이미지 판독불가/정상)에선 숨김 */}
+        {showFollowUpForm && result &&
+         result.defect_type?.en !== 'Image_Unreadable' &&
+         result.defect_type?.en !== 'No_Defect_Detected' && (
           <div ref={followUpFormRef} className="bg-white rounded-2xl p-4 sm:p-6 shadow-sm border-2 border-orange-300 space-y-5">
             <div className="flex items-center gap-2 mb-1">
               <span className="bg-orange-500 text-white text-xs font-bold px-2 py-1 rounded-full">{round}차 후속 추정</span>
