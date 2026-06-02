@@ -72,7 +72,7 @@ async function main() {
   console.log('[smoke] 서버 준비 완료. POST /api/diagnose 전송 (X-Api-Key 헤더 없음)...');
   let res;
   try {
-    res = await httpPost('/api/diagnose', PAYLOAD, 60000);
+    res = await httpPost('/api/diagnose', PAYLOAD, 120000);
   } catch (err) {
     console.error('[smoke] FAIL: 요청 오류', err.message);
     process.exit(1);

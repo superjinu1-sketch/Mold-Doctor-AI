@@ -504,7 +504,7 @@ function DiagnoseContent() {
       });
 
       if (!res.ok) {
-        let errMsg = '진단 실패';
+        let errMsg = '추정 실패';
         try { const err = await res.json(); errMsg = err.error || errMsg; } catch { /* HTML 에러 페이지 등 무시 */ }
         throw new Error(errMsg);
       }
@@ -539,7 +539,7 @@ function DiagnoseContent() {
       // Scroll to result
       setTimeout(() => resultRef.current?.scrollIntoView({ behavior: 'smooth' }), 100);
     } catch (err) {
-      setError(err instanceof Error ? err.message : '진단 중 오류가 발생했습니다.');
+      setError(err instanceof Error ? err.message : '추정 중 오류가 발생했습니다.');
     } finally {
       setIsLoading(false);
     }
@@ -613,7 +613,7 @@ function DiagnoseContent() {
     <div className="max-w-5xl mx-auto px-3 sm:px-4 py-6 sm:py-8">
       <div className="mb-8 flex items-start justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-white mb-2">사출 불량 AI 진단</h1>
+          <h1 className="text-3xl font-bold text-white mb-2">사출 불량 AI 추정</h1>
           <p className="text-white/40">불량 정보와 성형 조건을 입력하면 AI가 원인과 해결책을 알려드립니다.</p>
         </div>
       </div>
@@ -732,7 +732,7 @@ function DiagnoseContent() {
               value={defectDescription}
               onChange={(e) => setDefectDescription(e.target.value)}
             />
-            <p className="mt-1 text-xs text-slate-400">상세하게 작성할수록 정확한 진단이 가능합니다</p>
+            <p className="mt-1 text-xs text-slate-400">상세하게 작성할수록 정확한 추정이 가능합니다</p>
           </div>
         </section>
 
@@ -1121,7 +1121,7 @@ function DiagnoseContent() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                 </svg>
                 <p className="text-slate-600 text-sm font-medium">금형 도면, 제품 3D 캡처, 게이트/러너 레이아웃 이미지를 올려주세요</p>
-                <p className="text-slate-400 text-xs mt-1">AI가 금형 구조를 분석하여 불량 원인 진단에 반영합니다 · JPG, PNG, PDF</p>
+                <p className="text-slate-400 text-xs mt-1">AI가 금형 구조를 분석하여 불량 원인 추정에 반영합니다 · JPG, PNG, PDF</p>
                 <input
                   ref={moldDrawingInputRef}
                   type="file"
@@ -1169,14 +1169,14 @@ function DiagnoseContent() {
                 <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                 <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
               </svg>
-              AI 진단 중...
+              AI 추정 중...
             </>
           ) : (
             <>
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
               </svg>
-              AI 진단 시작
+              AI 추정 시작
             </>
           )}
         </button>
@@ -1208,8 +1208,8 @@ function DiagnoseContent() {
         {showFollowUpForm && result && (
           <div ref={followUpFormRef} className="bg-white rounded-2xl p-4 sm:p-6 shadow-sm border-2 border-orange-300 space-y-5">
             <div className="flex items-center gap-2 mb-1">
-              <span className="bg-orange-500 text-white text-xs font-bold px-2 py-1 rounded-full">{round}차 후속 진단</span>
-              <h3 className="text-lg font-bold text-[#1E293B]">후속 진단 정보 입력</h3>
+              <span className="bg-orange-500 text-white text-xs font-bold px-2 py-1 rounded-full">{round}차 후속 추정</span>
+              <h3 className="text-lg font-bold text-[#1E293B]">후속 추정 정보 입력</h3>
             </div>
 
             {/* 조치 체크리스트 */}
@@ -1306,7 +1306,7 @@ function DiagnoseContent() {
 
             {/* 셋팅 변경 안내 */}
             <div className="bg-slate-50 rounded-xl p-3 border border-slate-200">
-              <p className="text-xs text-slate-500 font-medium">변경된 셋팅값이 있으면 위의 사출기 셋팅 폼에서 직접 수정 후 후속 진단을 시작하세요.</p>
+              <p className="text-xs text-slate-500 font-medium">변경된 셋팅값이 있으면 위의 사출기 셋팅 폼에서 직접 수정 후 후속 추정을 시작하세요.</p>
             </div>
 
             <div className="flex gap-3">
@@ -1323,7 +1323,7 @@ function DiagnoseContent() {
                 disabled={isLoading}
                 className="flex-1 bg-orange-500 hover:bg-orange-600 disabled:opacity-50 text-white font-bold py-3 px-6 rounded-xl transition-colors"
               >
-                {isLoading ? 'AI 분석 중...' : `${round}차 후속 진단 시작`}
+                {isLoading ? 'AI 분석 중...' : `${round}차 후속 추정 시작`}
               </button>
             </div>
           </div>

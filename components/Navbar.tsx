@@ -21,7 +21,7 @@ export default function Navbar() {
 
             {/* Desktop Nav */}
             <div className="hidden md:flex items-center gap-7 text-sm text-white/40">
-              <Link href="/diagnose" className="hover:text-white transition-colors">진단하기</Link>
+              <Link href="/diagnose" className="hover:text-white transition-colors">추정하기</Link>
               <Link href="/guide" className="hover:text-white transition-colors">불량 가이드</Link>
               <Link href="/pricing" className="hover:text-white transition-colors">가격</Link>
             </div>
@@ -29,7 +29,7 @@ export default function Navbar() {
             <div className="hidden md:flex items-center gap-3">
               <Link href="/diagnose"
                 className="text-sm bg-white text-black px-4 py-1.5 rounded-full font-semibold hover:bg-white/90 transition-colors">
-                무료 진단
+                무료 추정
               </Link>
             </div>
 
@@ -53,7 +53,7 @@ export default function Navbar() {
           {menuOpen && (
             <div className="md:hidden pb-4 flex flex-col gap-1 border-t border-white/5 pt-3">
               {[
-                { href: '/diagnose', label: '진단하기' },
+                { href: '/diagnose', label: '추정하기' },
                 { href: '/guide', label: '불량 가이드' },
                 { href: '/pricing', label: '가격' },
               ].map(({ href, label }) => (
@@ -66,7 +66,7 @@ export default function Navbar() {
               <Link href="/diagnose"
                 className="mt-2 bg-white text-black px-4 py-2.5 rounded-full font-bold text-sm text-center"
                 onClick={() => setMenuOpen(false)}>
-                무료 진단
+                무료 추정
               </Link>
             </div>
           )}

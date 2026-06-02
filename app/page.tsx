@@ -21,7 +21,7 @@ export default function HomePage() {
         <div className="max-w-4xl mx-auto text-center relative">
           <div className="inline-flex items-center gap-2 border border-[#00E887]/25 bg-[#00E887]/8 text-[#00E887] text-xs font-medium px-3.5 py-1.5 rounded-full mb-8">
             <span className="w-1.5 h-1.5 bg-[#00E887] rounded-full animate-pulse" />
-            AI 기반 실시간 진단
+            AI 기반 실시간 추정
           </div>
 
           <h1 className="text-5xl sm:text-6xl md:text-7xl font-bold tracking-tight leading-[1.08] mb-6 text-white">
@@ -39,7 +39,7 @@ export default function HomePage() {
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
             <Link href="/diagnose"
               className="bg-[#00E887] text-black px-8 py-3.5 rounded-full font-bold text-base hover:bg-[#00E887]/90 transition-all shadow-[0_0_30px_rgba(0,232,135,0.3)] hover:shadow-[0_0_40px_rgba(0,232,135,0.4)]">
-              무료로 진단해보기 →
+              무료로 추정해보기 →
             </Link>
             <Link href="/guide"
               className="border border-white/10 text-white/60 px-8 py-3.5 rounded-full font-medium text-base hover:bg-white/5 hover:text-white transition-all">
@@ -49,7 +49,7 @@ export default function HomePage() {
 
           {/* Stats */}
           <div className="mt-16 flex flex-wrap justify-center gap-x-12 gap-y-4">
-            {[['12종', '불량 유형'], ['50종+', '수지 지원'], ['10초', '진단 속도']].map(([n, l]) => (
+            {[['12종', '불량 유형'], ['50종+', '수지 지원'], ['10초', '추정 속도']].map(([n, l]) => (
               <div key={l} className="text-center">
                 <div className="text-2xl font-bold text-white">{n}</div>
                 <div className="text-xs text-white/25 mt-0.5">{l}</div>
@@ -64,7 +64,7 @@ export default function HomePage() {
         <div className="max-w-5xl mx-auto">
           <div className="text-center mb-12">
             <h2 className="text-2xl sm:text-3xl font-bold text-white mb-3">이런 불량, 겪어보셨죠?</h2>
-            <p className="text-white/25 text-sm">클릭하면 바로 진단 페이지로 이동합니다</p>
+            <p className="text-white/25 text-sm">클릭하면 바로 추정 페이지로 이동합니다</p>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
             {defects.map((d) => (
@@ -92,7 +92,7 @@ export default function HomePage() {
               {[
                 { n: '01', t: '사진 업로드', d: '불량 부위를 촬영하거나 기존 사진을 업로드하세요. 드래그앤드롭, 클립보드 붙여넣기 모두 지원.' },
                 { n: '02', t: '셋팅값 입력', d: '수지 종류, 사출 온도, 압력, 속도 등 현재 성형 조건을 입력하세요.' },
-                { n: '03', t: 'AI 진단', d: 'AI가 원인을 분석하고 현재 vs 권장 셋팅을 비교하여 해결책을 제시합니다.' },
+                { n: '03', t: 'AI 추정', d: 'AI가 원인을 분석하고 현재 vs 권장 셋팅을 비교하여 해결책을 제시합니다.' },
               ].map((s) => (
                 <div key={s.n}>
                   <div className="text-6xl font-black text-white/5 leading-none mb-4">{s.n}</div>
@@ -110,13 +110,13 @@ export default function HomePage() {
       <section className="pb-28 px-4 sm:px-6">
         <div className="max-w-2xl mx-auto text-center">
           <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">
-            지금 바로 진단해보세요.{' '}
+            지금 바로 추정해보세요.{' '}
             <span className="text-[#00E887]">무료입니다.</span>
           </h2>
           <p className="text-white/30 text-sm mb-8">회원가입 없이 바로 사용 가능합니다.</p>
           <Link href="/diagnose"
             className="inline-block bg-[#00E887] text-black px-10 py-4 rounded-full font-bold text-base hover:bg-[#00E887]/90 transition-all shadow-[0_0_40px_rgba(0,232,135,0.2)]">
-            무료로 진단 시작하기
+            무료로 추정 시작하기
           </Link>
         </div>
       </section>

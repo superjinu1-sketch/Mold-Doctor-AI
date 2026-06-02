@@ -207,16 +207,16 @@ ${tier === 'complex' ? `COMPLEX CASE INSTRUCTIONS (복합 원인 케이스):
 금형 구조적 원인과 소재 상호작용도 반드시 검토하세요.
 최소 3개 이상의 가능한 원인을 제시하고 각각의 확률을 부여하세요.
 
-` : ''}${round >= 2 ? `FOLLOW-UP DIAGNOSIS INSTRUCTIONS (후속 진단):
-이것은 ${round}차 후속 진단입니다. 이전 진단과 조치 결과를 반드시 참고하세요.
+` : ''}${round >= 2 ? `FOLLOW-UP ANALYSIS INSTRUCTIONS (후속 추정):
+이것은 ${round}차 후속 추정입니다. 이전 추정과 조치 결과를 반드시 참고하세요.
 분석 규칙:
 1. 이미 시도해서 효과 없었던 조치는 다시 추천하지 마세요
 2. 부분 개선된 조치는 방향이 맞다는 뜻 — 더 강하게 조정하거나 보조 조치를 추가하세요
-3. 1차 진단에서 미처 고려하지 못한 원인을 탐색하세요: 금형 구조적 원인(벤트/게이트/냉각), 소재 로트 변화, 사출기 기계적 문제(체크링/스크류 마모), 환경 요인(습도/온도)
+3. 1차 추정에서 미처 고려하지 못한 원인을 탐색하세요: 금형 구조적 원인(벤트/게이트/냉각), 소재 로트 변화, 사출기 기계적 문제(체크링/스크류 마모), 환경 요인(습도/온도)
 4. 1차가 material/method 원인이었다면, 2차는 machine/mold 원인을 우선 검토하세요
 
-` : ''}${round >= 3 ? `REPEAT DIAGNOSIS ALERT (3차+ 반복 진단):
-이 케이스는 3회 이상 반복 진단입니다. 일반적인 성형 조건 조정으로는 해결이 어려운 상태입니다.
+` : ''}${round >= 3 ? `REPEAT ANALYSIS ALERT (3차+ 반복 추정):
+이 케이스는 3회 이상 반복 추정입니다. 일반적인 성형 조건 조정으로는 해결이 어려운 상태입니다.
 다음을 반드시 검토하세요:
 - 사출기 기계적 점검: 체크링 마모, 스크류 마모, 히터 열화
 - 금형 정밀 점검: 벤트 막힘, 냉각 라인 스케일, PL면 마모
@@ -233,7 +233,8 @@ ${tier === 'complex' ? `COMPLEX CASE INSTRUCTIONS (복합 원인 케이스):
 6. For hot runner molds, check zone temperature uniformity and dead spots.
 7. Respond in Korean. Technical terms may be in English with Korean explanation in parentheses.
 8. MOLD DRAWING ANALYSIS — if mold drawings are provided, analyze: gate location vs defect, runner balance, cooling near defect area, wall thickness variation, vent locations, ejector positions. Include in 'mold_analysis' field.
-9. FLAME RETARDANCY & THICKNESS — if a flame retardant grade and certification thickness are provided, evaluate whether the product's actual wall thickness matches the certified thickness. Thinner walls typically require V-0 at thinner certification (e.g., 0.4mm vs 0.8mm). Thicker walls may relax the flame retardant additive loading but can increase sink/void risk. Flag mismatches between certified thickness and actual wall thickness in resin_specific_notes.
+9. In all Korean output text (summary, description, notes, actions), use "추정" instead of "진단". Do not use "진단" in any output JSON field values.
+10. FLAME RETARDANCY & THICKNESS — if a flame retardant grade and certification thickness are provided, evaluate whether the product's actual wall thickness matches the certified thickness. Thinner walls typically require V-0 at thinner certification (e.g., 0.4mm vs 0.8mm). Thicker walls may relax the flame retardant additive loading but can increase sink/void risk. Flag mismatches between certified thickness and actual wall thickness in resin_specific_notes.
 
 OUTPUT LENGTH LIMITS — strictly enforce to prevent truncation:
 - causes: max 3 items. description max 60 chars. scientific_reasoning max 150 chars. evidence max 120 chars. elimination max 120 chars. verification max 150 chars.
@@ -448,8 +449,8 @@ ${(a.machineModel || a.screwDiameter) ? `## 사출기 정보
 - 특이사항: ${productInfo?.notes || '없음'}
 
 ${isFollowUp && previousDiagnosis ? `
-## 후속 진단 정보 (${round}차 Follow-up)
-### 이전 진단 원인
+## 후속 추정 정보 (${round}차 Follow-up)
+### 이전 추정 원인
 ${previousDiagnosis.causes.map(c => `- ${c.description} (${c.probability}%)`).join('\n')}
 
 ### 이전 AI 추천사항

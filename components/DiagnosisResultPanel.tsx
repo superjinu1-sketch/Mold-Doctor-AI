@@ -258,7 +258,7 @@ function ChatSection({
               value={chatInput}
               onChange={e => setChatInput(e.target.value)}
               onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendChat(chatInput); } }}
-              placeholder="진단 결과에 대해 질문하세요..."
+              placeholder="추정 결과에 대해 질문하세요..."
               disabled={isChatLoading}
               className="flex-1 text-sm bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-white placeholder:text-white/20 focus:outline-none focus:ring-2 focus:ring-[#00E887]/30 focus:border-[#00E887]/40 disabled:opacity-50"
             />
@@ -374,10 +374,10 @@ export default function DiagnosisResultPanel({ result, onSavePDF, round = 1, fol
   suggestedQuestions.push('이 조건에서 다른 수지로 바꾸면 어떤 차이가 있나요?');
 
   const roundBadge = round === 1
-    ? { label: '1차 진단', cls: 'bg-blue-500/15 text-blue-400 border border-blue-500/30' }
+    ? { label: '1차 추정', cls: 'bg-blue-500/15 text-blue-400 border border-blue-500/30' }
     : round === 2
-    ? { label: '2차 후속 진단', cls: 'bg-orange-500/15 text-orange-400 border border-orange-500/30' }
-    : { label: `${round}차 심층 진단`, cls: 'bg-red-500/15 text-red-400 border border-red-500/30' };
+    ? { label: '2차 후속 추정', cls: 'bg-orange-500/15 text-orange-400 border border-orange-500/30' }
+    : { label: `${round}차 심층 추정`, cls: 'bg-red-500/15 text-red-400 border border-red-500/30' };
 
   /* raw_response fallback: 구조화 JSON 파싱 실패 시 */
   if (hasRawResponse) {
@@ -422,7 +422,7 @@ export default function DiagnosisResultPanel({ result, onSavePDF, round = 1, fol
             </button>
             <button type="button" onClick={onStartFollowUp}
               className="flex-1 flex items-center justify-center gap-2 bg-amber-500/10 hover:bg-amber-500/15 text-amber-400 border border-amber-500/30 px-4 py-3 rounded-xl text-sm font-bold transition-colors">
-              <span className="text-lg">→</span>해결 안 됨 — 후속 진단
+              <span className="text-lg">→</span>해결 안 됨 — 후속 추정
             </button>
           </div>
         </div>
@@ -447,13 +447,13 @@ export default function DiagnosisResultPanel({ result, onSavePDF, round = 1, fol
       {/* Follow-up Timeline */}
       {followUpHistory.length > 0 && (
         <div className="bg-white/[0.03] rounded-2xl p-4 border border-white/8 overflow-x-auto">
-          <div className="text-xs font-bold text-white/30 uppercase tracking-wider mb-3">진단 이력</div>
+          <div className="text-xs font-bold text-white/30 uppercase tracking-wider mb-3">추정 이력</div>
           <div className="flex items-center gap-2 min-w-max">
             {followUpHistory.map((h, i) => (
               <div key={i} className="flex items-center gap-2">
                 <div className="text-center">
                   <div className={`px-2 py-1 rounded-full text-xs font-bold ${h.round === 1 ? 'bg-blue-500/15 text-blue-400' : h.round === 2 ? 'bg-orange-500/15 text-orange-400' : 'bg-red-500/15 text-red-400'}`}>
-                    {h.round}차 진단
+                    {h.round}차 추정
                   </div>
                   {h.changeDescription && (
                     <div className="text-xs text-white/30 mt-1 max-w-[100px] truncate" title={h.changeDescription}>
@@ -477,7 +477,7 @@ export default function DiagnosisResultPanel({ result, onSavePDF, round = 1, fol
         <div className="bg-red-500/10 border border-red-500/30 rounded-2xl p-4 flex items-start gap-3">
           <span className="text-red-400 text-xl shrink-0">⚠</span>
           <div>
-            <p className="font-bold text-red-400 text-sm">{round}차 반복 진단 — 전문가 상담 권장</p>
+            <p className="font-bold text-red-400 text-sm">{round}차 반복 추정 — 전문가 상담 권장</p>
             <p className="text-red-400/80 text-xs mt-1">성형 조건 조정으로 해결이 어려운 단계입니다. 금형 정밀 점검, 사출기 기계적 점검, 또는 소재 변경을 검토하세요.</p>
           </div>
         </div>
@@ -775,7 +775,7 @@ export default function DiagnosisResultPanel({ result, onSavePDF, round = 1, fol
       )}
 
       {/* Follow-up Actions */}
-      {/* TODO: Free: 1차 진단만 무료 / Pro: 후속 진단 무제한 */}
+      {/* TODO: Free: 1차 추정만 무료 / Pro: 후속 추정 무제한 */}
       <div className="bg-white/[0.03] rounded-2xl p-4 sm:p-6 border border-white/8">
         <div className="text-sm font-bold text-white/40 mb-3">조치 결과가 어떻게 됐나요?</div>
         <div className="flex flex-col sm:flex-row gap-3">
@@ -793,7 +793,7 @@ export default function DiagnosisResultPanel({ result, onSavePDF, round = 1, fol
             className="flex-1 flex items-center justify-center gap-2 bg-amber-500/10 hover:bg-amber-500/15 text-amber-400 border border-amber-500/30 px-4 py-3 rounded-xl text-sm font-bold transition-colors"
           >
             <span className="text-lg">→</span>
-            해결 안 됨 — 후속 진단
+            해결 안 됨 — 후속 추정
           </button>
         </div>
       </div>

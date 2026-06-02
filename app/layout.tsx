@@ -17,7 +17,7 @@ export const metadata: Metadata = {
   twitter: {
     card: 'summary',
     title: 'Mold Doctor AI',
-    description: '사출 불량 AI 진단 — 원인 분석 + 셋팅 권장값 즉시 제공',
+    description: '사출 불량 AI 추정 — 원인 분석 + 셋팅 권장값 즉시 제공',
   },
 };
 
