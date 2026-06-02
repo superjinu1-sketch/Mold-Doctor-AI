@@ -29,14 +29,14 @@ export default function RootLayout({
   return (
     <html lang="ko">
       <head>
-        <meta name="theme-color" content="#1E293B" />
+        <meta name="theme-color" content="#07090F" />
         <meta name="application-name" content="Mold Doctor AI" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
         <meta name="apple-mobile-web-app-title" content="MoldDoc" />
         <meta name="mobile-web-app-capable" content="yes" />
       </head>
-      <body className="min-h-screen flex flex-col bg-[#F8FAFC]">
+      <body className="min-h-screen flex flex-col bg-[#07090F] text-white">
         <Navbar />
         <main className="flex-1">
           {children}

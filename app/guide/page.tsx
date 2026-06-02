@@ -328,11 +328,11 @@ const defects = [
 ];
 
 const colorMap: Record<string, string> = {
-  red: 'border-red-300 bg-red-50',
-  amber: 'border-amber-300 bg-amber-50',
-  purple: 'border-purple-300 bg-purple-50',
-  blue: 'border-blue-300 bg-blue-50',
-  slate: 'border-slate-300 bg-slate-50',
+  red: 'border-red-500/30 bg-red-500/5',
+  amber: 'border-amber-500/30 bg-amber-500/5',
+  purple: 'border-purple-500/30 bg-purple-500/5',
+  blue: 'border-blue-500/30 bg-blue-500/5',
+  slate: 'border-white/15 bg-white/5',
 };
 
 const headerColorMap: Record<string, string> = {
@@ -340,7 +340,7 @@ const headerColorMap: Record<string, string> = {
   amber: 'bg-amber-500',
   purple: 'bg-purple-500',
   blue: 'bg-blue-500',
-  slate: 'bg-slate-500',
+  slate: 'bg-white/30',
 };
 
 export default function GuidePage() {
@@ -349,106 +349,112 @@ export default function GuidePage() {
   const toggle = (id: string) => setOpenId(openId === id ? null : id);
 
   return (
-    <div className="max-w-4xl mx-auto px-4 py-8">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-[#1E293B] mb-2">사출 불량 가이드</h1>
-        <p className="text-slate-500">12가지 주요 불량 유형별 원인과 해결 방향을 확인하세요.</p>
-      </div>
+    <div className="bg-[#07090F] min-h-screen px-4 sm:px-6 py-10">
+      <div className="max-w-4xl mx-auto">
+        <div className="mb-10">
+          <div className="inline-flex items-center gap-2 border border-[#00E887]/25 bg-[#00E887]/8 text-[#00E887] text-xs font-medium px-3.5 py-1.5 rounded-full mb-5">
+            <span className="w-1.5 h-1.5 bg-[#00E887] rounded-full" />
+            12종 불량 유형
+          </div>
+          <h1 className="text-3xl font-bold text-white mb-2">사출 불량 가이드</h1>
+          <p className="text-white/40">12가지 주요 불량 유형별 원인과 해결 방향을 확인하세요.</p>
+        </div>
 
-      <div className="space-y-3">
-        {defects.map((defect) => (
-          <div
-            key={defect.id}
-            className={`border-2 rounded-xl overflow-hidden transition-all ${
-              openId === defect.id ? colorMap[defect.color] : 'border-slate-200 bg-white'
-            }`}
-          >
-            <button
-              type="button"
-              className="w-full flex items-center justify-between p-5 text-left"
-              onClick={() => toggle(defect.id)}
+        <div className="space-y-2">
+          {defects.map((defect) => (
+            <div
+              key={defect.id}
+              className={`border rounded-2xl overflow-hidden transition-all ${
+                openId === defect.id ? colorMap[defect.color] : 'border-white/8 bg-white/[0.025] hover:border-white/15'
+              }`}
             >
-              <div className="flex items-center gap-3">
-                <span className={`w-10 h-10 rounded-full ${headerColorMap[defect.color]} text-white flex items-center justify-center text-sm font-bold shrink-0`}>
-                  {defect.id === 'short-shot' ? '1' : defect.id === 'flash' ? '2' : defect.id === 'sink-mark' ? '3' : defect.id === 'weld-line' ? '4' : defect.id === 'burn-mark' ? '5' : defect.id === 'silver-streak' ? '6' : defect.id === 'discoloration' ? '7' : defect.id === 'crack' ? '8' : defect.id === 'warpage' ? '9' : defect.id === 'void' ? '10' : defect.id === 'jetting' ? '11' : '12'}
-                </span>
-                <div>
-                  <span className="font-bold text-[#1E293B] text-lg">{defect.ko}</span>
-                  <span className="text-slate-400 ml-2 text-base">({defect.en})</span>
-                </div>
-              </div>
-              <svg
-                className={`w-5 h-5 text-slate-400 transition-transform ${openId === defect.id ? 'rotate-180' : ''}`}
-                fill="none" stroke="currentColor" viewBox="0 0 24 24"
+              <button
+                type="button"
+                className="w-full flex items-center justify-between p-5 text-left"
+                onClick={() => toggle(defect.id)}
               >
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-              </svg>
-            </button>
-
-            {openId === defect.id && (
-              <div className="px-5 pb-5 space-y-5">
-                <p className="text-slate-600">{defect.description}</p>
-
-                <div className="grid sm:grid-cols-2 gap-4">
+                <div className="flex items-center gap-3">
+                  <span className={`w-9 h-9 rounded-full ${headerColorMap[defect.color]} text-white flex items-center justify-center text-sm font-bold shrink-0`}>
+                    {defect.id === 'short-shot' ? '1' : defect.id === 'flash' ? '2' : defect.id === 'sink-mark' ? '3' : defect.id === 'weld-line' ? '4' : defect.id === 'burn-mark' ? '5' : defect.id === 'silver-streak' ? '6' : defect.id === 'discoloration' ? '7' : defect.id === 'crack' ? '8' : defect.id === 'warpage' ? '9' : defect.id === 'void' ? '10' : defect.id === 'jetting' ? '11' : '12'}
+                  </span>
                   <div>
-                    <h4 className="font-bold text-[#1E293B] mb-3 flex items-center gap-2">
-                      <span className="text-red-500">◆</span> 일반적 원인
-                    </h4>
-                    <ul className="space-y-2">
-                      {defect.causes.map((cause, i) => (
-                        <li key={i} className="flex items-start gap-2 text-sm text-slate-600">
-                          <span className="text-red-400 mt-0.5 shrink-0">•</span>
-                          {cause}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                  <div>
-                    <h4 className="font-bold text-[#1E293B] mb-3 flex items-center gap-2">
-                      <span className="text-green-500">◆</span> 해결 방향
-                    </h4>
-                    <ul className="space-y-2">
-                      {defect.solutions.map((sol, i) => (
-                        <li key={i} className="flex items-start gap-2 text-sm text-slate-600">
-                          <span className="text-green-500 mt-0.5 shrink-0">✓</span>
-                          {sol}
-                        </li>
-                      ))}
-                    </ul>
+                    <span className="font-bold text-white text-base">{defect.ko}</span>
+                    <span className="text-white/30 ml-2 text-sm">({defect.en})</span>
                   </div>
                 </div>
+                <svg
+                  className={`w-5 h-5 text-white/30 transition-transform ${openId === defect.id ? 'rotate-180' : ''}`}
+                  fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
 
-                {Object.keys(defect.resinNotes).length > 0 && (
-                  <div>
-                    <h4 className="font-bold text-[#1E293B] mb-3 flex items-center gap-2">
-                      <span className="text-blue-500">◆</span> 수지별 주의사항
-                    </h4>
-                    <div className="grid sm:grid-cols-2 gap-2">
-                      {Object.entries(defect.resinNotes).map(([resin, note]) => (
-                        <div key={resin} className="bg-white rounded-lg p-3 border border-slate-200">
-                          <span className="font-bold text-[#1E293B] text-sm">{resin}</span>
-                          <p className="text-slate-500 text-xs mt-1">{note}</p>
-                        </div>
-                      ))}
+              {openId === defect.id && (
+                <div className="px-5 pb-6 space-y-5 border-t border-white/5 pt-4">
+                  <p className="text-white/60 text-sm leading-relaxed">{defect.description}</p>
+
+                  <div className="grid sm:grid-cols-2 gap-4">
+                    <div>
+                      <h4 className="font-semibold text-white/70 mb-3 flex items-center gap-2 text-sm">
+                        <span className="text-red-400">◆</span> 일반적 원인
+                      </h4>
+                      <ul className="space-y-2">
+                        {defect.causes.map((cause, i) => (
+                          <li key={i} className="flex items-start gap-2 text-sm text-white/50">
+                            <span className="text-red-400 mt-0.5 shrink-0">•</span>
+                            {cause}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                    <div>
+                      <h4 className="font-semibold text-white/70 mb-3 flex items-center gap-2 text-sm">
+                        <span className="text-[#00E887]">◆</span> 해결 방향
+                      </h4>
+                      <ul className="space-y-2">
+                        {defect.solutions.map((sol, i) => (
+                          <li key={i} className="flex items-start gap-2 text-sm text-white/50">
+                            <span className="text-[#00E887] mt-0.5 shrink-0">✓</span>
+                            {sol}
+                          </li>
+                        ))}
+                      </ul>
                     </div>
                   </div>
-                )}
 
-                <div className="pt-2">
-                  <Link
-                    href={`/diagnose?defect=${encodeURIComponent(defect.ko)}`}
-                    className="inline-flex items-center gap-2 bg-[#059669] hover:bg-[#047857] text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
-                  >
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
-                    </svg>
-                    {defect.ko} AI 진단하기
-                  </Link>
+                  {Object.keys(defect.resinNotes).length > 0 && (
+                    <div>
+                      <h4 className="font-semibold text-white/70 mb-3 flex items-center gap-2 text-sm">
+                        <span className="text-blue-400">◆</span> 수지별 주의사항
+                      </h4>
+                      <div className="grid sm:grid-cols-2 gap-2">
+                        {Object.entries(defect.resinNotes).map(([resin, note]) => (
+                          <div key={resin} className="bg-white/5 rounded-xl p-3 border border-white/8">
+                            <span className="font-bold text-white/80 text-sm">{resin}</span>
+                            <p className="text-white/40 text-xs mt-1">{note}</p>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  <div className="pt-1">
+                    <Link
+                      href={`/diagnose?defect=${encodeURIComponent(defect.ko)}`}
+                      className="inline-flex items-center gap-2 bg-[#00E887] hover:bg-[#00E887]/90 text-black px-4 py-2 rounded-full text-sm font-bold transition-colors shadow-[0_0_16px_rgba(0,232,135,0.15)]"
+                    >
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                      </svg>
+                      {defect.ko} AI 진단하기
+                    </Link>
+                  </div>
                 </div>
-              </div>
-            )}
-          </div>
-        ))}
+              )}
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );

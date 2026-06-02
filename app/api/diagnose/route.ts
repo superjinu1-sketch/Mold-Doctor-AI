@@ -1,7 +1,5 @@
 import Anthropic from '@anthropic-ai/sdk';
 import { NextRequest, NextResponse } from 'next/server';
-import fs from 'fs';
-import path from 'path';
 
 // JSON 문자열 값 안의 실제 줄바꿈을 공백으로 치환 (문자 단위 파싱)
 function sanitizeJsonNewlines(text: string): string {
@@ -20,15 +18,7 @@ function sanitizeJsonNewlines(text: string): string {
 }
 
 function getApiKey(): string {
-  if (process.env.ANTHROPIC_API_KEY) return process.env.ANTHROPIC_API_KEY;
-  try {
-    const content = fs.readFileSync(path.join(process.cwd(), '.env.local'), 'utf-8');
-    for (const line of content.split('\n')) {
-      const match = line.match(/^ANTHROPIC_API_KEY=(.+)$/);
-      if (match) return match[1].trim();
-    }
-  } catch { /* ignore */ }
-  return '';
+  return process.env.ANTHROPIC_API_KEY || '';
 }
 
 // Resin-specific knowledge — only the selected resin is injected into the prompt
@@ -480,9 +470,10 @@ CRITICAL: Your entire response must be ONLY the JSON object. No text before or a
 
     userContent.push({ type: 'text', text: diagnosisText });
 
+    // TODO: rate-limit 구현 (과금/크레딧 보호)
     const apiKey = getApiKey();
     if (!apiKey) {
-      return NextResponse.json({ error: 'API 키가 설정되지 않았습니다. Vercel 환경 변수 또는 .env.local 파일에 ANTHROPIC_API_KEY를 설정해주세요.' }, { status: 401 });
+      return NextResponse.json({ error: '서버 환경변수 ANTHROPIC_API_KEY 미설정' }, { status: 401 });
     }
     const client = new Anthropic({ apiKey });
 

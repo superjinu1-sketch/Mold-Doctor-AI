@@ -1,18 +1,7 @@
 import Anthropic from '@anthropic-ai/sdk';
 import { NextRequest, NextResponse } from 'next/server';
-import fs from 'fs';
-import path from 'path';
-
 function getApiKey(): string {
-  if (process.env.ANTHROPIC_API_KEY) return process.env.ANTHROPIC_API_KEY;
-  try {
-    const content = fs.readFileSync(path.join(process.cwd(), '.env.local'), 'utf-8');
-    for (const line of content.split('\n')) {
-      const match = line.match(/^ANTHROPIC_API_KEY=(.+)$/);
-      if (match) return match[1].trim();
-    }
-  } catch { /* ignore */ }
-  return '';
+  return process.env.ANTHROPIC_API_KEY || '';
 }
 
 export async function POST(request: NextRequest) {
@@ -24,8 +13,9 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: '이미지가 없습니다.' }, { status: 400 });
     }
 
+    // TODO: rate-limit 구현 (과금/크레딧 보호)
     const apiKey = getApiKey();
-    if (!apiKey) return NextResponse.json({ error: 'API 키가 설정되지 않았습니다.' }, { status: 401 });
+    if (!apiKey) return NextResponse.json({ error: '서버 환경변수 ANTHROPIC_API_KEY 미설정' }, { status: 401 });
     const client = new Anthropic({ apiKey });
     const response = await client.messages.create({
       model: 'claude-sonnet-4-6',

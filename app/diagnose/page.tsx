@@ -368,7 +368,7 @@ function DiagnoseContent() {
   }, [searchParams]);
 
   const processFile = useCallback(async (file: File): Promise<ImageFile | null> => {
-    if (!file.type.startsWith('image/') && file.type !== 'application/pdf') return null;
+    if (!file.type.startsWith('image/')) return null;
     return new Promise((resolve) => {
       const reader = new FileReader();
       reader.onload = (e) => {
@@ -377,7 +377,7 @@ function DiagnoseContent() {
         resolve({
           id: Math.random().toString(36).slice(2),
           file,
-          preview: file.type === 'application/pdf' ? '' : dataUrl,
+          preview: dataUrl,
           base64,
           mediaType: file.type,
         });
@@ -606,25 +606,25 @@ function DiagnoseContent() {
     setFollowUpImages(prev => [...prev, ...valid].slice(0, 5));
   }, [processFile]);
 
-  const inputCls = "w-full border border-slate-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#059669] focus:border-transparent";
-  const labelCls = "block text-sm font-medium text-slate-700 mb-1";
+  const inputCls = "w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2.5 text-sm text-white placeholder:text-white/25 focus:outline-none focus:ring-2 focus:ring-[#00E887]/30 focus:border-[#00E887]/40";
+  const labelCls = "block text-sm font-medium text-white/50 mb-1";
 
   return (
     <div className="max-w-5xl mx-auto px-3 sm:px-4 py-6 sm:py-8">
       <div className="mb-8 flex items-start justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-[#1E293B] mb-2">사출 불량 AI 진단</h1>
-          <p className="text-slate-500">불량 정보와 성형 조건을 입력하면 AI가 원인과 해결책을 알려드립니다.</p>
+          <h1 className="text-3xl font-bold text-white mb-2">사출 불량 AI 진단</h1>
+          <p className="text-white/40">불량 정보와 성형 조건을 입력하면 AI가 원인과 해결책을 알려드립니다.</p>
         </div>
       </div>
 
       {/* Sample cases */}
-      <div className="mb-6 bg-amber-50 border border-amber-200 rounded-xl p-4">
+      <div className="mb-6 bg-white/[0.03] border border-white/8 rounded-xl p-4">
         <div className="flex items-center gap-2 mb-3">
-          <svg className="w-4 h-4 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg className="w-4 h-4 text-[#00E887]/60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
           </svg>
-          <span className="text-amber-700 font-semibold text-sm">샘플 케이스로 빠른 테스트</span>
+          <span className="text-white/50 font-semibold text-sm">샘플 케이스로 빠른 테스트</span>
         </div>
         <div className="flex flex-wrap gap-2">
           {SAMPLE_CASES.map((c, i) => (
@@ -632,7 +632,7 @@ function DiagnoseContent() {
               key={i}
               type="button"
               onClick={() => loadSample(i)}
-              className="bg-white hover:bg-amber-100 text-amber-800 border border-amber-300 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors whitespace-nowrap"
+              className="bg-white/5 hover:bg-[#00E887]/10 text-white/50 hover:text-[#00E887] border border-white/8 hover:border-[#00E887]/30 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors whitespace-nowrap"
             >
               {c.label}
             </button>
@@ -642,9 +642,9 @@ function DiagnoseContent() {
 
       <div className="space-y-6">
         {/* STEP 1: Defect Info */}
-        <section className="bg-white rounded-2xl p-4 sm:p-6 shadow-sm border border-slate-200">
-          <h2 className="text-lg font-bold text-[#1E293B] mb-5 flex items-center gap-2">
-            <span className="bg-[#059669] text-white w-7 h-7 rounded-full flex items-center justify-center text-sm font-bold">1</span>
+        <section className="bg-white/[0.03] rounded-2xl p-4 sm:p-6 border border-white/8">
+          <h2 className="text-lg font-bold text-white mb-5 flex items-center gap-2">
+            <span className="bg-[#00E887] text-black w-7 h-7 rounded-full flex items-center justify-center text-sm font-bold">1</span>
             불량 정보 입력
           </h2>
 
@@ -653,18 +653,18 @@ function DiagnoseContent() {
             <label className={labelCls}>불량 사진 업로드 (최대 5장)</label>
             <div
               className={`border-2 border-dashed rounded-xl p-5 sm:p-8 text-center cursor-pointer transition-colors ${
-                isDragging ? 'border-[#059669] bg-green-50' : 'border-slate-300 hover:border-[#059669]'
+                isDragging ? 'border-[#00E887]/60 bg-[#00E887]/5' : 'border-white/10 hover:border-[#00E887]/40'
               }`}
               onDragOver={(e) => { e.preventDefault(); setIsDragging(true); }}
               onDragLeave={() => setIsDragging(false)}
               onDrop={handleDrop}
               onClick={() => fileInputRef.current?.click()}
             >
-              <svg className="w-10 h-10 mx-auto mb-3 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-10 h-10 mx-auto mb-3 text-white/20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
               </svg>
-              <p className="text-slate-600 font-medium">클릭하거나 드래그하여 업로드</p>
-              <p className="text-slate-400 text-sm mt-1">또는 Ctrl+V로 붙여넣기 · 카메라로 직접 촬영</p>
+              <p className="text-white/50 font-medium">클릭하거나 드래그하여 업로드</p>
+              <p className="text-white/25 text-sm mt-1">또는 Ctrl+V로 붙여넣기 · 카메라로 직접 촬영</p>
               <input
                 ref={fileInputRef}
                 type="file"
@@ -737,9 +737,9 @@ function DiagnoseContent() {
         </section>
 
         {/* STEP 2: Resin Info */}
-        <section className="bg-white rounded-2xl p-4 sm:p-6 shadow-sm border border-slate-200">
-          <h2 className="text-lg font-bold text-[#1E293B] mb-5 flex items-center gap-2">
-            <span className="bg-[#059669] text-white w-7 h-7 rounded-full flex items-center justify-center text-sm font-bold">2</span>
+        <section className="bg-white/[0.03] rounded-2xl p-4 sm:p-6 border border-white/8">
+          <h2 className="text-lg font-bold text-white mb-5 flex items-center gap-2">
+            <span className="bg-[#00E887] text-black w-7 h-7 rounded-full flex items-center justify-center text-sm font-bold">2</span>
             수지 정보
           </h2>
           <div className="grid sm:grid-cols-2 gap-4">
@@ -803,10 +803,10 @@ function DiagnoseContent() {
         </section>
 
         {/* STEP 2b: Machine Settings */}
-        <section className="bg-white rounded-2xl p-4 sm:p-6 shadow-sm border border-slate-200">
+        <section className="bg-white/[0.03] rounded-2xl p-4 sm:p-6 border border-white/8">
           <div className="flex flex-wrap items-center justify-between gap-3 mb-5">
             <h2 className="text-lg font-bold text-[#1E293B] flex items-center gap-2">
-              <span className="bg-[#059669] text-white w-7 h-7 rounded-full flex items-center justify-center text-sm font-bold">3</span>
+              <span className="bg-[#00E887] text-black w-7 h-7 rounded-full flex items-center justify-center text-sm font-bold">3</span>
               사출기 셋팅값
             </h2>
             <button
@@ -1057,8 +1057,8 @@ function DiagnoseContent() {
         </section>
 
         {/* STEP 2c: Mold & Product Info */}
-        <section className="bg-white rounded-2xl p-4 sm:p-6 shadow-sm border border-slate-200">
-          <h2 className="text-lg font-bold text-[#1E293B] mb-5 flex items-center gap-2">
+        <section className="bg-white/[0.03] rounded-2xl p-4 sm:p-6 border border-white/8">
+          <h2 className="text-lg font-bold text-white mb-5 flex items-center gap-2">
             <span className="bg-slate-400 text-white w-7 h-7 rounded-full flex items-center justify-center text-sm font-bold">4</span>
             금형 & 제품 정보 <span className="text-slate-400 text-sm font-normal">(선택)</span>
           </h2>
@@ -1110,14 +1110,14 @@ function DiagnoseContent() {
               <label className={labelCls}>금형 도면 업로드 <span className="text-slate-400 font-normal">(선택 · 최대 3장)</span></label>
               <div
                 className={`border-2 border-dashed rounded-xl p-4 sm:p-5 text-center cursor-pointer transition-colors ${
-                  isDraggingDrawing ? 'border-[#059669] bg-green-50' : 'border-slate-300 hover:border-[#059669]'
+                  isDraggingDrawing ? 'border-[#00E887]/60 bg-[#00E887]/5' : 'border-white/10 hover:border-[#00E887]/40'
                 }`}
                 onDragOver={(e) => { e.preventDefault(); setIsDraggingDrawing(true); }}
                 onDragLeave={() => setIsDraggingDrawing(false)}
                 onDrop={(e) => { e.preventDefault(); setIsDraggingDrawing(false); addMoldDrawings(e.dataTransfer.files); }}
                 onClick={() => moldDrawingInputRef.current?.click()}
               >
-                <svg className="w-8 h-8 mx-auto mb-2 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-8 h-8 mx-auto mb-2 text-white/20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                 </svg>
                 <p className="text-slate-600 text-sm font-medium">금형 도면, 제품 3D 캡처, 게이트/러너 레이아웃 이미지를 올려주세요</p>
@@ -1161,7 +1161,7 @@ function DiagnoseContent() {
           type="button"
           onClick={handleDiagnose}
           disabled={isLoading}
-          className="w-full bg-[#059669] hover:bg-[#047857] disabled:bg-slate-300 text-white py-4 rounded-xl font-bold text-xl transition-colors shadow-lg flex items-center justify-center gap-3"
+          className="w-full bg-[#00E887] hover:bg-[#00E887]/90 disabled:bg-slate-300 text-white py-4 rounded-xl font-bold text-xl transition-colors shadow-lg flex items-center justify-center gap-3"
         >
           {isLoading ? (
             <>

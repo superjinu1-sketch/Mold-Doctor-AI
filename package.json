@@ -6,7 +6,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "verify": "bash .claude/scripts/verify.sh"
+    "verify": "node .claude/scripts/verify.mjs"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.82.0",
