@@ -32,7 +32,7 @@ const PORT = (() => {
 const HOST = '127.0.0.1';
 const PASS_THRESHOLD = 70;
 const INTERVAL_MS = 6000; // rate-limit 회피 간격
-const MAX_RETRIES = 3;    // 529 overloaded 재시도
+const MAX_RETRIES = 5;    // 529 overloaded 재시도 (diagnose + judge 공통)
 
 /* ── API key (from env or .env.local) ───────────────── */
 function loadApiKey() {
@@ -158,6 +158,25 @@ async function waitForServer(maxMs = 10000) {
   return false;
 }
 
+/* ── exponential backoff helper ─────────────────────── */
+async function withRetry(fn, label = '') {
+  for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
+    try {
+      return await fn();
+    } catch (e) {
+      const msg = String(e?.message || e);
+      const isOverload = msg.includes('529') || msg.includes('overloaded') || msg.includes('529') || msg.includes('rate_limit') || msg.includes('429');
+      if (isOverload && attempt < MAX_RETRIES) {
+        const wait = Math.min(attempt * 15000, 60000);
+        process.stdout.write(` [${label} 529 retry ${attempt}/${MAX_RETRIES}, ${wait/1000}s]`);
+        await new Promise(r => setTimeout(r, wait));
+      } else {
+        throw e;
+      }
+    }
+  }
+}
+
 /* ── LLM-as-judge ───────────────────────────────────── */
 async function judgeCase(c, aiRaw, client) {
   const aiResult = (() => { try { return JSON.parse(aiRaw); } catch { return null; } })();
@@ -211,11 +230,11 @@ ${hasTrap ? '5. trap 회피 보너스 (10점): AI가 오진 함정을 피했는�
 trap_avoided는 hard case가 아니면 null. pass = score >= 70.`;
 
   try {
-    const res = await client.messages.create({
+    const res = await withRetry(() => client.messages.create({
       model: 'claude-sonnet-4-6',
       max_tokens: 400,
       messages: [{ role: 'user', content: prompt }],
-    });
+    }), 'judge');
     const txt = res.content[0]?.type === 'text' ? res.content[0].text.trim() : '';
     const j = JSON.parse(txt.replace(/^```json\s*/i,'').replace(/\s*```$/,''));
     return j;
@@ -258,30 +277,25 @@ async function main() {
     const tag = `[${i+1}/${cases.length}] ${c.id} (${c.difficulty.toUpperCase()})`;
     process.stdout.write(`${tag} ${c.title.slice(0, 40)}... `);
 
-    // 1. Call /api/diagnose (with retry for 529 overloaded)
+    // 1. Call /api/diagnose (with retry via withRetry helper)
     let aiRaw = '';
     let diagError = null;
-    for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
-      try {
-        const payload = buildPayload(c);
-        const diagRes = await httpPost('/api/diagnose', payload, 120000);
-        if (diagRes.status === 529 || (diagRes.status === 500 && diagRes.body.includes('overloaded'))) {
-          const wait = attempt * 15000;
-          process.stdout.write(` [529 retry ${attempt}/${MAX_RETRIES}, ${wait/1000}s]`);
-          await new Promise(r => setTimeout(r, wait));
-          continue;
+    try {
+      const payload = buildPayload(c);
+      const diagRes = await withRetry(async () => {
+        const r = await httpPost('/api/diagnose', payload, 120000);
+        if (r.status === 529 || (r.status === 500 && r.body.includes('overloaded'))) {
+          throw new Error(`529 overloaded: ${r.body.slice(0, 80)}`);
         }
-        if (diagRes.status !== 200) {
-          diagError = `HTTP ${diagRes.status}: ${diagRes.body.slice(0, 120)}`;
-          break;
-        }
+        return r;
+      }, 'diag');
+      if (diagRes.status !== 200) {
+        diagError = `HTTP ${diagRes.status}: ${diagRes.body.slice(0, 120)}`;
+      } else {
         aiRaw = diagRes.body;
-        diagError = null;
-        break;
-      } catch (e) {
-        diagError = e.message;
-        if (attempt < MAX_RETRIES) await new Promise(r => setTimeout(r, attempt * 8000));
       }
+    } catch (e) {
+      diagError = e.message;
     }
     if (diagError) {
       console.log(` ✗ (${diagError.slice(0, 60)})`);
