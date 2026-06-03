@@ -417,65 +417,61 @@ export default function DiagnosisResultPanel({ result, onSavePDF, round = 1, fol
     );
   }
 
-  /* raw_response fallback: 구조화 JSON 파싱 실패 시 */
+  /* 파싱 실패 fallback — raw JSON 절대 노출 금지. 최소 정보 카드만 표시. */
   if (hasRawResponse) {
+    // raw 텍스트에서 핵심 필드만 정규식 추출
+    const raw = result?.raw_response ?? '';
+    const extractStr = (key: string) => {
+      const m = raw.match(new RegExp(`"${key}"\\s*:\\s*"([^"]{1,120})"`, 'i'));
+      return m ? m[1] : '';
+    };
+    const extractedSummary = extractStr('summary') || summary || '';
+    const extractedCause = (() => {
+      const m = raw.match(/"description"\s*:\s*"([^"]{1,80})"/);
+      return m ? m[1] : '';
+    })();
+
     return (
-      <div className="space-y-5">
-        {/* 헤더 */}
-        <div className="bg-white/[0.03] rounded-2xl p-4 sm:p-6 border border-amber-500/30">
-          <div className="flex flex-wrap items-start justify-between gap-3 mb-4">
-            <div>
-              <h2 className="text-xl sm:text-2xl font-bold text-white">
-                {defectTypeKo}
-                <span className="text-white/30 text-sm sm:text-base font-normal ml-2">({defectTypeEn})</span>
-              </h2>
-              <div className="flex items-center gap-3 mt-2 flex-wrap">
-                <SeverityBadge severity={severity} />
-                <span className={`px-3 py-1 rounded-full text-sm font-bold ${roundBadge.cls}`}>{roundBadge.label}</span>
-              </div>
+      <div className="space-y-4">
+        {/* 최소 결과 카드 */}
+        <div className="bg-[#0D1117] border border-amber-500/30 rounded-2xl p-5 sm:p-6">
+          <div className="flex items-center gap-2 mb-4">
+            <span className="text-amber-400 text-lg">⚠</span>
+            <span className="text-amber-400 font-bold text-sm">상세 결과 생성 실패</span>
+            <span className={`ml-auto px-2.5 py-0.5 rounded-full text-xs font-bold ${roundBadge.cls}`}>{roundBadge.label}</span>
+          </div>
+
+          {defectTypeKo && (
+            <div className="mb-3">
+              <span className="text-white font-bold text-lg">{defectTypeKo}</span>
+              {defectTypeEn && <span className="text-white/40 text-sm ml-2">({defectTypeEn})</span>}
             </div>
-            <button type="button" onClick={onSavePDF}
-              className="flex items-center gap-2 bg-white/10 hover:bg-white/15 text-white px-3 py-2 rounded-lg text-sm font-medium transition-colors whitespace-nowrap">
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-              </svg>
-              PDF 저장
-            </button>
-          </div>
-          <div className="flex items-center gap-2 text-amber-400 text-sm mb-3">
-            <span>⚠</span>
-            <span>AI가 구조화된 JSON 대신 텍스트로 응답했습니다. 아래 내용을 참고하세요.</span>
-          </div>
-          <pre className="text-sm text-white/70 whitespace-pre-wrap bg-white/5 rounded-xl p-4 border border-white/10 overflow-x-auto leading-relaxed">
-            {result?.raw_response}
-          </pre>
+          )}
+          {extractedSummary && (
+            <p className="text-white/70 text-sm bg-white/5 rounded-xl px-4 py-3 border border-white/8 mb-3">
+              {extractedSummary}
+            </p>
+          )}
+          {extractedCause && (
+            <p className="text-white/50 text-xs px-3">추정 원인 단서: {extractedCause}</p>
+          )}
+
+          <p className="text-white/30 text-xs mt-4">
+            응답이 너무 길어 구조화 파싱에 실패했습니다. 아래 버튼으로 다시 추정하거나 불량 설명을 줄여서 재시도하세요.
+          </p>
         </div>
-        {/* Follow-up Actions */}
-        <div className="bg-white/[0.03] rounded-2xl p-4 sm:p-6 border border-white/8">
-          <div className="text-sm font-bold text-white/40 mb-3">조치 결과가 어떻게 됐나요?</div>
-          <div className="flex flex-col sm:flex-row gap-3">
-            <button type="button" onClick={onResolved}
-              className="flex-1 flex items-center justify-center gap-2 bg-[#00E887]/10 hover:bg-[#00E887]/15 text-[#00E887] border border-[#00E887]/30 px-4 py-3 rounded-xl text-sm font-bold transition-colors">
-              <span className="text-lg">✓</span>해결됨
-            </button>
-            <button type="button" onClick={onStartFollowUp}
-              className="flex-1 flex items-center justify-center gap-2 bg-amber-500/10 hover:bg-amber-500/15 text-amber-400 border border-amber-500/30 px-4 py-3 rounded-xl text-sm font-bold transition-colors">
-              <span className="text-lg">→</span>해결 안 됨 — 후속 추정
-            </button>
-          </div>
-        </div>
-        <ChatSection
-          chatMessages={chatMessages}
-          chatInput={chatInput}
-          setChatInput={setChatInput}
-          isChatLoading={isChatLoading}
-          chatError={chatError}
-          chatDisabled={chatDisabled}
-          userTurns={userTurns}
-          suggestedQuestions={suggestedQuestions}
-          sendChat={sendChat}
-          chatBottomRef={chatBottomRef}
-        />
+
+        {/* 재시도 버튼 */}
+        <button
+          type="button"
+          onClick={() => window.location.reload()}
+          className="w-full flex items-center justify-center gap-2 bg-[#00E887]/10 hover:bg-[#00E887]/15 text-[#00E887] border border-[#00E887]/30 px-4 py-3.5 rounded-xl text-sm font-bold transition-colors min-h-[48px]"
+        >
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+          </svg>
+          다시 추정하기
+        </button>
       </div>
     );
   }

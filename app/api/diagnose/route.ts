@@ -233,15 +233,14 @@ CRITICAL RULES:
 10. FLAME RETARDANCY & THICKNESS — if a flame retardant grade and certification thickness are provided, evaluate whether the product's actual wall thickness matches the certified thickness. Thinner walls typically require V-0 at thinner certification (e.g., 0.4mm vs 0.8mm). Thicker walls may relax the flame retardant additive loading but can increase sink/void risk. Flag mismatches between certified thickness and actual wall thickness in resin_specific_notes.
 
 OUTPUT LENGTH LIMITS — strictly enforce to prevent truncation:
-- causes: max 3 items. description max 60 chars. scientific_reasoning max 150 chars. evidence max 120 chars. elimination max 120 chars. verification max 150 chars.
-- recommendations: max 5 items. reason max 50 chars. expected_result max 40 chars. risk max 40 chars. interaction_note max 40 chars.
-- checklist each array: max 3 items, each max 40 chars.
-- top5_actions: exactly 5. action max 50 chars. why max 40 chars.
-- process_window_check notes: max 30 chars each.
-- resin_specific_notes: max 80 chars.
-- drying_assessment: max 60 chars.
-- mold_analysis fields: max 60 chars each, design_risk_factors/recommendations max 3 items.
-- summary: max 40 chars.
+- causes: max 3 items. description max 50 chars. scientific_reasoning max 120 chars. evidence max 100 chars. elimination max 100 chars. verification max 120 chars.
+- recommendations: max 4 items. reason max 40 chars. expected_result max 35 chars. risk max 35 chars. interaction_note max 35 chars.
+- checklist each array: max 3 items, each max 35 chars.
+- process_window_check notes: max 25 chars each.
+- resin_specific_notes: max 60 chars.
+- drying_assessment: max 50 chars.
+- mold_analysis (only if mold drawings/info provided): max 2 design_risk_factors, max 2 recommendations, each max 50 chars.
+- summary: max 35 chars.
 Be concise. Korean only where specified. No extra explanation outside JSON.
 
 OUTPUT FORMAT (return as JSON only, no markdown):
@@ -285,24 +284,14 @@ OUTPUT FORMAT (return as JSON only, no markdown):
   "checklist": {
     "before_changes": ["변경 전 확인 항목"],
     "after_changes": ["변경 후 모니터링 항목"],
-    "escalation": ["3회 조정 후에도 해결 안 될 경우 고려할 사항"]
+    "escalation": ["3회 조정 후에도 해결 안 될 경우"]
   },
-  "top5_actions": [
-    {"step": 1, "action": "즉시 해야 할 가장 중요한 조치 (구체적 수치 포함)", "why": "이 조치가 최우선인 이유"},
-    {"step": 2, "action": "두 번째 조치", "why": "이유"},
-    {"step": 3, "action": "세 번째 조치", "why": "이유"},
-    {"step": 4, "action": "네 번째 조치", "why": "이유"},
-    {"step": 5, "action": "다섯 번째 조치", "why": "이유"}
-  ],
   "resin_specific_notes": "이 수지 특성상 주의할 점",
-  "drying_assessment": "건조 조건 평가 (건조 데이터가 제공된 경우)",
-  "mold_analysis": {
-    "gate_assessment": "게이트 위치/크기 평가 (도면 제공 시)",
-    "cooling_assessment": "냉각 효율 평가 (도면 제공 시)",
-    "design_risk_factors": ["설계상 위험 요소들"],
-    "recommendations": ["금형 수정 제안 — 있을 경우"]
-  }
-}`;
+  "drying_assessment": "건조 조건 평가 (건조 데이터 제공된 경우만)"
+}
+
+NOTE — mold_analysis: 금형 도면/moldInfo가 제공된 경우에만 아래 필드를 추가하라. 도면/정보 없으면 mold_analysis 키 자체를 생략하라.
+mold_analysis (조건부): {"gate_assessment":"...", "cooling_assessment":"...", "design_risk_factors":["..."], "recommendations":["..."]}`;
 
 // buildSystemBlocks: returns [fixed(cached), variable] for cache_control
 function buildSystemBlocks(resinType: string, tier: 'simple' | 'complex' = 'simple', round: number = 1): Anthropic.TextBlockParam[] {
