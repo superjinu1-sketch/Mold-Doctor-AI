@@ -3,6 +3,7 @@ import './globals.css';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { LocaleProvider } from '@/contexts/LocaleContext';
+import { AuthProvider } from '@/contexts/AuthContext';
 
 export const metadata: Metadata = {
   title: 'Mold Doctor AI — 사출 불량 트러블슈팅',
@@ -39,11 +40,13 @@ export default function RootLayout({
       </head>
       <body className="min-h-screen flex flex-col bg-[#07090F] text-white">
         <LocaleProvider>
-          <Navbar />
-          <main className="flex-1">
-            {children}
-          </main>
-          <Footer />
+          <AuthProvider>
+            <Navbar />
+            <main className="flex-1">
+              {children}
+            </main>
+            <Footer />
+          </AuthProvider>
         </LocaleProvider>
       </body>
     </html>

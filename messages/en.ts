@@ -73,6 +73,12 @@ export const en: Record<string, string> = {
   'top5.badge': 'Act Now',
   'top5.title': 'Top 5 Immediate Actions',
 
+  /* ── Auth ───────────────────────────────────── */
+  'auth.signin': 'Sign in with Google',
+  'auth.signout': 'Sign out',
+  'auth.signing_in': 'Signing in...',
+  'auth.callback_loading': 'Completing sign-in...',
+
   /* ── Navbar ─────────────────────────────────── */
   'nav.estimate': 'Analyze',
   'nav.guide': 'Defect Guide',

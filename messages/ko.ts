@@ -73,6 +73,12 @@ export const ko: Record<string, string> = {
   'top5.badge': '즉시 실행',
   'top5.title': '최우선 조치 5가지',
 
+  /* ── Auth ───────────────────────────────────── */
+  'auth.signin': 'Google로 로그인',
+  'auth.signout': '로그아웃',
+  'auth.signing_in': '로그인 중...',
+  'auth.callback_loading': '로그인 처리 중...',
+
   /* ── Navbar ─────────────────────────────────── */
   'nav.estimate': '추정하기',
   'nav.guide': '불량 가이드',
