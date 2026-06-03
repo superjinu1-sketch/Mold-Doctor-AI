@@ -9,7 +9,7 @@ export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
     const mock = tryMock(body, 'chat'); if (mock) return mock;
-    const { question, diagnosisResult, chatHistory = [], resinType, machineSettings } = body;
+    const { question, diagnosisResult, chatHistory = [], resinType, machineSettings, locale } = body;
 
     if (!question?.trim()) {
       return NextResponse.json({ error: '질문을 입력해주세요.' }, { status: 400 });
@@ -32,7 +32,17 @@ export async function POST(req: NextRequest) {
       raw_response: diagnosisResult.raw_response,
     } : null;
 
-    const contextLines = [
+    const isEn = locale === 'en';
+    const contextLines = isEn ? [
+      'You are an injection molding defect troubleshooting expert. Answer follow-up questions based on the previous analysis result.',
+      '',
+      'Guidelines:',
+      '1. If the question relates to the analysis result, answer specifically and concisely.',
+      '2. If parameter changes are needed, suggest exact numerical values.',
+      '3. If the question is unrelated to injection molding, politely clarify scope.',
+      '4. Respond in English. Technical terms in English.',
+      '5. Keep answers to 2-3 paragraphs maximum.',
+    ] : [
       '당신은 사출 성형 불량 추정 전문가입니다. 이전 추정 결과를 바탕으로 사용자의 후속 질문에 답변합니다.',
       '',
       '사용자의 질문에 대해:',

@@ -3,6 +3,7 @@
 import { useState, useRef, useCallback, useEffect, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import DiagnosisResultPanel from '@/components/DiagnosisResultPanel';
+import { useLocale } from '@/contexts/LocaleContext';
 
 // --- Types ---
 interface ImageFile {
@@ -93,7 +94,6 @@ function parseAIResponse(rawText: string) {
   try {
     return JSON.parse(text);
   } catch {
-    // regex가 안 먹힐 때: 단순하게 모든 줄바꿈 처리
     try {
       const lines = text.split('\n').map(l => l.trim()).join(' ');
       return JSON.parse(lines);
@@ -112,27 +112,42 @@ function parseAIResponse(rawText: string) {
   }
 }
 
-// --- Constants ---
+// --- Constants (values stay in Korean for API compatibility) ---
 const DEFECT_TYPES = [
   '미성형 (Short Shot)', '플래시 (Flash)', '싱크마크 (Sink Mark)', '웰드라인 (Weld Line)',
   '버닝/가스마크 (Burn Mark)', '은줄 (Silver Streak)', '변색 (Discoloration)', '크랙 (Crack)',
   '휨/변형 (Warpage)', '기포 (Void/Bubble)', '젯팅 (Jetting)', '기타 (직접 입력)',
 ];
 
+const DEFECT_KEY_MAP: Record<string, string> = {
+  '미성형 (Short Shot)': 'defect.short_shot',
+  '플래시 (Flash)': 'defect.flash',
+  '싱크마크 (Sink Mark)': 'defect.sink_mark',
+  '웰드라인 (Weld Line)': 'defect.weld_line',
+  '버닝/가스마크 (Burn Mark)': 'defect.burn_mark',
+  '은줄 (Silver Streak)': 'defect.silver_streak',
+  '변색 (Discoloration)': 'defect.discoloration',
+  '크랙 (Crack)': 'defect.crack',
+  '휨/변형 (Warpage)': 'defect.warpage',
+  '기포 (Void/Bubble)': 'defect.void',
+  '젯팅 (Jetting)': 'defect.jetting',
+  '기타 (직접 입력)': 'defect.custom',
+};
+
 const RESIN_OPTIONS = [
-  { group: '폴리아미드 (나일론)', options: ['PA6', 'PA66', 'PA46', 'PA410', 'PA4T', 'PA6T', 'PA9T', 'PA10T', 'PA12T', 'PA12', 'PA610', 'PA612', 'PA1010', 'PA6/66', 'MXD6'] },
-  { group: '폴리에스터', options: ['PBT', 'PET', 'PCT', 'PEN'] },
-  { group: '엔지니어링 플라스틱 기타', options: ['PC', 'POM(아세탈)', 'PPE/PPO', 'm-PPE'] },
-  { group: '슈퍼 엔지니어링 플라스틱', options: ['PPS', 'LCP', 'PEEK', 'PEI(Ultem)', 'PAI', 'PI(폴리이미드)', 'PSU', 'PPSU', 'PES', 'PTFE', 'FEP', 'PFA', 'ETFE'] },
-  { group: '범용 플라스틱', options: ['PP', 'PE(HDPE)', 'PE(LDPE)', 'PE(LLDPE)', 'PS', 'ABS', 'SAN', 'ASA', 'PMMA(아크릴)', 'PVC'] },
-  { group: '블렌드/알로이', options: ['PC/ABS', 'PC/PBT', 'PA/ABS', 'PA/PP', 'PPE/PA', 'PBT/ABS'] },
-  { group: '엘라스토머/TPE', options: ['TPU', 'TPE', 'TPC', 'TPA', 'TPEE', 'TPV', 'TPO'] },
-  { group: '기타', options: ['기타 (직접 입력)'] },
+  { group: '폴리아미드 (나일론)', groupKey: 'resin.group.polyamide', options: ['PA6', 'PA66', 'PA46', 'PA410', 'PA4T', 'PA6T', 'PA9T', 'PA10T', 'PA12T', 'PA12', 'PA610', 'PA612', 'PA1010', 'PA6/66', 'MXD6'] },
+  { group: '폴리에스터', groupKey: 'resin.group.polyester', options: ['PBT', 'PET', 'PCT', 'PEN'] },
+  { group: '엔지니어링 플라스틱 기타', groupKey: 'resin.group.engineering', options: ['PC', 'POM(아세탈)', 'PPE/PPO', 'm-PPE'] },
+  { group: '슈퍼 엔지니어링 플라스틱', groupKey: 'resin.group.super_eng', options: ['PPS', 'LCP', 'PEEK', 'PEI(Ultem)', 'PAI', 'PI(폴리이미드)', 'PSU', 'PPSU', 'PES', 'PTFE', 'FEP', 'PFA', 'ETFE'] },
+  { group: '범용 플라스틱', groupKey: 'resin.group.commodity', options: ['PP', 'PE(HDPE)', 'PE(LDPE)', 'PE(LLDPE)', 'PS', 'ABS', 'SAN', 'ASA', 'PMMA(아크릴)', 'PVC'] },
+  { group: '블렌드/알로이', groupKey: 'resin.group.blend', options: ['PC/ABS', 'PC/PBT', 'PA/ABS', 'PA/PP', 'PPE/PA', 'PBT/ABS'] },
+  { group: '엘라스토머/TPE', groupKey: 'resin.group.elastomer', options: ['TPU', 'TPE', 'TPC', 'TPA', 'TPEE', 'TPV', 'TPO'] },
+  { group: '기타', groupKey: 'resin.group.other', options: ['기타 (직접 입력)'] },
 ];
 
 const SAMPLE_CASES = [
   {
-    label: 'PA66 GF33% — 은줄',
+    label: 'PA66 GF33%', defectTypeKey: 'defect.silver_streak',
     defectType: '은줄 (Silver Streak)',
     defectDescription: '제품 표면에 은색 줄무늬 발생. 5샷에 1번꼴, 게이트 부근에서 시작됨.',
     resinType: 'PA66', filler: 'GF(유리섬유)', fillerContent: '33', flameRetardant: '없음', flameRetardantThickness: '미입력', flameRetardantType: '해당없음', resinDetail: 'PA66 GF33%', resinGrade: '',
@@ -143,7 +158,7 @@ const SAMPLE_CASES = [
     moldType: '2판', gateType: '사이드', cavities: '4', runnerType: '콜드', weight: '45', wallThicknessMin: '1.5', wallThicknessMax: '3.0',
   },
   {
-    label: 'PC — 크랙',
+    label: 'PC', defectTypeKey: 'defect.crack',
     defectType: '크랙 (Crack)',
     defectDescription: '이젝터 핀 주변에 크랙 발생. 이형 후 2~3분 내에 나타남. 투명 PC 제품.',
     resinType: 'PC', filler: '없음', fillerContent: '', flameRetardant: 'UL94 V-0', flameRetardantThickness: '1.6', flameRetardantType: '할로겐프리', resinDetail: 'PC 투명', resinGrade: 'Covestro Makrolon 2405',
@@ -154,7 +169,7 @@ const SAMPLE_CASES = [
     moldType: '2판', gateType: '핀포인트', cavities: '2', runnerType: '핫', weight: '120', wallThicknessMin: '2.0', wallThicknessMax: '4.0',
   },
   {
-    label: 'POM — 싱크마크',
+    label: 'POM', defectTypeKey: 'defect.sink_mark',
     defectType: '싱크마크 (Sink Mark)',
     defectDescription: '보스(boss) 반대면 표면에 싱크마크 발생. 두께 4mm 구간 집중.',
     resinType: 'POM(아세탈)', filler: '없음', fillerContent: '', flameRetardant: '없음', flameRetardantThickness: '미입력', flameRetardantType: '해당없음', resinDetail: 'POM Homo', resinGrade: 'Polyplastics Duracon M90',
@@ -165,7 +180,7 @@ const SAMPLE_CASES = [
     moldType: '3판', gateType: '핀포인트', cavities: '8', runnerType: '콜드', weight: '30', wallThicknessMin: '2.5', wallThicknessMax: '4.5',
   },
   {
-    label: 'PP GF20% — 휨/변형',
+    label: 'PP GF20%', defectTypeKey: 'defect.warpage',
     defectType: '휨/변형 (Warpage)',
     defectDescription: '냉각 후 평판형 제품이 대각선 방향으로 1.5mm 이상 휨. 4캐비티 중 유독 2번 캐비티에서 심함.',
     resinType: 'PP', filler: 'GF(유리섬유)', fillerContent: '20', flameRetardant: '없음', flameRetardantThickness: '미입력', flameRetardantType: '해당없음', resinDetail: 'PP GF20%', resinGrade: '',
@@ -176,7 +191,7 @@ const SAMPLE_CASES = [
     moldType: '2판', gateType: '사이드', cavities: '4', runnerType: '콜드', weight: '80', wallThicknessMin: '2.0', wallThicknessMax: '3.5',
   },
   {
-    label: 'ABS — 변색',
+    label: 'ABS', defectTypeKey: 'defect.discoloration',
     defectType: '변색 (Discoloration)',
     defectDescription: '제품 끝부분 및 웰드라인 부근 황변. 특히 사이클 정지 후 재가동 첫 5샷에 심함.',
     resinType: 'ABS', filler: '없음', fillerContent: '', flameRetardant: 'UL94 V-0', flameRetardantThickness: '1.6', flameRetardantType: '할로겐', resinDetail: 'ABS V-0', resinGrade: 'LG Chem Starex HG0660',
@@ -187,7 +202,7 @@ const SAMPLE_CASES = [
     moldType: '2판', gateType: '사이드', cavities: '4', runnerType: '콜드', weight: '55', wallThicknessMin: '1.8', wallThicknessMax: '3.0',
   },
   {
-    label: 'PPS GF40% — 플래시',
+    label: 'PPS GF40%', defectTypeKey: 'defect.flash',
     defectType: '플래시 (Flash)',
     defectDescription: '파팅라인 전체 구간에 얇은 버(flash) 발생. 형체력 올려도 개선 안됨.',
     resinType: 'PPS', filler: 'GF(유리섬유)', fillerContent: '40', flameRetardant: '없음', flameRetardantThickness: '미입력', flameRetardantType: '해당없음', resinDetail: 'PPS GF40%', resinGrade: 'Toray A504X90',
@@ -198,7 +213,7 @@ const SAMPLE_CASES = [
     moldType: '2판', gateType: '필름', cavities: '2', runnerType: '콜드', weight: '90', wallThicknessMin: '1.0', wallThicknessMax: '2.5',
   },
   {
-    label: 'PBT GF30% — 웰드라인',
+    label: 'PBT GF30%', defectTypeKey: 'defect.weld_line',
     defectType: '웰드라인 (Weld Line)',
     defectDescription: '2개 게이트 합류 지점에 뚜렷한 웰드라인. 외관 불량 및 강도 저하 의심.',
     resinType: 'PBT', filler: 'GF(유리섬유)', fillerContent: '30', flameRetardant: 'UL94 V-0', flameRetardantThickness: '0.8', flameRetardantType: '할로겐프리', resinDetail: 'PBT GF30% V-0', resinGrade: 'BASF Ultradur B4300 G6',
@@ -209,7 +224,7 @@ const SAMPLE_CASES = [
     moldType: '2판', gateType: '사이드', cavities: '4', runnerType: '핫', weight: '60', wallThicknessMin: '1.5', wallThicknessMax: '3.0',
   },
   {
-    label: 'PC/ABS — 미성형',
+    label: 'PC/ABS', defectTypeKey: 'defect.short_shot',
     defectType: '미성형 (Short Shot)',
     defectDescription: '제품 끝단부 2군데에서 미충전. 사출 압력 올리면 플래시 발생.',
     resinType: 'PC/ABS', filler: '없음', fillerContent: '', flameRetardant: 'UL94 V-0', flameRetardantThickness: '1.5', flameRetardantType: '할로겐프리', resinDetail: 'PC/ABS V-0 HF', resinGrade: 'Bayer Bayblend T85',
@@ -220,7 +235,7 @@ const SAMPLE_CASES = [
     moldType: '2판', gateType: '핀포인트', cavities: '4', runnerType: '핫', weight: '70', wallThicknessMin: '1.2', wallThicknessMax: '2.8',
   },
   {
-    label: 'PA46 GF30% — 은줄/블리스터',
+    label: 'PA46 GF30%', defectTypeKey: 'defect.silver_streak',
     defectType: '은줄 (Silver Streak)',
     defectDescription: '성형 직후에는 양품이나 리플로우 솔더링(260℃) 후 표면에 블리스터 발생. 일부 샷에서는 성형 시에도 은줄 발생.',
     resinType: 'PA46', filler: 'GF(유리섬유)', fillerContent: '30', flameRetardant: '없음', flameRetardantThickness: '미입력', flameRetardantType: '해당없음', resinDetail: 'PA46 GF30% (Stanyl TW341)', resinGrade: '',
@@ -231,7 +246,7 @@ const SAMPLE_CASES = [
     moldType: '2판', gateType: '핀포인트', cavities: '32', runnerType: '핫', weight: '1.5', wallThicknessMin: '0.5', wallThicknessMax: '1.2',
   },
   {
-    label: 'PA410 GF30% — 싱크마크',
+    label: 'PA410 GF30%', defectTypeKey: 'defect.sink_mark',
     defectType: '싱크마크 (Sink Mark)',
     defectDescription: '보스 부위에 싱크마크 발생. 보압 올려도 개선 미미. 금형 온도 낮추면 표면 광택이 떨어짐.',
     resinType: 'PA410', filler: 'GF(유리섬유)', fillerContent: '30', flameRetardant: '없음', flameRetardantThickness: '미입력', flameRetardantType: '해당없음', resinDetail: 'PA410 GF30% (EcoPaXX Q-HG6)', resinGrade: '',
@@ -242,7 +257,7 @@ const SAMPLE_CASES = [
     moldType: '2판', gateType: '사이드', cavities: '4', runnerType: '콜드', weight: '35', wallThicknessMin: '1.5', wallThicknessMax: '4.0',
   },
   {
-    label: 'PA4T GF30% — 플래시/블리스터',
+    label: 'PA4T GF30%', defectTypeKey: 'defect.flash',
     defectType: '플래시 (Flash)',
     defectDescription: '박벽 커넥터 성형 시 PL면에 미세 플래시 발생. 형체력 올려도 잡히지 않음. 일부 캐비티에서 리플로우 솔더링 후 블리스터도 발생.',
     resinType: 'PA4T', filler: 'GF(유리섬유)', fillerContent: '30', flameRetardant: '없음', flameRetardantThickness: '미입력', flameRetardantType: '해당없음', resinDetail: 'PA4T GF30% (ForTii T11)', resinGrade: '',
@@ -257,6 +272,8 @@ const SAMPLE_CASES = [
 // --- Main Diagnose Content ---
 function DiagnoseContent() {
   const searchParams = useSearchParams();
+  const { t, locale } = useLocale();
+
   const [images, setImages] = useState<ImageFile[]>([]);
   const [defectType, setDefectType] = useState('');
   const [customDefect, setCustomDefect] = useState('');
@@ -324,6 +341,54 @@ function DiagnoseContent() {
   const resultRef = useRef<HTMLDivElement>(null);
   const followUpFormRef = useRef<HTMLDivElement>(null);
 
+  // Computed label arrays (use t() — must be inside component)
+  const machineParams = [
+    { key: 'injPressure1', label: t('step3.inj_pressure'), placeholder: 'MPa' },
+    { key: 'holdPressure', label: t('step3.hold_pressure'), placeholder: 'MPa' },
+    { key: 'injSpeed1', label: t('step3.inj_speed1'), placeholder: '%' },
+    { key: 'injSpeed2', label: t('step3.inj_speed2'), placeholder: '%' },
+    { key: 'holdTime', label: t('step3.hold_time'), placeholder: 'sec' },
+    { key: 'coolTime', label: t('step3.cool_time'), placeholder: 'sec' },
+    { key: 'injTime', label: t('step3.inj_time'), placeholder: 'sec' },
+    { key: 'metering', label: t('step3.metering'), placeholder: 'mm' },
+    { key: 'cushion', label: t('step3.cushion'), placeholder: 'mm' },
+    { key: 'backPressure', label: t('step3.back_pressure'), placeholder: 'MPa' },
+    { key: 'screwRpm', label: t('step3.screw_rpm'), placeholder: 'rpm' },
+    { key: 'clampForce', label: t('step3.clamp'), placeholder: 'ton' },
+  ];
+
+  const tempZones = [
+    { key: 'nozzleTemp', label: t('step3.nozzle') },
+    { key: 'zone1Temp', label: t('step3.zone1') },
+    { key: 'zone2Temp', label: t('step3.zone2') },
+    { key: 'zone3Temp', label: t('step3.zone3') },
+    { key: 'zone4Temp', label: t('step3.zone4') },
+  ];
+
+  const moldTempFields = [
+    { key: 'moldTempFixed', label: t('step3.fixed') },
+    { key: 'moldTempMoving', label: t('step3.moving') },
+  ];
+
+  const fillerOptions: [string, string][] = [
+    ['없음', 'filler.none'],
+    ['GF(유리섬유)', 'filler.gf'],
+    ['CF(탄소섬유)', 'filler.cf'],
+    ['GF+CF', 'filler.gfcf'],
+    ['미네랄', 'filler.mineral'],
+    ['탈크', 'filler.talc'],
+    ['GB(유리비드)', 'filler.gb'],
+    ['기타', 'filler.other'],
+  ];
+
+  const frTypeOptions: [string, string][] = [
+    ['해당없음', 'step2.fr_none'],
+    ['할로겐', 'step2.fr_halogen'],
+    ['할로겐프리', 'step2.fr_hf'],
+    ['적인계', 'step2.fr_phosphorus'],
+    ['멜라민계', 'step2.fr_melamine'],
+  ];
+
   const handleSettingsImage = async (file: File) => {
     if (!file.type.startsWith('image/')) return;
     setIsExtractingSettings(true);
@@ -339,7 +404,7 @@ function DiagnoseContent() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ image: { data: base64, mediaType: file.type } }),
       });
-      if (!res.ok) throw new Error('추출 실패');
+      if (!res.ok) throw new Error(t('err.extract_fail'));
       const extracted = await res.json();
       const filledKeys: string[] = [];
       setSettings(prev => {
@@ -353,9 +418,9 @@ function DiagnoseContent() {
         return updated;
       });
       setExtractedFields(new Set(filledKeys));
-      setExtractMsg(`✓ ${filledKeys.length}개 항목 자동 입력 완료 — 확인 후 수정하세요.`);
+      setExtractMsg(`✓ ${filledKeys.length}${t('msg.extracted')}`);
     } catch {
-      setExtractMsg('추출 실패. 사출기 화면이 잘 보이는 사진을 사용해주세요.');
+      setExtractMsg(t('err.extract_fail'));
     } finally {
       setIsExtractingSettings(false);
     }
@@ -470,7 +535,7 @@ function DiagnoseContent() {
   const handleDiagnose = async () => {
     const effectiveResin = resinType === '기타 (직접 입력)' ? customResin : resinType;
     if (!effectiveResin) {
-      setError('수지 종류를 선택해주세요. (필수 항목)');
+      setError(t('err.resin_required'));
       return;
     }
     setIsLoading(true);
@@ -492,6 +557,7 @@ function DiagnoseContent() {
         productInfo: { weight, wallThicknessMin, wallThicknessMax, notes: productNotes },
         images: [...images, ...followUpImages].map(img => ({ data: img.base64, mediaType: img.mediaType })),
         moldDrawings: moldDrawings.map(img => ({ data: img.base64, mediaType: img.mediaType })),
+        locale,
         ...(isFollowUp && {
           isFollowUp: true,
           round,
@@ -508,8 +574,8 @@ function DiagnoseContent() {
       });
 
       if (!res.ok) {
-        let errMsg = '추정 실패';
-        try { const err = await res.json(); errMsg = err.error || errMsg; } catch { /* HTML 에러 페이지 등 무시 */ }
+        let errMsg = t('err.estimate_fail');
+        try { const err = await res.json(); errMsg = err.error || errMsg; } catch { /* ignore */ }
         throw new Error(errMsg);
       }
 
@@ -522,7 +588,6 @@ function DiagnoseContent() {
       setResult(data);
       setShowFollowUpForm(false);
 
-      // Update follow-up history for timeline
       if (round > 1) {
         setFollowUpHistory(prev => [
           ...prev.filter(h => h.round < diagnosisRound),
@@ -530,7 +595,6 @@ function DiagnoseContent() {
         ]);
       }
 
-      // Save to localStorage
       const newId = String(Date.now());
       setDiagnosisId(newId);
       try {
@@ -538,12 +602,11 @@ function DiagnoseContent() {
         const history = JSON.parse(raw || '[]');
         history.unshift({ ...data, timestamp: new Date().toISOString(), id: newId, round: diagnosisRound });
         localStorage.setItem('diagnoseHistory', JSON.stringify(history.slice(0, 20)));
-      } catch { /* localStorage 비활성화 또는 용량 초과 시 무시 */ }
+      } catch { /* ignore */ }
 
-      // Scroll to result
       setTimeout(() => resultRef.current?.scrollIntoView({ behavior: 'smooth' }), 100);
     } catch (err) {
-      setError(err instanceof Error ? err.message : '추정 중 오류가 발생했습니다.');
+      setError(err instanceof Error ? err.message : t('err.estimate_error'));
     } finally {
       setIsLoading(false);
     }
@@ -564,7 +627,7 @@ function DiagnoseContent() {
       pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
       pdf.save(`mold-doctor-${result.defect_type.en.replace(/\s/g, '-')}-${Date.now()}.pdf`);
     } catch {
-      alert('PDF 저장 중 오류가 발생했습니다.');
+      alert(t('err.pdf_error'));
     }
   };
 
@@ -579,7 +642,7 @@ function DiagnoseContent() {
         localStorage.setItem('diagnoseHistory', JSON.stringify(history));
       }
     } catch { /* ignore */ }
-    alert('해결된 사례로 기록되었습니다.');
+    alert(t('msg.resolved'));
   };
 
   const handleStartFollowUp = () => {
@@ -612,7 +675,6 @@ function DiagnoseContent() {
 
   const inputCls = "w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2.5 text-sm text-white placeholder:text-white/25 focus:outline-none focus:ring-2 focus:ring-[#00E887]/30 focus:border-[#00E887]/40";
   const labelCls = "block text-sm font-medium text-white/50 mb-1";
-  // 자동 추출 필드: 초록 tint + "확인 요망" 구분. 수동 편집 시 일반 스타일로 복귀.
   const settingInputCls = (key: string) => extractedFields.has(key)
     ? "w-full bg-[#00E887]/10 border border-[#00E887]/40 rounded-lg px-3 py-3 text-sm text-white placeholder:text-white/25 focus:outline-none focus:ring-2 focus:ring-[#00E887]/40 focus:border-[#00E887]/60"
     : "w-full bg-white/5 border border-white/10 rounded-lg px-3 py-3 text-sm text-white placeholder:text-white/25 focus:outline-none focus:ring-2 focus:ring-[#00E887]/30 focus:border-[#00E887]/40";
@@ -621,8 +683,8 @@ function DiagnoseContent() {
     <div className="max-w-5xl mx-auto px-3 sm:px-4 py-6 sm:py-8">
       <div className="mb-8 flex items-start justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-white mb-2">사출 불량 AI 추정</h1>
-          <p className="text-white/40">불량 정보와 성형 조건을 입력하면 AI가 원인과 해결책을 알려드립니다.</p>
+          <h1 className="text-3xl font-bold text-white mb-2">{t('diagnose.title')}</h1>
+          <p className="text-white/40">{t('diagnose.subtitle')}</p>
         </div>
       </div>
 
@@ -632,7 +694,7 @@ function DiagnoseContent() {
           <svg className="w-4 h-4 text-[#00E887]/60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
           </svg>
-          <span className="text-white/50 font-semibold text-sm">샘플 케이스로 빠른 테스트</span>
+          <span className="text-white/50 font-semibold text-sm">{t('diagnose.sample_title')}</span>
         </div>
         <div className="flex flex-wrap gap-2">
           {SAMPLE_CASES.map((c, i) => (
@@ -642,7 +704,7 @@ function DiagnoseContent() {
               onClick={() => loadSample(i)}
               className="bg-white/5 hover:bg-[#00E887]/10 text-white/50 hover:text-[#00E887] border border-white/8 hover:border-[#00E887]/30 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors whitespace-nowrap"
             >
-              {c.label}
+              {c.label} — {t(c.defectTypeKey)}
             </button>
           ))}
         </div>
@@ -653,12 +715,12 @@ function DiagnoseContent() {
         <section className="bg-white/[0.03] rounded-2xl p-4 sm:p-6 border border-white/8">
           <h2 className="text-lg font-bold text-white mb-5 flex items-center gap-2">
             <span className="bg-[#00E887] text-black w-7 h-7 rounded-full flex items-center justify-center text-sm font-bold">1</span>
-            불량 정보 입력
+            {t('step1.title')}
           </h2>
 
           {/* Image upload */}
           <div className="mb-5">
-            <label className={labelCls}>불량 사진 업로드 (최대 5장)</label>
+            <label className={labelCls}>{t('step1.photo_label')}</label>
             <div
               className={`border-2 border-dashed rounded-xl p-5 sm:p-8 text-center cursor-pointer transition-colors ${
                 isDragging ? 'border-[#00E887]/60 bg-[#00E887]/5' : 'border-white/10 hover:border-[#00E887]/40'
@@ -671,8 +733,8 @@ function DiagnoseContent() {
               <svg className="w-10 h-10 mx-auto mb-3 text-white/20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
               </svg>
-              <p className="text-white/50 font-medium">클릭하거나 드래그하여 업로드</p>
-              <p className="text-white/25 text-sm mt-1">또는 Ctrl+V로 붙여넣기 · 카메라로 직접 촬영</p>
+              <p className="text-white/50 font-medium">{t('step1.photo_drop')}</p>
+              <p className="text-white/25 text-sm mt-1">{t('step1.photo_hint')}</p>
               <input
                 ref={fileInputRef}
                 type="file"
@@ -688,12 +750,12 @@ function DiagnoseContent() {
                 {images.map((img) => (
                   <div key={img.id} className="relative">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img src={img.preview} alt="불량 사진" className="w-20 h-20 object-cover rounded-lg border border-slate-200" />
+                    <img src={img.preview} alt={t('step1.photo_alt')} className="w-20 h-20 object-cover rounded-lg border border-slate-200" />
                     <button
                       type="button"
                       onClick={() => setImages(prev => prev.filter(i => i.id !== img.id))}
                       className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs"
-                      aria-label="사진 삭제"
+                      aria-label={t('step1.photo_del')}
                     >×</button>
                   </div>
                 ))}
@@ -703,7 +765,7 @@ function DiagnoseContent() {
 
           {/* Defect type */}
           <div className="mb-4">
-            <label className={labelCls}>불량 유형 선택 (선택 사항 — AI가 사진으로 판단)</label>
+            <label className={labelCls}>{t('step1.type_label')}</label>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
               {DEFECT_TYPES.map((type) => (
                 <button
@@ -716,7 +778,7 @@ function DiagnoseContent() {
                       : 'bg-white text-slate-700 border-slate-300 hover:border-[#059669]'
                   }`}
                 >
-                  {type}
+                  {t(DEFECT_KEY_MAP[type] || type)}
                 </button>
               ))}
             </div>
@@ -724,7 +786,7 @@ function DiagnoseContent() {
               <input
                 type="text"
                 className={`${inputCls} mt-2`}
-                placeholder="불량 유형 직접 입력"
+                placeholder={t('step1.type_custom')}
                 value={customDefect}
                 onChange={(e) => setCustomDefect(e.target.value)}
               />
@@ -733,14 +795,14 @@ function DiagnoseContent() {
 
           {/* Description */}
           <div>
-            <label className={labelCls}>불량 상황 설명 (선택)</label>
+            <label className={labelCls}>{t('step1.desc_label')}</label>
             <textarea
               className={`${inputCls} h-24 resize-none`}
-              placeholder="예: 5샷에 1번꼴로 발생, 특정 부위에서만, 오후에 심해짐, 조건 바꿔도 안 됨..."
+              placeholder={t('step1.desc_placeholder')}
               value={defectDescription}
               onChange={(e) => setDefectDescription(e.target.value)}
             />
-            <p className="mt-1 text-xs text-slate-400">상세하게 작성할수록 정확한 추정이 가능합니다</p>
+            <p className="mt-1 text-xs text-slate-400">{t('step1.desc_hint')}</p>
           </div>
         </section>
 
@@ -748,76 +810,82 @@ function DiagnoseContent() {
         <section className="bg-white/[0.03] rounded-2xl p-4 sm:p-6 border border-white/8">
           <h2 className="text-lg font-bold text-white mb-5 flex items-center gap-2">
             <span className="bg-[#00E887] text-black w-7 h-7 rounded-full flex items-center justify-center text-sm font-bold">2</span>
-            수지 정보
+            {t('step2.title')}
           </h2>
           <div className="grid sm:grid-cols-2 gap-4">
             <div className="sm:col-span-2">
-              <label className={labelCls}>수지 종류 <span className="text-red-500">*</span></label>
+              <label className={labelCls}>{t('step2.resin_label')} <span className="text-red-500">*</span></label>
               <select
                 className={inputCls}
                 value={resinType}
                 onChange={(e) => setResinType(e.target.value)}
               >
-                <option value="">선택하세요</option>
+                <option value="">{t('step2.resin_placeholder')}</option>
                 {RESIN_OPTIONS.map(group => (
-                  <optgroup key={group.group} label={group.group}>
+                  <optgroup key={group.group} label={t(group.groupKey)}>
                     {group.options.map(opt => (
-                      <option key={opt} value={opt}>{opt}</option>
+                      <option key={opt} value={opt}>
+                        {opt === '기타 (직접 입력)' ? t('resin.custom_option') : opt}
+                      </option>
                     ))}
                   </optgroup>
                 ))}
               </select>
               {resinType === '기타 (직접 입력)' && (
-                <input type="text" className={`${inputCls} mt-2`} placeholder="수지 종류 직접 입력" value={customResin} onChange={(e) => setCustomResin(e.target.value)} />
+                <input type="text" className={`${inputCls} mt-2`} placeholder={t('step2.resin_custom')} value={customResin} onChange={(e) => setCustomResin(e.target.value)} />
               )}
             </div>
             <div>
-              <label className={labelCls}>강화재/필러</label>
+              <label className={labelCls}>{t('step2.filler_label')}</label>
               <select className={inputCls} value={filler} onChange={(e) => setFiller(e.target.value)}>
-                {['없음', 'GF(유리섬유)', 'CF(탄소섬유)', 'GF+CF', '미네랄', '탈크', 'GB(유리비드)', '기타'].map(f => <option key={f}>{f}</option>)}
+                {fillerOptions.map(([val, key]) => <option key={val} value={val}>{t(key)}</option>)}
               </select>
             </div>
             <div>
-              <label className={labelCls}>강화재 함량 (%)</label>
-              <input type="text" inputMode="numeric" className={inputCls} placeholder="예: 33" value={fillerContent} onChange={(e) => setFillerContent(e.target.value)} />
+              <label className={labelCls}>{t('step2.filler_pct')}</label>
+              <input type="text" inputMode="numeric" className={inputCls} placeholder={t('step2.filler_placeholder')} value={fillerContent} onChange={(e) => setFillerContent(e.target.value)} />
             </div>
             <div>
-              <label className={labelCls}>난연 등급</label>
+              <label className={labelCls}>{t('step2.fr_label')}</label>
               <select className={inputCls} value={flameRetardant} onChange={(e) => setFlameRetardant(e.target.value)}>
-                {['없음', 'UL94 V-0', 'UL94 V-1', 'UL94 V-2', 'UL94 HB', 'UL94 5VA', 'UL94 5VB'].map(f => <option key={f}>{f}</option>)}
+                {['없음', 'UL94 V-0', 'UL94 V-1', 'UL94 V-2', 'UL94 HB', 'UL94 5VA', 'UL94 5VB'].map(val => (
+                  <option key={val} value={val}>{val === '없음' ? t('common.none') : val}</option>
+                ))}
               </select>
             </div>
             <div>
-              <label className={labelCls}>난연 인증 두께 (mm)</label>
+              <label className={labelCls}>{t('step2.fr_thickness')}</label>
               <select className={inputCls} value={flameRetardantThickness} onChange={(e) => setFlameRetardantThickness(e.target.value)}>
-                {['미입력', '0.4', '0.75', '0.8', '1.0', '1.5', '1.6', '2.0', '3.0', '3.2'].map(t => <option key={t}>{t}</option>)}
+                {['미입력', '0.4', '0.75', '0.8', '1.0', '1.5', '1.6', '2.0', '3.0', '3.2'].map(val => (
+                  <option key={val} value={val}>{val === '미입력' ? t('step2.fr_thickness_default') : val}</option>
+                ))}
               </select>
             </div>
             <div>
-              <label className={labelCls}>난연 타입</label>
+              <label className={labelCls}>{t('step2.fr_type')}</label>
               <select className={inputCls} value={flameRetardantType} onChange={(e) => setFlameRetardantType(e.target.value)}>
-                {['해당없음', '할로겐', '할로겐프리', '적인계', '멜라민계'].map(f => <option key={f}>{f}</option>)}
+                {frTypeOptions.map(([val, key]) => <option key={val} value={val}>{t(key)}</option>)}
               </select>
             </div>
             <div>
-              <label className={labelCls}>수지 상세</label>
-              <input type="text" className={inputCls} placeholder="예: PA66 GF33% 할로겐프리 난연" value={resinDetail} onChange={(e) => setResinDetail(e.target.value)} />
+              <label className={labelCls}>{t('step2.detail_label')}</label>
+              <input type="text" className={inputCls} placeholder={t('step2.detail_placeholder')} value={resinDetail} onChange={(e) => setResinDetail(e.target.value)} />
             </div>
             <div>
-              <label className={labelCls}>수지 제조사/Grade</label>
-              <input type="text" className={inputCls} placeholder="예: DSM Stanyl TW341" value={resinGrade} onChange={(e) => setResinGrade(e.target.value)} />
+              <label className={labelCls}>{t('step2.grade_label')}</label>
+              <input type="text" className={inputCls} placeholder={t('step2.grade_placeholder')} value={resinGrade} onChange={(e) => setResinGrade(e.target.value)} />
             </div>
           </div>
         </section>
 
-        {/* STEP 2b: Machine Settings */}
+        {/* STEP 3: Machine Settings */}
         <section className="bg-white/[0.03] rounded-2xl p-4 sm:p-6 border border-white/8">
           <h2 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
             <span className="bg-[#00E887] text-black w-7 h-7 rounded-full flex items-center justify-center text-sm font-bold shrink-0">3</span>
-            사출기 셋팅값
+            {t('step3.title')}
           </h2>
 
-          {/* ★ 1급 기능: 사출기 화면 촬영 자동 입력 */}
+          {/* Camera auto-fill */}
           <div className="mb-5">
             <button
               type="button"
@@ -831,7 +899,7 @@ function DiagnoseContent() {
                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
                     <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
                   </svg>
-                  셋팅값 읽는 중...
+                  {t('step3.camera_loading')}
                 </>
               ) : (
                 <>
@@ -839,8 +907,8 @@ function DiagnoseContent() {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/>
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/>
                   </svg>
-                  <span>📷 사출기 화면 찍어 자동 입력</span>
-                  <span className="text-black/50 text-sm font-normal hidden sm:inline">— 19개 항목</span>
+                  <span>{t('step3.camera_btn')}</span>
+                  <span className="text-black/50 text-sm font-normal hidden sm:inline">{t('step3.camera_btn_count')}</span>
                 </>
               )}
             </button>
@@ -859,20 +927,14 @@ function DiagnoseContent() {
               </div>
             )}
             {extractedFields.size > 0 && (
-              <p className="mt-1.5 text-xs text-[#00E887]/60 text-center">초록 테두리 항목 = 자동 입력됨 · 수정하면 표시 사라짐</p>
+              <p className="mt-1.5 text-xs text-[#00E887]/60 text-center">{t('step3.extracted_hint')}</p>
             )}
           </div>
           <div className="space-y-5">
             <div>
-              <label className={labelCls}>사출 온도 (℃)</label>
+              <label className={labelCls}>{t('step3.temp_label')}</label>
               <div className="grid grid-cols-3 sm:grid-cols-5 gap-2">
-                {[
-                  { key: 'nozzleTemp', label: '노즐' },
-                  { key: 'zone1Temp', label: 'Zone1' },
-                  { key: 'zone2Temp', label: 'Zone2' },
-                  { key: 'zone3Temp', label: 'Zone3' },
-                  { key: 'zone4Temp', label: 'Zone4' },
-                ].map(({ key, label }) => (
+                {tempZones.map(({ key, label }) => (
                   <div key={key}>
                     <div className={`text-xs mb-1 text-center ${extractedFields.has(key) ? 'text-[#00E887]/70 font-semibold' : 'text-white/40'}`}>{label}{extractedFields.has(key) && ' ✓'}</div>
                     <input type="text" inputMode="numeric" className={settingInputCls(key)} placeholder="℃" value={settings[key as keyof typeof settings]} onChange={(e) => setSetting(key, e.target.value)} />
@@ -881,9 +943,9 @@ function DiagnoseContent() {
               </div>
             </div>
             <div>
-              <label className={labelCls}>금형 온도 (℃)</label>
+              <label className={labelCls}>{t('step3.mold_temp')}</label>
               <div className="grid grid-cols-2 gap-2">
-                {[{ key: 'moldTempFixed', label: '고정측' }, { key: 'moldTempMoving', label: '가동측' }].map(({ key, label }) => (
+                {moldTempFields.map(({ key, label }) => (
                   <div key={key}>
                     <div className={`text-xs mb-1 ${extractedFields.has(key) ? 'text-[#00E887]/70 font-semibold' : 'text-white/40'}`}>{label}{extractedFields.has(key) && ' ✓'}</div>
                     <input type="text" inputMode="numeric" className={settingInputCls(key)} placeholder="℃" value={settings[key as keyof typeof settings]} onChange={(e) => setSetting(key, e.target.value)} />
@@ -892,20 +954,7 @@ function DiagnoseContent() {
               </div>
             </div>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-              {[
-                { key: 'injPressure1', label: '사출압력 1차', placeholder: 'MPa' },
-                { key: 'holdPressure', label: '보압', placeholder: 'MPa' },
-                { key: 'injSpeed1', label: '사출속도 1차', placeholder: '%' },
-                { key: 'injSpeed2', label: '사출속도 2차', placeholder: '%' },
-                { key: 'holdTime', label: '보압 시간', placeholder: 'sec' },
-                { key: 'coolTime', label: '냉각 시간', placeholder: 'sec' },
-                { key: 'injTime', label: '사출 시간', placeholder: 'sec' },
-                { key: 'metering', label: '계량', placeholder: 'mm' },
-                { key: 'cushion', label: '쿠션', placeholder: 'mm' },
-                { key: 'backPressure', label: '배압', placeholder: 'MPa' },
-                { key: 'screwRpm', label: '스크류 회전수', placeholder: 'rpm' },
-                { key: 'clampForce', label: '형체력', placeholder: 'ton' },
-              ].map(({ key, label, placeholder }) => (
+              {machineParams.map(({ key, label, placeholder }) => (
                 <div key={key}>
                   <div className={`text-xs mb-1 ${extractedFields.has(key) ? 'text-[#00E887]/70 font-semibold' : 'text-white/40'}`}>{label}{extractedFields.has(key) && ' ✓'}</div>
                   <input type="text" inputMode="numeric" className={settingInputCls(key)} placeholder={placeholder} value={settings[key as keyof typeof settings]} onChange={(e) => setSetting(key, e.target.value)} />
@@ -924,22 +973,22 @@ function DiagnoseContent() {
               <svg className={`w-4 h-4 transition-transform ${showAdvanced ? 'rotate-90' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
               </svg>
-              고급 설정 {showAdvanced ? '접기' : '펼치기'} (V/P전환·감압·실측값·건조·핫러너·재생재·사출기 정보)
+              {showAdvanced ? t('adv.toggle_collapse') : t('adv.toggle_expand')}
             </button>
 
             {showAdvanced && (
               <div className="mt-4 space-y-5 border-t border-slate-100 pt-5">
 
-                {/* V/P 전환 & 감압 */}
+                {/* V/P & Decomp */}
                 <div>
-                  <div className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">V/P 전환 & 감압(석백)</div>
+                  <div className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">{t('adv.vp_section')}</div>
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                     {[
-                      { key: 'vpTransferPos', label: 'V/P 전환 위치', placeholder: 'mm' },
-                      { key: 'vpTransferPressure', label: 'V/P 전환 압력', placeholder: 'MPa' },
-                      { key: 'preInjectDecompDist', label: '사출 전 감압 거리', placeholder: 'mm' },
-                      { key: 'preInjectDecompSpeed', label: '사출 전 감압 속도', placeholder: 'mm/s' },
-                      { key: 'postMeterDecompDist', label: '계량 후 감압 거리', placeholder: 'mm' },
+                      { key: 'vpTransferPos', label: t('adv.vp_pos'), placeholder: 'mm' },
+                      { key: 'vpTransferPressure', label: t('adv.vp_pressure'), placeholder: 'MPa' },
+                      { key: 'preInjectDecompDist', label: t('adv.decomp_pre'), placeholder: 'mm' },
+                      { key: 'preInjectDecompSpeed', label: t('adv.decomp_pre_speed'), placeholder: 'mm/s' },
+                      { key: 'postMeterDecompDist', label: t('adv.decomp_post'), placeholder: 'mm' },
                     ].map(({ key, label, placeholder }) => (
                       <div key={key}>
                         <div className="text-xs text-slate-500 mb-1">{label}</div>
@@ -949,16 +998,16 @@ function DiagnoseContent() {
                   </div>
                 </div>
 
-                {/* 실측값 */}
+                {/* Actual measured values */}
                 <div>
-                  <div className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">실제 측정값 (모니터에서 읽은 값)</div>
+                  <div className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">{t('adv.actual_section')}</div>
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                     {[
-                      { key: 'actualFillTime', label: '실제 충전 시간', placeholder: 'sec' },
-                      { key: 'actualPeakPressure', label: '최대 사출압력(피크)', placeholder: 'MPa' },
-                      { key: 'actualCushion', label: '실제 쿠션량', placeholder: 'mm' },
-                      { key: 'actualCycleTime', label: '실제 사이클 타임', placeholder: 'sec' },
-                      { key: 'actualPartWeight', label: '제품 실측 중량', placeholder: 'g' },
+                      { key: 'actualFillTime', label: t('adv.fill_time'), placeholder: 'sec' },
+                      { key: 'actualPeakPressure', label: t('adv.peak_pressure'), placeholder: 'MPa' },
+                      { key: 'actualCushion', label: t('adv.cushion'), placeholder: 'mm' },
+                      { key: 'actualCycleTime', label: t('adv.cycle_time'), placeholder: 'sec' },
+                      { key: 'actualPartWeight', label: t('adv.part_weight'), placeholder: 'g' },
                     ].map(({ key, label, placeholder }) => (
                       <div key={key}>
                         <div className="text-xs text-slate-500 mb-1">{label}</div>
@@ -968,42 +1017,44 @@ function DiagnoseContent() {
                   </div>
                 </div>
 
-                {/* 건조 */}
+                {/* Drying */}
                 <div>
-                  <div className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">건조 조건</div>
+                  <div className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">{t('adv.dry_section')}</div>
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                     <div>
-                      <div className="text-xs text-slate-500 mb-1">건조 온도</div>
+                      <div className="text-xs text-slate-500 mb-1">{t('adv.dry_temp')}</div>
                       <input type="text" inputMode="numeric" className={inputCls} placeholder="℃" value={advSettings.dryTemp} onChange={(e) => setAdvSetting('dryTemp', e.target.value)} />
                     </div>
                     <div>
-                      <div className="text-xs text-slate-500 mb-1">건조 시간</div>
+                      <div className="text-xs text-slate-500 mb-1">{t('adv.dry_time')}</div>
                       <input type="text" inputMode="numeric" className={inputCls} placeholder="hr" value={advSettings.dryTime} onChange={(e) => setAdvSetting('dryTime', e.target.value)} />
                     </div>
                     <div>
-                      <div className="text-xs text-slate-500 mb-1">건조기 타입</div>
+                      <div className="text-xs text-slate-500 mb-1">{t('adv.dryer_type')}</div>
                       <select className={inputCls} value={advSettings.dryerType} onChange={(e) => setAdvSetting('dryerType', e.target.value)}>
-                        {['없음', '제습식', '열풍식'].map(t => <option key={t}>{t}</option>)}
+                        <option value="없음">{t('adv.dryer_none')}</option>
+                        <option value="제습식">{t('adv.dryer_dehum')}</option>
+                        <option value="열풍식">{t('adv.dryer_hot')}</option>
                       </select>
                     </div>
                     <div>
-                      <div className="text-xs text-slate-500 mb-1">수분율 측정값</div>
+                      <div className="text-xs text-slate-500 mb-1">{t('adv.moisture')}</div>
                       <input type="text" inputMode="numeric" className={inputCls} placeholder="%" value={advSettings.moistureContent} onChange={(e) => setAdvSetting('moistureContent', e.target.value)} />
                     </div>
                   </div>
                 </div>
 
-                {/* 핫러너 (핫러너 금형일 때) */}
+                {/* Hot runner (conditional) */}
                 {(moldType === '핫러너' || runnerType === '핫') && (
                   <div>
-                    <div className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">핫러너 설정</div>
+                    <div className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">{t('adv.hr_section')}</div>
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                       {[
-                        { key: 'hrManifoldTemp', label: '매니폴드' },
-                        { key: 'hrNozzle1Temp', label: '노즐 1' },
-                        { key: 'hrNozzle2Temp', label: '노즐 2' },
-                        { key: 'hrNozzle3Temp', label: '노즐 3' },
-                        { key: 'hrNozzle4Temp', label: '노즐 4' },
+                        { key: 'hrManifoldTemp', label: t('adv.hr_manifold') },
+                        { key: 'hrNozzle1Temp', label: t('adv.hr_nozzle1') },
+                        { key: 'hrNozzle2Temp', label: t('adv.hr_nozzle2') },
+                        { key: 'hrNozzle3Temp', label: t('adv.hr_nozzle3') },
+                        { key: 'hrNozzle4Temp', label: t('adv.hr_nozzle4') },
                       ].map(({ key, label }) => (
                         <div key={key}>
                           <div className="text-xs text-slate-500 mb-1">{label} (℃)</div>
@@ -1011,56 +1062,60 @@ function DiagnoseContent() {
                         </div>
                       ))}
                       <div>
-                        <div className="text-xs text-slate-500 mb-1">밸브게이트</div>
+                        <div className="text-xs text-slate-500 mb-1">{t('adv.valve_gate')}</div>
                         <select className={inputCls} value={advSettings.valveGate} onChange={(e) => setAdvSetting('valveGate', e.target.value)}>
-                          {['없음', '있음'].map(t => <option key={t}>{t}</option>)}
+                          <option value="없음">{t('adv.valve_none')}</option>
+                          <option value="있음">{t('adv.valve_yes')}</option>
                         </select>
                       </div>
                     </div>
                   </div>
                 )}
 
-                {/* 재생재/컬러 */}
+                {/* Regrind & Color */}
                 <div>
-                  <div className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">재생재 & 컬러</div>
+                  <div className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">{t('adv.regrind_section')}</div>
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                     <div>
-                      <div className="text-xs text-slate-500 mb-1">재생재 혼합 비율</div>
+                      <div className="text-xs text-slate-500 mb-1">{t('adv.regrind_ratio')}</div>
                       <input type="text" inputMode="numeric" className={inputCls} placeholder="%" value={advSettings.regrindRatio} onChange={(e) => setAdvSetting('regrindRatio', e.target.value)} />
                     </div>
                     <div>
-                      <div className="text-xs text-slate-500 mb-1">컬러 타입</div>
+                      <div className="text-xs text-slate-500 mb-1">{t('adv.color_type')}</div>
                       <select className={inputCls} value={advSettings.colorType} onChange={(e) => setAdvSetting('colorType', e.target.value)}>
-                        {['없음', '마스터배치', '액상컬러', '분체컬러'].map(t => <option key={t}>{t}</option>)}
+                        <option value="없음">{t('adv.color_none')}</option>
+                        <option value="마스터배치">{t('adv.color_mb')}</option>
+                        <option value="액상컬러">{t('adv.color_liquid')}</option>
+                        <option value="분체컬러">{t('adv.color_powder')}</option>
                       </select>
                     </div>
                     {advSettings.colorType !== '없음' && (
                       <div>
-                        <div className="text-xs text-slate-500 mb-1">컬러 투입 비율</div>
+                        <div className="text-xs text-slate-500 mb-1">{t('adv.color_ratio')}</div>
                         <input type="text" inputMode="numeric" className={inputCls} placeholder="%" value={advSettings.mbRatio} onChange={(e) => setAdvSetting('mbRatio', e.target.value)} />
                       </div>
                     )}
                   </div>
                 </div>
 
-                {/* 사출기 정보 */}
+                {/* Machine info */}
                 <div>
-                  <div className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">사출기 정보 (선택)</div>
+                  <div className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">{t('adv.machine_section')}</div>
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                     <div className="md:col-span-2">
-                      <div className="text-xs text-slate-500 mb-1">사출기 제조사/모델</div>
-                      <input type="text" className={inputCls} placeholder="예: Fanuc 100T, Engel 150" value={advSettings.machineModel} onChange={(e) => setAdvSetting('machineModel', e.target.value)} />
+                      <div className="text-xs text-slate-500 mb-1">{t('adv.machine_model')}</div>
+                      <input type="text" className={inputCls} placeholder={t('adv.machine_model_placeholder')} value={advSettings.machineModel} onChange={(e) => setAdvSetting('machineModel', e.target.value)} />
                     </div>
                     <div>
-                      <div className="text-xs text-slate-500 mb-1">스크류 직경</div>
+                      <div className="text-xs text-slate-500 mb-1">{t('adv.screw_dia')}</div>
                       <input type="text" inputMode="numeric" className={inputCls} placeholder="mm" value={advSettings.screwDiameter} onChange={(e) => setAdvSetting('screwDiameter', e.target.value)} />
                     </div>
                     <div>
-                      <div className="text-xs text-slate-500 mb-1">최대 형체력</div>
+                      <div className="text-xs text-slate-500 mb-1">{t('adv.max_clamp')}</div>
                       <input type="text" inputMode="numeric" className={inputCls} placeholder="ton" value={advSettings.maxClampForce} onChange={(e) => setAdvSetting('maxClampForce', e.target.value)} />
                     </div>
                     <div>
-                      <div className="text-xs text-slate-500 mb-1">최대 사출압력</div>
+                      <div className="text-xs text-slate-500 mb-1">{t('adv.max_pressure')}</div>
                       <input type="text" inputMode="numeric" className={inputCls} placeholder="MPa" value={advSettings.maxInjPressure} onChange={(e) => setAdvSetting('maxInjPressure', e.target.value)} />
                     </div>
                   </div>
@@ -1071,58 +1126,65 @@ function DiagnoseContent() {
           </div>
         </section>
 
-        {/* STEP 2c: Mold & Product Info */}
+        {/* STEP 4: Mold & Product Info */}
         <section className="bg-white/[0.03] rounded-2xl p-4 sm:p-6 border border-white/8">
           <h2 className="text-lg font-bold text-white mb-5 flex items-center gap-2">
             <span className="bg-slate-400 text-white w-7 h-7 rounded-full flex items-center justify-center text-sm font-bold">4</span>
-            금형 & 제품 정보 <span className="text-slate-400 text-sm font-normal">(선택)</span>
+            {t('step4.title')}
           </h2>
           <div className="grid sm:grid-cols-2 gap-4">
             <div>
-              <label className={labelCls}>금형 타입</label>
+              <label className={labelCls}>{t('step4.mold_type')}</label>
               <select className={inputCls} value={moldType} onChange={(e) => setMoldType(e.target.value)}>
-                <option value="">선택</option>
-                {['2판', '3판', '핫러너'].map(t => <option key={t}>{t}</option>)}
+                <option value="">{t('step4.mold_type_default')}</option>
+                <option value="2판">{t('step4.mold_2plate')}</option>
+                <option value="3판">{t('step4.mold_3plate')}</option>
+                <option value="핫러너">{t('step4.mold_hot')}</option>
               </select>
             </div>
             <div>
-              <label className={labelCls}>게이트 타입</label>
+              <label className={labelCls}>{t('step4.gate_type')}</label>
               <select className={inputCls} value={gateType} onChange={(e) => setGateType(e.target.value)}>
-                <option value="">선택</option>
-                {['사이드', '핀포인트', '서브마린', '다이렉트', '밸브'].map(t => <option key={t}>{t}</option>)}
+                <option value="">{t('step4.mold_type_default')}</option>
+                <option value="사이드">{t('step4.gate_side')}</option>
+                <option value="핀포인트">{t('step4.gate_pinpoint')}</option>
+                <option value="서브마린">{t('step4.gate_submarine')}</option>
+                <option value="다이렉트">{t('step4.gate_direct')}</option>
+                <option value="밸브">{t('step4.gate_valve')}</option>
               </select>
             </div>
             <div>
-              <label className={labelCls}>캐비티 수</label>
-              <input type="text" inputMode="numeric" className={inputCls} placeholder="예: 4" value={cavities} onChange={(e) => setCavities(e.target.value)} />
+              <label className={labelCls}>{t('step4.cavities')}</label>
+              <input type="text" inputMode="numeric" className={inputCls} placeholder={t('step4.cavities_placeholder')} value={cavities} onChange={(e) => setCavities(e.target.value)} />
             </div>
             <div>
-              <label className={labelCls}>러너 타입</label>
+              <label className={labelCls}>{t('step4.runner')}</label>
               <select className={inputCls} value={runnerType} onChange={(e) => setRunnerType(e.target.value)}>
-                <option value="">선택</option>
-                {['콜드', '핫'].map(t => <option key={t}>{t}</option>)}
+                <option value="">{t('step4.mold_type_default')}</option>
+                <option value="콜드">{t('step4.runner_cold')}</option>
+                <option value="핫">{t('step4.runner_hot')}</option>
               </select>
             </div>
             <div>
-              <label className={labelCls}>제품 중량 (g)</label>
-              <input type="text" inputMode="numeric" className={inputCls} placeholder="예: 45" value={weight} onChange={(e) => setWeight(e.target.value)} />
+              <label className={labelCls}>{t('step4.weight')}</label>
+              <input type="text" inputMode="numeric" className={inputCls} placeholder={t('step4.weight_placeholder')} value={weight} onChange={(e) => setWeight(e.target.value)} />
             </div>
             <div>
-              <label className={labelCls}>벽 두께 (mm)</label>
+              <label className={labelCls}>{t('step4.wall')}</label>
               <div className="flex gap-2 items-center">
-                <input type="text" inputMode="numeric" className={inputCls} placeholder="최소" value={wallThicknessMin} onChange={(e) => setWallThicknessMin(e.target.value)} />
+                <input type="text" inputMode="numeric" className={inputCls} placeholder={t('step4.wall_min')} value={wallThicknessMin} onChange={(e) => setWallThicknessMin(e.target.value)} />
                 <span className="text-slate-400">~</span>
-                <input type="text" inputMode="numeric" className={inputCls} placeholder="최대" value={wallThicknessMax} onChange={(e) => setWallThicknessMax(e.target.value)} />
+                <input type="text" inputMode="numeric" className={inputCls} placeholder={t('step4.wall_max')} value={wallThicknessMax} onChange={(e) => setWallThicknessMax(e.target.value)} />
               </div>
             </div>
             <div className="sm:col-span-2">
-              <label className={labelCls}>제품 특이사항</label>
-              <input type="text" className={inputCls} placeholder="예: 인서트, 이중사출, 보스, 리브 등" value={productNotes} onChange={(e) => setProductNotes(e.target.value)} />
+              <label className={labelCls}>{t('step4.notes')}</label>
+              <input type="text" className={inputCls} placeholder={t('step4.notes_placeholder')} value={productNotes} onChange={(e) => setProductNotes(e.target.value)} />
             </div>
 
             {/* Mold Drawing Upload */}
             <div className="sm:col-span-2 mt-2">
-              <label className={labelCls}>금형 도면 업로드 <span className="text-slate-400 font-normal">(선택 · 최대 3장)</span></label>
+              <label className={labelCls}>{t('step4.drawing_label')}</label>
               <div
                 className={`border-2 border-dashed rounded-xl p-4 sm:p-5 text-center cursor-pointer transition-colors ${
                   isDraggingDrawing ? 'border-[#00E887]/60 bg-[#00E887]/5' : 'border-white/10 hover:border-[#00E887]/40'
@@ -1135,8 +1197,8 @@ function DiagnoseContent() {
                 <svg className="w-8 h-8 mx-auto mb-2 text-white/20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                 </svg>
-                <p className="text-slate-600 text-sm font-medium">금형 도면, 제품 3D 캡처, 게이트/러너 레이아웃 이미지를 올려주세요</p>
-                <p className="text-slate-400 text-xs mt-1">AI가 금형 구조를 분석하여 불량 원인 추정에 반영합니다 · JPG, PNG, PDF</p>
+                <p className="text-slate-600 text-sm font-medium">{t('step4.drawing_hint')}</p>
+                <p className="text-slate-400 text-xs mt-1">{t('step4.drawing_ai_hint')}</p>
                 <input
                   ref={moldDrawingInputRef}
                   type="file"
@@ -1152,7 +1214,7 @@ function DiagnoseContent() {
                     <div key={d.id} className="relative flex items-center gap-1 bg-slate-100 rounded-lg px-2 py-1.5 border border-slate-200">
                       {d.preview ? (
                         // eslint-disable-next-line @next/next/no-img-element
-                        <img src={d.preview} alt="도면" className="w-10 h-10 object-cover rounded" />
+                        <img src={d.preview} alt={t('step4.drawing_alt')} className="w-10 h-10 object-cover rounded" />
                       ) : (
                         <div className="w-10 h-10 bg-red-100 rounded flex items-center justify-center text-xs font-bold text-red-600">PDF</div>
                       )}
@@ -1161,7 +1223,7 @@ function DiagnoseContent() {
                         type="button"
                         onClick={(e) => { e.stopPropagation(); setMoldDrawings(prev => prev.filter(x => x.id !== d.id)); }}
                         className="ml-1 text-slate-400 hover:text-red-500"
-                        aria-label="도면 삭제"
+                        aria-label={t('step4.drawing_del')}
                       >×</button>
                     </div>
                   ))}
@@ -1171,7 +1233,7 @@ function DiagnoseContent() {
           </div>
         </section>
 
-        {/* Diagnose Button */}
+        {/* Submit Button */}
         <button
           type="button"
           onClick={handleDiagnose}
@@ -1184,14 +1246,14 @@ function DiagnoseContent() {
                 <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                 <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
               </svg>
-              AI 추정 중...
+              {t('submit.loading')}
             </>
           ) : (
             <>
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
               </svg>
-              AI 추정 시작
+              {t('submit.start')}
             </>
           )}
         </button>
@@ -1202,11 +1264,9 @@ function DiagnoseContent() {
           </div>
         )}
 
-
         {/* Results */}
         {result && (
           <div ref={resultRef}>
-            {/* Image_Unreadable / No_Defect_Detected: DiagnosisResultPanel 내부에서 특수 UI 렌더링 */}
             <DiagnosisResultPanel
               result={result}
               onSavePDF={handleSavePDF}
@@ -1220,19 +1280,19 @@ function DiagnoseContent() {
           </div>
         )}
 
-        {/* Follow-up Form — 특수 케이스(이미지 판독불가/정상)에선 숨김 */}
+        {/* Follow-up Form */}
         {showFollowUpForm && result &&
          result.defect_type?.en !== 'Image_Unreadable' &&
          result.defect_type?.en !== 'No_Defect_Detected' && (
           <div ref={followUpFormRef} className="bg-white rounded-2xl p-4 sm:p-6 shadow-sm border-2 border-orange-300 space-y-5">
             <div className="flex items-center gap-2 mb-1">
-              <span className="bg-orange-500 text-white text-xs font-bold px-2 py-1 rounded-full">{round}차 후속 추정</span>
-              <h3 className="text-lg font-bold text-[#1E293B]">후속 추정 정보 입력</h3>
+              <span className="bg-orange-500 text-white text-xs font-bold px-2 py-1 rounded-full">{round}{t('followup.badge')}</span>
+              <h3 className="text-lg font-bold text-[#1E293B]">{t('followup.title')}</h3>
             </div>
 
-            {/* 조치 체크리스트 */}
+            {/* Action checklist */}
             <div>
-              <label className={labelCls}>어떤 조치를 했나요?</label>
+              <label className={labelCls}>{t('followup.actions_label')}</label>
               <div className="space-y-2 mt-1">
                 {followUpActions.map((action, i) => (
                   <div key={i} className="border border-slate-200 rounded-xl p-3">
@@ -1251,11 +1311,11 @@ function DiagnoseContent() {
                         value={action.result}
                         onChange={(e) => setFollowUpActions(prev => prev.map((a, j) => j === i ? { ...a, result: e.target.value } : a))}
                       >
-                        <option value="">결과 선택...</option>
-                        <option value="완전 해결">완전 해결</option>
-                        <option value="부분 개선">부분 개선 (빈도 줄었지만 아직 발생)</option>
-                        <option value="변화 없음">변화 없음</option>
-                        <option value="오히려 악화">오히려 악화됨</option>
+                        <option value="">{t('followup.result_default')}</option>
+                        <option value="완전 해결">{t('followup.result_resolved')}</option>
+                        <option value="부분 개선">{t('followup.result_partial')}</option>
+                        <option value="변화 없음">{t('followup.result_unchanged')}</option>
+                        <option value="오히려 악화">{t('followup.result_worse')}</option>
                       </select>
                     )}
                   </div>
@@ -1263,32 +1323,32 @@ function DiagnoseContent() {
               </div>
             </div>
 
-            {/* 전반적 변화 */}
+            {/* Overall change */}
             <div>
-              <label className={labelCls}>전반적인 조치 후 변화</label>
+              <label className={labelCls}>{t('followup.change_label')}</label>
               <select className={inputCls} value={followUpChange} onChange={(e) => setFollowUpChange(e.target.value)}>
-                <option value="">선택해주세요...</option>
-                <option value="개선됨 (빈도 줄었지만 아직 발생)">개선됨 (빈도 줄었지만 아직 발생)</option>
-                <option value="변화 없음">변화 없음</option>
-                <option value="오히려 악화됨">오히려 악화됨</option>
-                <option value="다른 불량이 새로 발생">다른 불량이 새로 발생</option>
+                <option value="">{t('followup.change_default')}</option>
+                <option value="개선됨 (빈도 줄었지만 아직 발생)">{t('followup.change_improved')}</option>
+                <option value="변화 없음">{t('followup.result_unchanged')}</option>
+                <option value="오히려 악화됨">{t('followup.result_worse')}</option>
+                <option value="다른 불량이 새로 발생">{t('followup.change_new_defect')}</option>
               </select>
             </div>
 
-            {/* 추가 관찰 사항 */}
+            {/* Notes */}
             <div>
-              <label className={labelCls}>추가 관찰 사항 (선택)</label>
+              <label className={labelCls}>{t('followup.notes_label')}</label>
               <textarea
                 className={`${inputCls} h-20 resize-none`}
-                placeholder="예: 건조 연장 후 은줄 빈도가 줄었지만 5번에 1번은 여전히 발생..."
+                placeholder={t('followup.notes_placeholder')}
                 value={followUpNotes}
                 onChange={(e) => setFollowUpNotes(e.target.value)}
               />
             </div>
 
-            {/* 조치 후 사진 업로드 */}
+            {/* Follow-up photo */}
             <div>
-              <label className={labelCls}>조치 후 불량 사진 (선택)</label>
+              <label className={labelCls}>{t('followup.photo_label')}</label>
               <div
                 className="border-2 border-dashed border-slate-300 rounded-xl p-4 text-center cursor-pointer hover:border-[#059669] transition-colors"
                 onClick={() => {
@@ -1303,7 +1363,7 @@ function DiagnoseContent() {
                   input.click();
                 }}
               >
-                <p className="text-sm text-slate-500">사진 클릭하여 업로드</p>
+                <p className="text-sm text-slate-500">{t('followup.photo_click')}</p>
                 {followUpImages.length > 0 && (
                   <div className="flex gap-2 mt-2 justify-center flex-wrap">
                     {followUpImages.map(img => (
@@ -1322,9 +1382,9 @@ function DiagnoseContent() {
               </div>
             </div>
 
-            {/* 셋팅 변경 안내 */}
+            {/* Settings hint */}
             <div className="bg-slate-50 rounded-xl p-3 border border-slate-200">
-              <p className="text-xs text-slate-500 font-medium">변경된 셋팅값이 있으면 위의 사출기 셋팅 폼에서 직접 수정 후 후속 추정을 시작하세요.</p>
+              <p className="text-xs text-slate-500 font-medium">{t('followup.settings_hint')}</p>
             </div>
 
             <div className="flex gap-3">
@@ -1333,7 +1393,7 @@ function DiagnoseContent() {
                 onClick={() => { setShowFollowUpForm(false); setRound(prev => Math.max(1, prev - 1)); }}
                 className="px-4 py-3 rounded-xl border border-slate-300 text-slate-600 text-sm font-medium hover:bg-slate-50 transition-colors"
               >
-                취소
+                {t('submit.cancel')}
               </button>
               <button
                 type="button"
@@ -1341,7 +1401,7 @@ function DiagnoseContent() {
                 disabled={isLoading}
                 className="flex-1 bg-orange-500 hover:bg-orange-600 disabled:opacity-50 text-white font-bold py-3 px-6 rounded-xl transition-colors"
               >
-                {isLoading ? 'AI 분석 중...' : `${round}차 후속 추정 시작`}
+                {isLoading ? t('submit.analyzing') : `${round}${t('submit.followup')}`}
               </button>
             </div>
           </div>

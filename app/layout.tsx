@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import './globals.css';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
+import { LocaleProvider } from '@/contexts/LocaleContext';
 
 export const metadata: Metadata = {
   title: 'Mold Doctor AI — 사출 불량 트러블슈팅',
@@ -37,11 +38,13 @@ export default function RootLayout({
         <meta name="mobile-web-app-capable" content="yes" />
       </head>
       <body className="min-h-screen flex flex-col bg-[#07090F] text-white">
-        <Navbar />
-        <main className="flex-1">
-          {children}
-        </main>
-        <Footer />
+        <LocaleProvider>
+          <Navbar />
+          <main className="flex-1">
+            {children}
+          </main>
+          <Footer />
+        </LocaleProvider>
       </body>
     </html>
   );

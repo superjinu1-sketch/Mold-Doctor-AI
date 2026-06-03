@@ -295,12 +295,13 @@ NOTE — mold_analysis: 금형 도면/moldInfo가 제공된 경우에만 아래 
 mold_analysis (조건부): {"gate_assessment":"...", "cooling_assessment":"...", "design_risk_factors":["..."], "recommendations":["..."]}`;
 
 // buildSystemBlocks: returns [fixed(cached), variable] for cache_control
-function buildSystemBlocks(resinType: string, tier: 'simple' | 'complex' = 'simple', round: number = 1): Anthropic.TextBlockParam[] {
+function buildSystemBlocks(resinType: string, tier: 'simple' | 'complex' = 'simple', round: number = 1, locale: string = 'ko'): Anthropic.TextBlockParam[] {
   const resinNote = getResinKnowledge(resinType);
 
   const variableText = [
     `RESIN IN USE: ${resinType || 'Unknown'}`,
     `RESIN KNOWLEDGE:\n${resinNote}`,
+    locale === 'en' ? `\nOUTPUT LANGUAGE: English. ALL JSON field string values (summary, description, scientific_reasoning, evidence, elimination, verification, resin_specific_notes, drying_assessment, additional_advice, note fields, action/why fields, checklist items, gate_assessment, cooling_assessment, design_risk_factors, recommendations text) MUST be written in English. Use English technical terms. No Korean text in any output field value. Category names in English (e.g. Material, Machine, Mold, Method, Drying).` : '',
     tier === 'complex' ? `\nCOMPLEX CASE INSTRUCTIONS (복합 원인 케이스):
 이 케이스는 복합 원인 가능성이 높습니다.
 단순 원인(건조, 온도)으로 결론 내리지 마세요.
@@ -336,7 +337,7 @@ export async function POST(request: NextRequest) {
     const mock = tryMock(body); if (mock) return mock;
     const {
       defectType, defectDescription, resinInfo, settings, advSettings, moldInfo, productInfo, images, moldDrawings,
-      isFollowUp, previousDiagnosis, actionsTaken, changeDescription, round: bodyRound,
+      isFollowUp, previousDiagnosis, actionsTaken, changeDescription, round: bodyRound, locale,
     }: {
   defectType?: string; defectDescription?: string;
   resinInfo?: { resinType?: string; filler?: string; fillerContent?: string; flameRetardant?: string; flameRetardantThickness?: string; flameRetardantType?: string; resinDetail?: string; resinGrade?: string };
@@ -349,9 +350,11 @@ export async function POST(request: NextRequest) {
   actionsTaken?: { recommendation: string; done: boolean; result?: string }[];
   changeDescription?: string;
   round?: number;
+  locale?: string;
 } = body;
 
     const round = Number(bodyRound) || 1;
+    const outputLocale = locale === 'en' ? 'en' : 'ko';
 
     // Limit image arrays to prevent token overflow
     const rawImages = (images || []).slice(0, 5);
@@ -512,7 +515,7 @@ CRITICAL: Your entire response must be ONLY the JSON object. No text before or a
     const response = await client.messages.create({
       model: 'claude-sonnet-4-6',
       max_tokens: maxTokens,
-      system: buildSystemBlocks(resinInfo?.resinType || '', tier, round),
+      system: buildSystemBlocks(resinInfo?.resinType || '', tier, round, outputLocale),
       messages: [{ role: 'user', content: userContent }],
     });
 
