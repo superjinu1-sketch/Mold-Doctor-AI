@@ -681,28 +681,28 @@ function DiagnoseContent() {
     setFollowUpImages(prev => [...prev, ...valid].slice(0, 5));
   }, [processFile]);
 
-  const inputCls = "w-full bg-white/5 border border-white/10 rounded-lg px-3 py-3 text-base text-white placeholder:text-white/30 focus:outline-none focus:ring-2 focus:ring-[#00E887]/30 focus:border-[#00E887]/40 min-h-[var(--touch-min)]";
-  const labelCls = "block text-sm font-medium text-white/60 mb-1.5";
+  const inputCls = "w-full bg-surface-sunken border border-border rounded-lg px-3 py-3 text-base text-ink placeholder:text-faint focus:outline-none focus:ring-2 focus:ring-brand focus:border-[var(--brand-border)] min-h-[var(--touch-min)]";
+  const labelCls = "block text-sm font-medium text-muted mb-1.5";
   const settingInputCls = (key: string) => extractedFields.has(key)
-    ? "w-full bg-[#00E887]/10 border border-[#00E887]/40 rounded-lg px-3 py-3 text-base text-white placeholder:text-white/30 focus:outline-none focus:ring-2 focus:ring-[#00E887]/40 focus:border-[#00E887]/60 min-h-[var(--touch-min)]"
-    : "w-full bg-white/5 border border-white/10 rounded-lg px-3 py-3 text-base text-white placeholder:text-white/30 focus:outline-none focus:ring-2 focus:ring-[#00E887]/30 focus:border-[#00E887]/40 min-h-[var(--touch-min)]";
+    ? "w-full bg-brand-tint border border-[var(--brand-border)] rounded-lg px-3 py-3 text-base text-ink placeholder:text-faint focus:outline-none focus:ring-2 focus:ring-brand focus:border-[var(--brand-border)] min-h-[var(--touch-min)]"
+    : "w-full bg-surface-sunken border border-border rounded-lg px-3 py-3 text-base text-ink placeholder:text-faint focus:outline-none focus:ring-2 focus:ring-brand focus:border-[var(--brand-border)] min-h-[var(--touch-min)]";
 
   return (
     <div className="max-w-5xl mx-auto px-3 sm:px-4 py-6 sm:py-8">
       <div className="mb-8 flex items-start justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-white mb-2">{t('diagnose.title')}</h1>
-          <p className="text-white/60 text-base">{t('diagnose.subtitle')}</p>
+          <h1 className="text-3xl font-bold text-ink mb-2">{t('diagnose.title')}</h1>
+          <p className="text-muted text-base">{t('diagnose.subtitle')}</p>
         </div>
       </div>
 
       {/* Sample cases */}
-      <div className="mb-6 bg-white/[0.03] border border-white/8 rounded-xl p-4">
+      <div className="mb-6 bg-surface border border-border rounded-xl p-4">
         <div className="flex items-center gap-2 mb-3">
-          <svg className="w-4 h-4 text-[#00E887]/60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg className="w-4 h-4 text-brand-ink/60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
           </svg>
-          <span className="text-white/50 font-semibold text-sm">{t('diagnose.sample_title')}</span>
+          <span className="text-faint font-semibold text-sm">{t('diagnose.sample_title')}</span>
         </div>
         <div className="flex flex-wrap gap-2">
           {SAMPLE_CASES.map((c, i) => (
@@ -710,7 +710,7 @@ function DiagnoseContent() {
               key={i}
               type="button"
               onClick={() => loadSample(i)}
-              className="bg-white/5 hover:bg-[#00E887]/10 text-white/60 hover:text-[#00E887] border border-white/10 hover:border-[#00E887]/30 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors whitespace-nowrap min-h-[44px] flex items-center"
+              className="bg-surface-sunken hover:bg-brand-tint text-muted hover:text-brand-ink border border-border hover:border-[var(--brand-border)] px-3 py-2.5 rounded-lg text-sm font-medium transition-colors whitespace-nowrap min-h-[44px] flex items-center"
             >
               {c.label} — {t(c.defectTypeKey)}
             </button>
@@ -720,9 +720,9 @@ function DiagnoseContent() {
 
       <div className="space-y-6">
         {/* STEP 1: Defect Info */}
-        <section className="bg-white/[0.03] rounded-2xl p-4 sm:p-6 border border-white/8">
-          <h2 className="text-lg font-bold text-white mb-5 flex items-center gap-2">
-            <span className="bg-[#00E887] text-black w-7 h-7 rounded-full flex items-center justify-center text-sm font-bold">1</span>
+        <section className="bg-surface rounded-2xl p-4 sm:p-6 border border-border">
+          <h2 className="text-lg font-bold text-ink mb-5 flex items-center gap-2">
+            <span className="bg-brand text-on-brand w-7 h-7 rounded-full flex items-center justify-center text-sm font-bold">1</span>
             {t('step1.title')}
           </h2>
 
@@ -731,18 +731,18 @@ function DiagnoseContent() {
             <label className={labelCls}>{t('step1.photo_label')}</label>
             <div
               className={`border-2 border-dashed rounded-xl p-5 sm:p-8 text-center cursor-pointer transition-colors ${
-                isDragging ? 'border-[#00E887]/60 bg-[#00E887]/5' : 'border-white/10 hover:border-[#00E887]/40'
+                isDragging ? 'border-[var(--brand-border)] bg-brand-tint' : 'border-border hover:border-[var(--brand-border)]'
               }`}
               onDragOver={(e) => { e.preventDefault(); setIsDragging(true); }}
               onDragLeave={() => setIsDragging(false)}
               onDrop={handleDrop}
               onClick={() => fileInputRef.current?.click()}
             >
-              <svg className="w-10 h-10 mx-auto mb-3 text-white/20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-10 h-10 mx-auto mb-3 text-faint" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
               </svg>
-              <p className="text-white/50 font-medium">{t('step1.photo_drop')}</p>
-              <p className="text-white/25 text-sm mt-1">{t('step1.photo_hint')}</p>
+              <p className="text-faint font-medium">{t('step1.photo_drop')}</p>
+              <p className="text-faint text-sm mt-1">{t('step1.photo_hint')}</p>
               <input
                 ref={fileInputRef}
                 type="file"
@@ -758,11 +758,11 @@ function DiagnoseContent() {
                 {images.map((img) => (
                   <div key={img.id} className="relative">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img src={img.preview} alt={t('step1.photo_alt')} className="w-20 h-20 object-cover rounded-lg border border-slate-200" />
+                    <img src={img.preview} alt={t('step1.photo_alt')} className="w-20 h-20 object-cover rounded-lg border border-border" />
                     <button
                       type="button"
                       onClick={() => setImages(prev => prev.filter(i => i.id !== img.id))}
-                      className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs"
+                      className="absolute -top-2 -right-2 bg-danger text-ink rounded-full w-5 h-5 flex items-center justify-center text-xs"
                       aria-label={t('step1.photo_del')}
                     >×</button>
                   </div>
@@ -782,8 +782,8 @@ function DiagnoseContent() {
                   onClick={() => setDefectType(defectType === type ? '' : type)}
                   className={`px-3 py-3 rounded-lg text-sm font-medium text-left transition-all border min-h-[44px] flex items-center ${
                     defectType === type
-                      ? 'bg-[#059669] text-white border-[#059669]'
-                      : 'bg-white/5 text-white/70 border-white/15 hover:border-[#00E887]/40 hover:text-white'
+                      ? 'bg-brand text-on-brand border-[var(--brand-border)]'
+                      : 'bg-surface-sunken text-muted border-border hover:border-[var(--brand-border)] hover:text-ink'
                   }`}
                 >
                   {t(DEFECT_KEY_MAP[type] || type)}
@@ -810,14 +810,14 @@ function DiagnoseContent() {
               value={defectDescription}
               onChange={(e) => setDefectDescription(e.target.value)}
             />
-            <p className="mt-1.5 text-[length:var(--text-label)] text-white/50">{t('step1.desc_hint')}</p>
+            <p className="mt-1.5 text-[length:var(--text-label)] text-faint">{t('step1.desc_hint')}</p>
           </div>
         </section>
 
         {/* STEP 2: Resin Info */}
-        <section className="bg-white/[0.03] rounded-2xl p-4 sm:p-6 border border-white/8">
-          <h2 className="text-lg font-bold text-white mb-5 flex items-center gap-2">
-            <span className="bg-[#00E887] text-black w-7 h-7 rounded-full flex items-center justify-center text-sm font-bold">2</span>
+        <section className="bg-surface rounded-2xl p-4 sm:p-6 border border-border">
+          <h2 className="text-lg font-bold text-ink mb-5 flex items-center gap-2">
+            <span className="bg-brand text-on-brand w-7 h-7 rounded-full flex items-center justify-center text-sm font-bold">2</span>
             {t('step2.title')}
           </h2>
           <div className="grid sm:grid-cols-2 gap-4">
@@ -891,9 +891,9 @@ function DiagnoseContent() {
         </section>
 
         {/* STEP 3: Machine Settings */}
-        <section className="bg-white/[0.03] rounded-2xl p-4 sm:p-6 border border-white/8">
-          <h2 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
-            <span className="bg-[#00E887] text-black w-7 h-7 rounded-full flex items-center justify-center text-sm font-bold shrink-0">3</span>
+        <section className="bg-surface rounded-2xl p-4 sm:p-6 border border-border">
+          <h2 className="text-lg font-bold text-ink mb-4 flex items-center gap-2">
+            <span className="bg-brand text-on-brand w-7 h-7 rounded-full flex items-center justify-center text-sm font-bold shrink-0">3</span>
             {t('step3.title')}
           </h2>
 
@@ -903,7 +903,7 @@ function DiagnoseContent() {
               type="button"
               onClick={() => settingsImageRef.current?.click()}
               disabled={isExtractingSettings}
-              className="w-full flex items-center justify-center gap-3 bg-[#00E887] hover:bg-[#00E887]/90 active:bg-[#00E887]/80 disabled:bg-white/10 text-black disabled:text-white/30 font-bold text-base py-4 rounded-xl transition-colors shadow-[0_0_20px_rgba(0,232,135,0.15)] min-h-[56px]"
+              className="w-full flex items-center justify-center gap-3 bg-brand hover:bg-brand/90 active:bg-brand/80 disabled:bg-surface-sunken text-on-brand disabled:text-faint font-bold text-base py-4 rounded-xl transition-colors shadow-sm min-h-[56px]"
             >
               {isExtractingSettings ? (
                 <>
@@ -920,7 +920,7 @@ function DiagnoseContent() {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/>
                   </svg>
                   <span>{t('step3.camera_btn')}</span>
-                  <span className="text-black/50 text-sm font-normal hidden sm:inline">{t('step3.camera_btn_count')}</span>
+                  <span className="text-on-brand/50 text-sm font-normal hidden sm:inline">{t('step3.camera_btn_count')}</span>
                 </>
               )}
             </button>
@@ -933,13 +933,13 @@ function DiagnoseContent() {
               onChange={(e) => e.target.files?.[0] && handleSettingsImage(e.target.files[0])}
             />
             {extractMsg && (
-              <div className={`mt-2 text-sm px-4 py-3 rounded-xl flex items-start gap-2 ${extractMsg.startsWith('✓') ? 'bg-[#00E887]/10 border border-[#00E887]/20 text-[#00E887]' : 'bg-red-500/10 border border-red-500/20 text-red-400'}`}>
+              <div className={`mt-2 text-sm px-4 py-3 rounded-xl flex items-start gap-2 ${extractMsg.startsWith('✓') ? 'bg-brand-tint border border-[var(--brand-border)] text-brand-ink' : 'bg-[var(--danger-bg)] border border-[var(--danger-border)] text-danger'}`}>
                 <span className="shrink-0 mt-0.5">{extractMsg.startsWith('✓') ? '✓' : '!'}</span>
                 <span>{extractMsg.startsWith('✓') ? extractMsg.slice(2) : extractMsg}</span>
               </div>
             )}
             {extractedFields.size > 0 && (
-              <p className="mt-1.5 text-xs text-[#00E887]/60 text-center">{t('step3.extracted_hint')}</p>
+              <p className="mt-1.5 text-xs text-brand-ink/60 text-center">{t('step3.extracted_hint')}</p>
             )}
           </div>
           <div className="space-y-5">
@@ -948,7 +948,7 @@ function DiagnoseContent() {
               <div className="grid grid-cols-3 sm:grid-cols-5 gap-2">
                 {tempZones.map(({ key, label }) => (
                   <div key={key}>
-                    <div className={`text-xs mb-1 text-center ${extractedFields.has(key) ? 'text-[#00E887]/70 font-semibold' : 'text-white/40'}`}>{label}{extractedFields.has(key) && ' ✓'}</div>
+                    <div className={`text-xs mb-1 text-center ${extractedFields.has(key) ? 'text-brand-ink/70 font-semibold' : 'text-faint'}`}>{label}{extractedFields.has(key) && ' ✓'}</div>
                     <input type="text" inputMode="numeric" className={settingInputCls(key)} placeholder="℃" value={settings[key as keyof typeof settings]} onChange={(e) => setSetting(key, e.target.value)} />
                   </div>
                 ))}
@@ -959,7 +959,7 @@ function DiagnoseContent() {
               <div className="grid grid-cols-2 gap-2">
                 {moldTempFields.map(({ key, label }) => (
                   <div key={key}>
-                    <div className={`text-xs mb-1 ${extractedFields.has(key) ? 'text-[#00E887]/70 font-semibold' : 'text-white/40'}`}>{label}{extractedFields.has(key) && ' ✓'}</div>
+                    <div className={`text-xs mb-1 ${extractedFields.has(key) ? 'text-brand-ink/70 font-semibold' : 'text-faint'}`}>{label}{extractedFields.has(key) && ' ✓'}</div>
                     <input type="text" inputMode="numeric" className={settingInputCls(key)} placeholder="℃" value={settings[key as keyof typeof settings]} onChange={(e) => setSetting(key, e.target.value)} />
                   </div>
                 ))}
@@ -968,7 +968,7 @@ function DiagnoseContent() {
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
               {machineParams.map(({ key, label, placeholder }) => (
                 <div key={key}>
-                  <div className={`text-xs mb-1 ${extractedFields.has(key) ? 'text-[#00E887]/70 font-semibold' : 'text-white/40'}`}>{label}{extractedFields.has(key) && ' ✓'}</div>
+                  <div className={`text-xs mb-1 ${extractedFields.has(key) ? 'text-brand-ink/70 font-semibold' : 'text-faint'}`}>{label}{extractedFields.has(key) && ' ✓'}</div>
                   <input type="text" inputMode="numeric" className={settingInputCls(key)} placeholder={placeholder} value={settings[key as keyof typeof settings]} onChange={(e) => setSetting(key, e.target.value)} />
                 </div>
               ))}
@@ -980,7 +980,7 @@ function DiagnoseContent() {
             <button
               type="button"
               onClick={() => setShowAdvanced(!showAdvanced)}
-              className="flex items-center gap-2 text-sm font-medium text-slate-500 hover:text-slate-700 transition-colors"
+              className="flex items-center gap-2 text-sm font-medium text-muted hover:text-muted transition-colors"
             >
               <svg className={`w-4 h-4 transition-transform ${showAdvanced ? 'rotate-90' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
@@ -989,11 +989,11 @@ function DiagnoseContent() {
             </button>
 
             {showAdvanced && (
-              <div className="mt-4 space-y-5 border-t border-slate-100 pt-5">
+              <div className="mt-4 space-y-5 border-t border-border pt-5">
 
                 {/* V/P & Decomp */}
                 <div>
-                  <div className="text-[length:var(--text-label)] font-bold text-white/50 uppercase tracking-wider mb-3">{t('adv.vp_section')}</div>
+                  <div className="text-[length:var(--text-label)] font-bold text-faint uppercase tracking-wider mb-3">{t('adv.vp_section')}</div>
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                     {[
                       { key: 'vpTransferPos', label: t('adv.vp_pos'), placeholder: 'mm' },
@@ -1003,7 +1003,7 @@ function DiagnoseContent() {
                       { key: 'postMeterDecompDist', label: t('adv.decomp_post'), placeholder: 'mm' },
                     ].map(({ key, label, placeholder }) => (
                       <div key={key}>
-                        <div className="text-[length:var(--text-label)] text-white/50 mb-1">{label}</div>
+                        <div className="text-[length:var(--text-label)] text-faint mb-1">{label}</div>
                         <input type="text" inputMode="numeric" className={inputCls} placeholder={placeholder} value={advSettings[key as keyof typeof advSettings]} onChange={(e) => setAdvSetting(key, e.target.value)} />
                       </div>
                     ))}
@@ -1012,7 +1012,7 @@ function DiagnoseContent() {
 
                 {/* Actual measured values */}
                 <div>
-                  <div className="text-[length:var(--text-label)] font-bold text-white/50 uppercase tracking-wider mb-3">{t('adv.actual_section')}</div>
+                  <div className="text-[length:var(--text-label)] font-bold text-faint uppercase tracking-wider mb-3">{t('adv.actual_section')}</div>
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                     {[
                       { key: 'actualFillTime', label: t('adv.fill_time'), placeholder: 'sec' },
@@ -1022,7 +1022,7 @@ function DiagnoseContent() {
                       { key: 'actualPartWeight', label: t('adv.part_weight'), placeholder: 'g' },
                     ].map(({ key, label, placeholder }) => (
                       <div key={key}>
-                        <div className="text-[length:var(--text-label)] text-white/50 mb-1">{label}</div>
+                        <div className="text-[length:var(--text-label)] text-faint mb-1">{label}</div>
                         <input type="text" inputMode="numeric" className={inputCls} placeholder={placeholder} value={advSettings[key as keyof typeof advSettings]} onChange={(e) => setAdvSetting(key, e.target.value)} />
                       </div>
                     ))}
@@ -1031,18 +1031,18 @@ function DiagnoseContent() {
 
                 {/* Drying */}
                 <div>
-                  <div className="text-[length:var(--text-label)] font-bold text-white/50 uppercase tracking-wider mb-3">{t('adv.dry_section')}</div>
+                  <div className="text-[length:var(--text-label)] font-bold text-faint uppercase tracking-wider mb-3">{t('adv.dry_section')}</div>
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                     <div>
-                      <div className="text-xs text-slate-500 mb-1">{t('adv.dry_temp')}</div>
+                      <div className="text-xs text-muted mb-1">{t('adv.dry_temp')}</div>
                       <input type="text" inputMode="numeric" className={inputCls} placeholder="℃" value={advSettings.dryTemp} onChange={(e) => setAdvSetting('dryTemp', e.target.value)} />
                     </div>
                     <div>
-                      <div className="text-xs text-slate-500 mb-1">{t('adv.dry_time')}</div>
+                      <div className="text-xs text-muted mb-1">{t('adv.dry_time')}</div>
                       <input type="text" inputMode="numeric" className={inputCls} placeholder="hr" value={advSettings.dryTime} onChange={(e) => setAdvSetting('dryTime', e.target.value)} />
                     </div>
                     <div>
-                      <div className="text-xs text-slate-500 mb-1">{t('adv.dryer_type')}</div>
+                      <div className="text-xs text-muted mb-1">{t('adv.dryer_type')}</div>
                       <select className={inputCls} value={advSettings.dryerType} onChange={(e) => setAdvSetting('dryerType', e.target.value)}>
                         <option value="없음">{t('adv.dryer_none')}</option>
                         <option value="제습식">{t('adv.dryer_dehum')}</option>
@@ -1050,7 +1050,7 @@ function DiagnoseContent() {
                       </select>
                     </div>
                     <div>
-                      <div className="text-xs text-slate-500 mb-1">{t('adv.moisture')}</div>
+                      <div className="text-xs text-muted mb-1">{t('adv.moisture')}</div>
                       <input type="text" inputMode="numeric" className={inputCls} placeholder="%" value={advSettings.moistureContent} onChange={(e) => setAdvSetting('moistureContent', e.target.value)} />
                     </div>
                   </div>
@@ -1059,7 +1059,7 @@ function DiagnoseContent() {
                 {/* Hot runner (conditional) */}
                 {(moldType === '핫러너' || runnerType === '핫') && (
                   <div>
-                    <div className="text-[length:var(--text-label)] font-bold text-white/50 uppercase tracking-wider mb-3">{t('adv.hr_section')}</div>
+                    <div className="text-[length:var(--text-label)] font-bold text-faint uppercase tracking-wider mb-3">{t('adv.hr_section')}</div>
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                       {[
                         { key: 'hrManifoldTemp', label: t('adv.hr_manifold') },
@@ -1069,12 +1069,12 @@ function DiagnoseContent() {
                         { key: 'hrNozzle4Temp', label: t('adv.hr_nozzle4') },
                       ].map(({ key, label }) => (
                         <div key={key}>
-                          <div className="text-[length:var(--text-label)] text-white/50 mb-1">{label} (℃)</div>
+                          <div className="text-[length:var(--text-label)] text-faint mb-1">{label} (℃)</div>
                           <input type="text" inputMode="numeric" className={inputCls} placeholder="℃" value={advSettings[key as keyof typeof advSettings]} onChange={(e) => setAdvSetting(key, e.target.value)} />
                         </div>
                       ))}
                       <div>
-                        <div className="text-[length:var(--text-label)] text-white/50 mb-1">{t('adv.valve_gate')}</div>
+                        <div className="text-[length:var(--text-label)] text-faint mb-1">{t('adv.valve_gate')}</div>
                         <select className={inputCls} value={advSettings.valveGate} onChange={(e) => setAdvSetting('valveGate', e.target.value)}>
                           <option value="없음">{t('adv.valve_none')}</option>
                           <option value="있음">{t('adv.valve_yes')}</option>
@@ -1086,14 +1086,14 @@ function DiagnoseContent() {
 
                 {/* Regrind & Color */}
                 <div>
-                  <div className="text-[length:var(--text-label)] font-bold text-white/50 uppercase tracking-wider mb-3">{t('adv.regrind_section')}</div>
+                  <div className="text-[length:var(--text-label)] font-bold text-faint uppercase tracking-wider mb-3">{t('adv.regrind_section')}</div>
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                     <div>
-                      <div className="text-xs text-slate-500 mb-1">{t('adv.regrind_ratio')}</div>
+                      <div className="text-xs text-muted mb-1">{t('adv.regrind_ratio')}</div>
                       <input type="text" inputMode="numeric" className={inputCls} placeholder="%" value={advSettings.regrindRatio} onChange={(e) => setAdvSetting('regrindRatio', e.target.value)} />
                     </div>
                     <div>
-                      <div className="text-xs text-slate-500 mb-1">{t('adv.color_type')}</div>
+                      <div className="text-xs text-muted mb-1">{t('adv.color_type')}</div>
                       <select className={inputCls} value={advSettings.colorType} onChange={(e) => setAdvSetting('colorType', e.target.value)}>
                         <option value="없음">{t('adv.color_none')}</option>
                         <option value="마스터배치">{t('adv.color_mb')}</option>
@@ -1103,7 +1103,7 @@ function DiagnoseContent() {
                     </div>
                     {advSettings.colorType !== '없음' && (
                       <div>
-                        <div className="text-[length:var(--text-label)] text-white/50 mb-1">{t('adv.color_ratio')}</div>
+                        <div className="text-[length:var(--text-label)] text-faint mb-1">{t('adv.color_ratio')}</div>
                         <input type="text" inputMode="numeric" className={inputCls} placeholder="%" value={advSettings.mbRatio} onChange={(e) => setAdvSetting('mbRatio', e.target.value)} />
                       </div>
                     )}
@@ -1112,22 +1112,22 @@ function DiagnoseContent() {
 
                 {/* Machine info */}
                 <div>
-                  <div className="text-[length:var(--text-label)] font-bold text-white/50 uppercase tracking-wider mb-3">{t('adv.machine_section')}</div>
+                  <div className="text-[length:var(--text-label)] font-bold text-faint uppercase tracking-wider mb-3">{t('adv.machine_section')}</div>
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                     <div className="md:col-span-2">
-                      <div className="text-xs text-slate-500 mb-1">{t('adv.machine_model')}</div>
+                      <div className="text-xs text-muted mb-1">{t('adv.machine_model')}</div>
                       <input type="text" className={inputCls} placeholder={t('adv.machine_model_placeholder')} value={advSettings.machineModel} onChange={(e) => setAdvSetting('machineModel', e.target.value)} />
                     </div>
                     <div>
-                      <div className="text-xs text-slate-500 mb-1">{t('adv.screw_dia')}</div>
+                      <div className="text-xs text-muted mb-1">{t('adv.screw_dia')}</div>
                       <input type="text" inputMode="numeric" className={inputCls} placeholder="mm" value={advSettings.screwDiameter} onChange={(e) => setAdvSetting('screwDiameter', e.target.value)} />
                     </div>
                     <div>
-                      <div className="text-xs text-slate-500 mb-1">{t('adv.max_clamp')}</div>
+                      <div className="text-xs text-muted mb-1">{t('adv.max_clamp')}</div>
                       <input type="text" inputMode="numeric" className={inputCls} placeholder="ton" value={advSettings.maxClampForce} onChange={(e) => setAdvSetting('maxClampForce', e.target.value)} />
                     </div>
                     <div>
-                      <div className="text-xs text-slate-500 mb-1">{t('adv.max_pressure')}</div>
+                      <div className="text-xs text-muted mb-1">{t('adv.max_pressure')}</div>
                       <input type="text" inputMode="numeric" className={inputCls} placeholder="MPa" value={advSettings.maxInjPressure} onChange={(e) => setAdvSetting('maxInjPressure', e.target.value)} />
                     </div>
                   </div>
@@ -1139,9 +1139,9 @@ function DiagnoseContent() {
         </section>
 
         {/* STEP 4: Mold & Product Info */}
-        <section className="bg-white/[0.03] rounded-2xl p-4 sm:p-6 border border-white/8">
-          <h2 className="text-lg font-bold text-white mb-5 flex items-center gap-2">
-            <span className="bg-slate-400 text-white w-7 h-7 rounded-full flex items-center justify-center text-sm font-bold">4</span>
+        <section className="bg-surface rounded-2xl p-4 sm:p-6 border border-border">
+          <h2 className="text-lg font-bold text-ink mb-5 flex items-center gap-2">
+            <span className="bg-surface-sunken text-muted w-7 h-7 rounded-full flex items-center justify-center text-sm font-bold">4</span>
             {t('step4.title')}
           </h2>
           <div className="grid sm:grid-cols-2 gap-4">
@@ -1185,7 +1185,7 @@ function DiagnoseContent() {
               <label className={labelCls}>{t('step4.wall')}</label>
               <div className="flex gap-2 items-center">
                 <input type="text" inputMode="numeric" className={inputCls} placeholder={t('step4.wall_min')} value={wallThicknessMin} onChange={(e) => setWallThicknessMin(e.target.value)} />
-                <span className="text-slate-400">~</span>
+                <span className="text-faint">~</span>
                 <input type="text" inputMode="numeric" className={inputCls} placeholder={t('step4.wall_max')} value={wallThicknessMax} onChange={(e) => setWallThicknessMax(e.target.value)} />
               </div>
             </div>
@@ -1199,18 +1199,18 @@ function DiagnoseContent() {
               <label className={labelCls}>{t('step4.drawing_label')}</label>
               <div
                 className={`border-2 border-dashed rounded-xl p-4 sm:p-5 text-center cursor-pointer transition-colors ${
-                  isDraggingDrawing ? 'border-[#00E887]/60 bg-[#00E887]/5' : 'border-white/10 hover:border-[#00E887]/40'
+                  isDraggingDrawing ? 'border-[var(--brand-border)] bg-brand-tint' : 'border-border hover:border-[var(--brand-border)]'
                 }`}
                 onDragOver={(e) => { e.preventDefault(); setIsDraggingDrawing(true); }}
                 onDragLeave={() => setIsDraggingDrawing(false)}
                 onDrop={(e) => { e.preventDefault(); setIsDraggingDrawing(false); addMoldDrawings(e.dataTransfer.files); }}
                 onClick={() => moldDrawingInputRef.current?.click()}
               >
-                <svg className="w-8 h-8 mx-auto mb-2 text-white/20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-8 h-8 mx-auto mb-2 text-faint" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                 </svg>
-                <p className="text-white/60 text-sm font-medium">{t('step4.drawing_hint')}</p>
-                <p className="text-white/50 text-[length:var(--text-label)] mt-1">{t('step4.drawing_ai_hint')}</p>
+                <p className="text-muted text-sm font-medium">{t('step4.drawing_hint')}</p>
+                <p className="text-faint text-[length:var(--text-label)] mt-1">{t('step4.drawing_ai_hint')}</p>
                 <input
                   ref={moldDrawingInputRef}
                   type="file"
@@ -1223,18 +1223,18 @@ function DiagnoseContent() {
               {moldDrawings.length > 0 && (
                 <div className="flex gap-2 mt-2 flex-wrap">
                   {moldDrawings.map((d) => (
-                    <div key={d.id} className="relative flex items-center gap-2 bg-white/5 rounded-lg px-2 py-2 border border-white/10">
+                    <div key={d.id} className="relative flex items-center gap-2 bg-surface-sunken rounded-lg px-2 py-2 border border-border">
                       {d.preview ? (
                         // eslint-disable-next-line @next/next/no-img-element
                         <img src={d.preview} alt={t('step4.drawing_alt')} className="w-10 h-10 object-cover rounded" />
                       ) : (
-                        <div className="w-10 h-10 bg-red-500/20 rounded flex items-center justify-center text-xs font-bold text-red-400">PDF</div>
+                        <div className="w-10 h-10 bg-danger/20 rounded flex items-center justify-center text-xs font-bold text-danger">PDF</div>
                       )}
-                      <span className="text-[length:var(--text-label)] text-white/60 max-w-[80px] truncate">{d.file.name}</span>
+                      <span className="text-[length:var(--text-label)] text-muted max-w-[80px] truncate">{d.file.name}</span>
                       <button
                         type="button"
                         onClick={(e) => { e.stopPropagation(); setMoldDrawings(prev => prev.filter(x => x.id !== d.id)); }}
-                        className="ml-auto min-w-[44px] min-h-[44px] flex items-center justify-center text-white/40 hover:text-red-400 transition-colors"
+                        className="ml-auto min-w-[44px] min-h-[44px] flex items-center justify-center text-faint hover:text-danger transition-colors"
                         aria-label={t('step4.drawing_del')}
                       >×</button>
                     </div>
@@ -1250,7 +1250,7 @@ function DiagnoseContent() {
           type="button"
           onClick={handleDiagnose}
           disabled={isLoading}
-          className="w-full bg-[#00E887] hover:bg-[#00E887]/90 disabled:bg-white/10 disabled:text-white/30 text-black py-4 rounded-xl font-bold text-xl transition-colors shadow-lg flex items-center justify-center gap-3 min-h-[var(--touch-cta)]"
+          className="w-full bg-brand hover:bg-brand/90 disabled:bg-surface-sunken disabled:text-faint text-on-brand py-4 rounded-xl font-bold text-xl transition-colors shadow-lg flex items-center justify-center gap-3 min-h-[var(--touch-cta)]"
         >
           {isLoading ? (
             <>
@@ -1271,7 +1271,7 @@ function DiagnoseContent() {
         </button>
 
         {error && (
-          <div className="bg-red-500/10 border border-red-500/30 text-red-400 rounded-xl p-4 text-base">
+          <div className="bg-[var(--danger-bg)] border border-[var(--danger-border)] text-danger rounded-xl p-4 text-base">
             {error}
           </div>
         )}
@@ -1296,10 +1296,10 @@ function DiagnoseContent() {
         {showFollowUpForm && result &&
          result.defect_type?.en !== 'Image_Unreadable' &&
          result.defect_type?.en !== 'No_Defect_Detected' && (
-          <div ref={followUpFormRef} className="bg-white/[0.03] rounded-2xl p-4 sm:p-6 border-2 border-orange-500/40 space-y-5">
+          <div ref={followUpFormRef} className="bg-surface rounded-2xl p-4 sm:p-6 border-2 border-[var(--warn-border)] space-y-5">
             <div className="flex items-center gap-2 mb-1">
-              <span className="bg-orange-500 text-white text-xs font-bold px-2 py-1 rounded-full">{round}{t('followup.badge')}</span>
-              <h3 className="text-lg font-bold text-white">{t('followup.title')}</h3>
+              <span className="bg-warn text-ink text-xs font-bold px-2 py-1 rounded-full">{round}{t('followup.badge')}</span>
+              <h3 className="text-lg font-bold text-ink">{t('followup.title')}</h3>
             </div>
 
             {/* Action checklist */}
@@ -1307,19 +1307,19 @@ function DiagnoseContent() {
               <label className={labelCls}>{t('followup.actions_label')}</label>
               <div className="space-y-2 mt-1">
                 {followUpActions.map((action, i) => (
-                  <div key={i} className="border border-white/10 rounded-xl p-3">
+                  <div key={i} className="border border-border rounded-xl p-3">
                     <label className="flex items-start gap-3 cursor-pointer min-h-[44px] py-1">
                       <input
                         type="checkbox"
-                        className="mt-0.5 w-6 h-6 rounded accent-[#059669] shrink-0"
+                        className="mt-0.5 w-6 h-6 rounded accent-[var(--brand)] shrink-0"
                         checked={action.done}
                         onChange={() => setFollowUpActions(prev => prev.map((a, j) => j === i ? { ...a, done: !a.done } : a))}
                       />
-                      <span className={`text-base flex-1 leading-snug ${action.done ? 'text-white/80 font-medium' : 'text-white/60'}`}>{action.recommendation}</span>
+                      <span className={`text-base flex-1 leading-snug ${action.done ? 'text-muted font-medium' : 'text-muted'}`}>{action.recommendation}</span>
                     </label>
                     {action.done && (
                       <select
-                        className="mt-2 ml-9 text-base border border-white/15 rounded-lg px-3 py-2.5 bg-white/5 text-white min-h-[44px] w-full"
+                        className="mt-2 ml-9 text-base border border-border rounded-lg px-3 py-2.5 bg-surface-sunken text-ink min-h-[44px] w-full"
                         value={action.result}
                         onChange={(e) => setFollowUpActions(prev => prev.map((a, j) => j === i ? { ...a, result: e.target.value } : a))}
                       >
@@ -1362,7 +1362,7 @@ function DiagnoseContent() {
             <div>
               <label className={labelCls}>{t('followup.photo_label')}</label>
               <div
-                className="border-2 border-dashed border-white/20 rounded-xl p-4 text-center cursor-pointer hover:border-[#00E887]/50 transition-colors min-h-[80px] flex flex-col items-center justify-center"
+                className="border-2 border-dashed border-border-strong rounded-xl p-4 text-center cursor-pointer hover:border-[var(--brand-border)] transition-colors min-h-[80px] flex flex-col items-center justify-center"
                 onClick={() => {
                   const input = document.createElement('input');
                   input.type = 'file';
@@ -1375,7 +1375,7 @@ function DiagnoseContent() {
                   input.click();
                 }}
               >
-                <p className="text-base text-white/60">{t('followup.photo_click')}</p>
+                <p className="text-base text-muted">{t('followup.photo_click')}</p>
                 {followUpImages.length > 0 && (
                   <div className="flex gap-2 mt-2 justify-center flex-wrap">
                     {followUpImages.map(img => (
@@ -1385,7 +1385,7 @@ function DiagnoseContent() {
                         <button
                           type="button"
                           onClick={(e) => { e.stopPropagation(); setFollowUpImages(prev => prev.filter(i => i.id !== img.id)); }}
-                          className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white rounded-full text-xs flex items-center justify-center"
+                          className="absolute -top-1 -right-1 w-5 h-5 bg-danger text-ink rounded-full text-xs flex items-center justify-center"
                         >×</button>
                       </div>
                     ))}
@@ -1395,15 +1395,15 @@ function DiagnoseContent() {
             </div>
 
             {/* Settings hint */}
-            <div className="bg-white/5 rounded-xl p-3 border border-white/8">
-              <p className="text-[length:var(--text-label)] text-white/50 font-medium">{t('followup.settings_hint')}</p>
+            <div className="bg-surface-sunken rounded-xl p-3 border border-border">
+              <p className="text-[length:var(--text-label)] text-faint font-medium">{t('followup.settings_hint')}</p>
             </div>
 
             <div className="flex gap-3">
               <button
                 type="button"
                 onClick={() => { setShowFollowUpForm(false); setRound(prev => Math.max(1, prev - 1)); }}
-                className="px-4 py-3 rounded-xl border border-white/20 text-white/60 text-base font-medium hover:bg-white/5 transition-colors min-h-[var(--touch-cta)]"
+                className="px-4 py-3 rounded-xl border border-border-strong text-muted text-base font-medium hover:bg-surface-sunken transition-colors min-h-[var(--touch-cta)]"
               >
                 {t('submit.cancel')}
               </button>
@@ -1411,7 +1411,7 @@ function DiagnoseContent() {
                 type="button"
                 onClick={handleFollowUpSubmit}
                 disabled={isLoading}
-                className="flex-1 bg-orange-500 hover:bg-orange-600 disabled:opacity-50 text-white font-bold py-3 px-6 rounded-xl transition-colors min-h-[var(--touch-cta)] text-base"
+                className="flex-1 bg-warn hover:bg-orange-600 disabled:opacity-50 text-ink font-bold py-3 px-6 rounded-xl transition-colors min-h-[var(--touch-cta)] text-base"
               >
                 {isLoading ? t('submit.analyzing') : `${round}${t('submit.followup')}`}
               </button>
@@ -1425,7 +1425,7 @@ function DiagnoseContent() {
 
 export default function DiagnosePage() {
   return (
-    <Suspense fallback={<div className="flex items-center justify-center min-h-screen"><div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#059669]"></div></div>}>
+    <Suspense fallback={<div className="flex items-center justify-center min-h-screen"><div className="animate-spin rounded-full h-12 w-12 border-b-2 border-brand"></div></div>}>
       <DiagnoseContent />
     </Suspense>
   );

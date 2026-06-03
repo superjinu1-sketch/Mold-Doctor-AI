@@ -36,14 +36,14 @@ export default function RootLayout({
           rel="stylesheet"
           href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.css"
         />
-        <meta name="theme-color" content="#07090F" />
+        <meta name="theme-color" content="#F4F5F7" />
         <meta name="application-name" content="Mold Doctor AI" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
         <meta name="apple-mobile-web-app-title" content="MoldDoc" />
         <meta name="mobile-web-app-capable" content="yes" />
       </head>
-      <body className="min-h-screen flex flex-col bg-[#07090F] text-white">
+      <body className="min-h-screen flex flex-col bg-canvas text-ink">
         <LocaleProvider>
           <AuthProvider>
             <Navbar />
