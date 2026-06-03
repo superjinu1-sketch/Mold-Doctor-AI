@@ -134,6 +134,14 @@ const DEFECT_KEY_MAP: Record<string, string> = {
   '기타 (직접 입력)': 'defect.custom',
 };
 
+// English display labels for resin options that have Korean annotations
+// Values (keys) stay Korean for API compatibility; only the <option> display changes
+const RESIN_OPTION_EN_LABEL: Record<string, string> = {
+  'POM(아세탈)': 'POM (Acetal)',
+  'PI(폴리이미드)': 'PI (Polyimide)',
+  'PMMA(아크릴)': 'PMMA (Acrylic)',
+};
+
 const RESIN_OPTIONS = [
   { group: '폴리아미드 (나일론)', groupKey: 'resin.group.polyamide', options: ['PA6', 'PA66', 'PA46', 'PA410', 'PA4T', 'PA6T', 'PA9T', 'PA10T', 'PA12T', 'PA12', 'PA610', 'PA612', 'PA1010', 'PA6/66', 'MXD6'] },
   { group: '폴리에스터', groupKey: 'resin.group.polyester', options: ['PBT', 'PET', 'PCT', 'PEN'] },
@@ -825,7 +833,11 @@ function DiagnoseContent() {
                   <optgroup key={group.group} label={t(group.groupKey)}>
                     {group.options.map(opt => (
                       <option key={opt} value={opt}>
-                        {opt === '기타 (직접 입력)' ? t('resin.custom_option') : opt}
+                        {opt === '기타 (직접 입력)'
+                          ? t('resin.custom_option')
+                          : locale === 'en'
+                            ? (RESIN_OPTION_EN_LABEL[opt] ?? opt)
+                            : opt}
                       </option>
                     ))}
                   </optgroup>
