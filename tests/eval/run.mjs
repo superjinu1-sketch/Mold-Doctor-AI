@@ -232,7 +232,7 @@ trap_avoided는 hard case가 아니면 null. pass = score >= 70.`;
   try {
     const res = await withRetry(() => client.messages.create({
       model: 'claude-sonnet-4-6',
-      max_tokens: 400,
+      max_tokens: 700,
       messages: [{ role: 'user', content: prompt }],
     }), 'judge');
     const txt = res.content[0]?.type === 'text' ? res.content[0].text.trim() : '';
