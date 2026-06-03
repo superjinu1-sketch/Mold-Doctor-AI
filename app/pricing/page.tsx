@@ -59,7 +59,7 @@ const faqs = [
     qKo: '모바일에서도 사용 가능한가요?',
     qEn: 'Can I use it on mobile?',
     aKo: '네, 반응형 웹앱으로 스마트폰에서도 최적화되어 있습니다. 카메라로 불량 사진을 직접 촬영해서 업로드할 수 있습니다.',
-    aEn: 'Yes — it\'s a responsive web app optimized for smartphones. You can take defect photos directly with your camera and upload them.',
+    aEn: "Yes — it's a responsive web app optimized for smartphones. You can take defect photos directly with your camera and upload them.",
   },
   {
     qKo: '우리 회사 수지 데이터를 학습시킬 수 있나요?',
@@ -71,7 +71,7 @@ const faqs = [
     qKo: 'API 키는 어디서 발급받나요?',
     qEn: 'Where do I get an API key?',
     aKo: 'Anthropic의 console.anthropic.com에서 Claude API 키를 발급받으실 수 있습니다. API 키를 .env.local 파일에 입력하면 바로 사용 가능합니다.',
-    aEn: 'You can obtain a Claude API key from console.anthropic.com. Enter it in the .env.local file and you\'re ready to go immediately.',
+    aEn: "You can obtain a Claude API key from console.anthropic.com. Enter it in the .env.local file and you're ready to go immediately.",
   },
 ];
 
@@ -79,17 +79,17 @@ export default function PricingPage() {
   const { t, locale } = useLocale();
 
   return (
-    <div className="bg-[#07090F] min-h-screen px-4 sm:px-6 py-16">
+    <div className="bg-canvas min-h-screen px-4 sm:px-6 py-16">
       <div className="max-w-5xl mx-auto">
 
         {/* Header */}
         <div className="text-center mb-16">
-          <div className="inline-flex items-center gap-2 border border-[#00E887]/25 bg-[#00E887]/8 text-[#00E887] text-xs font-medium px-3.5 py-1.5 rounded-full mb-6">
-            <span className="w-1.5 h-1.5 bg-[#00E887] rounded-full" />
+          <div className="inline-flex items-center gap-2 border border-[var(--brand-border)] bg-brand-tint text-brand-ink text-xs font-medium px-3.5 py-1.5 rounded-full mb-6">
+            <span className="w-1.5 h-1.5 bg-brand rounded-full" />
             {t('pricing.badge')}
           </div>
-          <h1 className="text-4xl font-bold text-white mb-4">{t('pricing.h1')}</h1>
-          <p className="text-white/40 text-base">{t('pricing.sub')}</p>
+          <h1 className="text-4xl font-bold text-ink mb-4">{t('pricing.h1')}</h1>
+          <p className="text-muted text-base">{t('pricing.sub')}</p>
         </div>
 
         {/* Plans */}
@@ -105,42 +105,42 @@ export default function PricingPage() {
               <div key={plan.name}
                 className={`relative rounded-2xl overflow-hidden border transition-all ${
                   plan.recommended
-                    ? 'border-[#00E887]/40 bg-gradient-to-b from-[#00E887]/8 to-transparent shadow-[0_0_40px_rgba(0,232,135,0.08)] scale-[1.02]'
-                    : 'border-white/8 bg-white/[0.025] hover:border-white/15'
+                    ? 'border-brand bg-brand-tint shadow-sm scale-[1.02]'
+                    : 'border-border bg-surface hover:border-[var(--brand-border)]'
                 }`}>
                 {plan.recommended && (
-                  <div className="text-center bg-[#00E887] text-black text-xs font-black py-1.5 tracking-wider">
+                  <div className="text-center bg-brand text-on-brand text-xs font-black py-1.5 tracking-wider">
                     {t('pricing.recommended_badge')}
                   </div>
                 )}
                 <div className={`px-6 ${plan.recommended ? 'pt-6 pb-5' : 'pt-7 pb-5'}`}>
-                  <div className="text-xs font-bold text-white/30 uppercase tracking-widest mb-3">{plan.name}</div>
-                  <div className={`text-3xl font-bold mb-1 ${plan.recommended ? 'text-[#00E887]' : 'text-white'}`}>
+                  <div className="text-xs font-bold text-faint uppercase tracking-widest mb-3">{plan.name}</div>
+                  <div className={`text-3xl font-bold mb-1 ${plan.recommended ? 'text-brand-ink' : 'text-ink'}`}>
                     {price}
                   </div>
-                  <div className="text-xs text-white/25">{priceDetail}</div>
+                  <div className="text-xs text-faint">{priceDetail}</div>
                 </div>
 
                 <div className="px-6 pb-6">
                   <ul className="space-y-2.5 mb-6">
                     {features.map((feat) => (
-                      <li key={feat} className="flex items-start gap-2.5 text-sm text-white/70">
-                        <span className="text-[#00E887] shrink-0 mt-0.5">✓</span>
+                      <li key={feat} className="flex items-start gap-2.5 text-sm text-muted">
+                        <span className="text-brand-ink shrink-0 mt-0.5">✓</span>
                         {feat}
                       </li>
                     ))}
                     {notIncluded.map((feat) => (
-                      <li key={feat} className="flex items-start gap-2.5 text-sm text-white/20">
+                      <li key={feat} className="flex items-start gap-2.5 text-sm text-faint">
                         <span className="shrink-0 mt-0.5">–</span>
                         {feat}
                       </li>
                     ))}
                   </ul>
                   <Link href={plan.btnHref}
-                    className={`block w-full text-center py-3 rounded-xl font-bold text-sm transition-all ${
+                    className={`block w-full text-center py-3 rounded-xl font-bold text-sm transition-all min-h-[var(--touch-min)] flex items-center justify-center ${
                       plan.recommended
-                        ? 'bg-[#00E887] text-black hover:bg-[#00E887]/90 shadow-[0_0_20px_rgba(0,232,135,0.2)]'
-                        : 'border border-white/10 text-white/60 hover:bg-white/5 hover:text-white'
+                        ? 'bg-brand text-on-brand hover:bg-brand-ink shadow-sm'
+                        : 'border border-border-strong text-muted hover:bg-surface-sunken hover:text-ink'
                     }`}>
                     {btnText}
                   </Link>
@@ -152,23 +152,23 @@ export default function PricingPage() {
 
         {/* FAQ */}
         <div className="max-w-2xl mx-auto mb-20">
-          <h2 className="text-xl font-bold text-white text-center mb-8">{t('pricing.faq_h2')}</h2>
+          <h2 className="text-xl font-bold text-ink text-center mb-8">{t('pricing.faq_h2')}</h2>
           <div className="space-y-3">
             {faqs.map((faq, i) => (
-              <div key={i} className="bg-white/[0.03] border border-white/8 rounded-xl p-5">
-                <h3 className="font-semibold text-white/80 text-sm mb-2">Q. {locale === 'en' ? faq.qEn : faq.qKo}</h3>
-                <p className="text-white/35 text-sm leading-relaxed">A. {locale === 'en' ? faq.aEn : faq.aKo}</p>
+              <div key={i} className="bg-surface border border-border rounded-xl p-5">
+                <h3 className="font-semibold text-ink text-sm mb-2">Q. {locale === 'en' ? faq.qEn : faq.qKo}</h3>
+                <p className="text-muted text-sm leading-relaxed">A. {locale === 'en' ? faq.aEn : faq.aKo}</p>
               </div>
             ))}
           </div>
         </div>
 
         {/* CTA */}
-        <div className="bg-white/[0.025] border border-white/8 rounded-2xl p-10 text-center">
-          <h2 className="text-2xl font-bold text-white mb-3">{t('pricing.cta_h2')}</h2>
-          <p className="text-white/30 text-sm mb-6">{t('pricing.cta_sub')}</p>
+        <div className="bg-surface border border-border rounded-2xl p-10 text-center">
+          <h2 className="text-2xl font-bold text-ink mb-3">{t('pricing.cta_h2')}</h2>
+          <p className="text-muted text-sm mb-6">{t('pricing.cta_sub')}</p>
           <Link href="/diagnose"
-            className="inline-block bg-[#00E887] text-black px-8 py-3.5 rounded-full font-bold text-sm hover:bg-[#00E887]/90 transition-all shadow-[0_0_30px_rgba(0,232,135,0.2)]">
+            className="inline-block bg-brand text-on-brand px-8 py-3.5 rounded-full font-bold text-sm hover:bg-brand-ink transition-all shadow-sm">
             {t('pricing.cta_btn')}
           </Link>
         </div>
