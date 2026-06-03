@@ -1,17 +1,37 @@
 @import "tailwindcss";
 
-/* ─── Design Tokens: Color (DO NOT CHANGE) ───────────────────────────────── */
+/* ─── Design Tokens: Color ───────────────────────────────────────────────── */
 :root {
-  --background: #07090F;
-  --foreground: #ffffff;
-  --accent:     #00E887;
-  --surface:    rgba(255,255,255,0.03);
-  --border:     rgba(255,255,255,0.07);
+  /* Canvas & Surface */
+  --canvas:          #F4F5F7;
+  --surface:         #FFFFFF;
+  --surface-solid:   #FFFFFF;
+  --surface-sunken:  #EEF1F5;
+  --border:          #E3E6EA;
+  --border-strong:   #D0D5DD;
+
+  /* Ink (text) */
+  --ink:   #14171C;
+  --muted: #45505B;
+  --faint: #6B7280;
+
+  /* Brand — Industrial Blue */
+  --brand:        #1E5FA5;
+  --brand-ink:    #0C447C;
+  --brand-tint:   #E6F1FB;
+  --brand-border: #B5D4F4;
+  --on-brand:     #FFFFFF;
 
   /* Semantic severity */
-  --color-ok:      #00E887;  /* accent — normal / resolved */
-  --color-warn:    #F59E0B;  /* amber  — caution */
-  --color-danger:  #EF4444;  /* red    — error / critical */
+  --ok:          #047857;
+  --ok-bg:       #E1F5EE;
+  --ok-border:   #9FE1CB;
+  --warn:        #854F0B;
+  --warn-bg:     #FAEEDA;
+  --warn-border: #FAC775;
+  --danger:      #B42318;
+  --danger-bg:   #FCEBEB;
+  --danger-border: #F7C1C1;
 
   /* ── Typography scale ───────────────────────────────────────────────── */
   --text-display: 2.75rem;   /* 44px — hero headline */
@@ -21,8 +41,8 @@
   --text-body:    1.0625rem; /* 17px — minimum for body copy */
   --text-label:   0.8125rem; /* 13px — labels, tags, captions only */
 
-  --leading-tight: 1.2;      /* headlines */
-  --leading-body:  1.6;      /* body copy */
+  --leading-tight: 1.2;
+  --leading-body:  1.6;
 
   /* ── Spacing scale ──────────────────────────────────────────────────── */
   --space-xs:  0.25rem;   /*  4px */
@@ -33,35 +53,52 @@
   --space-2xl: 4rem;      /* 64px */
 
   /* ── Touch targets ──────────────────────────────────────────────────── */
-  --touch-min: 2.75rem;   /* 44px — absolute minimum */
-  --touch-cta: 3rem;      /* 48px — CTA buttons */
+  --touch-min: 2.75rem;   /* 44px */
+  --touch-cta: 3rem;      /* 48px */
 
   /* ── Radius ─────────────────────────────────────────────────────────── */
-  --radius-sm:   0.375rem; /*  6px */
-  --radius-md:   0.75rem;  /* 12px */
-  --radius-lg:   1.25rem;  /* 20px */
+  --radius-sm:   0.375rem;
+  --radius-md:   0.75rem;
+  --radius-lg:   1.25rem;
   --radius-full: 9999px;
 
   /* ── Motion ─────────────────────────────────────────────────────────── */
-  --ease-apple:    cubic-bezier(0.32, 0.72, 0,    1);
-  --ease-out:      cubic-bezier(0.16, 1,    0.3,  1);
+  --ease-apple:    cubic-bezier(0.32, 0.72, 0,   1);
+  --ease-out:      cubic-bezier(0.16, 1,    0.3, 1);
   --duration-fast: 150ms;
   --duration-mid:  240ms;
   --duration-slow: 320ms;
 }
 
-/* ─── Tailwind v4 @theme (font + color aliases) ──────────────────────────── */
+/* ─── Tailwind v4 @theme ─────────────────────────────────────────────────── */
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground:  var(--foreground);
+  /* Font */
   --font-sans: 'Pretendard Variable', Pretendard, -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
   --font-mono: ui-monospace, 'Cascadia Code', 'Source Code Pro', Menlo, Consolas, monospace;
+
+  /* Color utility aliases */
+  --color-canvas:          var(--canvas);
+  --color-surface:         var(--surface);
+  --color-surface-solid:   var(--surface-solid);
+  --color-surface-sunken:  var(--surface-sunken);
+  --color-border:          var(--border);
+  --color-border-strong:   var(--border-strong);
+  --color-ink:             var(--ink);
+  --color-muted:           var(--muted);
+  --color-faint:           var(--faint);
+  --color-brand:           var(--brand);
+  --color-brand-ink:       var(--brand-ink);
+  --color-brand-tint:      var(--brand-tint);
+  --color-on-brand:        var(--on-brand);
+  --color-ok:              var(--ok);
+  --color-warn:            var(--warn);
+  --color-danger:          var(--danger);
 }
 
 /* ─── Base ───────────────────────────────────────────────────────────────── */
 body {
-  background:  var(--background);
-  color:       var(--foreground);
+  background:  var(--canvas);
+  color:       var(--ink);
   font-family: var(--font-sans);
   font-size:   var(--text-body);
   line-height: var(--leading-body);
@@ -71,5 +108,5 @@ body {
 /* ─── Scrollbar ──────────────────────────────────────────────────────────── */
 ::-webkit-scrollbar        { width: 6px; height: 6px; }
 ::-webkit-scrollbar-track  { background: transparent; }
-::-webkit-scrollbar-thumb  { background: rgba(255,255,255,0.10); border-radius: 3px; }
-::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.20); }
+::-webkit-scrollbar-thumb  { background: var(--border-strong); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--muted); opacity: 0.4; }
