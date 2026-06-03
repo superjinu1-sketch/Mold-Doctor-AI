@@ -127,9 +127,9 @@ function CauseCard({ cause }: { cause: CauseItem }) {
           <span className={`shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold text-white ${rankColor}`}>
             {cause.rank}
           </span>
-          <span className="font-semibold text-white/80 text-sm sm:text-base">{cause.description}</span>
+          <span className="font-semibold text-white/90 text-base sm:text-lg">{cause.description}</span>
         </div>
-        <span className={`shrink-0 text-sm font-bold px-2 py-1 rounded ${rankBg}`}>{cause.probability}%</span>
+        <span className={`shrink-0 text-xl font-bold px-3 py-1 rounded ${rankBg}`}>{cause.probability}%</span>
       </div>
       <div className="w-full bg-white/10 rounded-full h-2 mb-3">
         <div className={`h-2 rounded-full ${rankColor}`} style={{ width: `${cause.probability}%` }} />
@@ -142,16 +142,16 @@ function CauseCard({ cause }: { cause: CauseItem }) {
               <button
                 type="button"
                 onClick={() => toggle(key)}
-                className={`w-full flex items-center justify-between px-3 py-2 text-xs font-semibold transition-colors ${headerCls}`}
+                className={`w-full flex items-center justify-between px-3 py-2.5 text-sm font-semibold transition-colors min-h-[44px] ${headerCls}`}
               >
                 <span className="flex items-center gap-1.5">
                   <span>{icon}</span>
                   <span>{label}</span>
                 </span>
-                <span className={`text-xs transition-transform inline-block ${openPanel === key ? 'rotate-180' : ''}`}>▾</span>
+                <span className={`text-sm transition-transform inline-block ${openPanel === key ? 'rotate-180' : ''}`}>▾</span>
               </button>
               {openPanel === key && (
-                <div className={`px-3 py-2.5 text-xs leading-relaxed border-x border-b rounded-b-lg ${bodyCls}`}>
+                <div className={`px-3 py-3 text-sm leading-relaxed border-x border-b rounded-b-lg ${bodyCls}`}>
                   {value}
                 </div>
               )}
@@ -238,7 +238,7 @@ function ChatSection({
               key={i}
               type="button"
               onClick={() => sendChat(q)}
-              className="text-xs bg-white/5 hover:bg-white/10 text-white/50 border border-white/10 px-3 py-1.5 rounded-full transition-colors text-left"
+              className="text-sm bg-white/5 hover:bg-white/10 text-white/60 border border-white/10 px-3 py-2.5 rounded-full transition-colors text-left min-h-[44px] flex items-center"
             >
               {q.length > 40 ? q.slice(0, 40) + '…' : q}
             </button>
@@ -260,13 +260,13 @@ function ChatSection({
               onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendChat(chatInput); } }}
               placeholder={t('chat.placeholder')}
               disabled={isChatLoading}
-              className="flex-1 text-sm bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-white placeholder:text-white/20 focus:outline-none focus:ring-2 focus:ring-[#00E887]/30 focus:border-[#00E887]/40 disabled:opacity-50"
+              className="flex-1 text-base bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder:text-white/30 focus:outline-none focus:ring-2 focus:ring-[#00E887]/30 focus:border-[#00E887]/40 disabled:opacity-50 min-h-[var(--touch-min)]"
             />
             <button
               type="button"
               onClick={() => sendChat(chatInput)}
               disabled={isChatLoading || !chatInput.trim()}
-              className="shrink-0 bg-[#00E887] hover:bg-[#00E887]/90 disabled:bg-white/10 disabled:cursor-not-allowed text-black disabled:text-white/20 px-4 py-2.5 rounded-xl text-sm font-bold transition-colors"
+              className="shrink-0 bg-[#00E887] hover:bg-[#00E887]/90 disabled:bg-white/10 disabled:cursor-not-allowed text-black disabled:text-white/20 px-4 py-3 rounded-xl text-base font-bold transition-colors min-h-[var(--touch-min)]"
             >
               {isChatLoading ? '…' : t('chat.send')}
             </button>
@@ -387,13 +387,13 @@ export default function DiagnosisResultPanel({ result, onSavePDF, round = 1, fol
       <div className="bg-[#0D1117] border border-amber-500/30 rounded-2xl p-6 sm:p-8 text-center space-y-4">
         <div className="text-5xl">📷</div>
         <h2 className="text-lg font-bold text-amber-400">{t('fallback.unreadable_title')}</h2>
-        <p className="text-white/60 text-sm leading-relaxed">
+        <p className="text-white/70 text-base leading-relaxed">
           {t('fallback.unreadable_body')}<br />
           {t('fallback.unreadable_detail')}
         </p>
-        <p className="text-white/30 text-xs">{summary}</p>
+        <p className="text-white/50 text-[length:var(--text-label)]">{summary}</p>
         <button type="button" onClick={onResolved}
-          className="mx-auto mt-2 flex items-center gap-2 bg-amber-500/15 hover:bg-amber-500/20 text-amber-300 border border-amber-500/30 px-5 py-2.5 rounded-xl text-sm font-bold transition-colors">
+          className="mx-auto mt-2 flex items-center gap-2 bg-amber-500/15 hover:bg-amber-500/20 text-amber-300 border border-amber-500/30 px-5 py-3 rounded-xl text-base font-bold transition-colors min-h-[var(--touch-cta)]">
           {t('fallback.unreadable_btn')}
         </button>
       </div>
@@ -406,12 +406,12 @@ export default function DiagnosisResultPanel({ result, onSavePDF, round = 1, fol
       <div className="bg-[#0D1117] border border-[#00E887]/20 rounded-2xl p-6 sm:p-8 text-center space-y-4">
         <div className="text-5xl">✅</div>
         <h2 className="text-lg font-bold text-[#00E887]">{t('fallback.nodefect_title')}</h2>
-        <p className="text-white/60 text-sm leading-relaxed">
+        <p className="text-white/70 text-base leading-relaxed">
           {t('fallback.nodefect_body')}
         </p>
-        <p className="text-white/30 text-xs">{summary}</p>
+        <p className="text-white/50 text-[length:var(--text-label)]">{summary}</p>
         <button type="button" onClick={onResolved}
-          className="mx-auto mt-2 flex items-center gap-2 bg-[#00E887]/10 hover:bg-[#00E887]/15 text-[#00E887] border border-[#00E887]/30 px-5 py-2.5 rounded-xl text-sm font-bold transition-colors">
+          className="mx-auto mt-2 flex items-center gap-2 bg-[#00E887]/10 hover:bg-[#00E887]/15 text-[#00E887] border border-[#00E887]/30 px-5 py-3 rounded-xl text-base font-bold transition-colors min-h-[var(--touch-cta)]">
           {t('fallback.nodefect_btn')}
         </button>
       </div>
@@ -443,7 +443,7 @@ export default function DiagnosisResultPanel({ result, onSavePDF, round = 1, fol
           {defectTypeMain && (
             <div className="mb-3">
               <span className="text-white font-bold text-lg">{defectTypeMain}</span>
-              {defectTypeSub && <span className="text-white/40 text-sm ml-2">({defectTypeSub})</span>}
+              {defectTypeSub && <span className="text-white/60 text-sm ml-2">({defectTypeSub})</span>}
             </div>
           )}
           {extractedSummary && (
@@ -452,10 +452,10 @@ export default function DiagnosisResultPanel({ result, onSavePDF, round = 1, fol
             </p>
           )}
           {extractedCause && (
-            <p className="text-white/50 text-xs px-3">{t('fallback.parse_cause_prefix')}{extractedCause}</p>
+            <p className="text-white/60 text-[length:var(--text-label)] px-3">{t('fallback.parse_cause_prefix')}{extractedCause}</p>
           )}
 
-          <p className="text-white/30 text-xs mt-4">{t('fallback.parse_body')}</p>
+          <p className="text-white/60 text-[length:var(--text-label)] mt-4">{t('fallback.parse_body')}</p>
         </div>
 
         <button
@@ -527,9 +527,9 @@ export default function DiagnosisResultPanel({ result, onSavePDF, round = 1, fol
       <div className="bg-white/[0.03] rounded-2xl p-4 sm:p-6 border border-white/8">
         <div className="flex flex-wrap items-start justify-between gap-3 mb-4">
           <div>
-            <h2 className="text-xl sm:text-2xl font-bold text-white">
+            <h2 className="text-[length:var(--text-h2)] sm:text-[length:var(--text-h1)] font-bold text-white leading-tight">
               {defectTypeMain}
-              {defectTypeSub && <span className="text-white/30 text-sm sm:text-base font-normal ml-2">({defectTypeSub})</span>}
+              {defectTypeSub && <span className="text-white/50 text-base font-normal ml-2">({defectTypeSub})</span>}
             </h2>
             <div className="flex items-center gap-3 mt-2 flex-wrap">
               <SeverityBadge severity={severity} />
@@ -543,7 +543,7 @@ export default function DiagnosisResultPanel({ result, onSavePDF, round = 1, fol
           <button
             type="button"
             onClick={onSavePDF}
-            className="flex items-center gap-2 bg-white/10 hover:bg-white/15 text-white px-3 py-2 rounded-lg text-sm font-medium transition-colors whitespace-nowrap"
+            className="flex items-center gap-2 bg-white/10 hover:bg-white/15 text-white px-3 py-2.5 rounded-lg text-base font-medium transition-colors whitespace-nowrap min-h-[44px]"
           >
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
@@ -606,8 +606,8 @@ export default function DiagnosisResultPanel({ result, onSavePDF, round = 1, fol
                     {item.step}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-white font-semibold text-sm leading-snug">{item.action}</p>
-                    <p className="text-white/40 text-xs mt-1">{item.why}</p>
+                    <p className="text-white font-semibold text-base leading-snug">{item.action}</p>
+                    <p className="text-white/60 text-[length:var(--text-label)] mt-1">{item.why}</p>
                   </div>
                 </div>
               );
@@ -649,7 +649,7 @@ export default function DiagnosisResultPanel({ result, onSavePDF, round = 1, fol
                   return (
                     <tr key={i} className={changed ? 'bg-amber-500/5' : ''}>
                       <td className="px-4 py-3 font-medium text-white/70">{rec.parameter}</td>
-                      <td className="px-4 py-3 text-center text-white/40">{rec.current || '-'}</td>
+                      <td className="px-4 py-3 text-center text-white/60">{rec.current || '-'}</td>
                       <td className="px-4 py-3 text-center font-bold text-white">
                         <span className="flex items-center justify-center gap-1">
                           <DirectionArrow direction={rec.direction} />
@@ -675,21 +675,21 @@ export default function DiagnosisResultPanel({ result, onSavePDF, round = 1, fol
                   </div>
                   <div className="flex items-center gap-3 mb-2">
                     <div className="flex-1 text-center bg-white/5 rounded-lg p-2 border border-white/10">
-                      <div className="text-xs text-white/30 mb-0.5">{t('rec.col_current')}</div>
-                      <div className="text-sm text-white/50 font-medium">{rec.current || '-'}</div>
+                      <div className="text-[length:var(--text-label)] text-white/50 mb-0.5">{t('rec.col_current')}</div>
+                      <div className="text-base text-white/70 font-medium">{rec.current || '-'}</div>
                     </div>
-                    <div className="text-white/20">→</div>
+                    <div className="text-white/40">→</div>
                     <div className="flex-1 text-center bg-white/5 rounded-lg p-2 border border-[#00E887]/30">
-                      <div className="text-xs text-white/30 mb-0.5">{t('rec.col_recommended')}</div>
-                      <div className="text-sm font-bold text-white flex items-center justify-center gap-1">
+                      <div className="text-[length:var(--text-label)] text-white/50 mb-0.5">{t('rec.col_recommended')}</div>
+                      <div className="text-base font-bold text-white flex items-center justify-center gap-1">
                         <DirectionArrow direction={rec.direction} />
                         {rec.recommended}
                       </div>
                     </div>
                   </div>
-                  <p className="text-xs text-white/40 mb-1">{rec.reason}</p>
-                  {rec.expected_result && <p className="text-xs text-[#00E887] bg-[#00E887]/10 rounded px-2 py-1">{t('rec.expected_prefix')}{rec.expected_result}</p>}
-                  {rec.risk && <p className="text-xs text-amber-400 bg-amber-500/10 rounded px-2 py-1 mt-1">{t('rec.risk_prefix')}{rec.risk}</p>}
+                  <p className="text-[length:var(--text-label)] text-white/60 mb-1">{rec.reason}</p>
+                  {rec.expected_result && <p className="text-[length:var(--text-label)] text-white/80 bg-[#00E887]/10 rounded px-2 py-1">{t('rec.expected_prefix')}{rec.expected_result}</p>}
+                  {rec.risk && <p className="text-[length:var(--text-label)] text-amber-300 bg-amber-500/10 rounded px-2 py-1 mt-1">{t('rec.risk_prefix')}{rec.risk}</p>}
                 </div>
               );
             })}
@@ -703,9 +703,9 @@ export default function DiagnosisResultPanel({ result, onSavePDF, round = 1, fol
         {Array.isArray(checklist) ? (
           <div className="space-y-2">
             {(checklist as string[]).map((item, i) => (
-              <label key={i} className={`flex items-start gap-3 cursor-pointer p-3 rounded-lg transition-colors ${checkedItems.has(i) ? 'bg-[#00E887]/5 line-through text-white/25' : 'hover:bg-white/5'}`}>
-                <input type="checkbox" className="mt-0.5 w-5 h-5 rounded accent-[#00E887]" checked={checkedItems.has(i)} onChange={() => toggleCheck(i)} />
-                <span className="text-sm text-white/70">{item}</span>
+              <label key={i} className={`flex items-start gap-3 cursor-pointer px-3 py-2.5 rounded-lg transition-colors min-h-[44px] ${checkedItems.has(i) ? 'bg-[#00E887]/5 line-through text-white/30' : 'hover:bg-white/5'}`}>
+                <input type="checkbox" className="mt-0.5 w-6 h-6 rounded accent-[#00E887] shrink-0" checked={checkedItems.has(i)} onChange={() => toggleCheck(i)} />
+                <span className="text-base text-white/80">{item}</span>
               </label>
             ))}
           </div>
@@ -723,7 +723,7 @@ export default function DiagnosisResultPanel({ result, onSavePDF, round = 1, fol
                   <div className={`text-xs font-bold uppercase tracking-wider mb-2 ${color}`}>{label}</div>
                   <div className="space-y-1">
                     {items.map((item, i) => (
-                      <div key={i} className="flex items-start gap-2 text-sm text-white/70">
+                      <div key={i} className="flex items-start gap-2 text-base text-white/80">
                         <span className={`shrink-0 font-bold ${color}`}>·</span>
                         <span>{item}</span>
                       </div>
@@ -749,13 +749,13 @@ export default function DiagnosisResultPanel({ result, onSavePDF, round = 1, fol
             {result.mold_analysis.gate_assessment && (
               <div className="bg-purple-500/10 rounded-xl p-3 border border-purple-500/20">
                 <div className="text-xs font-bold text-purple-400 uppercase tracking-wider mb-1">{t('mold.gate')}</div>
-                <p className="text-sm text-white/70">{result.mold_analysis.gate_assessment}</p>
+                <p className="text-base text-white/80">{result.mold_analysis.gate_assessment}</p>
               </div>
             )}
             {result.mold_analysis.cooling_assessment && (
               <div className="bg-blue-500/10 rounded-xl p-3 border border-blue-500/20">
                 <div className="text-xs font-bold text-blue-400 uppercase tracking-wider mb-1">{t('mold.cooling')}</div>
-                <p className="text-sm text-white/70">{result.mold_analysis.cooling_assessment}</p>
+                <p className="text-base text-white/80">{result.mold_analysis.cooling_assessment}</p>
               </div>
             )}
             {(result.mold_analysis.design_risk_factors?.length ?? 0) > 0 && (
@@ -794,19 +794,19 @@ export default function DiagnosisResultPanel({ result, onSavePDF, round = 1, fol
           {result?.resin_specific_notes && (
             <div>
               <h3 className="font-bold text-[#00E887] mb-2">{t('notes.resin')}</h3>
-              <p className="text-white/60 text-sm leading-relaxed">{result.resin_specific_notes}</p>
+              <p className="text-white/80 text-base leading-relaxed">{result.resin_specific_notes}</p>
             </div>
           )}
           {result?.drying_assessment && (
             <div>
               <h3 className="font-bold text-blue-400 mb-2">{t('notes.drying')}</h3>
-              <p className="text-white/60 text-sm leading-relaxed">{result.drying_assessment}</p>
+              <p className="text-white/80 text-base leading-relaxed">{result.drying_assessment}</p>
             </div>
           )}
           {result?.additional_advice && (
             <div>
               <h3 className="font-bold text-amber-400 mb-2">{t('notes.advice')}</h3>
-              <p className="text-white/60 text-sm leading-relaxed">{result.additional_advice}</p>
+              <p className="text-white/80 text-base leading-relaxed">{result.additional_advice}</p>
             </div>
           )}
         </div>
@@ -814,12 +814,12 @@ export default function DiagnosisResultPanel({ result, onSavePDF, round = 1, fol
 
       {/* Follow-up Actions */}
       <div className="bg-white/[0.03] rounded-2xl p-4 sm:p-6 border border-white/8">
-        <div className="text-sm font-bold text-white/40 mb-3">{t('action.prompt')}</div>
+        <div className="text-base font-bold text-white/60 mb-3">{t('action.prompt')}</div>
         <div className="flex flex-col sm:flex-row gap-3">
           <button
             type="button"
             onClick={onResolved}
-            className="flex-1 flex items-center justify-center gap-2 bg-[#00E887]/10 hover:bg-[#00E887]/15 text-[#00E887] border border-[#00E887]/30 px-4 py-3 rounded-xl text-sm font-bold transition-colors"
+            className="flex-1 flex items-center justify-center gap-2 bg-[#00E887]/10 hover:bg-[#00E887]/15 text-[#00E887] border border-[#00E887]/30 px-4 py-3 rounded-xl text-base font-bold transition-colors min-h-[var(--touch-cta)]"
           >
             <span className="text-lg">✓</span>
             {t('action.resolved')}
@@ -827,7 +827,7 @@ export default function DiagnosisResultPanel({ result, onSavePDF, round = 1, fol
           <button
             type="button"
             onClick={onStartFollowUp}
-            className="flex-1 flex items-center justify-center gap-2 bg-amber-500/10 hover:bg-amber-500/15 text-amber-400 border border-amber-500/30 px-4 py-3 rounded-xl text-sm font-bold transition-colors"
+            className="flex-1 flex items-center justify-center gap-2 bg-amber-500/10 hover:bg-amber-500/15 text-amber-400 border border-amber-500/30 px-4 py-3 rounded-xl text-base font-bold transition-colors min-h-[var(--touch-cta)]"
           >
             <span className="text-lg">→</span>
             {t('action.followup')}

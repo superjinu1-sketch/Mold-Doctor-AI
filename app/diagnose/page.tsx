@@ -681,18 +681,18 @@ function DiagnoseContent() {
     setFollowUpImages(prev => [...prev, ...valid].slice(0, 5));
   }, [processFile]);
 
-  const inputCls = "w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2.5 text-sm text-white placeholder:text-white/25 focus:outline-none focus:ring-2 focus:ring-[#00E887]/30 focus:border-[#00E887]/40";
-  const labelCls = "block text-sm font-medium text-white/50 mb-1";
+  const inputCls = "w-full bg-white/5 border border-white/10 rounded-lg px-3 py-3 text-base text-white placeholder:text-white/30 focus:outline-none focus:ring-2 focus:ring-[#00E887]/30 focus:border-[#00E887]/40 min-h-[var(--touch-min)]";
+  const labelCls = "block text-sm font-medium text-white/60 mb-1.5";
   const settingInputCls = (key: string) => extractedFields.has(key)
-    ? "w-full bg-[#00E887]/10 border border-[#00E887]/40 rounded-lg px-3 py-3 text-sm text-white placeholder:text-white/25 focus:outline-none focus:ring-2 focus:ring-[#00E887]/40 focus:border-[#00E887]/60"
-    : "w-full bg-white/5 border border-white/10 rounded-lg px-3 py-3 text-sm text-white placeholder:text-white/25 focus:outline-none focus:ring-2 focus:ring-[#00E887]/30 focus:border-[#00E887]/40";
+    ? "w-full bg-[#00E887]/10 border border-[#00E887]/40 rounded-lg px-3 py-3 text-base text-white placeholder:text-white/30 focus:outline-none focus:ring-2 focus:ring-[#00E887]/40 focus:border-[#00E887]/60 min-h-[var(--touch-min)]"
+    : "w-full bg-white/5 border border-white/10 rounded-lg px-3 py-3 text-base text-white placeholder:text-white/30 focus:outline-none focus:ring-2 focus:ring-[#00E887]/30 focus:border-[#00E887]/40 min-h-[var(--touch-min)]";
 
   return (
     <div className="max-w-5xl mx-auto px-3 sm:px-4 py-6 sm:py-8">
       <div className="mb-8 flex items-start justify-between gap-4">
         <div>
           <h1 className="text-3xl font-bold text-white mb-2">{t('diagnose.title')}</h1>
-          <p className="text-white/40">{t('diagnose.subtitle')}</p>
+          <p className="text-white/60 text-base">{t('diagnose.subtitle')}</p>
         </div>
       </div>
 
@@ -710,7 +710,7 @@ function DiagnoseContent() {
               key={i}
               type="button"
               onClick={() => loadSample(i)}
-              className="bg-white/5 hover:bg-[#00E887]/10 text-white/50 hover:text-[#00E887] border border-white/8 hover:border-[#00E887]/30 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors whitespace-nowrap"
+              className="bg-white/5 hover:bg-[#00E887]/10 text-white/60 hover:text-[#00E887] border border-white/10 hover:border-[#00E887]/30 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors whitespace-nowrap min-h-[44px] flex items-center"
             >
               {c.label} — {t(c.defectTypeKey)}
             </button>
@@ -780,10 +780,10 @@ function DiagnoseContent() {
                   key={type}
                   type="button"
                   onClick={() => setDefectType(defectType === type ? '' : type)}
-                  className={`px-3 py-2 rounded-lg text-sm font-medium text-left transition-all border ${
+                  className={`px-3 py-3 rounded-lg text-sm font-medium text-left transition-all border min-h-[44px] flex items-center ${
                     defectType === type
                       ? 'bg-[#059669] text-white border-[#059669]'
-                      : 'bg-white text-slate-700 border-slate-300 hover:border-[#059669]'
+                      : 'bg-white/5 text-white/70 border-white/15 hover:border-[#00E887]/40 hover:text-white'
                   }`}
                 >
                   {t(DEFECT_KEY_MAP[type] || type)}
@@ -810,7 +810,7 @@ function DiagnoseContent() {
               value={defectDescription}
               onChange={(e) => setDefectDescription(e.target.value)}
             />
-            <p className="mt-1 text-xs text-slate-400">{t('step1.desc_hint')}</p>
+            <p className="mt-1.5 text-[length:var(--text-label)] text-white/50">{t('step1.desc_hint')}</p>
           </div>
         </section>
 
@@ -993,7 +993,7 @@ function DiagnoseContent() {
 
                 {/* V/P & Decomp */}
                 <div>
-                  <div className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">{t('adv.vp_section')}</div>
+                  <div className="text-[length:var(--text-label)] font-bold text-white/50 uppercase tracking-wider mb-3">{t('adv.vp_section')}</div>
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                     {[
                       { key: 'vpTransferPos', label: t('adv.vp_pos'), placeholder: 'mm' },
@@ -1003,7 +1003,7 @@ function DiagnoseContent() {
                       { key: 'postMeterDecompDist', label: t('adv.decomp_post'), placeholder: 'mm' },
                     ].map(({ key, label, placeholder }) => (
                       <div key={key}>
-                        <div className="text-xs text-slate-500 mb-1">{label}</div>
+                        <div className="text-[length:var(--text-label)] text-white/50 mb-1">{label}</div>
                         <input type="text" inputMode="numeric" className={inputCls} placeholder={placeholder} value={advSettings[key as keyof typeof advSettings]} onChange={(e) => setAdvSetting(key, e.target.value)} />
                       </div>
                     ))}
@@ -1012,7 +1012,7 @@ function DiagnoseContent() {
 
                 {/* Actual measured values */}
                 <div>
-                  <div className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">{t('adv.actual_section')}</div>
+                  <div className="text-[length:var(--text-label)] font-bold text-white/50 uppercase tracking-wider mb-3">{t('adv.actual_section')}</div>
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                     {[
                       { key: 'actualFillTime', label: t('adv.fill_time'), placeholder: 'sec' },
@@ -1022,7 +1022,7 @@ function DiagnoseContent() {
                       { key: 'actualPartWeight', label: t('adv.part_weight'), placeholder: 'g' },
                     ].map(({ key, label, placeholder }) => (
                       <div key={key}>
-                        <div className="text-xs text-slate-500 mb-1">{label}</div>
+                        <div className="text-[length:var(--text-label)] text-white/50 mb-1">{label}</div>
                         <input type="text" inputMode="numeric" className={inputCls} placeholder={placeholder} value={advSettings[key as keyof typeof advSettings]} onChange={(e) => setAdvSetting(key, e.target.value)} />
                       </div>
                     ))}
@@ -1031,7 +1031,7 @@ function DiagnoseContent() {
 
                 {/* Drying */}
                 <div>
-                  <div className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">{t('adv.dry_section')}</div>
+                  <div className="text-[length:var(--text-label)] font-bold text-white/50 uppercase tracking-wider mb-3">{t('adv.dry_section')}</div>
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                     <div>
                       <div className="text-xs text-slate-500 mb-1">{t('adv.dry_temp')}</div>
@@ -1059,7 +1059,7 @@ function DiagnoseContent() {
                 {/* Hot runner (conditional) */}
                 {(moldType === '핫러너' || runnerType === '핫') && (
                   <div>
-                    <div className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">{t('adv.hr_section')}</div>
+                    <div className="text-[length:var(--text-label)] font-bold text-white/50 uppercase tracking-wider mb-3">{t('adv.hr_section')}</div>
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                       {[
                         { key: 'hrManifoldTemp', label: t('adv.hr_manifold') },
@@ -1069,12 +1069,12 @@ function DiagnoseContent() {
                         { key: 'hrNozzle4Temp', label: t('adv.hr_nozzle4') },
                       ].map(({ key, label }) => (
                         <div key={key}>
-                          <div className="text-xs text-slate-500 mb-1">{label} (℃)</div>
+                          <div className="text-[length:var(--text-label)] text-white/50 mb-1">{label} (℃)</div>
                           <input type="text" inputMode="numeric" className={inputCls} placeholder="℃" value={advSettings[key as keyof typeof advSettings]} onChange={(e) => setAdvSetting(key, e.target.value)} />
                         </div>
                       ))}
                       <div>
-                        <div className="text-xs text-slate-500 mb-1">{t('adv.valve_gate')}</div>
+                        <div className="text-[length:var(--text-label)] text-white/50 mb-1">{t('adv.valve_gate')}</div>
                         <select className={inputCls} value={advSettings.valveGate} onChange={(e) => setAdvSetting('valveGate', e.target.value)}>
                           <option value="없음">{t('adv.valve_none')}</option>
                           <option value="있음">{t('adv.valve_yes')}</option>
@@ -1086,7 +1086,7 @@ function DiagnoseContent() {
 
                 {/* Regrind & Color */}
                 <div>
-                  <div className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">{t('adv.regrind_section')}</div>
+                  <div className="text-[length:var(--text-label)] font-bold text-white/50 uppercase tracking-wider mb-3">{t('adv.regrind_section')}</div>
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                     <div>
                       <div className="text-xs text-slate-500 mb-1">{t('adv.regrind_ratio')}</div>
@@ -1103,7 +1103,7 @@ function DiagnoseContent() {
                     </div>
                     {advSettings.colorType !== '없음' && (
                       <div>
-                        <div className="text-xs text-slate-500 mb-1">{t('adv.color_ratio')}</div>
+                        <div className="text-[length:var(--text-label)] text-white/50 mb-1">{t('adv.color_ratio')}</div>
                         <input type="text" inputMode="numeric" className={inputCls} placeholder="%" value={advSettings.mbRatio} onChange={(e) => setAdvSetting('mbRatio', e.target.value)} />
                       </div>
                     )}
@@ -1112,7 +1112,7 @@ function DiagnoseContent() {
 
                 {/* Machine info */}
                 <div>
-                  <div className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">{t('adv.machine_section')}</div>
+                  <div className="text-[length:var(--text-label)] font-bold text-white/50 uppercase tracking-wider mb-3">{t('adv.machine_section')}</div>
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                     <div className="md:col-span-2">
                       <div className="text-xs text-slate-500 mb-1">{t('adv.machine_model')}</div>
@@ -1209,8 +1209,8 @@ function DiagnoseContent() {
                 <svg className="w-8 h-8 mx-auto mb-2 text-white/20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                 </svg>
-                <p className="text-slate-600 text-sm font-medium">{t('step4.drawing_hint')}</p>
-                <p className="text-slate-400 text-xs mt-1">{t('step4.drawing_ai_hint')}</p>
+                <p className="text-white/60 text-sm font-medium">{t('step4.drawing_hint')}</p>
+                <p className="text-white/50 text-[length:var(--text-label)] mt-1">{t('step4.drawing_ai_hint')}</p>
                 <input
                   ref={moldDrawingInputRef}
                   type="file"
@@ -1223,18 +1223,18 @@ function DiagnoseContent() {
               {moldDrawings.length > 0 && (
                 <div className="flex gap-2 mt-2 flex-wrap">
                   {moldDrawings.map((d) => (
-                    <div key={d.id} className="relative flex items-center gap-1 bg-slate-100 rounded-lg px-2 py-1.5 border border-slate-200">
+                    <div key={d.id} className="relative flex items-center gap-2 bg-white/5 rounded-lg px-2 py-2 border border-white/10">
                       {d.preview ? (
                         // eslint-disable-next-line @next/next/no-img-element
                         <img src={d.preview} alt={t('step4.drawing_alt')} className="w-10 h-10 object-cover rounded" />
                       ) : (
-                        <div className="w-10 h-10 bg-red-100 rounded flex items-center justify-center text-xs font-bold text-red-600">PDF</div>
+                        <div className="w-10 h-10 bg-red-500/20 rounded flex items-center justify-center text-xs font-bold text-red-400">PDF</div>
                       )}
-                      <span className="text-xs text-slate-600 max-w-[80px] truncate">{d.file.name}</span>
+                      <span className="text-[length:var(--text-label)] text-white/60 max-w-[80px] truncate">{d.file.name}</span>
                       <button
                         type="button"
                         onClick={(e) => { e.stopPropagation(); setMoldDrawings(prev => prev.filter(x => x.id !== d.id)); }}
-                        className="ml-1 text-slate-400 hover:text-red-500"
+                        className="ml-auto min-w-[44px] min-h-[44px] flex items-center justify-center text-white/40 hover:text-red-400 transition-colors"
                         aria-label={t('step4.drawing_del')}
                       >×</button>
                     </div>
@@ -1250,7 +1250,7 @@ function DiagnoseContent() {
           type="button"
           onClick={handleDiagnose}
           disabled={isLoading}
-          className="w-full bg-[#00E887] hover:bg-[#00E887]/90 disabled:bg-slate-300 text-white py-4 rounded-xl font-bold text-xl transition-colors shadow-lg flex items-center justify-center gap-3"
+          className="w-full bg-[#00E887] hover:bg-[#00E887]/90 disabled:bg-white/10 disabled:text-white/30 text-black py-4 rounded-xl font-bold text-xl transition-colors shadow-lg flex items-center justify-center gap-3 min-h-[var(--touch-cta)]"
         >
           {isLoading ? (
             <>
@@ -1271,7 +1271,7 @@ function DiagnoseContent() {
         </button>
 
         {error && (
-          <div className="bg-red-50 border border-red-300 text-red-700 rounded-xl p-4 text-sm">
+          <div className="bg-red-500/10 border border-red-500/30 text-red-400 rounded-xl p-4 text-base">
             {error}
           </div>
         )}
@@ -1296,10 +1296,10 @@ function DiagnoseContent() {
         {showFollowUpForm && result &&
          result.defect_type?.en !== 'Image_Unreadable' &&
          result.defect_type?.en !== 'No_Defect_Detected' && (
-          <div ref={followUpFormRef} className="bg-white rounded-2xl p-4 sm:p-6 shadow-sm border-2 border-orange-300 space-y-5">
+          <div ref={followUpFormRef} className="bg-white/[0.03] rounded-2xl p-4 sm:p-6 border-2 border-orange-500/40 space-y-5">
             <div className="flex items-center gap-2 mb-1">
               <span className="bg-orange-500 text-white text-xs font-bold px-2 py-1 rounded-full">{round}{t('followup.badge')}</span>
-              <h3 className="text-lg font-bold text-[#1E293B]">{t('followup.title')}</h3>
+              <h3 className="text-lg font-bold text-white">{t('followup.title')}</h3>
             </div>
 
             {/* Action checklist */}
@@ -1307,19 +1307,19 @@ function DiagnoseContent() {
               <label className={labelCls}>{t('followup.actions_label')}</label>
               <div className="space-y-2 mt-1">
                 {followUpActions.map((action, i) => (
-                  <div key={i} className="border border-slate-200 rounded-xl p-3">
-                    <label className="flex items-start gap-3 cursor-pointer">
+                  <div key={i} className="border border-white/10 rounded-xl p-3">
+                    <label className="flex items-start gap-3 cursor-pointer min-h-[44px] py-1">
                       <input
                         type="checkbox"
-                        className="mt-0.5 w-5 h-5 rounded accent-[#059669] shrink-0"
+                        className="mt-0.5 w-6 h-6 rounded accent-[#059669] shrink-0"
                         checked={action.done}
                         onChange={() => setFollowUpActions(prev => prev.map((a, j) => j === i ? { ...a, done: !a.done } : a))}
                       />
-                      <span className={`text-sm flex-1 ${action.done ? 'text-slate-700 font-medium' : 'text-slate-400'}`}>{action.recommendation}</span>
+                      <span className={`text-base flex-1 leading-snug ${action.done ? 'text-white/80 font-medium' : 'text-white/60'}`}>{action.recommendation}</span>
                     </label>
                     {action.done && (
                       <select
-                        className="mt-2 ml-8 text-sm border border-slate-200 rounded-lg px-2 py-1.5 bg-slate-50"
+                        className="mt-2 ml-9 text-base border border-white/15 rounded-lg px-3 py-2.5 bg-white/5 text-white min-h-[44px] w-full"
                         value={action.result}
                         onChange={(e) => setFollowUpActions(prev => prev.map((a, j) => j === i ? { ...a, result: e.target.value } : a))}
                       >
@@ -1362,7 +1362,7 @@ function DiagnoseContent() {
             <div>
               <label className={labelCls}>{t('followup.photo_label')}</label>
               <div
-                className="border-2 border-dashed border-slate-300 rounded-xl p-4 text-center cursor-pointer hover:border-[#059669] transition-colors"
+                className="border-2 border-dashed border-white/20 rounded-xl p-4 text-center cursor-pointer hover:border-[#00E887]/50 transition-colors min-h-[80px] flex flex-col items-center justify-center"
                 onClick={() => {
                   const input = document.createElement('input');
                   input.type = 'file';
@@ -1375,7 +1375,7 @@ function DiagnoseContent() {
                   input.click();
                 }}
               >
-                <p className="text-sm text-slate-500">{t('followup.photo_click')}</p>
+                <p className="text-base text-white/60">{t('followup.photo_click')}</p>
                 {followUpImages.length > 0 && (
                   <div className="flex gap-2 mt-2 justify-center flex-wrap">
                     {followUpImages.map(img => (
@@ -1395,15 +1395,15 @@ function DiagnoseContent() {
             </div>
 
             {/* Settings hint */}
-            <div className="bg-slate-50 rounded-xl p-3 border border-slate-200">
-              <p className="text-xs text-slate-500 font-medium">{t('followup.settings_hint')}</p>
+            <div className="bg-white/5 rounded-xl p-3 border border-white/8">
+              <p className="text-[length:var(--text-label)] text-white/50 font-medium">{t('followup.settings_hint')}</p>
             </div>
 
             <div className="flex gap-3">
               <button
                 type="button"
                 onClick={() => { setShowFollowUpForm(false); setRound(prev => Math.max(1, prev - 1)); }}
-                className="px-4 py-3 rounded-xl border border-slate-300 text-slate-600 text-sm font-medium hover:bg-slate-50 transition-colors"
+                className="px-4 py-3 rounded-xl border border-white/20 text-white/60 text-base font-medium hover:bg-white/5 transition-colors min-h-[var(--touch-cta)]"
               >
                 {t('submit.cancel')}
               </button>
@@ -1411,7 +1411,7 @@ function DiagnoseContent() {
                 type="button"
                 onClick={handleFollowUpSubmit}
                 disabled={isLoading}
-                className="flex-1 bg-orange-500 hover:bg-orange-600 disabled:opacity-50 text-white font-bold py-3 px-6 rounded-xl transition-colors"
+                className="flex-1 bg-orange-500 hover:bg-orange-600 disabled:opacity-50 text-white font-bold py-3 px-6 rounded-xl transition-colors min-h-[var(--touch-cta)] text-base"
               >
                 {isLoading ? t('submit.analyzing') : `${round}${t('submit.followup')}`}
               </button>
