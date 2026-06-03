@@ -7,7 +7,7 @@ import { useLocale } from '@/contexts/LocaleContext';
 const defects = [
   {
     id: 'short-shot',
-    ko: '미성형', en: 'Short Shot',
+    nameKo: '미성형', nameEn: 'Short Shot',
     descriptionKo: '충전 부족으로 제품이 완성되지 않는 현상. 제품의 끝부분이나 얇은 부위가 채워지지 않음.',
     descriptionEn: 'Incomplete filling — the product is not fully formed. End sections or thin walls remain unfilled.',
     causesKo: ['사출 압력/속도 부족', '수지 온도 낮음 (점도 높음)', '게이트/러너 크기 부족', '벤트 불량 (공기 갇힘)', '계량 부족'],
@@ -20,7 +20,7 @@ const defects = [
   },
   {
     id: 'flash',
-    ko: '플래시', en: 'Flash',
+    nameKo: '플래시', nameEn: 'Flash',
     descriptionKo: '파팅 라인이나 에젝터 핀 주변에서 수지가 새어 나오는 현상.',
     descriptionEn: 'Resin leaks past the parting line, ejector pins, or other mold interfaces.',
     causesKo: ['형체력 부족', '사출 압력/보압 과다', '금형 PL면 마모/손상', '금형 강성 부족', '수지 온도 과다 (점도 하락)'],
@@ -33,7 +33,7 @@ const defects = [
   },
   {
     id: 'sink-mark',
-    ko: '싱크마크', en: 'Sink Mark',
+    nameKo: '싱크마크', nameEn: 'Sink Mark',
     descriptionKo: '두꺼운 부위 표면이 오목하게 함몰되는 현상. 내부 수축으로 발생.',
     descriptionEn: 'Concave depressions on the surface of thick sections, caused by internal shrinkage during cooling.',
     causesKo: ['보압 부족', '보압 시간 부족', '냉각 시간 부족', '게이트 크기 작음 (조기 동결)', '벽 두께 불균일'],
@@ -46,7 +46,7 @@ const defects = [
   },
   {
     id: 'weld-line',
-    ko: '웰드라인', en: 'Weld Line',
+    nameKo: '웰드라인', nameEn: 'Weld Line',
     descriptionKo: '두 수지 흐름이 합류하는 지점에 생기는 선. 강도 저하 원인.',
     descriptionEn: 'A line or seam that forms where two melt fronts meet. Can reduce structural strength.',
     causesKo: ['수지 온도 낮음', '금형 온도 낮음', '사출 속도 낮음', '게이트 위치 문제', '이형제 과다'],
@@ -59,7 +59,7 @@ const defects = [
   },
   {
     id: 'burn-mark',
-    ko: '버닝/가스마크', en: 'Burn Mark',
+    nameKo: '버닝/가스마크', nameEn: 'Burn Mark',
     descriptionKo: '공기 압축 발열 또는 수지 분해로 인해 제품에 탄 자국이 생기는 현상.',
     descriptionEn: 'Charring or discoloration from compressed-air combustion (diesel effect) or thermal degradation.',
     causesKo: ['사출 속도 과다 (공기 압축 발열)', '벤트 불량', '수지 온도 과다 (분해)', '과도한 체류 시간', '핫러너 온도 과다'],
@@ -72,7 +72,7 @@ const defects = [
   },
   {
     id: 'silver-streak',
-    ko: '은줄', en: 'Silver Streak',
+    nameKo: '은줄', nameEn: 'Silver Streak',
     descriptionKo: '게이트에서 수지 흐름 방향으로 은색 줄무늬가 생기는 현상. 수분 또는 가스 원인.',
     descriptionEn: 'Silver or streaky lines running in the flow direction from the gate, caused by moisture or gas.',
     causesKo: ['수지 건조 불충분 (수분)', '수지 온도 과다 (분해 가스)', '공기 혼입 (배압 낮음)', '스크류 역류', '이형제 가스'],
@@ -85,7 +85,7 @@ const defects = [
   },
   {
     id: 'discoloration',
-    ko: '변색', en: 'Discoloration',
+    nameKo: '변색', nameEn: 'Discoloration',
     descriptionKo: '제품 색상이 의도와 다르게 변하는 현상. 갈색화, 황변, 탄화 등.',
     descriptionEn: 'Product color deviates from intent — browning, yellowing, charring, etc.',
     causesKo: ['수지 온도 과다 (열화)', '과도한 체류 시간', '이전 수지 오염', '스크류/바렐 손상', '난연제 분해'],
@@ -98,7 +98,7 @@ const defects = [
   },
   {
     id: 'crack',
-    ko: '크랙', en: 'Crack',
+    nameKo: '크랙', nameEn: 'Crack',
     descriptionKo: '제품에 균열이 생기는 현상. 이형 시, 사용 중, 또는 후처리 중 발생.',
     descriptionEn: 'Cracks occurring during ejection, in service, or during post-processing.',
     causesKo: ['잔류 응력 과다 (보압 과다)', '이형 불량 (에젝터)', '금형 온도 낮음', '환경 응력 균열 (화학물질 접촉)', '과도한 사출 속도'],
@@ -111,7 +111,7 @@ const defects = [
   },
   {
     id: 'warpage',
-    ko: '휨/변형', en: 'Warpage',
+    nameKo: '휨/변형', nameEn: 'Warpage',
     descriptionKo: '이형 후 제품이 뒤틀리거나 변형되는 현상.',
     descriptionEn: 'Distortion or twisting of the part after ejection.',
     causesKo: ['불균일 냉각', '금형 온도 불균일', '보압 불균일 (멀티캐비티)', '수지 배향 차이 (GF 강화)', '두께 불균일'],
@@ -124,7 +124,7 @@ const defects = [
   },
   {
     id: 'void',
-    ko: '기포', en: 'Void/Bubble',
+    nameKo: '기포', nameEn: 'Void/Bubble',
     descriptionKo: '제품 내부에 생기는 공동(기포). 표면에서 보이지 않는 내부 불량.',
     descriptionEn: 'Internal voids inside the part that may not be visible from the surface.',
     causesKo: ['보압 부족', '보압 시간 부족', '게이트 조기 동결', '사출 속도 과다', '수지 건조 불량'],
@@ -137,7 +137,7 @@ const defects = [
   },
   {
     id: 'jetting',
-    ko: '젯팅', en: 'Jetting',
+    nameKo: '젯팅', nameEn: 'Jetting',
     descriptionKo: '게이트에서 수지가 고속 분사되어 뱀 모양의 흔적이 생기는 현상.',
     descriptionEn: 'High-velocity melt jetting from the gate creates serpentine marks on the part surface.',
     causesKo: ['사출 속도 과다', '게이트 크기 작음', '게이트 위치 불량 (공간을 향해 직접 사출)', '수지 온도 낮음'],
@@ -150,7 +150,7 @@ const defects = [
   },
   {
     id: 'surface-roughness',
-    ko: '표면 거침', en: 'Surface Roughness',
+    nameKo: '표면 거침', nameEn: 'Surface Roughness',
     descriptionKo: '제품 표면이 거칠거나 광택이 없는 현상. 유동 불량, 금형 온도 부족 등.',
     descriptionEn: 'Rough surface or lack of gloss. Caused by inadequate flow, low mold temperature, etc.',
     causesKo: ['수지 온도 낮음', '금형 온도 낮음', '사출 속도 낮음', '금형 표면 불량', '이형제 과다'],
@@ -205,12 +205,14 @@ export default function GuidePage() {
 
         <div className="space-y-2">
           {defects.map((defect) => {
-            const displayName = locale === 'en' ? defect.en : defect.ko;
-            const secondaryName = locale === 'en' ? defect.ko : defect.en;
-            const description = locale === 'en' ? defect.descriptionEn : defect.descriptionKo;
-            const causes = locale === 'en' ? defect.causesEn : defect.causesKo;
-            const solutions = locale === 'en' ? defect.solutionsEn : defect.solutionsKo;
-            const resinNotes = locale === 'en' ? defect.resinNotesEn : defect.resinNotesKo;
+            const isEn = locale === 'en';
+            const displayName = isEn ? defect.nameEn : defect.nameKo;
+            // Korean mode: show English in parens. English mode: no Korean shown.
+            const secondaryName = isEn ? null : defect.nameEn;
+            const description = isEn ? defect.descriptionEn : defect.descriptionKo;
+            const causes = isEn ? defect.causesEn : defect.causesKo;
+            const solutions = isEn ? defect.solutionsEn : defect.solutionsKo;
+            const resinNotes = isEn ? defect.resinNotesEn : defect.resinNotesKo;
 
             return (
               <div
@@ -230,7 +232,9 @@ export default function GuidePage() {
                     </span>
                     <div>
                       <span className="font-bold text-white text-base">{displayName}</span>
-                      <span className="text-white/30 ml-2 text-sm">({secondaryName})</span>
+                      {secondaryName && (
+                        <span className="text-white/30 ml-2 text-sm">({secondaryName})</span>
+                      )}
                     </div>
                   </div>
                   <svg
@@ -292,7 +296,7 @@ export default function GuidePage() {
 
                     <div className="pt-1">
                       <Link
-                        href={`/diagnose?defect=${encodeURIComponent(defect.ko)}`}
+                        href={`/diagnose?defect=${encodeURIComponent(defect.nameKo)}`}
                         className="inline-flex items-center gap-2 bg-[#00E887] hover:bg-[#00E887]/90 text-black px-4 py-2 rounded-full text-sm font-bold transition-colors shadow-[0_0_16px_rgba(0,232,135,0.15)]"
                       >
                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
