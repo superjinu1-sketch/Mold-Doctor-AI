@@ -1,0 +1,10 @@
+{
+  "defect_type": {"ko": "은줄", "en": "Silver Streak"},
+  "defect_phase": "material",
+  "severity": "medium",
+  "summary": "truncation 테스트용",
+  "raw_response": "{\"defect_type\":{\"ko\":\"은줄\",\"en\":\"Silver Streak\"},\"defect_phase\":\"material\",\"severity\":\"medium\",\"summary\":\"truncation 테스트용\",\"process_window_check\":{\"melt_temp\":{\"status\":\"ok\",\"note\":\"정상\"},\"drying\":{\"status\":\"critical\",\"note",
+  "causes": [],
+  "recommendations": [],
+  "checklist": {"before_changes": [], "after_changes": [], "escalation": []}
+}

@@ -1,0 +1,10 @@
+{
+  "defect_type": {"ko": "이상없음", "en": "No_Defect_Detected"},
+  "defect_phase": "none",
+  "severity": "low",
+  "summary": "불량 미검출. 의심 부위 확대 촬영 권장.",
+  "process_window_check": {},
+  "causes": [],
+  "recommendations": [],
+  "checklist": {"before_changes": [], "after_changes": [], "escalation": []}
+}

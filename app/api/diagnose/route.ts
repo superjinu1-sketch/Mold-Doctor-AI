@@ -1,6 +1,7 @@
 import Anthropic from '@anthropic-ai/sdk';
 import { NextRequest, NextResponse } from 'next/server';
 import { downscaleBase64 } from '@/lib/downscale';
+import { tryMock } from '@/lib/mock';
 
 // JSON 문자열 값 안의 실제 줄바꿈을 공백으로 치환 (문자 단위 파싱)
 function sanitizeJsonNewlines(text: string): string {
@@ -332,6 +333,7 @@ function buildSystemBlocks(resinType: string, tier: 'simple' | 'complex' = 'simp
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
+    const mock = tryMock(body); if (mock) return mock;
     const {
       defectType, defectDescription, resinInfo, settings, advSettings, moldInfo, productInfo, images, moldDrawings,
       isFollowUp, previousDiagnosis, actionsTaken, changeDescription, round: bodyRound,

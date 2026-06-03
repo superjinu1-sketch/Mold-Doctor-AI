@@ -1,6 +1,7 @@
 import Anthropic from '@anthropic-ai/sdk';
 import { NextRequest, NextResponse } from 'next/server';
 import { downscaleBase64 } from '@/lib/downscale';
+import { tryMock } from '@/lib/mock';
 
 function getApiKey(): string {
   return process.env.ANTHROPIC_API_KEY || '';
@@ -9,6 +10,7 @@ function getApiKey(): string {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
+    const mock = tryMock(body, 'analyze'); if (mock) return mock;
     const { image } = body;
 
     if (!image) {

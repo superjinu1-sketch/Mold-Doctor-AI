@@ -1,0 +1,10 @@
+{
+  "defect_type": {"ko": "판독불가", "en": "Image_Unreadable"},
+  "defect_phase": "none",
+  "severity": "low",
+  "summary": "이미지 판독불가. 재촬영 필요.",
+  "process_window_check": {},
+  "causes": [],
+  "recommendations": [],
+  "checklist": {"before_changes": [], "after_changes": [], "escalation": []}
+}

@@ -1,12 +1,15 @@
 import Anthropic from '@anthropic-ai/sdk';
 import { NextRequest, NextResponse } from 'next/server';
+import { tryMock } from '@/lib/mock';
 function getApiKey(): string {
   return process.env.ANTHROPIC_API_KEY || '';
 }
 
 export async function POST(request: NextRequest) {
   try {
-    const { image } = await request.json();
+    const body = await request.json();
+    const mock = tryMock(body, 'extract'); if (mock) return mock;
+    const { image } = body;
     if (!image) return NextResponse.json({ error: '이미지가 없습니다.' }, { status: 400 });
 
     // TODO: rate-limit 구현 (과금/크레딧 보호)

@@ -1,0 +1,10 @@
+{
+  "nozzleTemp": "285", "zone1Temp": "280", "zone2Temp": "275",
+  "zone3Temp": "265", "zone4Temp": "255",
+  "moldTempFixed": "80", "moldTempMoving": "80",
+  "injPressure1": "120", "holdPressure": "80",
+  "injSpeed1": "60", "injSpeed2": "",
+  "holdTime": "8", "coolTime": "15", "injTime": "",
+  "metering": "85", "cushion": "5",
+  "backPressure": "5", "screwRpm": "80", "clampForce": ""
+}

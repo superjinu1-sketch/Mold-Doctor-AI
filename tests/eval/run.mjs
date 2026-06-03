@@ -15,10 +15,11 @@
  *   PASS 임계 = 70점
  */
 
-import { readFileSync, existsSync } from 'fs';
+import { readFileSync, writeFileSync, existsSync, mkdirSync } from 'fs';
 import { request as httpRequest } from 'http';
 import { fileURLToPath } from 'url';
 import { join, dirname } from 'path';
+import { createHash } from 'crypto';
 import Anthropic from '@anthropic-ai/sdk';
 
 const __dir = dirname(fileURLToPath(import.meta.url));
@@ -33,6 +34,28 @@ const HOST = '127.0.0.1';
 const PASS_THRESHOLD = 70;
 const INTERVAL_MS = 6000; // rate-limit 회피 간격
 const MAX_RETRIES = 5;    // 529 overloaded 재시도 (diagnose + judge 공통)
+const JUDGE_MODEL = 'claude-haiku-4-5-20251001'; // Sonnet 대비 ~1/10 비용
+const PROMPT_VERSION = 'v5';  // FIXED_FRAMEWORK 변경 시 bump → 캐시 무효화
+const CACHE_DIR = join(ROOT, 'tests/eval/.cache');
+const CACHE_TTL_MS = 7 * 24 * 3600 * 1000; // 7일
+
+/* ── diagnose 응답 캐시 (프롬프트 버전 기준 7일 유효) ─── */
+function cacheKey(caseId) {
+  return createHash('sha256').update(`${caseId}:${PROMPT_VERSION}`).digest('hex').slice(0, 16);
+}
+function loadDiagnoseCache(caseId) {
+  const path = join(CACHE_DIR, `${cacheKey(caseId)}.json`);
+  if (!existsSync(path)) return null;
+  try {
+    const d = JSON.parse(readFileSync(path, 'utf-8'));
+    if (Date.now() - d.ts > CACHE_TTL_MS) return null;
+    return d.body;
+  } catch { return null; }
+}
+function saveDiagnoseCache(caseId, body) {
+  if (!existsSync(CACHE_DIR)) mkdirSync(CACHE_DIR, { recursive: true });
+  writeFileSync(join(CACHE_DIR, `${cacheKey(caseId)}.json`), JSON.stringify({ ts: Date.now(), body }));
+}
 
 /* ── API key (from env or .env.local) ───────────────── */
 function loadApiKey() {
@@ -231,7 +254,7 @@ trap_avoided는 hard case가 아니면 null. pass = score >= 70.`;
 
   try {
     const res = await withRetry(() => client.messages.create({
-      model: 'claude-sonnet-4-6',
+      model: JUDGE_MODEL,
       max_tokens: 700,
       messages: [{ role: 'user', content: prompt }],
     }), 'judge');
@@ -277,9 +300,14 @@ async function main() {
     const tag = `[${i+1}/${cases.length}] ${c.id} (${c.difficulty.toUpperCase()})`;
     process.stdout.write(`${tag} ${c.title.slice(0, 40)}... `);
 
-    // 1. Call /api/diagnose (with retry via withRetry helper)
+    // 1. Call /api/diagnose — 캐시 히트 시 API 스킵
     let aiRaw = '';
     let diagError = null;
+    const cached = loadDiagnoseCache(c.id);
+    if (cached) {
+      process.stdout.write(' [cached]');
+      aiRaw = cached;
+    } else
     try {
       const payload = buildPayload(c);
       const diagRes = await withRetry(async () => {
@@ -293,6 +321,7 @@ async function main() {
         diagError = `HTTP ${diagRes.status}: ${diagRes.body.slice(0, 120)}`;
       } else {
         aiRaw = diagRes.body;
+        saveDiagnoseCache(c.id, aiRaw);
       }
     } catch (e) {
       diagError = e.message;

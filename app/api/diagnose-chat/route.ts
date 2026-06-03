@@ -1,12 +1,15 @@
 import Anthropic from '@anthropic-ai/sdk';
 import { NextRequest, NextResponse } from 'next/server';
+import { tryMock } from '@/lib/mock';
 function getApiKey(): string {
   return process.env.ANTHROPIC_API_KEY || '';
 }
 
 export async function POST(req: NextRequest) {
   try {
-    const { question, diagnosisResult, chatHistory = [], resinType, machineSettings } = await req.json();
+    const body = await req.json();
+    const mock = tryMock(body, 'chat'); if (mock) return mock;
+    const { question, diagnosisResult, chatHistory = [], resinType, machineSettings } = body;
 
     if (!question?.trim()) {
       return NextResponse.json({ error: '질문을 입력해주세요.' }, { status: 400 });

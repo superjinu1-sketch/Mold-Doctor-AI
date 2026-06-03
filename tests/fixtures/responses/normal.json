@@ -1,0 +1,47 @@
+{
+  "defect_type": {"ko": "은줄", "en": "Silver Streak"},
+  "defect_phase": "material",
+  "severity": "medium",
+  "summary": "PA66 건조부족 — 수분 기인 은줄 추정",
+  "process_window_check": {
+    "melt_temp": {"status": "ok", "note": "노즐285°C 권장범위"},
+    "mold_temp": {"status": "ok", "note": "80°C 적정"},
+    "injection_speed": {"status": "ok", "note": "60% 정상"},
+    "pack_pressure": {"status": "ok", "note": "보압 정상"},
+    "drying": {"status": "critical", "note": "2hr — PA66 최소4hr 미달"}
+  },
+  "causes": [
+    {
+      "rank": 1,
+      "category": "Material",
+      "probability": 75,
+      "description": "건조시간 2hr — PA66 최소 4hr 미달",
+      "scientific_reasoning": "PA66 평형수분율 RH50%에서 2.5%. 2hr건조는 표면만 건조 → 내부수분잔류 → 280°C 가수분해 가스",
+      "evidence": "dryTime=2hr, PA66권장 4~8hr",
+      "elimination": "사출속도·보압·금형온도 모두 PA66 정상범위 → 건조만 이탈",
+      "verification": "호퍼직전 수분 0.1%이상 → 확진. 건조6hr후 재성형"
+    },
+    {
+      "rank": 2,
+      "category": "Method",
+      "probability": 15,
+      "description": "배압3MPa 낮음 — 가스배출 불충분",
+      "scientific_reasoning": "낮은 배압 → 스크류 후단 가스포켓 제거 불가 → 사출 시 가스동반",
+      "evidence": "backPressure=3MPa, 권장5~8MPa",
+      "elimination": "건조 해결 후에도 잔존 시 2순위 검토",
+      "verification": "배압5→8MPa 증가 후 은줄 감소 여부 확인"
+    }
+  ],
+  "recommendations": [
+    {"priority": 1, "parameter": "건조시간", "current": "2hr", "recommended": "6~8hr", "reason": "PA66 수분 제거 최소조건", "expected_result": "은줄 80%+ 감소", "risk": "생산성 저하", "interaction_note": "제습식 건조기 필수", "direction": "up"},
+    {"priority": 2, "parameter": "배압", "current": "3MPa", "recommended": "5~8MPa", "reason": "스크류 가스 배출 개선", "expected_result": "잔여 은줄 추가 감소", "risk": "배압 과다 시 마찰열", "interaction_note": "RPM 함께 모니터링", "direction": "up"},
+    {"priority": 3, "parameter": "건조기타입", "current": "열풍식(추정)", "recommended": "제습식 -30°C 노점", "reason": "노점관리 없이 PA66 충분건조 불가", "expected_result": "재현성 있는 건조", "risk": "설비비용", "interaction_note": "건조온도80°C 유지", "direction": "same"}
+  ],
+  "checklist": {
+    "before_changes": ["수분율 측정(KF법)", "건조기 노점 확인"],
+    "after_changes": ["은줄 빈도 기록", "배압 변경 후 마찰열 체크"],
+    "escalation": ["6hr건조 후에도 지속 시 스크류/체크링 점검"]
+  },
+  "resin_specific_notes": "PA66 GF33%: 수분 민감. 반드시 제습식",
+  "drying_assessment": "2hr 불충분 — 최소 4hr, 권장 6~8hr"
+}
