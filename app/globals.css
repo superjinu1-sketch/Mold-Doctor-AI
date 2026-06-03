@@ -1,28 +1,75 @@
 @import "tailwindcss";
 
+/* ─── Design Tokens: Color (DO NOT CHANGE) ───────────────────────────────── */
 :root {
   --background: #07090F;
   --foreground: #ffffff;
-  --accent: #00E887;
-  --surface: rgba(255,255,255,0.03);
-  --border: rgba(255,255,255,0.07);
+  --accent:     #00E887;
+  --surface:    rgba(255,255,255,0.03);
+  --border:     rgba(255,255,255,0.07);
+
+  /* Semantic severity */
+  --color-ok:      #00E887;  /* accent — normal / resolved */
+  --color-warn:    #F59E0B;  /* amber  — caution */
+  --color-danger:  #EF4444;  /* red    — error / critical */
+
+  /* ── Typography scale ───────────────────────────────────────────────── */
+  --text-display: 2.75rem;   /* 44px — hero headline */
+  --text-h1:      2rem;      /* 32px */
+  --text-h2:      1.5rem;    /* 24px */
+  --text-h3:      1.25rem;   /* 20px */
+  --text-body:    1.0625rem; /* 17px — minimum for body copy */
+  --text-label:   0.8125rem; /* 13px — labels, tags, captions only */
+
+  --leading-tight: 1.2;      /* headlines */
+  --leading-body:  1.6;      /* body copy */
+
+  /* ── Spacing scale ──────────────────────────────────────────────────── */
+  --space-xs:  0.25rem;   /*  4px */
+  --space-sm:  0.5rem;    /*  8px */
+  --space-md:  1rem;      /* 16px */
+  --space-lg:  1.5rem;    /* 24px */
+  --space-xl:  2.5rem;    /* 40px */
+  --space-2xl: 4rem;      /* 64px */
+
+  /* ── Touch targets ──────────────────────────────────────────────────── */
+  --touch-min: 2.75rem;   /* 44px — absolute minimum */
+  --touch-cta: 3rem;      /* 48px — CTA buttons */
+
+  /* ── Radius ─────────────────────────────────────────────────────────── */
+  --radius-sm:   0.375rem; /*  6px */
+  --radius-md:   0.75rem;  /* 12px */
+  --radius-lg:   1.25rem;  /* 20px */
+  --radius-full: 9999px;
+
+  /* ── Motion ─────────────────────────────────────────────────────────── */
+  --ease-apple:    cubic-bezier(0.32, 0.72, 0,    1);
+  --ease-out:      cubic-bezier(0.16, 1,    0.3,  1);
+  --duration-fast: 150ms;
+  --duration-mid:  240ms;
+  --duration-slow: 320ms;
 }
 
+/* ─── Tailwind v4 @theme (font + color aliases) ──────────────────────────── */
 @theme inline {
   --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-foreground:  var(--foreground);
+  --font-sans: 'Pretendard Variable', Pretendard, -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+  --font-mono: ui-monospace, 'Cascadia Code', 'Source Code Pro', Menlo, Consolas, monospace;
 }
 
+/* ─── Base ───────────────────────────────────────────────────────────────── */
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background:  var(--background);
+  color:       var(--foreground);
+  font-family: var(--font-sans);
+  font-size:   var(--text-body);
+  line-height: var(--leading-body);
+  -webkit-font-smoothing: antialiased;
 }
 
-/* Scrollbar */
-::-webkit-scrollbar { width: 6px; height: 6px; }
-::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 3px; }
-::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.2); }
+/* ─── Scrollbar ──────────────────────────────────────────────────────────── */
+::-webkit-scrollbar        { width: 6px; height: 6px; }
+::-webkit-scrollbar-track  { background: transparent; }
+::-webkit-scrollbar-thumb  { background: rgba(255,255,255,0.10); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.20); }

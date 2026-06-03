@@ -40,12 +40,39 @@
 - /api/diagnose — POST, Claude API 호출, 수지별 프롬프트 분리
 - /api/analyze-image — POST, Claude vision으로 불량 사진 분석
 
-## 스타일 규칙
-- Tailwind CSS 사용
-- 메인: #1E293B (다크블루), 악센트: #059669 (그린)
-- 경고: #D97706 (앰버), 에러: #DC2626 (레드)
-- 모바일 퍼스트 (현장 작업자가 장갑 끼고 사용)
-- 큰 터치 타겟 (최소 44px)
+## 디자인 시스템 — 5대 규율
+
+### 색 토큰 (절대 변경 금지)
+- 배경: `#07090F` (`var(--background)`)
+- 강조/CTA: `#00E887` (`var(--accent)`)
+- 심각도: ok=`var(--color-ok)` / warn=`var(--color-warn)` / danger=`var(--color-danger)`
+
+### 규율 1 — 모바일 우선 절대
+- 단일 컬럼 기본, 외곽 패딩 16–24px (`var(--space-md)` ~ `var(--space-lg)`)
+- 모든 레이아웃은 375px 기준으로 설계 후 sm:/md: 확장
+
+### 규율 2 — 본문 17px+
+- 본문 최소 `var(--text-body)` (17px). 결과 수치·강조는 `var(--text-h2)` (24px+)
+- `var(--text-label)` (13px)는 라벨·태그·캡션 전용 — 본문·설명에 절대 사용 금지
+
+### 규율 3 — 터치 타겟 44px+
+- 모든 버튼·링크·아이콘 버튼: `min-h-[var(--touch-min)]` (44px) 이상
+- CTA 버튼: `min-h-[var(--touch-cta)]` (48px) 이상
+- `type="button"` 필수 (form submit 오작동 방지)
+
+### 규율 4 — 한 페이지 한 테마
+- 다크 단일 원칙 (`#07090F` 기반). 페이지 내 라이트 카드 혼용 금지
+- `bg-white`, `bg-slate-*`, `bg-gray-*` 직접 사용 금지 — `var(--surface)`로 대체
+
+### 규율 5 — 대비 WCAG AA (4.5:1)
+- 다크 배경 위: 흰색(`#fff`) 또는 밝은 회색(`text-white/70` 이상) 사용
+- `var(--accent)` (#00E887)은 강조·CTA·아이콘 전용 — **본문 텍스트 색으로 사용 금지**
+- 위험/경고 상태는 `var(--color-danger)` / `var(--color-warn)` 시맨틱 토큰 사용
+
+### 토큰 사용 원칙
+- CSS 변수(`var(--)`)·Tailwind 유틸리티만 사용. **raw hex 직접 작성 금지**
+- 예외: globals.css `:root` 토큰 정의 내부만 허용
+- 심각도 색 매핑: 정상→ok / 주의→warn / 위험→danger (의미 역전 금지)
 
 ## 코딩 규칙
 - 모든 button에 type="button" (자동 새로고침 방지)

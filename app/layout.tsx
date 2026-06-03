@@ -31,6 +31,11 @@ export default function RootLayout({
   return (
     <html lang="ko">
       <head>
+        {/* Pretendard Variable — Korean-first sans-serif */}
+        <link
+          rel="stylesheet"
+          href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.css"
+        />
         <meta name="theme-color" content="#07090F" />
         <meta name="application-name" content="Mold Doctor AI" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
