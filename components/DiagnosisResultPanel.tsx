@@ -429,6 +429,26 @@ export default function DiagnosisResultPanel({ result, onSavePDF, round = 1, fol
     );
   }
 
+  /* Insufficient_Input — 이미지 없고 입력 근거 부족 (이미지 관련 멘트 없음) */
+  if (defectTypeEn === 'Insufficient_Input') {
+    return (
+      <div className="bg-surface-solid border border-border rounded-2xl p-6 sm:p-8 text-center space-y-4">
+        <div className="text-5xl">📝</div>
+        <h2 className="text-lg font-bold text-ink">
+          {locale === 'en' ? 'More Information Needed' : '추가 정보가 필요합니다'}
+        </h2>
+        <p className="text-muted text-base leading-relaxed">{summary}</p>
+        <button
+          type="button"
+          onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+          className="mx-auto mt-2 flex items-center gap-2 bg-brand hover:brightness-90 text-on-brand px-5 py-3 rounded-xl text-base font-bold transition-colors min-h-[var(--touch-cta)]"
+        >
+          {locale === 'en' ? 'Add Information & Retry' : '정보 입력 후 재시도'}
+        </button>
+      </div>
+    );
+  }
+
   /* Parse failure fallback */
   if (hasRawResponse) {
     const raw = result?.raw_response ?? '';

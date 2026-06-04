@@ -333,6 +333,22 @@ async function main() {
       continue;
     }
 
+    // 1b. prevent_image_fallback 회귀 assert
+    if (c.prevent_image_fallback) {
+      let parsed = null;
+      try { parsed = JSON.parse(aiRaw); } catch { /* ignore */ }
+      const fallbackTypes = ['No_Defect_Detected', 'Image_Unreadable'];
+      const gotFallback = parsed && fallbackTypes.includes(parsed.defect_type?.en);
+      if (gotFallback) {
+        const ft = parsed.defect_type.en;
+        console.log(` ❌ REGRESSION (이미지 폴백 오분기: ${ft})`);
+        results.push({ id: c.id, title: c.title, difficulty: c.difficulty, score: 0, pass: false,
+          error: `이미지 폴백 오분기 — ${ft} (이미지 없는 텍스트 경로에서 발생하면 안 됨)`, reasoning: '' });
+        if (i < cases.length - 1) await new Promise(r => setTimeout(r, INTERVAL_MS));
+        continue;
+      }
+    }
+
     // 2. Judge
     let judgment;
     try {
