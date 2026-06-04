@@ -183,3 +183,94 @@ export function getResinSpec(resinType: string): ResinSpec | null {
   const partial = Object.keys(RESIN_KB).find(k => resinType.startsWith(k));
   return partial ? RESIN_KB[partial] : null;
 }
+
+// ── 수치 대조 (입력 셋팅값 vs KB 권장범위) ──────────────────────────────
+// 철학 A: 코드는 객관적 앵커만 제공(가이드레일). 최종 판단은 모델이 맥락 종합.
+export type CheckStatus = 'ok' | 'low' | 'high' | 'degrade';
+export interface SettingCheck {
+  label: string;     // '노즐 온도'
+  value: number;
+  unit: string;      // '℃'
+  rangeText: string; // '260-290℃'
+  status: CheckStatus;
+}
+
+// 문자열 입력에서 숫자만 추출. 비거나 파싱 불가면 null.
+function toNum(v: string | undefined | null): number | null {
+  if (v == null) return null;
+  const n = parseFloat(String(v).replace(/[^0-9.\-]/g, ''));
+  return Number.isFinite(n) ? n : null;
+}
+
+export function checkSettings(
+  spec: ResinSpec,
+  s: Record<string, string>,
+  a: Record<string, string>,
+  filler?: string,
+): SettingCheck[] {
+  const out: SettingCheck[] = [];
+
+  // 멜트(노즐온도 근사 — 실측 멜트는 입력에 없음)
+  const nozzle = toNum(s.nozzleTemp);
+  if (nozzle !== null) {
+    const { min, max, degradeAbove } = spec.meltC;
+    let status: CheckStatus = nozzle < min ? 'low' : nozzle > max ? 'high' : 'ok';
+    if (degradeAbove !== undefined && nozzle >= degradeAbove) status = 'degrade';
+    const range = `${min}-${max}℃${degradeAbove !== undefined ? `, ${degradeAbove}℃+ 열분해` : ''}`;
+    out.push({ label: '노즐 온도', value: nozzle, unit: '℃', rangeText: range, status });
+  }
+
+  // 금형온도(고정/가동 평균). 충전재 입력 있으면 GF 범위 적용.
+  const moldVals = [toNum(s.moldTempFixed), toNum(s.moldTempMoving)].filter(
+    (v): v is number => v !== null,
+  );
+  if (moldVals.length > 0) {
+    const mold = moldVals.reduce((x, y) => x + y, 0) / moldVals.length;
+    const hasFiller = !!filler && filler !== '없음' && filler.toLowerCase() !== 'none';
+    const useGf = hasFiller && spec.moldC.gf !== undefined;
+    const lo = useGf ? spec.moldC.gf![0] : spec.moldC.min;
+    const hi = useGf ? spec.moldC.gf![1] : spec.moldC.max;
+    const status: CheckStatus = mold < lo ? 'low' : mold > hi ? 'high' : 'ok';
+    out.push({ label: '금형 온도', value: Math.round(mold), unit: '℃', rangeText: `${lo}-${hi}℃${useGf ? '(GF)' : ''}`, status });
+  }
+
+  // 건조(필요 수지만). 온도/시간/수분율.
+  if (spec.drying !== null) {
+    const d = spec.drying;
+    const dryTemp = toNum(a.dryTemp);
+    if (dryTemp !== null) {
+      const status: CheckStatus = dryTemp < d.tempC - 10 ? 'low' : dryTemp > d.tempC + 20 ? 'high' : 'ok';
+      out.push({ label: '건조 온도', value: dryTemp, unit: '℃', rangeText: `${d.tempC}℃ 권장`, status });
+    }
+    const dryTime = toNum(a.dryTime);
+    if (dryTime !== null) {
+      const status: CheckStatus = dryTime < d.hours[0] ? 'low' : 'ok';
+      out.push({ label: '건조 시간', value: dryTime, unit: 'hr', rangeText: `${d.hours[0]}-${d.hours[1]}hr`, status });
+    }
+    const moisture = toNum(a.moistureContent);
+    if (moisture !== null && d.targetMoisturePct !== null) {
+      const status: CheckStatus = moisture > d.targetMoisturePct ? 'high' : 'ok';
+      out.push({ label: '수분율', value: moisture, unit: '%', rangeText: `<${d.targetMoisturePct}% 목표`, status });
+    }
+  }
+
+  return out;
+}
+
+const STATUS_MARK: Record<CheckStatus, string> = {
+  ok: '범위 내 ✓',
+  low: '낮음 ⚠',
+  high: '높음 ⚠',
+  degrade: '상한 초과·열분해 위험 ⚠',
+};
+
+// 대조 결과 → 프롬프트 주입용 텍스트(가이드레일). 면책 포함.
+export function formatKbCompare(spec: ResinSpec, checks: SettingCheck[]): string {
+  if (checks.length === 0) return '';
+  const lines = checks
+    .map(c => `- ${c.label} ${c.value}${c.unit}: ${spec.id} 권장 ${c.rangeText} → ${STATUS_MARK[c.status]}`)
+    .join('\n');
+  return `## 가공윈도우 사전 대조 (KB 기준, 참고용)
+${lines}
+※ 일반 가공윈도우 기준이다. 등급·충전재·벽두께에 따라 적정값이 달라질 수 있어 절대 기준이 아니다. 최종 판단은 전체 맥락으로 하라.`;
+}

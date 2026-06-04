@@ -2,6 +2,7 @@ import Anthropic from '@anthropic-ai/sdk';
 import { NextRequest, NextResponse } from 'next/server';
 import { downscaleBase64 } from '@/lib/downscale';
 import { tryMock } from '@/lib/mock';
+import { getResinSpec, checkSettings, formatKbCompare } from '@/lib/resin-kb';
 
 // JSON 문자열 값 안의 실제 줄바꿈을 공백으로 치환 (문자 단위 파싱)
 function sanitizeJsonNewlines(text: string): string {
@@ -423,6 +424,12 @@ export async function POST(request: NextRequest) {
     const s = settings || {};
     const a = advSettings || {};
 
+    // KB 수치 대조(가이드레일). spec 있는 수지만, 없으면 빈 문자열(기존 동작 유지).
+    const resinSpec = getResinSpec(resinInfo?.resinType || '');
+    const kbCompare = resinSpec
+      ? formatKbCompare(resinSpec, checkSettings(resinSpec, s, a, resinInfo?.filler))
+      : '';
+
     const noImageGuard = safeImages.length === 0 ? `[이미지 없음 — 텍스트 기반 추정 모드]
 - 불량 사진이 제공되지 않았다. IMAGE QUALITY CHECK 단계를 건너뛰어라.
 - No_Defect_Detected / Image_Unreadable 로 절대 분기하지 마라 (이미지가 없으므로 해당 없음).
@@ -490,7 +497,7 @@ ${(a.machineModel || a.screwDiameter) ? `## 사출기 정보
 - 스크류 직경: ${a.screwDiameter || '-'}mm
 - 최대 형체력: ${a.maxClampForce || '-'}ton, 최대 사출압력: ${a.maxInjPressure || '-'} MPa
 ` : ''}
-## 금형 & 제품 정보
+${kbCompare ? `${kbCompare}\n\n` : ''}## 금형 & 제품 정보
 - 금형 타입: ${moldInfo?.moldType || '-'}, 게이트: ${moldInfo?.gateType || '-'}, 캐비티: ${moldInfo?.cavities || '-'}개, 러너: ${moldInfo?.runnerType || '-'}
 - 제품 중량: ${productInfo?.weight || '-'}g, 벽 두께: ${productInfo?.wallThicknessMin || '-'}~${productInfo?.wallThicknessMax || '-'}mm
 - 특이사항: ${productInfo?.notes || '없음'}
