@@ -89,7 +89,7 @@ export const en: Record<string, string> = {
   /* ── Page: /diagnose ─────────────────────────── */
   'diagnose.title': 'Injection Defect AI Analysis',
   'diagnose.subtitle': 'Enter defect info and process settings — AI identifies root cause and solutions.',
-  'diagnose.sample_title': 'Quick Test with Sample Cases',
+  'diagnose.sample_title': 'Try with an Example',
 
   /* STEP 1 */
   'step1.title': 'Defect Information',

@@ -42,10 +42,28 @@
 
 ## 디자인 시스템 — 5대 규율
 
-### 색 토큰 (절대 변경 금지)
-- 배경: `#07090F` (`var(--background)`)
-- 강조/CTA: `#00E887` (`var(--accent)`)
-- 심각도: ok=`var(--color-ok)` / warn=`var(--color-warn)` / danger=`var(--color-danger)`
+### 색 토큰 (절대 변경 금지, globals.css :root 기준)
+
+| 역할 | 토큰 | 용도 |
+|------|------|------|
+| 페이지 배경 | `var(--canvas)` `#F4F5F7` | body background |
+| 카드·패널 | `var(--surface)` `#FFFFFF` | 컨텐츠 카드 배경 |
+| 내부 함몰 | `var(--surface-sunken)` `#EEF1F5` | 입력 필드·비활성 영역 |
+| 경계선 | `var(--border)` `#E3E6EA` | 기본 구분선 |
+| 강한 경계선 | `var(--border-strong)` `#D0D5DD` | 강조 구분선 |
+| 본문 | `var(--ink)` `#14171C` | 주요 텍스트 |
+| 보조 | `var(--muted)` `#45505B` | 설명·보조 텍스트 |
+| 희미 | `var(--faint)` `#6B7280` | 라벨·캡션 전용 |
+| 브랜드(산업블루) | `var(--brand)` `#1E5FA5` | CTA·링크·강조 |
+| 브랜드 진한 | `var(--brand-ink)` `#0C447C` | 호버·눌림 상태 |
+| 브랜드 배경 | `var(--brand-tint)` `#E6F1FB` | 배지·태그 배경 |
+| 브랜드 위 텍스트 | `var(--on-brand)` `#FFFFFF` | brand 버튼 내 텍스트 |
+| 정상 | `var(--ok)` `#047857` | 성공·해결 상태 |
+| 주의 | `var(--warn)` `#854F0B` | 경고 상태 |
+| 위험 | `var(--danger)` `#B42318` | 오류·위험 상태 |
+
+심각도 배경: `var(--ok-bg)` / `var(--warn-bg)` / `var(--danger-bg)`
+심각도 경계: `var(--ok-border)` / `var(--warn-border)` / `var(--danger-border)`
 
 ### 규율 1 — 모바일 우선 절대
 - 단일 컬럼 기본, 외곽 패딩 16–24px (`var(--space-md)` ~ `var(--space-lg)`)
@@ -60,14 +78,16 @@
 - CTA 버튼: `min-h-[var(--touch-cta)]` (48px) 이상
 - `type="button"` 필수 (form submit 오작동 방지)
 
-### 규율 4 — 한 페이지 한 테마
-- 다크 단일 원칙 (`#07090F` 기반). 페이지 내 라이트 카드 혼용 금지
-- `bg-white`, `bg-slate-*`, `bg-gray-*` 직접 사용 금지 — `var(--surface)`로 대체
+### 규율 4 — 한 페이지 한 테마 (라이트 단일)
+- `var(--canvas)` 기반 라이트 단일 원칙. 다크 카드·순백 혼용 금지
+- `bg-white`, `bg-gray-*`, `bg-slate-*`, `bg-black` 직접 사용 금지 — 토큰 유틸만 사용
+- **raw hex 직접 작성 절대 금지** (globals.css `:root` 정의 내부만 허용)
 
 ### 규율 5 — 대비 WCAG AA (4.5:1)
-- 다크 배경 위: 흰색(`#fff`) 또는 밝은 회색(`text-white/70` 이상) 사용
-- `var(--accent)` (#00E887)은 강조·CTA·아이콘 전용 — **본문 텍스트 색으로 사용 금지**
-- 위험/경고 상태는 `var(--color-danger)` / `var(--color-warn)` 시맨틱 토큰 사용
+- 본문은 `text-muted` 이상. `text-faint`는 라벨·캡션 전용, 그 아래 색 금지
+- `var(--brand)` (#1E5FA5)은 CTA·강조·링크 전용 — **본문 텍스트 색으로 사용 금지**
+- 심각도 색 매핑: 정상→`ok` / 주의→`warn` / 위험→`danger` (의미 역전 금지)
+- 심각도 배경·경계선은 반드시 `--ok-bg` / `--warn-bg` / `--danger-bg` 토큰 사용
 
 ### 토큰 사용 원칙
 - CSS 변수(`var(--)`)·Tailwind 유틸리티만 사용. **raw hex 직접 작성 금지**

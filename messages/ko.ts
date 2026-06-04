@@ -89,7 +89,7 @@ export const ko: Record<string, string> = {
   /* ── Page: /diagnose ─────────────────────────── */
   'diagnose.title': '사출 불량 AI 추정',
   'diagnose.subtitle': '불량 정보와 성형 조건을 입력하면 AI가 원인과 해결책을 알려드립니다.',
-  'diagnose.sample_title': '샘플 케이스로 빠른 테스트',
+  'diagnose.sample_title': '예시로 빠르게 체험',
 
   /* STEP 1: Defect Info */
   'step1.title': '불량 정보 입력',

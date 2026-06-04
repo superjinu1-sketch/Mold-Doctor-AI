@@ -29,22 +29,22 @@ export default function Navbar() {
 
   return (
     <>
-      <nav className="fixed top-0 w-full z-50 border-b border-white/5 bg-[#07090F]/80 backdrop-blur-xl">
+      <nav className="fixed top-0 w-full z-50 border-b border-border bg-canvas/80 backdrop-blur-xl">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <div className="flex items-center justify-between h-14">
             {/* Logo */}
             <Link href="/" className="flex items-center gap-2 font-bold">
-              <div className="w-7 h-7 rounded-lg bg-[#00E887] flex items-center justify-center shadow-[0_0_12px_rgba(0,232,135,0.4)]">
-                <span className="text-black text-xs font-black">M</span>
+              <div className="w-7 h-7 rounded-lg bg-brand flex items-center justify-center shadow-sm">
+                <span className="text-on-brand text-xs font-black">M</span>
               </div>
-              <span className="text-sm tracking-tight text-white">Mold Doctor AI</span>
+              <span className="text-sm tracking-tight text-ink">Mold Doctor AI</span>
             </Link>
 
             {/* Desktop Nav */}
-            <div className="hidden md:flex items-center gap-7 text-sm text-white/40">
-              <Link href="/diagnose" className="hover:text-white transition-colors">{t('nav.estimate')}</Link>
-              <Link href="/guide" className="hover:text-white transition-colors">{t('nav.guide')}</Link>
-              <Link href="/pricing" className="hover:text-white transition-colors">{t('nav.pricing')}</Link>
+            <div className="hidden md:flex items-center gap-7 text-sm text-faint">
+              <Link href="/diagnose" className="hover:text-ink transition-colors">{t('nav.estimate')}</Link>
+              <Link href="/guide" className="hover:text-ink transition-colors">{t('nav.guide')}</Link>
+              <Link href="/pricing" className="hover:text-ink transition-colors">{t('nav.pricing')}</Link>
             </div>
 
             {/* Desktop right */}
@@ -53,7 +53,7 @@ export default function Navbar() {
               <button
                 type="button"
                 onClick={toggleLocale}
-                className="min-w-[44px] min-h-[44px] flex items-center justify-center text-xs font-bold text-white/50 hover:text-white border border-white/15 hover:border-white/40 rounded-lg px-2 transition-colors"
+                className="min-w-[44px] min-h-[44px] flex items-center justify-center text-xs font-bold text-faint hover:text-ink border border-border hover:border-border-strong rounded-lg px-2 transition-colors"
                 aria-label="언어 전환 / Switch language"
               >
                 {t('nav.locale_toggle')}
@@ -64,7 +64,7 @@ export default function Navbar() {
                 <button
                   type="button"
                   onClick={signInWithGoogle}
-                  className="min-h-[44px] flex items-center gap-2 bg-white hover:bg-white/90 text-slate-800 px-4 rounded-full text-sm font-semibold transition-colors"
+                  className="min-h-[44px] flex items-center gap-2 bg-white hover:bg-surface-sunken text-ink border border-border-strong shadow-sm px-4 rounded-full text-sm font-semibold transition-colors"
                 >
                   <GoogleIcon />
                   {t('auth.signin')}
@@ -76,30 +76,30 @@ export default function Navbar() {
                   <button
                     type="button"
                     onClick={() => setUserMenuOpen(!userMenuOpen)}
-                    className="min-h-[44px] flex items-center gap-2 border border-white/15 hover:border-white/30 rounded-full px-3 transition-colors"
+                    className="min-h-[44px] flex items-center gap-2 border border-border hover:border-border-strong rounded-full px-3 transition-colors"
                   >
                     {avatarUrl ? (
                       /* eslint-disable-next-line @next/next/no-img-element */
                       <img src={avatarUrl} alt="" className="w-6 h-6 rounded-full shrink-0" />
                     ) : (
-                      <div className="w-6 h-6 rounded-full bg-[#00E887]/30 flex items-center justify-center shrink-0">
-                        <span className="text-[#00E887] text-xs font-bold">{email[0]?.toUpperCase()}</span>
+                      <div className="w-6 h-6 rounded-full bg-brand-tint flex items-center justify-center shrink-0">
+                        <span className="text-brand-ink text-xs font-bold">{email[0]?.toUpperCase()}</span>
                       </div>
                     )}
-                    <span className="text-white/70 text-xs">{shortEmail}</span>
-                    <svg className="w-3 h-3 text-white/30" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <span className="text-muted text-xs">{shortEmail}</span>
+                    <svg className="w-3 h-3 text-faint" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                     </svg>
                   </button>
                   {userMenuOpen && (
                     <>
                       <div className="fixed inset-0 z-10" onClick={() => setUserMenuOpen(false)} />
-                      <div className="absolute right-0 top-full mt-2 w-44 bg-[#0D1117] border border-white/10 rounded-xl shadow-xl z-20 py-1">
-                        <div className="px-4 py-2 text-xs text-white/30 border-b border-white/5">{email}</div>
+                      <div className="absolute right-0 top-full mt-2 w-44 bg-surface-solid border border-border rounded-xl shadow-xl z-20 py-1">
+                        <div className="px-4 py-2 text-xs text-faint border-b border-border">{email}</div>
                         <button
                           type="button"
                           onClick={() => { signOut(); setUserMenuOpen(false); }}
-                          className="w-full text-left px-4 py-2.5 text-sm text-white/60 hover:text-white hover:bg-white/5 transition-colors"
+                          className="w-full text-left px-4 py-2.5 text-sm text-muted hover:text-ink hover:bg-surface-sunken transition-colors"
                         >
                           {t('auth.signout')}
                         </button>
@@ -111,7 +111,7 @@ export default function Navbar() {
 
               {loading && (
                 <div className="min-h-[44px] w-24 flex items-center justify-center">
-                  <div className="w-4 h-4 border-2 border-white/20 border-t-white/60 rounded-full animate-spin" />
+                  <div className="w-4 h-4 border-2 border-border border-t-brand rounded-full animate-spin" />
                 </div>
               )}
             </div>
@@ -121,14 +121,14 @@ export default function Navbar() {
               <button
                 type="button"
                 onClick={toggleLocale}
-                className="min-w-[44px] min-h-[44px] flex items-center justify-center text-xs font-bold text-white/50 hover:text-white border border-white/15 rounded-lg px-2 transition-colors"
+                className="min-w-[44px] min-h-[44px] flex items-center justify-center text-xs font-bold text-faint hover:text-ink border border-border rounded-lg px-2 transition-colors"
                 aria-label="언어 전환 / Switch language"
               >
                 {t('nav.locale_toggle')}
               </button>
               <button
                 type="button"
-                className="min-w-[44px] min-h-[44px] flex items-center justify-center rounded-lg hover:bg-white/5 text-white/60"
+                className="min-w-[44px] min-h-[44px] flex items-center justify-center rounded-lg hover:bg-surface-sunken text-muted"
                 onClick={() => setMenuOpen(!menuOpen)}
                 aria-label="메뉴 열기"
               >
@@ -144,14 +144,14 @@ export default function Navbar() {
 
           {/* Mobile Menu */}
           {menuOpen && (
-            <div className="md:hidden pb-4 flex flex-col gap-1 border-t border-white/5 pt-3">
+            <div className="md:hidden pb-4 flex flex-col gap-1 border-t border-border pt-3">
               {[
                 { href: '/diagnose', label: t('nav.estimate') },
                 { href: '/guide', label: t('nav.guide') },
                 { href: '/pricing', label: t('nav.pricing') },
               ].map(({ href, label }) => (
                 <Link key={href} href={href}
-                  className="text-white/50 hover:text-white hover:bg-white/5 px-3 py-3 rounded-lg text-sm font-medium transition-colors min-h-[44px] flex items-center"
+                  className="text-faint hover:text-ink hover:bg-surface-sunken px-3 py-3 rounded-lg text-sm font-medium transition-colors min-h-[44px] flex items-center"
                   onClick={() => setMenuOpen(false)}>
                   {label}
                 </Link>
@@ -162,7 +162,7 @@ export default function Navbar() {
                 <button
                   type="button"
                   onClick={() => { signInWithGoogle(); setMenuOpen(false); }}
-                  className="mt-2 flex items-center justify-center gap-2 bg-white text-slate-800 px-4 py-3 rounded-full font-bold text-sm min-h-[44px]"
+                  className="mt-2 flex items-center justify-center gap-2 bg-white text-ink border border-border-strong shadow-sm px-4 py-3 rounded-full font-bold text-sm min-h-[44px]"
                 >
                   <GoogleIcon />
                   {t('auth.signin')}
@@ -170,22 +170,22 @@ export default function Navbar() {
               )}
 
               {!loading && user && (
-                <div className="mt-2 border border-white/10 rounded-xl p-3 space-y-2">
+                <div className="mt-2 border border-border rounded-xl p-3 space-y-2">
                   <div className="flex items-center gap-2">
                     {avatarUrl ? (
                       /* eslint-disable-next-line @next/next/no-img-element */
                       <img src={avatarUrl} alt="" className="w-8 h-8 rounded-full shrink-0" />
                     ) : (
-                      <div className="w-8 h-8 rounded-full bg-[#00E887]/30 flex items-center justify-center shrink-0">
-                        <span className="text-[#00E887] text-sm font-bold">{email[0]?.toUpperCase()}</span>
+                      <div className="w-8 h-8 rounded-full bg-brand-tint flex items-center justify-center shrink-0">
+                        <span className="text-brand-ink text-sm font-bold">{email[0]?.toUpperCase()}</span>
                       </div>
                     )}
-                    <span className="text-white/50 text-xs truncate flex-1">{email}</span>
+                    <span className="text-faint text-xs truncate flex-1">{email}</span>
                   </div>
                   <button
                     type="button"
                     onClick={() => { signOut(); setMenuOpen(false); }}
-                    className="w-full text-left text-sm text-white/50 hover:text-white py-2 px-2 rounded-lg hover:bg-white/5 transition-colors min-h-[44px] flex items-center"
+                    className="w-full text-left text-sm text-faint hover:text-ink py-2 px-2 rounded-lg hover:bg-surface-sunken transition-colors min-h-[44px] flex items-center"
                   >
                     {t('auth.signout')}
                   </button>

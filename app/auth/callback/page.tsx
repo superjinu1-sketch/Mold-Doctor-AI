@@ -21,9 +21,9 @@ export default function AuthCallbackPage() {
   }, [router]);
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center gap-4 bg-[#07090F]">
-      <div className="w-8 h-8 border-2 border-white/20 border-t-[#00E887] rounded-full animate-spin" />
-      <p className="text-white/40 text-sm">{t('auth.callback_loading')}</p>
+    <div className="min-h-screen flex flex-col items-center justify-center gap-4 bg-canvas">
+      <div className="w-8 h-8 border-2 border-border border-t-brand rounded-full animate-spin" />
+      <p className="text-muted text-sm">{t('auth.callback_loading')}</p>
     </div>
   );
 }
