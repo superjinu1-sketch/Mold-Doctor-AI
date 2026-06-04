@@ -704,13 +704,13 @@ function DiagnoseContent() {
           </svg>
           <span className="text-faint font-semibold text-sm">{t('diagnose.sample_title')}</span>
         </div>
-        <div className="flex flex-wrap gap-2">
+        <div className="flex gap-2 overflow-x-auto pb-1 -mx-1 px-1 sm:flex-wrap sm:overflow-visible sm:mx-0 sm:px-0">
           {SAMPLE_CASES.map((c, i) => (
             <button
               key={i}
               type="button"
               onClick={() => loadSample(i)}
-              className="bg-surface-sunken hover:bg-brand-tint text-muted hover:text-brand-ink border border-border hover:border-[var(--brand-border)] px-3 py-2.5 rounded-lg text-sm font-medium transition-colors whitespace-nowrap min-h-[44px] flex items-center"
+              className="shrink-0 bg-surface-sunken hover:bg-brand-tint text-muted hover:text-brand-ink border border-border hover:border-[var(--brand-border)] px-3 py-2.5 rounded-lg text-sm font-medium transition-colors whitespace-nowrap min-h-[44px] flex items-center"
             >
               {c.label} — {t(c.defectTypeKey)}
             </button>
