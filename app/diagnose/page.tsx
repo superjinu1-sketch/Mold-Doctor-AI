@@ -1,9 +1,11 @@
 'use client';
 
 import { useState, useRef, useCallback, useEffect, Suspense } from 'react';
-import { useSearchParams } from 'next/navigation';
+import { useSearchParams, useRouter } from 'next/navigation';
 import DiagnosisResultPanel from '@/components/DiagnosisResultPanel';
 import { useLocale } from '@/contexts/LocaleContext';
+import { useAuth } from '@/contexts/AuthContext';
+import { authHeaders } from '@/lib/supabase/authHeader';
 
 // --- Types ---
 interface ImageFile {
@@ -281,6 +283,8 @@ const SAMPLE_CASES = [
 function DiagnoseContent() {
   const searchParams = useSearchParams();
   const { t, locale } = useLocale();
+  const { user, signInWithGoogle } = useAuth();
+  const router = useRouter();
 
   const [images, setImages] = useState<ImageFile[]>([]);
   const [defectType, setDefectType] = useState('');
@@ -314,6 +318,7 @@ function DiagnoseContent() {
 
   const [isLoading, setIsLoading] = useState(false);
   const [result, setResult] = useState<DiagnosisResult | null>(null);
+  const [sessionId, setSessionId] = useState<string | null>(null);
   const [error, setError] = useState('');
 
   // Follow-up state
@@ -546,6 +551,11 @@ function DiagnoseContent() {
       setError(t('err.resin_required'));
       return;
     }
+    if (!user) {
+      setError(t('auth.login_required'));
+      await signInWithGoogle();
+      return;
+    }
     setIsLoading(true);
     setError('');
     setResult(null);
@@ -577,10 +587,20 @@ function DiagnoseContent() {
 
       const res = await fetch('/api/diagnose', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', ...(await authHeaders()) },
         body: JSON.stringify(payload),
       });
 
+      if (res.status === 401) {
+        setError(t('auth.login_required'));
+        await signInWithGoogle();
+        return;
+      }
+      if (res.status === 402) {
+        setError(t('credit.insufficient'));
+        router.push('/pricing');
+        return;
+      }
       if (!res.ok) {
         let errMsg = t('err.estimate_fail');
         try { const err = await res.json(); errMsg = err.error || errMsg; } catch { /* ignore */ }
@@ -589,10 +609,13 @@ function DiagnoseContent() {
 
       const diagnosisTier = (res.headers.get('X-Diagnosis-Tier') || 'simple') as 'simple' | 'complex';
       const diagnosisRound = Number(res.headers.get('X-Diagnosis-Round') || round);
+      const newSessionId = res.headers.get('X-Session-Id');
+      if (newSessionId) setSessionId(newSessionId);
 
       const data = await res.json();
       data.tier = diagnosisTier;
       data.round = diagnosisRound;
+      if (newSessionId) data.session_id = newSessionId;
       setResult(data);
       setShowFollowUpForm(false);
 
@@ -1288,6 +1311,7 @@ function DiagnoseContent() {
               onStartFollowUp={handleStartFollowUp}
               resinType={resinType === '기타 (직접 입력)' ? customResin : resinType}
               machineSettings={{ ...settings, ...advSettings }}
+              sessionId={sessionId}
             />
           </div>
         )}

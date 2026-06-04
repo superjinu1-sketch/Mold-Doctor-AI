@@ -78,6 +78,8 @@ export const en: Record<string, string> = {
   'auth.signout': 'Sign out',
   'auth.signing_in': 'Signing in...',
   'auth.callback_loading': 'Completing sign-in...',
+  'auth.login_required': 'Please sign in to continue. Redirecting to Google login.',
+  'credit.insufficient': 'Not enough credits. Redirecting to the pricing page.',
 
   /* ── Navbar ─────────────────────────────────── */
   'nav.estimate': 'Analyze',
@@ -302,6 +304,8 @@ export const en: Record<string, string> = {
   'chat.limit': ' used',
   'chat.limit_msg': 'Free plan question limit (%d) reached.',
   'chat.placeholder': 'Ask about the analysis results...',
+  'chat.followup_limit': 'You have used all 5 follow-up questions for this estimate. Start a new estimate.',
+  'chat.error': 'An error occurred while getting a chat response.',
   'chat.send': 'Send',
   'chat.q1': ' — how does changing to  affect cycle time?',
   'chat.q2': ' — how do I verify this first, step by step?',

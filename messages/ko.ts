@@ -78,6 +78,8 @@ export const ko: Record<string, string> = {
   'auth.signout': '로그아웃',
   'auth.signing_in': '로그인 중...',
   'auth.callback_loading': '로그인 처리 중...',
+  'auth.login_required': '로그인 후 이용할 수 있습니다. 구글 로그인 창으로 이동합니다.',
+  'credit.insufficient': '크레딧이 부족합니다. 충전 페이지로 이동합니다.',
 
   /* ── Navbar ─────────────────────────────────── */
   'nav.estimate': '추정하기',
@@ -304,6 +306,8 @@ export const ko: Record<string, string> = {
   'chat.limit': '회 사용',
   'chat.limit_msg': '무료 플랜 질문 한도(%d회)를 모두 사용했습니다.',
   'chat.placeholder': '추정 결과에 대해 질문하세요...',
+  'chat.followup_limit': '이 추정의 추가 질문 5회를 모두 사용했어요. 새 추정을 시작해 주세요.',
+  'chat.error': '채팅 응답 중 오류가 발생했습니다.',
   'chat.send': '전송',
   'chat.q1': '으로 바꾸면 사이클 타임이 늘어나나요?',
   'chat.q2': '을 먼저 확인하려면 구체적으로 어떻게 하나요?',

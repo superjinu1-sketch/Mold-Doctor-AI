@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { useLocale } from '@/contexts/LocaleContext';
+import { authHeaders } from '@/lib/supabase/authHeader';
 
 interface DiagnosisResult {
   defect_type: { ko: string; en: string };
@@ -298,9 +299,10 @@ interface Props {
   onStartFollowUp?: () => void;
   resinType?: string;
   machineSettings?: Record<string, unknown>;
+  sessionId?: string | null;
 }
 
-export default function DiagnosisResultPanel({ result, onSavePDF, round = 1, followUpHistory = [], onResolved, onStartFollowUp, resinType, machineSettings }: Props) {
+export default function DiagnosisResultPanel({ result, onSavePDF, round = 1, followUpHistory = [], onResolved, onStartFollowUp, resinType, machineSettings, sessionId }: Props) {
   const { t, locale } = useLocale();
   const [checkedItems, setCheckedItems] = useState<Set<number>>(new Set());
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
@@ -357,7 +359,7 @@ export default function DiagnosisResultPanel({ result, onSavePDF, round = 1, fol
     try {
       const res = await fetch('/api/diagnose-chat', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', ...(await authHeaders()) },
         body: JSON.stringify({
           question: q,
           diagnosisResult: result,
@@ -365,10 +367,22 @@ export default function DiagnosisResultPanel({ result, onSavePDF, round = 1, fol
           resinType,
           machineSettings,
           locale,
+          session_id: sessionId,
         }),
       });
+
+      if (res.status === 401) {
+        setChatError(t('auth.login_required'));
+        setIsChatLoading(false);
+        return;
+      }
+      if (res.status === 402) {
+        setChatError(t('chat.followup_limit'));
+        setIsChatLoading(false);
+        return;
+      }
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || '...');
+      if (!res.ok) throw new Error(data.error || t('chat.error'));
       setChatMessages(prev => [...prev, { role: 'assistant', content: data.answer }]);
     } catch (err) {
       setChatError(err instanceof Error ? err.message : '...');

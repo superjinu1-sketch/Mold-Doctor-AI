@@ -1,6 +1,7 @@
 import Anthropic from '@anthropic-ai/sdk';
 import { NextRequest, NextResponse } from 'next/server';
 import { tryMock } from '@/lib/mock';
+import { supabaseAdmin } from '@/lib/supabase/server';
 function getApiKey(): string {
   return process.env.ANTHROPIC_API_KEY || '';
 }
@@ -15,10 +16,40 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: '질문을 입력해주세요.' }, { status: 400 });
     }
 
+    const authHeader = req.headers.get('authorization') || '';
+    const token = authHeader.startsWith('Bearer ') ? authHeader.slice(7) : '';
+    if (!token) {
+      return NextResponse.json({ error: '로그인이 필요합니다.', code: 'AUTH_REQUIRED' }, { status: 401 });
+    }
+    const { data: userData, error: userErr } = await supabaseAdmin.auth.getUser(token);
+    if (userErr || !userData?.user) {
+      return NextResponse.json({ error: '로그인이 필요합니다.', code: 'AUTH_REQUIRED' }, { status: 401 });
+    }
+    const userId = userData.user.id;
+
+    const sessionId = body.session_id as string | undefined;
+    if (!sessionId) {
+      return NextResponse.json({ error: '세션 정보가 없습니다. 새 추정을 시작해주세요.', code: 'NO_SESSION' }, { status: 400 });
+    }
+    const { data: fuRaw, error: fuErr } = await supabaseAdmin.rpc('add_follow_up', {
+      p_session_id: sessionId,
+      p_user_id: userId,
+    });
+    if (fuErr) {
+      return NextResponse.json({ error: '팔로업 처리 중 오류가 발생했습니다.', code: 'FOLLOWUP_ERROR' }, { status: 500 });
+    }
+    const fu = fuRaw as { ok: boolean; code?: string; follow_up_count?: number };
+    if (!fu?.ok) {
+      if (fu?.code === 'FOLLOWUP_LIMIT') {
+        return NextResponse.json({ error: '이 추정의 추가 질문 5회를 모두 사용했습니다. 새 추정을 시작해 주세요.', code: 'FOLLOWUP_LIMIT' }, { status: 402 });
+      }
+      return NextResponse.json({ error: '세션을 찾을 수 없습니다.', code: 'NOT_FOUND' }, { status: 403 });
+    }
+
     // TODO: rate-limit 구현 (과금/크레딧 보호)
     const apiKey = getApiKey();
     if (!apiKey) {
-      return NextResponse.json({ error: '서버 환경변수 ANTHROPIC_API_KEY 미설정' }, { status: 401 });
+      return NextResponse.json({ error: '서버 환경변수 ANTHROPIC_API_KEY 미설정' }, { status: 500 });
     }
 
     // 진단 결과에서 핵심 필드만 추출 (비용 최적화)

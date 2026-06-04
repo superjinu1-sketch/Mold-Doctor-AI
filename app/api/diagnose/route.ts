@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { downscaleBase64 } from '@/lib/downscale';
 import { tryMock } from '@/lib/mock';
 import { getResinSpec, checkSettings, formatKbCompare } from '@/lib/resin-kb';
+import { supabaseAdmin } from '@/lib/supabase/server';
 
 // JSON 문자열 값 안의 실제 줄바꿈을 공백으로 치환 (문자 단위 파싱)
 function sanitizeJsonNewlines(text: string): string {
@@ -333,9 +334,40 @@ function buildSystemBlocks(resinType: string, tier: 'simple' | 'complex' = 'simp
 }
 
 export async function POST(request: NextRequest) {
+  // 진단 throw 시 환불에 쓸 컨텍스트 (start_session 성공 후 채워짐)
+  let refundCtx: { sessionId: string; userId: string } | null = null;
   try {
     const body = await request.json();
     const mock = tryMock(body); if (mock) return mock;
+
+    // ── 베타-B 인증 + 크레딧 게이트 ──────────────────────────
+    const authHeader = request.headers.get('authorization') || '';
+    const token = authHeader.startsWith('Bearer ') ? authHeader.slice(7) : '';
+    if (!token) {
+      return NextResponse.json({ error: '로그인이 필요합니다.', code: 'AUTH_REQUIRED' }, { status: 401 });
+    }
+    const { data: userData, error: userErr } = await supabaseAdmin.auth.getUser(token);
+    if (userErr || !userData?.user) {
+      return NextResponse.json({ error: '로그인이 필요합니다.', code: 'AUTH_REQUIRED' }, { status: 401 });
+    }
+    const userId = userData.user.id;
+
+    // 진단 본 호출 전 크레딧 원자 차감(신규는 lazy 5크레딧 grant 후 1 차감)
+    const { data: sessRaw, error: sessErr } = await supabaseAdmin.rpc('start_session', { p_user_id: userId });
+    if (sessErr) {
+      return NextResponse.json({ error: '크레딧 처리 중 오류가 발생했습니다.', code: 'CREDIT_ERROR' }, { status: 500 });
+    }
+    const sess = sessRaw as { ok: boolean; code?: string; session_id?: string; credit_balance?: number };
+    if (!sess?.ok) {
+      return NextResponse.json(
+        { error: '크레딧이 부족합니다.', code: 'INSUFFICIENT', credit_balance: sess?.credit_balance ?? 0 },
+        { status: 402 }
+      );
+    }
+    const sessionId = sess.session_id as string;
+    const creditBalance = sess.credit_balance as number;
+    refundCtx = { sessionId, userId };
+    // ──────────────────────────────────────────────────────
     const {
       defectType, defectDescription, resinInfo, settings, advSettings, moldInfo, productInfo, images, moldDrawings,
       isFollowUp, previousDiagnosis, actionsTaken, changeDescription, round: bodyRound, locale,
@@ -528,7 +560,7 @@ CRITICAL: Your entire response must be ONLY the JSON object. No text before or a
     // TODO: rate-limit 구현 (과금/크레딧 보호)
     const apiKey = getApiKey();
     if (!apiKey) {
-      return NextResponse.json({ error: '서버 환경변수 ANTHROPIC_API_KEY 미설정' }, { status: 401 });
+      return NextResponse.json({ error: '서버 환경변수 ANTHROPIC_API_KEY 미설정' }, { status: 500 });
     }
     const client = new Anthropic({ apiKey });
 
@@ -542,6 +574,7 @@ CRITICAL: Your entire response must be ONLY the JSON object. No text before or a
     const rawText = response.content[0].type === 'text' ? response.content[0].text : '';
 
     let result;
+    let parseFallback = false;       // 3차 폴백(구조화 실패) = 부분성공 → 환불 대상
     try {
       // 1차: JSON 문자열 내부 줄바꿈 제거 후 파싱
       const sanitized = sanitizeJsonNewlines(rawText);
@@ -553,6 +586,7 @@ CRITICAL: Your entire response must be ONLY the JSON object. No text before or a
         if (!match) throw new Error('No JSON');
         result = JSON.parse(sanitizeJsonNewlines(match[0]));
       } catch {
+        parseFallback = true;        // 3차 폴백 진입
         // 3차: 핵심 필드만 regex로 추출, raw_response fallback
         const getText = (key: string) => {
           const m = rawText.match(new RegExp(`"${key}"\\s*:\\s*"([^"]*)"`, 'i'));
@@ -579,14 +613,40 @@ CRITICAL: Your entire response must be ONLY the JSON object. No text before or a
       cache_read: (u as unknown as Record<string, number>).cache_read_input_tokens ?? 0,
     };
 
+    // 부분성공(파싱 폴백)이면 크레딧 환불(멱등). throw 아니라 200 경로라 여기서 처리.
+    let finalBalance = creditBalance;
+    if (parseFallback && refundCtx) {
+      try {
+        const { data: rfRaw } = await supabaseAdmin.rpc('refund_session', {
+          p_session_id: refundCtx.sessionId,
+          p_user_id: refundCtx.userId,
+        });
+        const rf = rfRaw as { ok?: boolean; credit_balance?: number };
+        finalBalance = rf?.ok && typeof rf.credit_balance === 'number' ? rf.credit_balance : creditBalance + 1;
+      } catch {
+        finalBalance = creditBalance + 1;
+      }
+    }
+
+    // 성공 = 헤더로 세션·잔액 전달. 실패(401·402·500)는 body의 code로 분기(헤더 안 씀).
     return NextResponse.json(result, {
       headers: {
         'X-Diagnosis-Tier': tier,
         'X-Diagnosis-Round': String(round),
+        'X-Session-Id': sessionId,
+        'X-Credit-Balance': String(finalBalance),
       },
     });
   } catch (error) {
     console.error('Diagnose API error:', error);
+    if (refundCtx) {
+      try {
+        await supabaseAdmin.rpc('refund_session', {
+          p_session_id: refundCtx.sessionId,
+          p_user_id: refundCtx.userId,
+        });
+      } catch { /* 환불 실패는 무시(로그만) */ }
+    }
     return NextResponse.json(
       { error: error instanceof Error ? error.message : '진단 중 오류가 발생했습니다.' },
       { status: 500 }
