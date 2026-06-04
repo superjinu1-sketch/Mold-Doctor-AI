@@ -50,6 +50,12 @@ interface DiagnosisResult {
     recommendations: string[];
   };
   raw_response?: string;
+  _debug?: {
+    model: string;
+    input_tokens: number;
+    output_tokens: number;
+    cache_read: number;
+  };
 }
 
 function SeverityBadge({ severity }: { severity: string }) {
@@ -301,7 +307,12 @@ export default function DiagnosisResultPanel({ result, onSavePDF, round = 1, fol
   const [chatInput, setChatInput] = useState('');
   const [isChatLoading, setIsChatLoading] = useState(false);
   const [chatError, setChatError] = useState('');
+  const [isDebug, setIsDebug] = useState(false);
   const chatBottomRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    setIsDebug(new URLSearchParams(window.location.search).get('debug') === '1');
+  }, []);
 
   useEffect(() => {
     if (chatMessages.length > 0) {
@@ -413,6 +424,26 @@ export default function DiagnosisResultPanel({ result, onSavePDF, round = 1, fol
         <button type="button" onClick={onResolved}
           className="mx-auto mt-2 flex items-center gap-2 bg-brand-tint hover:bg-brand-tint text-brand-ink border border-[var(--brand-border)] px-5 py-3 rounded-xl text-base font-bold transition-colors min-h-[var(--touch-cta)]">
           {t('fallback.nodefect_btn')}
+        </button>
+      </div>
+    );
+  }
+
+  /* Insufficient_Input — 이미지 없고 입력 근거 부족 (이미지 관련 멘트 없음) */
+  if (defectTypeEn === 'Insufficient_Input') {
+    return (
+      <div className="bg-surface-solid border border-border rounded-2xl p-6 sm:p-8 text-center space-y-4">
+        <div className="text-5xl">📝</div>
+        <h2 className="text-lg font-bold text-ink">
+          {locale === 'en' ? 'More Information Needed' : '추가 정보가 필요합니다'}
+        </h2>
+        <p className="text-muted text-base leading-relaxed">{summary}</p>
+        <button
+          type="button"
+          onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+          className="mx-auto mt-2 flex items-center gap-2 bg-brand hover:brightness-90 text-on-brand px-5 py-3 rounded-xl text-base font-bold transition-colors min-h-[var(--touch-cta)]"
+        >
+          {locale === 'en' ? 'Add Information & Retry' : '정보 입력 후 재시도'}
         </button>
       </div>
     );
@@ -834,6 +865,21 @@ export default function DiagnosisResultPanel({ result, onSavePDF, round = 1, fol
           </button>
         </div>
       </div>
+      {isDebug && result._debug && (() => {
+        const d = result._debug!;
+        const isHaiku = d.model.toLowerCase().includes('haiku');
+        const priceIn = isHaiku ? 1 : 3;
+        const priceOut = isHaiku ? 5 : 15;
+        const costUsd = d.input_tokens / 1e6 * priceIn + d.output_tokens / 1e6 * priceOut;
+        const costKrw = Math.round(costUsd * 1500);
+        return (
+          <div className="mt-2 px-3 py-1.5 bg-surface-sunken rounded-lg">
+            <span className="font-mono text-faint" style={{ fontSize: '11px' }}>
+              tok in={d.input_tokens} out={d.output_tokens} cache={d.cache_read} · {d.model} · ≈₩{costKrw}
+            </span>
+          </div>
+        );
+      })()}
       <ChatSection
         chatMessages={chatMessages}
         chatInput={chatInput}

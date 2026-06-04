@@ -258,5 +258,85 @@
       "severity": "high",
       "trap": "외관 양품이라 성형 조건으로 해결하려 하지만, GF 고함량 소재의 웰드는 사출 조건 최적화만으로 한계. 금형 설계 변경이 필요한 케이스."
     }
+  },
+
+  {
+    "id": "text-001",
+    "source": "텍스트 전용 회귀",
+    "title": "PA66 은줄 — 이미지 없는 텍스트 전용 경로",
+    "difficulty": "basic",
+    "prevent_image_fallback": true,
+    "description": "이미지 없이 수지+불량유형+셋팅만 입력. No_Defect/Image_Unreadable 로 빠지면 버그.",
+    "input": {
+      "defect_type": "은줄 (Silver Streak)",
+      "resin_type": "PA66",
+      "resin_detail": "PA66 GF30%",
+      "machine_settings": {
+        "nozzle_temp": 295, "zone1_temp": 290, "zone2_temp": 285, "zone3_temp": 275, "zone4_temp": 265,
+        "mold_temp_fixed": 80, "mold_temp_moving": 80,
+        "injection_pressure": 115, "holding_pressure": 75,
+        "injection_speed_1": 60, "back_pressure": 3, "screw_rpm": 140,
+        "drying_temp": 80, "drying_time": 2
+      }
+    },
+    "expected": {
+      "root_cause": "건조 시간 2시간은 PA66에 불충분 (권장 4~8시간) — 수분 가수분해로 은줄",
+      "key_recommendations": ["건조 시간 2→4~8시간 연장", "배압 증가"],
+      "expected_phase": "material",
+      "severity": "medium"
+    }
+  },
+  {
+    "id": "text-002",
+    "source": "텍스트 전용 회귀",
+    "title": "POM 버닝 — 이미지 없는 텍스트 전용 경로",
+    "difficulty": "basic",
+    "prevent_image_fallback": true,
+    "description": "이미지 없이 수지+불량유형+셋팅만 입력. No_Defect/Image_Unreadable 로 빠지면 버그.",
+    "input": {
+      "defect_type": "버닝/가스마크 (Burn Mark)",
+      "resin_type": "POM(아세탈)",
+      "resin_detail": "POM 호모폴리머",
+      "machine_settings": {
+        "nozzle_temp": 218, "zone1_temp": 212, "zone2_temp": 208, "zone3_temp": 200, "zone4_temp": 192,
+        "mold_temp_fixed": 88, "mold_temp_moving": 88,
+        "injection_pressure": 105, "holding_pressure": 68,
+        "injection_speed_1": 78, "back_pressure": 5, "screw_rpm": 120
+      },
+      "mold_info": { "mold_type": "2판", "gate_type": "핀포인트", "cavity_count": 4 }
+    },
+    "expected": {
+      "root_cause": "POM 권장 온도(190~210℃) 초과로 포름알데히드 분해 + 고속 사출로 가스 압축",
+      "key_recommendations": ["노즐 온도 218→205℃ 감소", "사출속도 감소", "벤트 청소/추가"],
+      "expected_phase": "filling",
+      "severity": "high"
+    }
+  },
+  {
+    "id": "text-003",
+    "source": "텍스트 전용 회귀",
+    "title": "PC 크랙 — 이미지 없는 텍스트 전용 경로",
+    "difficulty": "basic",
+    "prevent_image_fallback": true,
+    "description": "이미지 없이 수지+불량유형+셋팅만 입력. No_Defect/Image_Unreadable 로 빠지면 버그.",
+    "input": {
+      "defect_type": "크랙 (Crack)",
+      "resin_type": "PC",
+      "resin_detail": "PC 투명",
+      "machine_settings": {
+        "nozzle_temp": 292, "zone1_temp": 288, "zone2_temp": 282, "zone3_temp": 276, "zone4_temp": 268,
+        "mold_temp_fixed": 88, "mold_temp_moving": 88,
+        "injection_pressure": 128, "holding_pressure": 108,
+        "holding_time": 12, "injection_speed_1": 50,
+        "drying_temp": 120, "drying_time": 4
+      },
+      "defect_description": "이형 후 24시간 뒤 보스 근처 크랙. 성형 직후에는 양품."
+    },
+    "expected": {
+      "root_cause": "보압 108MPa은 사출압의 84%로 과보압 → 잔류응력 → 24시간 후 ESC(환경응력균열)",
+      "key_recommendations": ["보압 108→80~90MPa 감소", "금형온도 증가로 응력 완화"],
+      "expected_phase": "packing",
+      "severity": "high"
+    }
   }
 ]

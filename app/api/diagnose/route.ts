@@ -423,8 +423,21 @@ export async function POST(request: NextRequest) {
     const s = settings || {};
     const a = advSettings || {};
 
+    const noImageGuard = safeImages.length === 0 ? `[이미지 없음 — 텍스트 기반 추정 모드]
+- 불량 사진이 제공되지 않았다. IMAGE QUALITY CHECK 단계를 건너뛰어라.
+- No_Defect_Detected / Image_Unreadable 로 절대 분기하지 마라 (이미지가 없으므로 해당 없음).
+- 사용자가 선택한 불량 유형(${defectType || '미선택'})을 defect_type으로 사용하고,
+  공정 조건·수지 특성으로 원인과 조정안을 정상적으로 추정하라 (causes/recommendations 최소 1개).
+- 예외: 불량 유형도 미선택이고 셋팅값도 거의 없어 추정 근거가 전혀 없을 때만:
+  defect_type.en='Insufficient_Input', severity='low',
+  summary='추가 정보가 필요합니다. 불량 유형을 선택하거나 사출 조건을 입력해 주세요.',
+  causes=[], recommendations=[].
+  ※ 이미지/재촬영/사진 관련 문구 절대 쓰지 마라.
+
+` : '';
+
     const diagnosisText = `
-다음 사출 불량 정보를 Scientific Molding 방법론으로 체계적으로 분석해주세요.
+${noImageGuard}다음 사출 불량 정보를 Scientific Molding 방법론으로 체계적으로 분석해주세요.
 
 ## 불량 정보
 - 불량 유형: ${defectType || '사진 분석 필요'}
@@ -550,6 +563,14 @@ CRITICAL: Your entire response must be ONLY the JSON object. No text before or a
         };
       }
     }
+
+    const u = response.usage;
+    result._debug = {
+      model: response.model,
+      input_tokens: u.input_tokens,
+      output_tokens: u.output_tokens,
+      cache_read: (u as unknown as Record<string, number>).cache_read_input_tokens ?? 0,
+    };
 
     return NextResponse.json(result, {
       headers: {
