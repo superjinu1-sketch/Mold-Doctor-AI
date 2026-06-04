@@ -551,6 +551,14 @@ CRITICAL: Your entire response must be ONLY the JSON object. No text before or a
       }
     }
 
+    const u = response.usage;
+    result._debug = {
+      model: response.model,
+      input_tokens: u.input_tokens,
+      output_tokens: u.output_tokens,
+      cache_read: (u as unknown as Record<string, number>).cache_read_input_tokens ?? 0,
+    };
+
     return NextResponse.json(result, {
       headers: {
         'X-Diagnosis-Tier': tier,

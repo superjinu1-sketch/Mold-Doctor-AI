@@ -50,6 +50,12 @@ interface DiagnosisResult {
     recommendations: string[];
   };
   raw_response?: string;
+  _debug?: {
+    model: string;
+    input_tokens: number;
+    output_tokens: number;
+    cache_read: number;
+  };
 }
 
 function SeverityBadge({ severity }: { severity: string }) {
@@ -301,7 +307,12 @@ export default function DiagnosisResultPanel({ result, onSavePDF, round = 1, fol
   const [chatInput, setChatInput] = useState('');
   const [isChatLoading, setIsChatLoading] = useState(false);
   const [chatError, setChatError] = useState('');
+  const [isDebug, setIsDebug] = useState(false);
   const chatBottomRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    setIsDebug(new URLSearchParams(window.location.search).get('debug') === '1');
+  }, []);
 
   useEffect(() => {
     if (chatMessages.length > 0) {
@@ -834,6 +845,21 @@ export default function DiagnosisResultPanel({ result, onSavePDF, round = 1, fol
           </button>
         </div>
       </div>
+      {isDebug && result._debug && (() => {
+        const d = result._debug!;
+        const isHaiku = d.model.toLowerCase().includes('haiku');
+        const priceIn = isHaiku ? 1 : 3;
+        const priceOut = isHaiku ? 5 : 15;
+        const costUsd = d.input_tokens / 1e6 * priceIn + d.output_tokens / 1e6 * priceOut;
+        const costKrw = Math.round(costUsd * 1500);
+        return (
+          <div className="mt-2 px-3 py-1.5 bg-surface-sunken rounded-lg">
+            <span className="font-mono text-faint" style={{ fontSize: '11px' }}>
+              tok in={d.input_tokens} out={d.output_tokens} cache={d.cache_read} · {d.model} · ≈₩{costKrw}
+            </span>
+          </div>
+        );
+      })()}
       <ChatSection
         chatMessages={chatMessages}
         chatInput={chatInput}
