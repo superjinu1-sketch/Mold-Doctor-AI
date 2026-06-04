@@ -2,8 +2,8 @@
   "name": "Mold Doctor AI",
   "short_name": "MoldDoc",
   "description": "사출 불량 AI 트러블슈팅 앱",
-  "theme_color": "#1E293B",
-  "background_color": "#F8FAFC",
+  "theme_color": "#1E5FA5",
+  "background_color": "#F4F5F7",
   "display": "standalone",
   "start_url": "/",
   "icons": [

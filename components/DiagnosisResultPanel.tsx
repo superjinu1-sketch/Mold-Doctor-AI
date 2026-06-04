@@ -64,9 +64,9 @@ function SeverityBadge({ severity }: { severity: string }) {
 }
 
 function DirectionArrow({ direction }: { direction?: string }) {
-  if (direction === 'up') return <span className="text-red-500 font-bold">↑</span>;
-  if (direction === 'down') return <span className="text-blue-500 font-bold">↓</span>;
-  return <span className="text-green-500 font-bold">✓</span>;
+  if (direction === 'up') return <span className="text-danger font-bold">↑</span>;
+  if (direction === 'down') return <span className="text-brand font-bold">↓</span>;
+  return <span className="text-ok font-bold">✓</span>;
 }
 
 type CauseItem = DiagnosisResult['causes'][number];
@@ -108,7 +108,7 @@ function CauseCard({ cause }: { cause: CauseItem }) {
       icon: '✕',
       value: cause.elimination,
       headerCls: 'bg-[var(--warn-bg)] hover:bg-[var(--warn-bg)] text-warn',
-      bodyCls: 'bg-[var(--warn-bg)] border-amber-500/20 text-warn',
+      bodyCls: 'bg-[var(--warn-bg)] border-[var(--warn-border)] text-warn',
     },
     {
       key: 'verification',
@@ -376,7 +376,7 @@ export default function DiagnosisResultPanel({ result, onSavePDF, round = 1, fol
   suggestedQuestions.push(t('chat.q3'));
 
   const roundBadge = round === 1
-    ? { label: t('result.round1'), cls: 'bg-brand-tint text-brand-ink border border-blue-500/30' }
+    ? { label: t('result.round1'), cls: 'bg-brand-tint text-brand-ink border border-[var(--brand-border)]' }
     : round === 2
     ? { label: t('result.round2'), cls: 'bg-[var(--warn-bg)] text-warn border border-[var(--warn-border)]' }
     : { label: `${round}${t('result.round_n')}`, cls: 'bg-[var(--danger-bg)] text-danger border border-[var(--danger-border)]' };
@@ -568,7 +568,7 @@ export default function DiagnosisResultPanel({ result, onSavePDF, round = 1, fol
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
               {Object.entries(processWindow).map(([key, val]) => {
                 if (!val) return null;
-                const colorMap = { ok: 'bg-brand-tint border-[var(--brand-border)] text-brand-ink', warning: 'bg-[var(--warn-bg)] border-amber-500/20 text-warn', critical: 'bg-[var(--danger-bg)] border-[var(--danger-border)] text-danger' };
+                const colorMap = { ok: 'bg-brand-tint border-[var(--brand-border)] text-brand-ink', warning: 'bg-[var(--warn-bg)] border-[var(--warn-border)] text-warn', critical: 'bg-[var(--danger-bg)] border-[var(--danger-border)] text-danger' };
                 const iconMap = { ok: '✓', warning: '⚠', critical: '✕' };
                 const c = colorMap[val.status as keyof typeof colorMap] || colorMap.warning;
                 return (
@@ -596,7 +596,7 @@ export default function DiagnosisResultPanel({ result, onSavePDF, round = 1, fol
                 { ring: 'bg-danger', badge: 'bg-danger/20 text-danger border-[var(--danger-border)]' },
                 { ring: 'bg-warn', badge: 'bg-warn/20 text-warn border-[var(--warn-border)]' },
                 { ring: 'bg-warn', badge: 'bg-warn/20 text-warn border-[var(--warn-border)]' },
-                { ring: 'bg-blue-500', badge: 'bg-blue-500/20 text-brand-ink border-blue-500/30' },
+                { ring: 'bg-brand', badge: 'bg-brand-tint text-brand-ink border-[var(--brand-border)]' },
                 { ring: 'bg-surface-sunken', badge: 'bg-surface-sunken text-faint border-border' },
               ];
               const c = colors[(item.step - 1) % colors.length];
@@ -759,7 +759,7 @@ export default function DiagnosisResultPanel({ result, onSavePDF, round = 1, fol
               </div>
             )}
             {(result.mold_analysis.design_risk_factors?.length ?? 0) > 0 && (
-              <div className="bg-[var(--warn-bg)] rounded-xl p-3 border border-amber-500/20">
+              <div className="bg-[var(--warn-bg)] rounded-xl p-3 border border-[var(--warn-border)]">
                 <div className="text-xs font-bold text-warn uppercase tracking-wider mb-2">{t('mold.risks')}</div>
                 <div className="space-y-1">
                   {result.mold_analysis.design_risk_factors?.map((r, i) => (

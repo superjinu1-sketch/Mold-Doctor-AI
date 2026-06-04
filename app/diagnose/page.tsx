@@ -822,7 +822,7 @@ function DiagnoseContent() {
           </h2>
           <div className="grid sm:grid-cols-2 gap-4">
             <div className="sm:col-span-2">
-              <label className={labelCls}>{t('step2.resin_label')} <span className="text-red-500">*</span></label>
+              <label className={labelCls}>{t('step2.resin_label')} <span className="text-danger">*</span></label>
               <select
                 className={inputCls}
                 value={resinType}
@@ -1411,7 +1411,7 @@ function DiagnoseContent() {
                 type="button"
                 onClick={handleFollowUpSubmit}
                 disabled={isLoading}
-                className="flex-1 bg-warn hover:bg-orange-600 disabled:opacity-50 text-ink font-bold py-3 px-6 rounded-xl transition-colors min-h-[var(--touch-cta)] text-base"
+                className="flex-1 bg-warn hover:brightness-90 disabled:opacity-50 text-ink font-bold py-3 px-6 rounded-xl transition-colors min-h-[var(--touch-cta)] text-base"
               >
                 {isLoading ? t('submit.analyzing') : `${round}${t('submit.followup')}`}
               </button>
