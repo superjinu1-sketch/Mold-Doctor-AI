@@ -486,6 +486,61 @@ export async function POST(request: NextRequest) {
       resinInfo?.filler,
     );
 
+    // 금형·기계 해석 가이드레일 — 입력된 항목 관련 규칙만 생성
+    const moldMachineGuard = (() => {
+      const rules: string[] = [];
+      const mi = moldInfo || {};
+      const pi = productInfo || {};
+      const maxClamp = parseFloat(a.maxClampForce || '0');
+      const maxInjP  = parseFloat(a.maxInjPressure || '0');
+      const wallMin  = parseFloat(pi.wallThicknessMin || '0');
+      const wallMax  = parseFloat(pi.wallThicknessMax || '0');
+      const cavities = parseInt(mi.cavities || '0', 10);
+      const screwD   = parseFloat(a.screwDiameter || '0');
+      const moldType = mi.moldType || '';
+      const gateType = mi.gateType || '';
+      const runnerType = mi.runnerType || '';
+
+      if (maxClamp > 0)
+        rules.push(`- 최대 형체력 ${maxClamp}ton: 플래시 발생 시 형체력 한계 여부를 먼저 검토하라. 요구형체력(캐비티 투영면적×캐비티압×캐비티수)이 최대형체력 초과 → 성형조건 조정으로 해결 불가, "형체력 한계(더 큰 기계 또는 캐비티 수 축소)"를 1순위로.`);
+
+      if (maxInjP > 0)
+        rules.push(`- 최대 사출압 ${maxInjP}MPa: 미성형 + 고점도 수지/긴 유로 시 기계 압력 한계 검토.`);
+
+      if (wallMin > 0 && wallMax > 0) {
+        const variance = wallMax - wallMin;
+        if (variance > 1.5)
+          rules.push(`- 벽두께 편차 ${wallMin}~${wallMax}mm(편차 ${variance.toFixed(1)}mm): 불균일 수축 → 휨 의심 가중. 두꺼운 쪽은 싱크/보이드 주의.`);
+        if (wallMax > 4)
+          rules.push(`- 두꺼운 벽(최대 ${wallMax}mm): 보압·보압시간·냉각시간 요구 증가. 게이트씰 시간 길어짐.`);
+      }
+
+      if (cavities >= 4) {
+        const hasSpecific = !!(defectDescription && /특정.*캐비티|캐비티.*만|specific.*cavit/i.test(defectDescription));
+        if (hasSpecific)
+          rules.push(`- 캐비티 ${cavities}개 + 특정 캐비티 증상: 러너 밸런스·핫러너 노즐 온도를 성형조건보다 우선 검토 (국부 원인).`);
+        else
+          rules.push(`- 캐비티 ${cavities}개: 특정 캐비티 집중 불량이면 러너 밸런스·핫러너 노즐 편차 우선.`);
+      }
+
+      if (moldType.includes('핫') || runnerType === '핫')
+        rules.push(`- 핫러너: 데드스팟 체류·노즐 온도 편차 → 은선/변색/흑점/특정 캐비티 불량 원인 가중.`);
+
+      if (/핀포인트/i.test(gateType))
+        rules.push(`- 핀포인트 게이트: 제팅(통과속도↓)·미성형(압력손실)·은선(전단발열) 위험 가중.`);
+
+      if (runnerType === '콜드')
+        rules.push(`- 콜드러너: 콜드슬러그웰 확인 (흑점·미성형).`);
+
+      if (screwD > 0 && screwD < 30)
+        rules.push(`- 스크류경 ${screwD}mm(소경): 체류 시간↑ → 은선/변색 원인 가중.`);
+      else if (screwD > 60)
+        rules.push(`- 스크류경 ${screwD}mm(대경): 전단↓·계량 안정성 확인.`);
+
+      if (rules.length === 0) return '';
+      return `[금형·기계 해석 가이드]\n${rules.join('\n')}`;
+    })();
+
     const noImageGuard = safeImages.length === 0 ? `[이미지 없음 — 텍스트 기반 추정 모드]
 - 불량 사진이 제공되지 않았다. IMAGE QUALITY CHECK 단계를 건너뛰어라.
 - No_Defect_Detected / Image_Unreadable 로 절대 분기하지 마라 (이미지가 없으므로 해당 없음).
@@ -548,15 +603,23 @@ ${(a.regrindRatio || a.colorType !== '없음') ? `## 재생재 & 컬러
 - 재생재 혼합 비율: ${a.regrindRatio || '0'}%
 - 컬러 타입: ${a.colorType || '없음'}${a.mbRatio ? `, 투입 비율: ${a.mbRatio}%` : ''}
 ` : ''}
-${(a.machineModel || a.screwDiameter) ? `## 사출기 정보
-- 제조사/모델: ${a.machineModel || '-'}
-- 스크류 직경: ${a.screwDiameter || '-'}mm
-- 최대 형체력: ${a.maxClampForce || '-'}ton, 최대 사출압력: ${a.maxInjPressure || '-'} MPa
+${(a.machineModel || a.screwDiameter || a.maxClampForce || a.maxInjPressure) ? `## 사출기 스펙
+- 기종: ${a.machineModel || '-'}
+- 스크류경: ${a.screwDiameter || '-'}mm
+- 최대 형체력: ${a.maxClampForce || '-'}ton, 최대 사출압: ${a.maxInjPressure || '-'} MPa
 ` : ''}
-${defectGuide ? `${defectGuide}\n\n` : ''}${kbCompare ? `${kbCompare}\n\n` : ''}## 금형 & 제품 정보
-- 금형 타입: ${moldInfo?.moldType || '-'}, 게이트: ${moldInfo?.gateType || '-'}, 캐비티: ${moldInfo?.cavities || '-'}개, 러너: ${moldInfo?.runnerType || '-'}
-- 제품 중량: ${productInfo?.weight || '-'}g, 벽 두께: ${productInfo?.wallThicknessMin || '-'}~${productInfo?.wallThicknessMax || '-'}mm
+${(moldInfo?.moldType || moldInfo?.gateType || moldInfo?.cavities || moldInfo?.runnerType) ? `## 금형 정보
+- 금형 타입: ${moldInfo?.moldType || '-'} (2판/3판/핫러너)
+- 게이트 타입: ${moldInfo?.gateType || '-'}
+- 캐비티 수: ${moldInfo?.cavities || '-'}개
+- 러너 타입: ${moldInfo?.runnerType || '-'}
+` : ''}
+${(productInfo?.weight || productInfo?.wallThicknessMin || productInfo?.wallThicknessMax || productInfo?.notes) ? `## 제품 정보
+- 제품 중량: ${productInfo?.weight || '-'}g
+- 벽 두께: ${productInfo?.wallThicknessMin || '-'}~${productInfo?.wallThicknessMax || '-'}mm
 - 특이사항: ${productInfo?.notes || '없음'}
+` : ''}
+${defectGuide ? `${defectGuide}\n\n` : ''}${moldMachineGuard ? `${moldMachineGuard}\n\n` : ''}${kbCompare ? `${kbCompare}\n\n` : ''}
 
 ${isFollowUp && previousDiagnosis ? `
 ## 후속 추정 정보 (${round}차 Follow-up)
