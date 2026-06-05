@@ -92,7 +92,16 @@ export async function POST(request: NextRequest) {
 
     try {
       const result = JSON.parse(jsonText);
-      return NextResponse.json(result);
+      const eu = response.usage as unknown as Record<string, number>;
+      return NextResponse.json(result, {
+        headers: {
+          'X-Usage-In': String(eu.input_tokens ?? 0),
+          'X-Usage-Out': String(eu.output_tokens ?? 0),
+          'X-Usage-CacheRead': String(eu.cache_read_input_tokens ?? 0),
+          'X-Usage-CacheWrite': String(eu.cache_creation_input_tokens ?? 0),
+          'X-Usage-Model': response.model,
+        },
+      });
     } catch {
       return NextResponse.json({ error: 'AI 응답을 파싱할 수 없습니다. 사출기 화면이 선명한 사진을 사용해주세요.' }, { status: 422 });
     }

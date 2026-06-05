@@ -108,7 +108,16 @@ export async function POST(req: NextRequest) {
     });
 
     const answer = response.content[0].type === 'text' ? response.content[0].text : '';
-    return NextResponse.json({ answer });
+    const cu = response.usage as unknown as Record<string, number>;
+    return NextResponse.json({ answer }, {
+      headers: {
+        'X-Usage-In': String(cu.input_tokens ?? 0),
+        'X-Usage-Out': String(cu.output_tokens ?? 0),
+        'X-Usage-CacheRead': String(cu.cache_read_input_tokens ?? 0),
+        'X-Usage-CacheWrite': String(cu.cache_creation_input_tokens ?? 0),
+        'X-Usage-Model': response.model,
+      },
+    });
   } catch (error) {
     console.error('Chat API error:', error);
     return NextResponse.json(

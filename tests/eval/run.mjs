@@ -21,6 +21,7 @@ import { fileURLToPath } from 'url';
 import { join, dirname } from 'path';
 import { createHash } from 'crypto';
 import Anthropic from '@anthropic-ai/sdk';
+import { costKrw } from './cost.mjs';
 
 const __dir = dirname(fileURLToPath(import.meta.url));
 const ROOT = join(__dir, '../..');
@@ -30,6 +31,7 @@ const PORT = (() => {
   const idx = process.argv.indexOf('--port');
   return idx !== -1 ? process.argv[idx + 1] : (process.env.EVAL_PORT || '3000');
 })();
+const MEASURE_COST = process.argv.includes('--measure-cost');
 const HOST = '127.0.0.1';
 const PASS_THRESHOLD = 70;
 const INTERVAL_MS = 6000; // rate-limit 회피 간격
@@ -153,7 +155,7 @@ function httpPost(path, bodyObj, timeoutMs = 90000) {
     }, res => {
       let data = '';
       res.on('data', c => data += c);
-      res.on('end', () => resolve({ status: res.statusCode, body: data }));
+      res.on('end', () => resolve({ status: res.statusCode, body: data, headers: res.headers }));
     });
     req.on('error', reject);
     req.setTimeout(timeoutMs, () => { req.destroy(); reject(new Error('timeout')); });
@@ -260,6 +262,8 @@ trap_avoided는 hard case가 아니면 null. pass = score >= 70.`;
     }), 'judge');
     const txt = res.content[0]?.type === 'text' ? res.content[0].text.trim() : '';
     const j = JSON.parse(txt.replace(/^```json\s*/i,'').replace(/\s*```$/,''));
+    const ju = res.usage;
+    j._judgeUsage = { in: ju.input_tokens, out: ju.output_tokens, model: JUDGE_MODEL };
     return j;
   } catch (e) {
     return { score: 0, pass: false, reasoning: `Judge 오류: ${e.message}`, phase_ok: false, trap_avoided: null };
@@ -294,16 +298,23 @@ async function main() {
 
   const cases = JSON.parse(readFileSync(join(__dir, 'cases.json'), 'utf-8'));
   const results = [];
+  const costRows = [];      // --measure-cost 케이스별 비용
+  let judgeTotalKrw = 0;    // judge(haiku) 원가 별도 집계
+
+  if (MEASURE_COST) {
+    console.log('  ⚠️  --measure-cost: 캐시 우회 + 헤더 usage 수집 모드\n');
+  }
 
   for (let i = 0; i < cases.length; i++) {
     const c = cases[i];
     const tag = `[${i+1}/${cases.length}] ${c.id} (${c.difficulty.toUpperCase()})`;
     process.stdout.write(`${tag} ${c.title.slice(0, 40)}... `);
 
-    // 1. Call /api/diagnose — 캐시 히트 시 API 스킵
+    // 1. Call /api/diagnose — 캐시 히트 시 API 스킵 (--measure-cost 시 항상 실콜)
     let aiRaw = '';
     let diagError = null;
-    const cached = loadDiagnoseCache(c.id);
+    let diagHeaders = {};
+    const cached = MEASURE_COST ? null : loadDiagnoseCache(c.id);
     if (cached) {
       process.stdout.write(' [cached]');
       aiRaw = cached;
@@ -321,7 +332,8 @@ async function main() {
         diagError = `HTTP ${diagRes.status}: ${diagRes.body.slice(0, 120)}`;
       } else {
         aiRaw = diagRes.body;
-        saveDiagnoseCache(c.id, aiRaw);
+        diagHeaders = diagRes.headers || {};
+        if (!MEASURE_COST) saveDiagnoseCache(c.id, aiRaw);
       }
     } catch (e) {
       diagError = e.message;
@@ -357,8 +369,23 @@ async function main() {
       judgment = { score: 0, pass: false, reasoning: `Judge 오류: ${e.message}`, phase_ok: false, trap_avoided: null };
     }
 
+    // cost 집계 (--measure-cost 시)
+    if (MEASURE_COST) {
+      const usageIn  = parseInt(diagHeaders['x-usage-in']        || '0', 10);
+      const usageOut = parseInt(diagHeaders['x-usage-out']       || '0', 10);
+      const cachRead = parseInt(diagHeaders['x-usage-cacheread'] || '0', 10);
+      const cachWrite= parseInt(diagHeaders['x-usage-cachewrite']|| '0', 10);
+      const model    = diagHeaders['x-usage-model'] || 'claude-sonnet-4-6';
+      const krw = costKrw({ model, in: usageIn, out: usageOut, cacheRead: cachRead, cacheWrite: cachWrite });
+      costRows.push({ id: c.id, model, in: usageIn, out: usageOut, cacheRead: cachRead, cacheWrite: cachWrite, krw });
+      if (judgment._judgeUsage) {
+        const ju = judgment._judgeUsage;
+        judgeTotalKrw += costKrw({ model: ju.model, in: ju.in, out: ju.out });
+      }
+    }
+
     const passStr = judgment.pass ? '✅ PASS' : '❌ FAIL';
-    console.log(`${passStr} (${judgment.score}점)`);
+    console.log(`${passStr} (${judgment.score}점)${MEASURE_COST && costRows.length ? ` [₩${costRows[costRows.length-1].krw}]` : ''}`);
 
     results.push({
       id: c.id,
@@ -423,6 +450,45 @@ async function main() {
   console.log(`\n${'═'.repeat(60)}`);
   console.log(`  FINAL: ${Math.round(passed/total*100)}% PASS  (${passed}/${total})  평균 ${avgScore}/100`);
   console.log(`${'═'.repeat(60)}\n`);
+
+  // ── Cost report (--measure-cost 시) ─────────────────────
+  if (MEASURE_COST && costRows.length > 0) {
+    const krwList = costRows.map(r => r.krw).sort((a, b) => a - b);
+    const sum = krwList.reduce((s, v) => s + v, 0);
+    const mean = Math.round(sum / krwList.length);
+    const median = krwList[Math.floor(krwList.length / 2)];
+    const p90 = krwList[Math.floor(krwList.length * 0.9)];
+    const min = krwList[0];
+    const max = krwList[krwList.length - 1];
+
+    console.log(`\n${'═'.repeat(60)}`);
+    console.log('  원가 측정 결과 (진단 경로 KRW)');
+    console.log(`${'═'.repeat(60)}`);
+    console.log(`  ${'케이스ID'.padEnd(12)} ${'모델'.padEnd(22)} ${'in'.padEnd(7)} ${'out'.padEnd(7)} KRW`);
+    console.log(`  ${'─'.repeat(55)}`);
+    for (const r of costRows) {
+      console.log(`  ${r.id.padEnd(12)} ${r.model.padEnd(22)} ${String(r.in).padEnd(7)} ${String(r.out).padEnd(7)} ₩${r.krw}`);
+    }
+    console.log(`${'─'.repeat(60)}`);
+    console.log(`  min=₩${min}  median=₩${median}  mean=₩${mean}  p90=₩${p90}  max=₩${max}`);
+    console.log(`  judge(haiku) 원가 합계: ₩${judgeTotalKrw}  (QA 내부 원가, 사용자 미부담)`);
+    console.log(`  이미지 경로: N/A — no fixture`);
+    console.log(`  재료분석: N/A — feature not built`);
+    console.log(`${'═'.repeat(60)}\n`);
+
+    const costReport = {
+      generated: new Date().toISOString(),
+      note: '잠정가 — 토큰 실측 후 가격 확정 예정',
+      cases: costRows,
+      aggregate: { min, median, mean, p90, max, count: krwList.length },
+      judge_total_krw: judgeTotalKrw,
+      image_path: 'N/A — no fixture',
+      material_analysis: 'N/A — feature not built',
+    };
+    const reportPath = join(__dir, 'cost-report.json');
+    writeFileSync(reportPath, JSON.stringify(costReport, null, 2));
+    console.log(`  cost-report.json 저장 완료: ${reportPath}\n`);
+  }
 
   // Machine-readable JSON for piping
   const jsonOut = {

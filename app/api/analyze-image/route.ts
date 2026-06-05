@@ -84,7 +84,16 @@ export async function POST(request: NextRequest) {
 
     try {
       const result = JSON.parse(jsonText);
-      return NextResponse.json(result);
+      const au = response.usage as unknown as Record<string, number>;
+      return NextResponse.json(result, {
+        headers: {
+          'X-Usage-In': String(au.input_tokens ?? 0),
+          'X-Usage-Out': String(au.output_tokens ?? 0),
+          'X-Usage-CacheRead': String(au.cache_read_input_tokens ?? 0),
+          'X-Usage-CacheWrite': String(au.cache_creation_input_tokens ?? 0),
+          'X-Usage-Model': response.model,
+        },
+      });
     } catch {
       return NextResponse.json({ error: '이미지 분석 결과를 파싱할 수 없습니다. 다시 시도해주세요.' }, { status: 422 });
     }

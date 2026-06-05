@@ -349,34 +349,41 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    // ── 베타-B 인증 + 크레딧 게이트 ──────────────────────────
-    const authHeader = request.headers.get('authorization') || '';
-    const token = authHeader.startsWith('Bearer ') ? authHeader.slice(7) : '';
-    if (!token) {
-      return NextResponse.json({ error: '로그인이 필요합니다.', code: 'AUTH_REQUIRED' }, { status: 401 });
-    }
-    const { data: userData, error: userErr } = await supabaseAdmin.auth.getUser(token);
-    if (userErr || !userData?.user) {
-      return NextResponse.json({ error: '로그인이 필요합니다.', code: 'AUTH_REQUIRED' }, { status: 401 });
-    }
-    const userId = userData.user.id;
+    // ── eval 원가 측정 우회 (dev only, EVAL_AUTH_BYPASS=1 환경변수 필요) ──
+    const isEvalBypass = process.env.NODE_ENV !== 'production' && process.env.EVAL_AUTH_BYPASS === '1';
+    let sessionId = '';
+    let creditBalance = 0;
 
-    // 진단 본 호출 전 크레딧 원자 차감(신규는 lazy 5크레딧 grant 후 1 차감)
-    const { data: sessRaw, error: sessErr } = await supabaseAdmin.rpc('start_session', { p_user_id: userId });
-    if (sessErr) {
-      return NextResponse.json({ error: '크레딧 처리 중 오류가 발생했습니다.', code: 'CREDIT_ERROR' }, { status: 500 });
+    if (!isEvalBypass) {
+      // ── 베타-B 인증 + 크레딧 게이트 ────────────────────────
+      const authHeader = request.headers.get('authorization') || '';
+      const token = authHeader.startsWith('Bearer ') ? authHeader.slice(7) : '';
+      if (!token) {
+        return NextResponse.json({ error: '로그인이 필요합니다.', code: 'AUTH_REQUIRED' }, { status: 401 });
+      }
+      const { data: userData, error: userErr } = await supabaseAdmin.auth.getUser(token);
+      if (userErr || !userData?.user) {
+        return NextResponse.json({ error: '로그인이 필요합니다.', code: 'AUTH_REQUIRED' }, { status: 401 });
+      }
+      const userId = userData.user.id;
+
+      // 진단 본 호출 전 크레딧 원자 차감(신규는 lazy 5크레딧 grant 후 1 차감)
+      const { data: sessRaw, error: sessErr } = await supabaseAdmin.rpc('start_session', { p_user_id: userId });
+      if (sessErr) {
+        return NextResponse.json({ error: '크레딧 처리 중 오류가 발생했습니다.', code: 'CREDIT_ERROR' }, { status: 500 });
+      }
+      const sess = sessRaw as { ok: boolean; code?: string; session_id?: string; credit_balance?: number };
+      if (!sess?.ok) {
+        return NextResponse.json(
+          { error: '크레딧이 부족합니다.', code: 'INSUFFICIENT', credit_balance: sess?.credit_balance ?? 0 },
+          { status: 402 }
+        );
+      }
+      sessionId = sess.session_id as string;
+      creditBalance = sess.credit_balance as number;
+      refundCtx = { sessionId, userId };
+      // ────────────────────────────────────────────────────
     }
-    const sess = sessRaw as { ok: boolean; code?: string; session_id?: string; credit_balance?: number };
-    if (!sess?.ok) {
-      return NextResponse.json(
-        { error: '크레딧이 부족합니다.', code: 'INSUFFICIENT', credit_balance: sess?.credit_balance ?? 0 },
-        { status: 402 }
-      );
-    }
-    const sessionId = sess.session_id as string;
-    const creditBalance = sess.credit_balance as number;
-    refundCtx = { sessionId, userId };
-    // ──────────────────────────────────────────────────────
     const {
       defectType, defectDescription, resinInfo, settings, advSettings, moldInfo, productInfo, images, moldDrawings,
       isFollowUp, previousDiagnosis, actionsTaken, changeDescription, round: bodyRound, locale,
@@ -638,12 +645,18 @@ CRITICAL: Your entire response must be ONLY the JSON object. No text before or a
     }
 
     // 성공 = 헤더로 세션·잔액 전달. 실패(401·402·500)는 body의 code로 분기(헤더 안 씀).
+    const ru = response.usage as unknown as Record<string, number>;
     return NextResponse.json(result, {
       headers: {
         'X-Diagnosis-Tier': tier,
         'X-Diagnosis-Round': String(round),
         'X-Session-Id': sessionId,
         'X-Credit-Balance': String(finalBalance),
+        'X-Usage-In': String(ru.input_tokens ?? 0),
+        'X-Usage-Out': String(ru.output_tokens ?? 0),
+        'X-Usage-CacheRead': String(ru.cache_read_input_tokens ?? 0),
+        'X-Usage-CacheWrite': String(ru.cache_creation_input_tokens ?? 0),
+        'X-Usage-Model': response.model,
       },
     });
   } catch (error) {

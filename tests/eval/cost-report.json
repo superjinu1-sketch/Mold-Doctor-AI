@@ -1,0 +1,134 @@
+{
+  "generated": "2026-06-05T02:17:37.310Z",
+  "note": "잠정가 — 토큰 실측 후 가격 확정 예정",
+  "cases": [
+    {
+      "id": "case-001",
+      "model": "claude-sonnet-4-6",
+      "in": 3,
+      "out": 2589,
+      "cacheRead": 4388,
+      "cacheWrite": 1378,
+      "krw": 68
+    },
+    {
+      "id": "case-002",
+      "model": "claude-sonnet-4-6",
+      "in": 985,
+      "out": 2610,
+      "cacheRead": 4388,
+      "cacheWrite": 0,
+      "krw": 61
+    },
+    {
+      "id": "case-003",
+      "model": "claude-sonnet-4-6",
+      "in": 1207,
+      "out": 2558,
+      "cacheRead": 4388,
+      "cacheWrite": 0,
+      "krw": 60
+    },
+    {
+      "id": "case-004",
+      "model": "claude-sonnet-4-6",
+      "in": 1227,
+      "out": 2464,
+      "cacheRead": 4388,
+      "cacheWrite": 0,
+      "krw": 57
+    },
+    {
+      "id": "case-005",
+      "model": "claude-sonnet-4-6",
+      "in": 1234,
+      "out": 2521,
+      "cacheRead": 4388,
+      "cacheWrite": 0,
+      "krw": 59
+    },
+    {
+      "id": "case-006",
+      "model": "claude-sonnet-4-6",
+      "in": 1399,
+      "out": 2449,
+      "cacheRead": 4388,
+      "cacheWrite": 0,
+      "krw": 57
+    },
+    {
+      "id": "case-007",
+      "model": "claude-sonnet-4-6",
+      "in": 1400,
+      "out": 3200,
+      "cacheRead": 4388,
+      "cacheWrite": 0,
+      "krw": 74
+    },
+    {
+      "id": "case-008",
+      "model": "claude-sonnet-4-6",
+      "in": 1631,
+      "out": 3547,
+      "cacheRead": 4388,
+      "cacheWrite": 0,
+      "krw": 82
+    },
+    {
+      "id": "case-009",
+      "model": "claude-sonnet-4-6",
+      "in": 1459,
+      "out": 2700,
+      "cacheRead": 4388,
+      "cacheWrite": 0,
+      "krw": 63
+    },
+    {
+      "id": "case-010",
+      "model": "claude-sonnet-4-6",
+      "in": 1447,
+      "out": 2514,
+      "cacheRead": 4388,
+      "cacheWrite": 0,
+      "krw": 59
+    },
+    {
+      "id": "text-001",
+      "model": "claude-sonnet-4-6",
+      "in": 1380,
+      "out": 2688,
+      "cacheRead": 4388,
+      "cacheWrite": 0,
+      "krw": 62
+    },
+    {
+      "id": "text-002",
+      "model": "claude-sonnet-4-6",
+      "in": 1271,
+      "out": 2666,
+      "cacheRead": 4388,
+      "cacheWrite": 0,
+      "krw": 62
+    },
+    {
+      "id": "text-003",
+      "model": "claude-sonnet-4-6",
+      "in": 1369,
+      "out": 2868,
+      "cacheRead": 4388,
+      "cacheWrite": 0,
+      "krw": 67
+    }
+  ],
+  "aggregate": {
+    "min": 57,
+    "median": 62,
+    "mean": 64,
+    "p90": 74,
+    "max": 82,
+    "count": 13
+  },
+  "judge_total_krw": 42,
+  "image_path": "N/A — no fixture",
+  "material_analysis": "N/A — feature not built"
+}
