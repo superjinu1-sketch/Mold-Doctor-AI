@@ -39,11 +39,11 @@ export const en: Record<string, string> = {
   /* ── Pricing page ────────────────────────────── */
   'pricing.badge': 'Simple, Transparent Pricing',
   'pricing.h1': 'AI Analysis Tool Built for the Production Floor',
-  'pricing.sub': 'Injection molding troubleshooting AI for engineers',
+  'pricing.sub': 'Pay only for what you need. 5 free credits on sign-up.',
   'pricing.recommended_badge': '⭐ Recommended',
   'pricing.faq_h2': 'Frequently Asked Questions',
   'pricing.cta_h2': 'Start for Free Right Now',
-  'pricing.cta_sub': 'No credit card required · Works immediately with your Claude API key',
+  'pricing.cta_sub': 'No credit card required · 5 free credits instantly on sign-up',
   'pricing.cta_btn': 'Start Free Analysis',
   'pricing.forever': 'Forever',
   'pricing.custom_quote': 'Custom Quote',

@@ -39,11 +39,11 @@ export const ko: Record<string, string> = {
   /* ── Pricing page ────────────────────────────── */
   'pricing.badge': '간단하고 투명한 가격',
   'pricing.h1': '현장에서 바로 쓰는 AI 추정 도구',
-  'pricing.sub': '사출 엔지니어를 위한 트러블슈팅 AI',
+  'pricing.sub': '필요한 만큼만. 가입하면 5크레딧 무료.',
   'pricing.recommended_badge': '⭐ 추천 플랜',
   'pricing.faq_h2': '자주 묻는 질문',
   'pricing.cta_h2': '지금 바로 무료로 시작하세요',
-  'pricing.cta_sub': '신용카드 불필요 · Claude API 키만 있으면 즉시 사용 가능',
+  'pricing.cta_sub': '신용카드 불필요 · 가입 즉시 5크레딧 무료',
   'pricing.cta_btn': '무료 추정 시작하기',
   'pricing.forever': '영원히',
   'pricing.custom_quote': '맞춤 견적',

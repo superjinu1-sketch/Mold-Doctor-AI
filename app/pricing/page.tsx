@@ -3,46 +3,41 @@
 import Link from 'next/link';
 import { useLocale } from '@/contexts/LocaleContext';
 
-const plans = [
+const creditPacks = [
+  { nameKo: '스타터', nameEn: 'Starter', credits: 5,   priceKo: '₩5,500',  priceEn: '₩5,500',  perKo: '크레딧당 ₩1,100', perEn: '₩1,100 / credit', recommended: false },
+  { nameKo: '베이직', nameEn: 'Basic',   credits: 10,  priceKo: '₩9,900',  priceEn: '₩9,900',  perKo: '크레딧당 ₩990',   perEn: '₩990 / credit',   recommended: true  },
+  { nameKo: '프로',   nameEn: 'Pro',     credits: 30,  priceKo: '₩24,900', priceEn: '₩24,900', perKo: '크레딧당 ₩830',   perEn: '₩830 / credit',   recommended: false },
+  { nameKo: '벌크',   nameEn: 'Bulk',    credits: 100, priceKo: '₩69,000', priceEn: '₩69,000', perKo: '크레딧당 ₩690',   perEn: '₩690 / credit',   recommended: false },
+];
+
+const creditPoints = [
   {
-    name: 'Free',
-    priceKo: '무료', priceEn: 'Free',
-    priceDetailKo: '영원히', priceDetailKey: 'pricing.forever',
-    recommended: false,
-    featuresKo: ['월 3회 AI 추정', '기본 불량 가이드 (12종)', '추정 기록 저장 (로컬)', '12가지 불량 유형 지원'],
-    featuresEn: ['3 AI analyses / month', 'Basic defect guide (12 types)', 'Local analysis history', '12 defect types supported'],
-    notIncludedKo: ['상세 원인 분석 (확률 %)', '셋팅 비교표 상세', '클라우드 기록 저장', '수지별 권장 조건 DB', '이메일 리포트'],
-    notIncludedEn: ['Detailed cause analysis (probability %)', 'Detailed settings comparison', 'Cloud history storage', 'Resin-specific condition DB', 'Email report'],
-    btnTextKo: '무료로 시작', btnTextEn: 'Get Started Free',
-    btnHref: '/diagnose',
+    ko: '1크레딧 = 진단 1건 + 그 건 추가 질문 5회',
+    en: '1 credit = 1 diagnosis + 5 follow-up questions',
   },
   {
-    name: 'Pro',
-    priceKo: '29,000원', priceEn: '$19.99',
-    priceDetailKo: '월 / $19.99', priceDetailEn: '/month',
-    recommended: true,
-    featuresKo: ['무제한 AI 추정', '상세 원인 분석 (확률 %)', '현재 vs 권장 셋팅 비교표', '추정 기록 클라우드 저장', '수지별 권장 조건 DB', '이메일 추정 리포트', '50종 이상 수지 지원', 'PDF 저장'],
-    featuresEn: ['Unlimited AI analyses', 'Detailed cause analysis (probability %)', 'Current vs. recommended settings comparison', 'Cloud analysis history', 'Resin-specific condition DB', 'Email analysis report', '50+ resins supported', 'PDF export'],
-    notIncludedKo: [],
-    notIncludedEn: [],
-    btnTextKo: 'Pro 시작', btnTextEn: 'Start Pro',
-    btnHref: '/diagnose',
+    ko: '셋팅 바꿔 다시 진단하면 새 크레딧 1개',
+    en: 'Re-diagnosing with new settings uses 1 new credit',
   },
   {
-    name: 'Enterprise',
-    priceKo: '문의', priceKey: 'pricing.contact',
-    priceDetailKo: '맞춤 견적', priceDetailKey: 'pricing.custom_quote',
-    recommended: false,
-    featuresKo: ['Pro 모든 기능 포함', '팀 계정 (다수 사용자)', '자사 수지 DB 등록', 'API 연동', '전담 기술 지원', '커스텀 AI 파인튜닝', 'SLA 보장'],
-    featuresEn: ['All Pro features', 'Team accounts (multiple users)', 'Custom resin DB registration', 'API integration', 'Dedicated technical support', 'Custom AI fine-tuning', 'SLA guarantee'],
-    notIncludedKo: [],
-    notIncludedEn: [],
-    btnTextKo: '문의하기', btnTextEn: 'Contact Us',
-    btnHref: 'mailto:contact@molddoctor.ai',
+    ko: '저장된 결과 다시 보기는 무료',
+    en: 'Re-viewing saved results is free',
   },
 ];
 
 const faqs = [
+  {
+    qKo: '크레딧은 어떻게 쓰나요?',
+    qEn: 'How do credits work?',
+    aKo: '크레딧 1개로 추정 1건을 받고, 그 결과에 대한 추가 질문을 5번까지 무료로 할 수 있어요. 셋팅을 바꿔 다시 진단하면 새 크레딧 1개가 쓰이고, 저장된 결과를 다시 보는 건 무료입니다.',
+    aEn: '1 credit gives you 1 analysis result plus up to 5 free follow-up questions on that result. Re-running with new settings uses 1 new credit. Viewing saved results is always free.',
+  },
+  {
+    qKo: '가입하면 뭘 받나요?',
+    qEn: 'What do I get on sign-up?',
+    aKo: '가입 즉시 5크레딧을 무료로 드려요. 모든 기능을 동일한 품질로 쓸 수 있고, 플랜별 기능 차등은 없습니다.',
+    aEn: 'You get 5 free credits immediately on sign-up. All features are available at the same quality — no tier-based feature differences.',
+  },
   {
     qKo: '어떤 수지를 지원하나요?',
     qEn: 'What resins are supported?',
@@ -62,16 +57,10 @@ const faqs = [
     aEn: "Yes — it's a responsive web app optimized for smartphones. You can take defect photos directly with your camera and upload them.",
   },
   {
-    qKo: '우리 회사 수지 데이터를 학습시킬 수 있나요?',
-    qEn: 'Can you train on our proprietary resin data?',
-    aKo: 'Enterprise 플랜에서 자사 수지 DB를 등록하여 맞춤형 추정이 가능합니다. 특수 Grade나 자체 배합 수지에 대한 커스텀 지원을 제공합니다.',
-    aEn: 'With the Enterprise plan, you can register your custom resin DB for tailored analysis. We provide custom support for special grades or in-house compound resins.',
-  },
-  {
-    qKo: 'API 키는 어디서 발급받나요?',
-    qEn: 'Where do I get an API key?',
-    aKo: 'Anthropic의 console.anthropic.com에서 Claude API 키를 발급받으실 수 있습니다. API 키를 .env.local 파일에 입력하면 바로 사용 가능합니다.',
-    aEn: "You can obtain a Claude API key from console.anthropic.com. Enter it in the .env.local file and you're ready to go immediately.",
+    qKo: '우리 회사 수지 데이터를 등록할 수 있나요?',
+    qEn: 'Can we register our proprietary resin data?',
+    aKo: 'Enterprise 문의를 통해 자사 수지 DB 등록 및 맞춤형 추정을 지원합니다. 특수 Grade나 자체 배합 수지에 대한 커스텀 지원을 제공합니다.',
+    aEn: 'Contact us for Enterprise to register your custom resin DB for tailored analysis. We support special grades and in-house compound resins.',
   },
 ];
 
@@ -83,7 +72,7 @@ export default function PricingPage() {
       <div className="max-w-5xl mx-auto">
 
         {/* Header */}
-        <div className="text-center mb-16">
+        <div className="text-center mb-12">
           <div className="inline-flex items-center gap-2 border border-[var(--brand-border)] bg-brand-tint text-brand-ink text-xs font-medium px-3.5 py-1.5 rounded-full mb-6">
             <span className="w-1.5 h-1.5 bg-brand rounded-full" />
             {t('pricing.badge')}
@@ -92,72 +81,140 @@ export default function PricingPage() {
           <p className="text-muted text-base">{t('pricing.sub')}</p>
         </div>
 
-        {/* Plans */}
-        <div className="grid md:grid-cols-3 gap-4 mb-20">
-          {plans.map((plan) => {
-            const price = locale === 'en' ? (plan.priceEn ?? t(plan.priceKey ?? 'pricing.contact')) : plan.priceKo;
-            const priceDetail = locale === 'en' ? (plan.priceDetailEn ?? t(plan.priceDetailKey ?? 'pricing.custom_quote')) : plan.priceDetailKo;
-            const features = locale === 'en' ? plan.featuresEn : plan.featuresKo;
-            const notIncluded = locale === 'en' ? plan.notIncludedEn : plan.notIncludedKo;
-            const btnText = locale === 'en' ? plan.btnTextEn : plan.btnTextKo;
+        {/* 가입 무료 강조 카드 */}
+        <div className="bg-brand-tint border border-[var(--brand-border)] rounded-2xl p-8 sm:p-10 text-center mb-12">
+          <h2 className="text-2xl font-bold text-brand-ink mb-3">
+            {locale === 'en' ? '5 free credits on sign-up' : '가입 즉시 5크레딧 무료'}
+          </h2>
+          <p className="text-muted text-base mb-6">
+            {locale === 'en'
+              ? 'All features, no quality tiers. Start right away.'
+              : '전 기능 그대로. 품질 차등 없이 바로 써보세요.'}
+          </p>
+          <Link
+            href="/diagnose"
+            className="inline-flex items-center justify-center bg-brand text-on-brand px-8 py-3.5 rounded-full font-bold text-base hover:bg-brand-ink transition-colors min-h-[var(--touch-cta)]"
+          >
+            {locale === 'en' ? 'Get started free' : '무료로 시작'}
+          </Link>
+        </div>
 
-            return (
-              <div key={plan.name}
-                className={`relative rounded-2xl overflow-hidden border transition-all ${
-                  plan.recommended
-                    ? 'border-brand bg-brand-tint shadow-sm scale-[1.02]'
-                    : 'border-border bg-surface hover:border-[var(--brand-border)]'
-                }`}>
-                {plan.recommended && (
+        {/* 크레딧 설명 */}
+        <div className="mb-12">
+          <h2 className="text-lg font-bold text-ink text-center mb-6">
+            {locale === 'en' ? 'How credits work' : '크레딧이 뭐예요?'}
+          </h2>
+          <div className="grid sm:grid-cols-3 gap-4">
+            {creditPoints.map((pt, i) => (
+              <div key={i} className="bg-surface border border-border rounded-xl p-5 flex items-start gap-3">
+                <span className="shrink-0 w-7 h-7 rounded-full bg-brand-tint text-brand-ink text-sm font-bold flex items-center justify-center">
+                  {i + 1}
+                </span>
+                <p className="text-muted text-base leading-snug">
+                  {locale === 'en' ? pt.en : pt.ko}
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* 크레딧 팩 그리드 */}
+        <div className="mb-4">
+          <h2 className="text-lg font-bold text-ink text-center mb-6">
+            {locale === 'en' ? 'Credit packs' : '크레딧 팩'}
+          </h2>
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            {creditPacks.map((pack) => (
+              <div
+                key={pack.nameKo}
+                className={`relative rounded-2xl border overflow-hidden ${
+                  pack.recommended
+                    ? 'border-brand bg-brand-tint shadow-sm'
+                    : 'border-border bg-surface'
+                }`}
+              >
+                {pack.recommended && (
                   <div className="text-center bg-brand text-on-brand text-xs font-black py-1.5 tracking-wider">
                     {t('pricing.recommended_badge')}
                   </div>
                 )}
-                <div className={`px-6 ${plan.recommended ? 'pt-6 pb-5' : 'pt-7 pb-5'}`}>
-                  <div className="text-xs font-bold text-faint uppercase tracking-widest mb-3">{plan.name}</div>
-                  <div className={`text-3xl font-bold mb-1 ${plan.recommended ? 'text-brand-ink' : 'text-ink'}`}>
-                    {price}
+                <div className={`px-5 ${pack.recommended ? 'pt-5 pb-4' : 'pt-6 pb-4'}`}>
+                  <div className="text-xs font-bold text-faint uppercase tracking-widest mb-2">
+                    {locale === 'en' ? pack.nameEn : pack.nameKo}
                   </div>
-                  <div className="text-xs text-faint">{priceDetail}</div>
+                  <div className={`text-3xl font-bold mb-0.5 ${pack.recommended ? 'text-brand-ink' : 'text-ink'}`}>
+                    {pack.credits}
+                    <span className="text-base font-semibold text-muted ml-1">
+                      {locale === 'en' ? 'credits' : '크레딧'}
+                    </span>
+                  </div>
+                  <div className="text-xl font-bold text-ink mt-1">
+                    {locale === 'en' ? pack.priceEn : pack.priceKo}
+                  </div>
+                  <div className="text-xs text-faint mt-1">
+                    {locale === 'en' ? pack.perEn : pack.perKo}
+                  </div>
                 </div>
-
-                <div className="px-6 pb-6">
-                  <ul className="space-y-2.5 mb-6">
-                    {features.map((feat) => (
-                      <li key={feat} className="flex items-start gap-2.5 text-sm text-muted">
-                        <span className="text-brand-ink shrink-0 mt-0.5">✓</span>
-                        {feat}
-                      </li>
-                    ))}
-                    {notIncluded.map((feat) => (
-                      <li key={feat} className="flex items-start gap-2.5 text-sm text-faint">
-                        <span className="shrink-0 mt-0.5">–</span>
-                        {feat}
-                      </li>
-                    ))}
-                  </ul>
-                  <Link href={plan.btnHref}
-                    className={`block w-full text-center py-3 rounded-xl font-bold text-sm transition-all min-h-[var(--touch-min)] flex items-center justify-center ${
-                      plan.recommended
-                        ? 'bg-brand text-on-brand hover:bg-brand-ink shadow-sm'
-                        : 'border border-border-strong text-muted hover:bg-surface-sunken hover:text-ink'
-                    }`}>
-                    {btnText}
-                  </Link>
+                <div className="px-5 pb-5">
+                  <button
+                    type="button"
+                    disabled
+                    className="w-full py-3 rounded-xl font-bold text-sm border border-border text-faint bg-surface-sunken disabled:opacity-60 cursor-not-allowed min-h-[var(--touch-min)]"
+                  >
+                    {locale === 'en' ? 'Coming soon' : '구매 준비 중'}
+                  </button>
                 </div>
               </div>
-            );
-          })}
+            ))}
+          </div>
+          <p className="text-center text-faint text-sm mt-4">
+            {locale === 'en'
+              ? 'Credit purchases are coming soon. For now, try it with your 5 free sign-up credits.'
+              : '추가 크레딧 구매는 곧 제공됩니다. 지금은 가입 5크레딧으로 체험하세요.'}
+          </p>
+        </div>
+
+        {/* Enterprise 카드 */}
+        <div className="bg-surface border border-border rounded-2xl p-8 mb-16">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6">
+            <div>
+              <div className="text-xs font-bold text-faint uppercase tracking-widest mb-2">Enterprise</div>
+              <h2 className="text-xl font-bold text-ink mb-3">
+                {locale === 'en' ? 'Custom Quote' : t('pricing.custom_quote')}
+              </h2>
+              <ul className="space-y-1.5">
+                {(locale === 'en'
+                  ? ['Team accounts (multiple users)', 'Custom resin DB registration', 'API integration', 'Dedicated technical support']
+                  : ['팀 계정 (다수 사용자)', '자사 수지 DB 등록', 'API 연동', '전담 기술 지원']
+                ).map((feat) => (
+                  <li key={feat} className="flex items-start gap-2 text-sm text-muted">
+                    <span className="text-brand-ink shrink-0 mt-0.5">✓</span>
+                    {feat}
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <Link
+              href="mailto:contact@molddoctor.ai"
+              className="shrink-0 inline-flex items-center justify-center border border-border-strong text-brand-ink hover:bg-brand-tint px-6 py-3 rounded-xl font-bold text-sm transition-colors min-h-[var(--touch-cta)]"
+            >
+              {locale === 'en' ? 'Contact' : t('pricing.contact')}
+            </Link>
+          </div>
         </div>
 
         {/* FAQ */}
-        <div className="max-w-2xl mx-auto mb-20">
+        <div className="max-w-2xl mx-auto mb-16">
           <h2 className="text-xl font-bold text-ink text-center mb-8">{t('pricing.faq_h2')}</h2>
           <div className="space-y-3">
             {faqs.map((faq, i) => (
               <div key={i} className="bg-surface border border-border rounded-xl p-5">
-                <h3 className="font-semibold text-ink text-sm mb-2">Q. {locale === 'en' ? faq.qEn : faq.qKo}</h3>
-                <p className="text-muted text-sm leading-relaxed">A. {locale === 'en' ? faq.aEn : faq.aKo}</p>
+                <h3 className="font-semibold text-ink text-sm mb-2">
+                  Q. {locale === 'en' ? faq.qEn : faq.qKo}
+                </h3>
+                <p className="text-muted text-sm leading-relaxed">
+                  A. {locale === 'en' ? faq.aEn : faq.aKo}
+                </p>
               </div>
             ))}
           </div>
@@ -167,8 +224,10 @@ export default function PricingPage() {
         <div className="bg-surface border border-border rounded-2xl p-10 text-center">
           <h2 className="text-2xl font-bold text-ink mb-3">{t('pricing.cta_h2')}</h2>
           <p className="text-muted text-sm mb-6">{t('pricing.cta_sub')}</p>
-          <Link href="/diagnose"
-            className="inline-block bg-brand text-on-brand px-8 py-3.5 rounded-full font-bold text-sm hover:bg-brand-ink transition-all shadow-sm">
+          <Link
+            href="/diagnose"
+            className="inline-block bg-brand text-on-brand px-8 py-3.5 rounded-full font-bold text-sm hover:bg-brand-ink transition-all shadow-sm"
+          >
             {t('pricing.cta_btn')}
           </Link>
         </div>
