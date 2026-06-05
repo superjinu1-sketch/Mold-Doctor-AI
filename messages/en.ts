@@ -211,6 +211,12 @@ export const en: Record<string, string> = {
   'adv.screw_dia': 'Screw Diameter',
   'adv.max_clamp': 'Max Clamp Force',
   'adv.max_pressure': 'Max Injection Pressure',
+  'adv.heating_method': 'Mold Heating Method',
+  'adv.heating_none': 'Not specified',
+  'adv.heating_water': 'Water TCU',
+  'adv.heating_oil': 'Oil TCU',
+  'adv.heating_cartridge': 'Cartridge Heater',
+  'adv.optional': 'optional',
 
   /* STEP 4 */
   'step4.title': 'Mold & Product Info (optional)',

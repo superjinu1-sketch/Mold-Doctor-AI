@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { downscaleBase64 } from '@/lib/downscale';
 import { tryMock } from '@/lib/mock';
 import { getResinSpec, checkSettings, formatKbCompare } from '@/lib/resin-kb';
+import { formatDefectGuide } from '@/lib/defect-kb';
 import { supabaseAdmin } from '@/lib/supabase/server';
 import { SAMPLE_DEMO_RESULT } from '@/lib/sample-demo';
 
@@ -477,6 +478,13 @@ export async function POST(request: NextRequest) {
     const kbCompare = resinSpec
       ? formatKbCompare(resinSpec, checkSettings(resinSpec, s, a, resinInfo?.filler))
       : '';
+    const defectGuide = formatDefectGuide(
+      defectType || '',
+      resinSpec,
+      s,
+      a,
+      resinInfo?.filler,
+    );
 
     const noImageGuard = safeImages.length === 0 ? `[이미지 없음 — 텍스트 기반 추정 모드]
 - 불량 사진이 제공되지 않았다. IMAGE QUALITY CHECK 단계를 건너뛰어라.
@@ -545,7 +553,7 @@ ${(a.machineModel || a.screwDiameter) ? `## 사출기 정보
 - 스크류 직경: ${a.screwDiameter || '-'}mm
 - 최대 형체력: ${a.maxClampForce || '-'}ton, 최대 사출압력: ${a.maxInjPressure || '-'} MPa
 ` : ''}
-${kbCompare ? `${kbCompare}\n\n` : ''}## 금형 & 제품 정보
+${defectGuide ? `${defectGuide}\n\n` : ''}${kbCompare ? `${kbCompare}\n\n` : ''}## 금형 & 제품 정보
 - 금형 타입: ${moldInfo?.moldType || '-'}, 게이트: ${moldInfo?.gateType || '-'}, 캐비티: ${moldInfo?.cavities || '-'}개, 러너: ${moldInfo?.runnerType || '-'}
 - 제품 중량: ${productInfo?.weight || '-'}g, 벽 두께: ${productInfo?.wallThicknessMin || '-'}~${productInfo?.wallThicknessMax || '-'}mm
 - 특이사항: ${productInfo?.notes || '없음'}

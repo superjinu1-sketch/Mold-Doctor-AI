@@ -211,6 +211,12 @@ export const ko: Record<string, string> = {
   'adv.screw_dia': '스크류 직경',
   'adv.max_clamp': '최대 형체력',
   'adv.max_pressure': '최대 사출압력',
+  'adv.heating_method': '금형 가열방식',
+  'adv.heating_none': '미입력',
+  'adv.heating_water': '온수기',
+  'adv.heating_oil': '온유기 (오일 TCU)',
+  'adv.heating_cartridge': '카트리지 (히터봉)',
+  'adv.optional': '선택',
 
   /* STEP 4: Mold & Product */
   'step4.title': '금형 & 제품 정보 (선택)',

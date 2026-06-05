@@ -233,6 +233,7 @@ function DiagnoseContent() {
     hrManifoldTemp: '', hrNozzle1Temp: '', hrNozzle2Temp: '', hrNozzle3Temp: '', hrNozzle4Temp: '', valveGate: '없음',
     regrindRatio: '', colorType: '없음', mbRatio: '',
     machineModel: '', screwDiameter: '', maxClampForce: '', maxInjPressure: '',
+    heatingMethod: '',
   });
   const [moldDrawings, setMoldDrawings] = useState<ImageFile[]>([]);
   const [isDraggingDrawing, setIsDraggingDrawing] = useState(false);
@@ -1053,6 +1054,15 @@ function DiagnoseContent() {
                       <div className="text-xs text-muted mb-1">{t('adv.max_pressure')}</div>
                       <input type="text" inputMode="numeric" className={inputCls} placeholder="MPa" value={advSettings.maxInjPressure} onChange={(e) => setAdvSetting('maxInjPressure', e.target.value)} />
                     </div>
+                  </div>
+                  <div>
+                    <label className={labelCls}>{t('adv.heating_method')} <span className="text-faint text-xs">({t('adv.optional')})</span></label>
+                    <select className={inputCls} value={advSettings.heatingMethod} onChange={(e) => setAdvSetting('heatingMethod', e.target.value)}>
+                      <option value="">{t('adv.heating_none')}</option>
+                      <option value="온수기">{t('adv.heating_water')}</option>
+                      <option value="온유기">{t('adv.heating_oil')}</option>
+                      <option value="카트리지">{t('adv.heating_cartridge')}</option>
+                    </select>
                   </div>
                 </div>
 
