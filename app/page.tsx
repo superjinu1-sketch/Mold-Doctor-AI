@@ -3,14 +3,21 @@
 import Link from 'next/link';
 import { useLocale } from '@/contexts/LocaleContext';
 
-// color/dot fields kept for data compatibility but not rendered
-const defects = [
-  { koName: '미성형', en: 'Short Shot', descKo: '충전 부족으로 제품이 완성되지 않음', descEn: 'Incomplete fill — part not fully formed' },
-  { koName: '플래시', en: 'Flash', descKo: '파팅 라인에서 수지가 새어 나옴', descEn: 'Resin bleeds past the parting line' },
-  { koName: '싱크마크', en: 'Sink Mark', descKo: '두꺼운 부위 표면이 함몰됨', descEn: 'Surface depressions at thick sections' },
-  { koName: '웰드라인', en: 'Weld Line', descKo: '수지 합류점에 선이 생김', descEn: 'Line forms at the melt-front junction' },
-  { koName: '버닝/가스마크', en: 'Burn Mark', descKo: '공기 압축 발열로 탄 자국', descEn: 'Char marks from compressed-air combustion' },
-  { koName: '은줄', en: 'Silver Streak', descKo: '수분/가스로 인한 은색 줄무늬', descEn: 'Silver lines from moisture or gas' },
+const defectChips = [
+  { ko: '은선/은줄', en: 'Silver Streak' },
+  { ko: '플래시', en: 'Flash' },
+  { ko: '웰드라인', en: 'Weld Line' },
+  { ko: '싱크마크', en: 'Sink Mark' },
+  { ko: '버닝/가스마크', en: 'Burn Mark' },
+  { ko: '변색', en: 'Discoloration' },
+  { ko: '크랙', en: 'Crack' },
+  { ko: '휨/변형', en: 'Warpage' },
+  { ko: '기포/보이드', en: 'Void/Bubble' },
+  { ko: '제팅', en: 'Jetting' },
+  { ko: '박리', en: 'Delamination' },
+  { ko: 'GF 백화', en: 'Fiber Read-out' },
+  { ko: '흐름자국', en: 'Flow Mark' },
+  { ko: '미성형', en: 'Short Shot' },
 ];
 
 export default function HomePage() {
@@ -65,6 +72,12 @@ export default function HomePage() {
             </Link>
           </div>
 
+          {/* 5 Credits Banner */}
+          <div className="mt-5 inline-flex items-center gap-2 bg-brand-tint border border-[var(--brand-border)] text-brand-ink px-5 py-2.5 rounded-full text-sm font-semibold">
+            <span aria-hidden="true">🎁</span>
+            {t('landing.credits_banner')}
+          </div>
+
           {/* Stats */}
           <div className="mt-16 flex flex-wrap justify-center gap-x-12 gap-y-4">
             {stats.map((s) => (
@@ -77,30 +90,37 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Defect Types */}
+      {/* Defect Coverage */}
       <section className="pb-28 px-4 sm:px-6">
         <div className="max-w-5xl mx-auto">
-          <div className="text-center mb-12">
+          <div className="text-center mb-10">
             <h2 className="text-2xl sm:text-3xl font-bold text-ink mb-3">{t('landing.defects_h2')}</h2>
-            <p className="text-faint text-sm">{t('landing.defects_sub')}</p>
+            <p className="text-muted text-base">{t('landing.defects_sub')}</p>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-            {defects.map((d) => (
-              <Link key={d.en} href={`/diagnose?defect=${encodeURIComponent(d.koName)}`}
-                className="group relative bg-surface border border-border rounded-2xl p-5 hover:border-[var(--brand-border)] transition-all hover:shadow-sm">
-                <div className="flex items-center gap-2 mb-3">
-                  <span className="w-2 h-2 rounded-full bg-brand" />
-                  <span className="text-xs text-faint font-medium">{d.en}</span>
-                </div>
-                <h3 className="text-base font-bold text-ink mb-1">
-                  {locale === 'en' ? d.en : d.koName}
-                </h3>
-                <p className="text-muted text-sm leading-relaxed">
-                  {locale === 'en' ? d.descEn : d.descKo}
-                </p>
-                <span className="absolute top-4 right-4 text-faint group-hover:text-brand-ink transition-colors">→</span>
+
+          {/* Defect chip cloud */}
+          <div className="flex flex-wrap gap-2 justify-center mb-6">
+            {defectChips.map((chip) => (
+              <Link
+                key={chip.en}
+                href="/diagnose"
+                className="px-3.5 py-2 bg-surface border border-border rounded-full text-sm font-medium text-muted hover:border-[var(--brand-border)] hover:text-brand-ink hover:bg-brand-tint transition-colors min-h-[44px] flex items-center"
+              >
+                {locale === 'en' ? chip.en : chip.ko}
               </Link>
             ))}
+            <span className="px-3.5 py-2 bg-surface-sunken rounded-full text-sm font-medium text-faint min-h-[44px] flex items-center select-none">
+              {locale === 'en' ? '+ many more' : '+ 그 외 다수'}
+            </span>
+          </div>
+
+          {/* Safety net */}
+          <div className="flex items-center justify-center gap-2.5 bg-surface-sunken border border-border rounded-xl px-5 py-3.5 max-w-md mx-auto">
+            <svg className="w-5 h-5 text-brand-ink shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+            </svg>
+            <span className="text-muted text-base">{t('landing.defects_safety')}</span>
           </div>
         </div>
       </section>

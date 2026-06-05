@@ -117,7 +117,7 @@ export default function Navbar() {
             </div>
 
             {/* Mobile right side */}
-            <div className="md:hidden flex items-center gap-2">
+            <div className="md:hidden flex items-center gap-1.5">
               <button
                 type="button"
                 onClick={toggleLocale}
@@ -126,6 +126,36 @@ export default function Navbar() {
               >
                 {t('nav.locale_toggle')}
               </button>
+
+              {/* 비로그인: brand 배경 로그인 버튼 / 로그인: 아바타 */}
+              {!loading && !user && (
+                <button
+                  type="button"
+                  onClick={signInWithGoogle}
+                  className="min-h-[44px] flex items-center gap-1.5 bg-brand text-on-brand px-3.5 rounded-full text-sm font-bold transition-colors hover:bg-brand-ink shrink-0"
+                >
+                  {t('auth.signin')}
+                </button>
+              )}
+
+              {!loading && user && (
+                <button
+                  type="button"
+                  onClick={() => setMenuOpen(!menuOpen)}
+                  className="min-w-[44px] min-h-[44px] flex items-center justify-center"
+                  aria-label="계정 메뉴"
+                >
+                  {avatarUrl ? (
+                    /* eslint-disable-next-line @next/next/no-img-element */
+                    <img src={avatarUrl} alt="" className="w-8 h-8 rounded-full border-2 border-border" />
+                  ) : (
+                    <div className="w-8 h-8 rounded-full bg-brand-tint border-2 border-[var(--brand-border)] flex items-center justify-center">
+                      <span className="text-brand-ink text-sm font-bold">{email[0]?.toUpperCase()}</span>
+                    </div>
+                  )}
+                </button>
+              )}
+
               <button
                 type="button"
                 className="min-w-[44px] min-h-[44px] flex items-center justify-center rounded-lg hover:bg-surface-sunken text-muted"
