@@ -51,6 +51,7 @@ interface DiagnosisResult {
     recommendations: string[];
   };
   raw_response?: string;
+  is_demo?: boolean;
   _debug?: {
     model: string;
     input_tokens: number;
@@ -857,28 +858,36 @@ export default function DiagnosisResultPanel({ result, onSavePDF, round = 1, fol
         </div>
       )}
 
-      {/* Follow-up Actions */}
-      <div className="bg-surface rounded-2xl p-4 sm:p-6 border border-border">
-        <div className="text-base font-bold text-muted mb-3">{t('action.prompt')}</div>
-        <div className="flex flex-col sm:flex-row gap-3">
-          <button
-            type="button"
-            onClick={onResolved}
-            className="flex-1 flex items-center justify-center gap-2 bg-brand-tint hover:bg-brand-tint text-brand-ink border border-[var(--brand-border)] px-4 py-3 rounded-xl text-base font-bold transition-colors min-h-[var(--touch-cta)]"
-          >
-            <span className="text-lg">✓</span>
-            {t('action.resolved')}
-          </button>
-          <button
-            type="button"
-            onClick={onStartFollowUp}
-            className="flex-1 flex items-center justify-center gap-2 bg-[var(--warn-bg)] hover:bg-[var(--warn-bg)] text-warn border border-[var(--warn-border)] px-4 py-3 rounded-xl text-base font-bold transition-colors min-h-[var(--touch-cta)]"
-          >
-            <span className="text-lg">→</span>
-            {t('action.followup')}
-          </button>
+      {result.is_demo ? (
+        <div className="rounded-xl border border-[var(--brand-border)] bg-brand-tint p-4 text-center">
+          <p className="text-muted text-base">{t('demo.notice')}</p>
         </div>
-      </div>
+      ) : (
+        <>
+          {/* Follow-up Actions */}
+          <div className="bg-surface rounded-2xl p-4 sm:p-6 border border-border">
+            <div className="text-base font-bold text-muted mb-3">{t('action.prompt')}</div>
+            <div className="flex flex-col sm:flex-row gap-3">
+              <button
+                type="button"
+                onClick={onResolved}
+                className="flex-1 flex items-center justify-center gap-2 bg-brand-tint hover:bg-brand-tint text-brand-ink border border-[var(--brand-border)] px-4 py-3 rounded-xl text-base font-bold transition-colors min-h-[var(--touch-cta)]"
+              >
+                <span className="text-lg">✓</span>
+                {t('action.resolved')}
+              </button>
+              <button
+                type="button"
+                onClick={onStartFollowUp}
+                className="flex-1 flex items-center justify-center gap-2 bg-[var(--warn-bg)] hover:bg-[var(--warn-bg)] text-warn border border-[var(--warn-border)] px-4 py-3 rounded-xl text-base font-bold transition-colors min-h-[var(--touch-cta)]"
+              >
+                <span className="text-lg">→</span>
+                {t('action.followup')}
+              </button>
+            </div>
+          </div>
+        </>
+      )}
       {isDebug && result._debug && (() => {
         const d = result._debug!;
         const isHaiku = d.model.toLowerCase().includes('haiku');
@@ -894,18 +903,20 @@ export default function DiagnosisResultPanel({ result, onSavePDF, round = 1, fol
           </div>
         );
       })()}
-      <ChatSection
-        chatMessages={chatMessages}
-        chatInput={chatInput}
-        setChatInput={setChatInput}
-        isChatLoading={isChatLoading}
-        chatError={chatError}
-        chatDisabled={chatDisabled}
-        userTurns={userTurns}
-        suggestedQuestions={suggestedQuestions}
-        sendChat={sendChat}
-        chatBottomRef={chatBottomRef}
-      />
+      {!result.is_demo && (
+        <ChatSection
+          chatMessages={chatMessages}
+          chatInput={chatInput}
+          setChatInput={setChatInput}
+          isChatLoading={isChatLoading}
+          chatError={chatError}
+          chatDisabled={chatDisabled}
+          userTurns={userTurns}
+          suggestedQuestions={suggestedQuestions}
+          sendChat={sendChat}
+          chatBottomRef={chatBottomRef}
+        />
+      )}
     </div>
   );
 }

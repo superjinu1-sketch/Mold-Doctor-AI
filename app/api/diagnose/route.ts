@@ -4,6 +4,7 @@ import { downscaleBase64 } from '@/lib/downscale';
 import { tryMock } from '@/lib/mock';
 import { getResinSpec, checkSettings, formatKbCompare } from '@/lib/resin-kb';
 import { supabaseAdmin } from '@/lib/supabase/server';
+import { SAMPLE_DEMO_RESULT } from '@/lib/sample-demo';
 
 // JSON 문자열 값 안의 실제 줄바꿈을 공백으로 치환 (문자 단위 파싱)
 function sanitizeJsonNewlines(text: string): string {
@@ -339,6 +340,14 @@ export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
     const mock = tryMock(body); if (mock) return mock;
+
+    // ── 샘플 무료 체험 데모: 인증·크레딧·Anthropic 호출 없이 고정 결과 반환 ──
+    if (body?.isDemo === true) {
+      return NextResponse.json(SAMPLE_DEMO_RESULT, {
+        headers: { 'X-Diagnosis-Tier': 'simple', 'X-Diagnosis-Round': '1', 'X-Demo': '1' },
+        // X-Session-Id 없음(데모는 세션 미생성) → 클라가 팔로업 비활성 처리
+      });
+    }
 
     // ── 베타-B 인증 + 크레딧 게이트 ──────────────────────────
     const authHeader = request.headers.get('authorization') || '';

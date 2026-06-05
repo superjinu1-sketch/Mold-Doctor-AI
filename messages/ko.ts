@@ -306,6 +306,7 @@ export const ko: Record<string, string> = {
   'chat.limit': '회 사용',
   'chat.limit_msg': '무료 플랜 질문 한도(%d회)를 모두 사용했습니다.',
   'chat.placeholder': '추정 결과에 대해 질문하세요...',
+  'demo.notice': '체험용 예시 결과예요. 내 불량 사진과 셋팅값으로 직접 진단하면 추가 질문까지 할 수 있어요.',
   'chat.followup_limit': '이 추정의 추가 질문 5회를 모두 사용했어요. 새 추정을 시작해 주세요.',
   'chat.error': '채팅 응답 중 오류가 발생했습니다.',
   'chat.send': '전송',

@@ -304,6 +304,7 @@ export const en: Record<string, string> = {
   'chat.limit': ' used',
   'chat.limit_msg': 'Free plan question limit (%d) reached.',
   'chat.placeholder': 'Ask about the analysis results...',
+  'demo.notice': 'This is a sample preview. Run a real diagnosis with your own photo and settings to ask follow-up questions.',
   'chat.followup_limit': 'You have used all 5 follow-up questions for this estimate. Start a new estimate.',
   'chat.error': 'An error occurred while getting a chat response.',
   'chat.send': 'Send',

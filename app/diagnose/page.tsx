@@ -167,117 +167,8 @@ const SAMPLE_CASES = [
     metering: '85', cushion: '5', backPressure: '5', screwRpm: '80', clampForce: '',
     moldType: '2판', gateType: '사이드', cavities: '4', runnerType: '콜드', weight: '45', wallThicknessMin: '1.5', wallThicknessMax: '3.0',
   },
-  {
-    label: 'PC', defectTypeKey: 'defect.crack',
-    defectType: '크랙 (Crack)',
-    defectDescription: '이젝터 핀 주변에 크랙 발생. 이형 후 2~3분 내에 나타남. 투명 PC 제품.',
-    resinType: 'PC', filler: '없음', fillerContent: '', flameRetardant: 'UL94 V-0', flameRetardantThickness: '1.6', flameRetardantType: '할로겐프리', resinDetail: 'PC 투명', resinGrade: 'Covestro Makrolon 2405',
-    nozzleTemp: '310', zone1Temp: '305', zone2Temp: '295', zone3Temp: '285', zone4Temp: '275',
-    moldTempFixed: '90', moldTempMoving: '85', injPressure1: '150', holdPressure: '120',
-    injSpeed1: '70', injSpeed2: '50', holdTime: '12', coolTime: '25', injTime: '4',
-    metering: '60', cushion: '4', backPressure: '8', screwRpm: '60', clampForce: '180',
-    moldType: '2판', gateType: '핀포인트', cavities: '2', runnerType: '핫', weight: '120', wallThicknessMin: '2.0', wallThicknessMax: '4.0',
-  },
-  {
-    label: 'POM', defectTypeKey: 'defect.sink_mark',
-    defectType: '싱크마크 (Sink Mark)',
-    defectDescription: '보스(boss) 반대면 표면에 싱크마크 발생. 두께 4mm 구간 집중.',
-    resinType: 'POM(아세탈)', filler: '없음', fillerContent: '', flameRetardant: '없음', flameRetardantThickness: '미입력', flameRetardantType: '해당없음', resinDetail: 'POM Homo', resinGrade: 'Polyplastics Duracon M90',
-    nozzleTemp: '200', zone1Temp: '195', zone2Temp: '190', zone3Temp: '185', zone4Temp: '180',
-    moldTempFixed: '90', moldTempMoving: '90', injPressure1: '130', holdPressure: '100',
-    injSpeed1: '55', injSpeed2: '35', holdTime: '15', coolTime: '30', injTime: '5',
-    metering: '70', cushion: '6', backPressure: '6', screwRpm: '70', clampForce: '120',
-    moldType: '3판', gateType: '핀포인트', cavities: '8', runnerType: '콜드', weight: '30', wallThicknessMin: '2.5', wallThicknessMax: '4.5',
-  },
-  {
-    label: 'PP GF20%', defectTypeKey: 'defect.warpage',
-    defectType: '휨/변형 (Warpage)',
-    defectDescription: '냉각 후 평판형 제품이 대각선 방향으로 1.5mm 이상 휨. 4캐비티 중 유독 2번 캐비티에서 심함.',
-    resinType: 'PP', filler: 'GF(유리섬유)', fillerContent: '20', flameRetardant: '없음', flameRetardantThickness: '미입력', flameRetardantType: '해당없음', resinDetail: 'PP GF20%', resinGrade: '',
-    nozzleTemp: '240', zone1Temp: '235', zone2Temp: '228', zone3Temp: '220', zone4Temp: '210',
-    moldTempFixed: '40', moldTempMoving: '40', injPressure1: '100', holdPressure: '65',
-    injSpeed1: '80', injSpeed2: '55', holdTime: '10', coolTime: '20', injTime: '3',
-    metering: '110', cushion: '8', backPressure: '4', screwRpm: '90', clampForce: '200',
-    moldType: '2판', gateType: '사이드', cavities: '4', runnerType: '콜드', weight: '80', wallThicknessMin: '2.0', wallThicknessMax: '3.5',
-  },
-  {
-    label: 'ABS', defectTypeKey: 'defect.discoloration',
-    defectType: '변색 (Discoloration)',
-    defectDescription: '제품 끝부분 및 웰드라인 부근 황변. 특히 사이클 정지 후 재가동 첫 5샷에 심함.',
-    resinType: 'ABS', filler: '없음', fillerContent: '', flameRetardant: 'UL94 V-0', flameRetardantThickness: '1.6', flameRetardantType: '할로겐', resinDetail: 'ABS V-0', resinGrade: 'LG Chem Starex HG0660',
-    nozzleTemp: '255', zone1Temp: '250', zone2Temp: '245', zone3Temp: '238', zone4Temp: '230',
-    moldTempFixed: '65', moldTempMoving: '60', injPressure1: '110', holdPressure: '75',
-    injSpeed1: '65', injSpeed2: '45', holdTime: '9', coolTime: '18', injTime: '3',
-    metering: '75', cushion: '5', backPressure: '7', screwRpm: '75', clampForce: '150',
-    moldType: '2판', gateType: '사이드', cavities: '4', runnerType: '콜드', weight: '55', wallThicknessMin: '1.8', wallThicknessMax: '3.0',
-  },
-  {
-    label: 'PPS GF40%', defectTypeKey: 'defect.flash',
-    defectType: '플래시 (Flash)',
-    defectDescription: '파팅라인 전체 구간에 얇은 버(flash) 발생. 형체력 올려도 개선 안됨.',
-    resinType: 'PPS', filler: 'GF(유리섬유)', fillerContent: '40', flameRetardant: '없음', flameRetardantThickness: '미입력', flameRetardantType: '해당없음', resinDetail: 'PPS GF40%', resinGrade: 'Toray A504X90',
-    nozzleTemp: '320', zone1Temp: '315', zone2Temp: '310', zone3Temp: '305', zone4Temp: '295',
-    moldTempFixed: '140', moldTempMoving: '135', injPressure1: '160', holdPressure: '110',
-    injSpeed1: '75', injSpeed2: '50', holdTime: '10', coolTime: '20', injTime: '4',
-    metering: '65', cushion: '5', backPressure: '5', screwRpm: '55', clampForce: '250',
-    moldType: '2판', gateType: '필름', cavities: '2', runnerType: '콜드', weight: '90', wallThicknessMin: '1.0', wallThicknessMax: '2.5',
-  },
-  {
-    label: 'PBT GF30%', defectTypeKey: 'defect.weld_line',
-    defectType: '웰드라인 (Weld Line)',
-    defectDescription: '2개 게이트 합류 지점에 뚜렷한 웰드라인. 외관 불량 및 강도 저하 의심.',
-    resinType: 'PBT', filler: 'GF(유리섬유)', fillerContent: '30', flameRetardant: 'UL94 V-0', flameRetardantThickness: '0.8', flameRetardantType: '할로겐프리', resinDetail: 'PBT GF30% V-0', resinGrade: 'BASF Ultradur B4300 G6',
-    nozzleTemp: '260', zone1Temp: '255', zone2Temp: '248', zone3Temp: '240', zone4Temp: '235',
-    moldTempFixed: '80', moldTempMoving: '75', injPressure1: '140', holdPressure: '95',
-    injSpeed1: '70', injSpeed2: '50', holdTime: '10', coolTime: '18', injTime: '3',
-    metering: '80', cushion: '6', backPressure: '6', screwRpm: '65', clampForce: '160',
-    moldType: '2판', gateType: '사이드', cavities: '4', runnerType: '핫', weight: '60', wallThicknessMin: '1.5', wallThicknessMax: '3.0',
-  },
-  {
-    label: 'PC/ABS', defectTypeKey: 'defect.short_shot',
-    defectType: '미성형 (Short Shot)',
-    defectDescription: '제품 끝단부 2군데에서 미충전. 사출 압력 올리면 플래시 발생.',
-    resinType: 'PC/ABS', filler: '없음', fillerContent: '', flameRetardant: 'UL94 V-0', flameRetardantThickness: '1.5', flameRetardantType: '할로겐프리', resinDetail: 'PC/ABS V-0 HF', resinGrade: 'Bayer Bayblend T85',
-    nozzleTemp: '265', zone1Temp: '260', zone2Temp: '252', zone3Temp: '245', zone4Temp: '240',
-    moldTempFixed: '75', moldTempMoving: '70', injPressure1: '145', holdPressure: '95',
-    injSpeed1: '85', injSpeed2: '60', holdTime: '10', coolTime: '20', injTime: '4',
-    metering: '90', cushion: '5', backPressure: '8', screwRpm: '65', clampForce: '200',
-    moldType: '2판', gateType: '핀포인트', cavities: '4', runnerType: '핫', weight: '70', wallThicknessMin: '1.2', wallThicknessMax: '2.8',
-  },
-  {
-    label: 'PA46 GF30%', defectTypeKey: 'defect.silver_streak',
-    defectType: '은줄 (Silver Streak)',
-    defectDescription: '성형 직후에는 양품이나 리플로우 솔더링(260℃) 후 표면에 블리스터 발생. 일부 샷에서는 성형 시에도 은줄 발생.',
-    resinType: 'PA46', filler: 'GF(유리섬유)', fillerContent: '30', flameRetardant: '없음', flameRetardantThickness: '미입력', flameRetardantType: '해당없음', resinDetail: 'PA46 GF30% (Stanyl TW341)', resinGrade: '',
-    nozzleTemp: '310', zone1Temp: '305', zone2Temp: '300', zone3Temp: '290', zone4Temp: '280',
-    moldTempFixed: '120', moldTempMoving: '120', injPressure1: '100', holdPressure: '65',
-    injSpeed1: '60', injSpeed2: '', holdTime: '5', coolTime: '10', injTime: '',
-    metering: '', cushion: '', backPressure: '5', screwRpm: '100', clampForce: '',
-    moldType: '2판', gateType: '핀포인트', cavities: '32', runnerType: '핫', weight: '1.5', wallThicknessMin: '0.5', wallThicknessMax: '1.2',
-  },
-  {
-    label: 'PA410 GF30%', defectTypeKey: 'defect.sink_mark',
-    defectType: '싱크마크 (Sink Mark)',
-    defectDescription: '보스 부위에 싱크마크 발생. 보압 올려도 개선 미미. 금형 온도 낮추면 표면 광택이 떨어짐.',
-    resinType: 'PA410', filler: 'GF(유리섬유)', fillerContent: '30', flameRetardant: '없음', flameRetardantThickness: '미입력', flameRetardantType: '해당없음', resinDetail: 'PA410 GF30% (EcoPaXX Q-HG6)', resinGrade: '',
-    nozzleTemp: '290', zone1Temp: '285', zone2Temp: '280', zone3Temp: '275', zone4Temp: '265',
-    moldTempFixed: '60', moldTempMoving: '60', injPressure1: '110', holdPressure: '75',
-    injSpeed1: '55', injSpeed2: '', holdTime: '6', coolTime: '15', injTime: '',
-    metering: '', cushion: '', backPressure: '5', screwRpm: '80', clampForce: '',
-    moldType: '2판', gateType: '사이드', cavities: '4', runnerType: '콜드', weight: '35', wallThicknessMin: '1.5', wallThicknessMax: '4.0',
-  },
-  {
-    label: 'PA4T GF30%', defectTypeKey: 'defect.flash',
-    defectType: '플래시 (Flash)',
-    defectDescription: '박벽 커넥터 성형 시 PL면에 미세 플래시 발생. 형체력 올려도 잡히지 않음. 일부 캐비티에서 리플로우 솔더링 후 블리스터도 발생.',
-    resinType: 'PA4T', filler: 'GF(유리섬유)', fillerContent: '30', flameRetardant: '없음', flameRetardantThickness: '미입력', flameRetardantType: '해당없음', resinDetail: 'PA4T GF30% (ForTii T11)', resinGrade: '',
-    nozzleTemp: '340', zone1Temp: '335', zone2Temp: '330', zone3Temp: '320', zone4Temp: '310',
-    moldTempFixed: '140', moldTempMoving: '140', injPressure1: '130', holdPressure: '80',
-    injSpeed1: '75', injSpeed2: '', holdTime: '3', coolTime: '8', injTime: '',
-    metering: '', cushion: '', backPressure: '5', screwRpm: '80', clampForce: '',
-    moldType: '2판', gateType: '핀포인트', cavities: '64', runnerType: '핫', weight: '0.8', wallThicknessMin: '0.3', wallThicknessMax: '0.8',
-  },
 ];
+
 
 // --- Main Diagnose Content ---
 function DiagnoseContent() {
@@ -319,6 +210,7 @@ function DiagnoseContent() {
   const [isLoading, setIsLoading] = useState(false);
   const [result, setResult] = useState<DiagnosisResult | null>(null);
   const [sessionId, setSessionId] = useState<string | null>(null);
+  const [demoSnapshot, setDemoSnapshot] = useState<string | null>(null);
   const [error, setError] = useState('');
 
   // Follow-up state
@@ -542,6 +434,12 @@ function DiagnoseContent() {
     setWeight(d.weight);
     setWallThicknessMin(d.wallThicknessMin);
     setWallThicknessMax(d.wallThicknessMax);
+    setDemoSnapshot(JSON.stringify({
+      defectType: d.defectType, resinType: d.resinType,
+      nozzleTemp: d.nozzleTemp, zone1Temp: d.zone1Temp, zone2Temp: d.zone2Temp,
+      moldTempFixed: d.moldTempFixed, injPressure1: d.injPressure1, holdPressure: d.holdPressure,
+      injSpeed1: d.injSpeed1, holdTime: d.holdTime, coolTime: d.coolTime,
+    }));
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
@@ -551,7 +449,15 @@ function DiagnoseContent() {
       setError(t('err.resin_required'));
       return;
     }
-    if (!user) {
+    const currentSnapshot = JSON.stringify({
+      defectType, resinType,
+      nozzleTemp: settings.nozzleTemp, zone1Temp: settings.zone1Temp, zone2Temp: settings.zone2Temp,
+      moldTempFixed: settings.moldTempFixed, injPressure1: settings.injPressure1, holdPressure: settings.holdPressure,
+      injSpeed1: settings.injSpeed1, holdTime: settings.holdTime, coolTime: settings.coolTime,
+    });
+    const isDemo = demoSnapshot !== null && currentSnapshot === demoSnapshot;
+
+    if (!user && !isDemo) {
       setError(t('auth.login_required'));
       await signInWithGoogle();
       return;
@@ -587,19 +493,13 @@ function DiagnoseContent() {
 
       const res = await fetch('/api/diagnose', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', ...(await authHeaders()) },
-        body: JSON.stringify(payload),
+        headers: { 'Content-Type': 'application/json', ...(isDemo ? {} : await authHeaders()) },
+        body: JSON.stringify({ ...payload, isDemo }),
       });
 
-      if (res.status === 401) {
-        setError(t('auth.login_required'));
-        await signInWithGoogle();
-        return;
-      }
-      if (res.status === 402) {
-        setError(t('credit.insufficient'));
-        router.push('/pricing');
-        return;
+      if (!isDemo) {
+        if (res.status === 401) { setError(t('auth.login_required')); await signInWithGoogle(); return; }
+        if (res.status === 402) { setError(t('credit.insufficient')); router.push('/pricing'); return; }
       }
       if (!res.ok) {
         let errMsg = t('err.estimate_fail');
@@ -609,8 +509,8 @@ function DiagnoseContent() {
 
       const diagnosisTier = (res.headers.get('X-Diagnosis-Tier') || 'simple') as 'simple' | 'complex';
       const diagnosisRound = Number(res.headers.get('X-Diagnosis-Round') || round);
-      const newSessionId = res.headers.get('X-Session-Id');
-      if (newSessionId) setSessionId(newSessionId);
+      const newSessionId = res.headers.get('X-Session-Id');   // 데모는 null
+      setSessionId(newSessionId);   // 데모면 null → 팔로업 비활성
 
       const data = await res.json();
       data.tier = diagnosisTier;
