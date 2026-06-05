@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { useLocale } from '@/contexts/LocaleContext';
 import { authHeaders } from '@/lib/supabase/authHeader';
+import { downscaleImageClient } from '@/lib/clientDownscale';
 
 interface DiagnosisResult {
   defect_type: { ko: string; en: string };
@@ -297,7 +298,7 @@ interface Props {
   round?: number;
   followUpHistory?: FollowUpHistoryItem[];
   onResolved?: () => void;
-  onResolvedWithStatus?: (status: string, memo: string) => void;
+  onResolvedWithStatus?: (status: string, memo: string, afterPhoto?: string) => void;
   onStartFollowUp?: () => void;
   resinType?: string;
   machineSettings?: Record<string, unknown>;
@@ -315,6 +316,8 @@ export default function DiagnosisResultPanel({ result, onSavePDF, round = 1, fol
   const [showResolvedForm, setShowResolvedForm] = useState(false);
   const [resolvedStatus, setResolvedStatus] = useState('solved');
   const [resolvedMemo, setResolvedMemo] = useState('');
+  const [afterPhoto, setAfterPhoto] = useState<string | undefined>(undefined);
+  const afterPhotoRef = useRef<HTMLInputElement>(null);
   const chatBottomRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -896,13 +899,53 @@ export default function DiagnosisResultPanel({ result, onSavePDF, round = 1, fol
                   value={resolvedMemo}
                   onChange={(e) => setResolvedMemo(e.target.value)}
                 />
+                {/* 해결 사진 업로드 */}
+                <div>
+                  <button
+                    type="button"
+                    onClick={() => afterPhotoRef.current?.click()}
+                    className="w-full flex items-center gap-2 bg-surface-sunken border border-border rounded-xl px-3 py-3 text-muted text-sm font-medium hover:border-[var(--brand-border)] transition-colors min-h-[44px]"
+                  >
+                    <span>📷</span>
+                    <span>{afterPhoto ? t('history.after_photo') + ' ✓' : t('history.after_photo_label')}</span>
+                  </button>
+                  <p className="text-faint text-xs mt-1 px-1">{t('history.after_photo_help')}</p>
+                  <input
+                    ref={afterPhotoRef}
+                    type="file"
+                    accept="image/*"
+                    capture="environment"
+                    className="hidden"
+                    onChange={async (e) => {
+                      const file = e.target.files?.[0];
+                      if (!file) return;
+                      const reader = new FileReader();
+                      reader.onload = async (ev) => {
+                        const b64 = (ev.target?.result as string)?.split(',')[1];
+                        if (b64) {
+                          const small = await downscaleImageClient(b64, 400);
+                          setAfterPhoto(small);
+                        }
+                      };
+                      reader.readAsDataURL(file);
+                    }}
+                  />
+                  {afterPhoto && (
+                    <div className="mt-2 relative">
+                      <img src={`data:image/jpeg;base64,${afterPhoto}`} alt="" className="w-full max-h-32 object-cover rounded-lg" />
+                      <button type="button" onClick={() => setAfterPhoto(undefined)} className="absolute top-1 right-1 bg-surface text-muted rounded-full w-6 h-6 flex items-center justify-center text-xs border border-border">×</button>
+                    </div>
+                  )}
+                </div>
                 <div className="flex gap-2">
                   <button
                     type="button"
                     onClick={() => {
-                      onResolvedWithStatus?.(resolvedStatus, resolvedMemo);
+                      onResolvedWithStatus?.(resolvedStatus, resolvedMemo, afterPhoto);
                       onResolved?.();
                       setShowResolvedForm(false);
+                      setAfterPhoto(undefined);
+                      setResolvedMemo('');
                     }}
                     className="flex-1 bg-brand text-on-brand py-3 rounded-xl font-bold text-base hover:bg-brand-ink transition-colors min-h-[var(--touch-cta)]"
                   >
@@ -910,7 +953,7 @@ export default function DiagnosisResultPanel({ result, onSavePDF, round = 1, fol
                   </button>
                   <button
                     type="button"
-                    onClick={() => setShowResolvedForm(false)}
+                    onClick={() => { setShowResolvedForm(false); setAfterPhoto(undefined); setResolvedMemo(''); }}
                     className="px-5 py-3 rounded-xl border border-border text-muted font-medium hover:bg-surface-sunken transition-colors min-h-[var(--touch-cta)]"
                   >
                     {t('history.cancel')}

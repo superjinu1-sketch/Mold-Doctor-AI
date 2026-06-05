@@ -7,6 +7,7 @@ import DiagnosisResultPanel from '@/components/DiagnosisResultPanel';
 import { useLocale } from '@/contexts/LocaleContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { authHeaders } from '@/lib/supabase/authHeader';
+import { downscaleImageClient, safeLocalStorageSet } from '@/lib/clientDownscale';
 
 // --- Types ---
 interface ImageFile {
@@ -554,15 +555,35 @@ function DiagnoseContent() {
       try {
         const raw = typeof window !== 'undefined' ? localStorage.getItem('diagnoseHistory') : null;
         const history = JSON.parse(raw || '[]');
-        history.unshift({
+        const record = {
           ...data,
           timestamp: new Date().toISOString(),
           id: newId,
           round: diagnosisRound,
           beforeResin: resinType === '기타 (직접 입력)' ? customResin : resinType,
           beforeSettings: { ...settings },
-        });
-        localStorage.setItem('diagnoseHistory', JSON.stringify(history.slice(0, 20)));
+        };
+        history.unshift(record);
+        const trimmed = history.slice(0, 20);
+        if (!safeLocalStorageSet('diagnoseHistory', JSON.stringify(trimmed))) {
+          // QuotaExceeded: retry without images
+          trimmed.forEach((r: Record<string, unknown>) => { delete r.beforePhoto; delete r.afterPhoto; });
+          safeLocalStorageSet('diagnoseHistory', JSON.stringify(trimmed));
+        }
+        // 비동기: 첫 번째 불량 사진을 축소해 beforePhoto로 추가 저장
+        if (images.length > 0) {
+          downscaleImageClient(images[0].base64, 400).then(thumb => {
+            try {
+              const r2 = localStorage.getItem('diagnoseHistory');
+              const h2 = JSON.parse(r2 || '[]');
+              const idx = h2.findIndex((h: { id: string }) => h.id === newId);
+              if (idx !== -1) {
+                h2[idx].beforePhoto = thumb;
+                safeLocalStorageSet('diagnoseHistory', JSON.stringify(h2));
+              }
+            } catch { /* ignore */ }
+          });
+        }
       } catch { /* ignore */ }
 
       setTimeout(() => resultRef.current?.scrollIntoView({ behavior: 'smooth' }), 100);
@@ -596,7 +617,7 @@ function DiagnoseContent() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  const handleResolvedWithStatus = (status: string, memo: string) => {
+  const handleResolvedWithStatus = (status: string, memo: string, afterPhoto?: string) => {
     try {
       const raw = typeof window !== 'undefined' ? localStorage.getItem('diagnoseHistory') : null;
       const history = JSON.parse(raw || '[]');
@@ -604,10 +625,16 @@ function DiagnoseContent() {
       if (idx !== -1) {
         history[idx].resolved = status;
         history[idx].resolvedAt = new Date().toISOString();
-        history[idx].resolvedMemo = memo || undefined;
-        // after-settings: 현재 settings 캡처 (조건 바꾼 뒤 해결 시 자동 기록)
+        if (memo) history[idx].resolvedMemo = memo;
+        // after-settings: 현재 settings 캡처
         history[idx].afterSettings = { ...settings };
-        localStorage.setItem('diagnoseHistory', JSON.stringify(history));
+        if (afterPhoto) history[idx].afterPhoto = afterPhoto;
+        if (!safeLocalStorageSet('diagnoseHistory', JSON.stringify(history))) {
+          // QuotaExceeded: 사진 없이 재시도
+          if (afterPhoto) delete history[idx].afterPhoto;
+          safeLocalStorageSet('diagnoseHistory', JSON.stringify(history));
+        }
+        setHistoryCount(history.length);
       }
     } catch { /* ignore */ }
   };

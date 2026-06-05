@@ -4,6 +4,7 @@ import { useState, useEffect, Suspense } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useLocale } from '@/contexts/LocaleContext';
+import { ReportModal } from '@/components/ResolutionReport';
 
 // v0: localStorage. 로그인 사용자는 추후 Supabase 동기화 예정(v1).
 const LS_KEY = 'diagnoseHistory';
@@ -21,6 +22,9 @@ interface HistoryRecord {
   resolvedMemo?: string;
   beforeResin?: string;
   beforeSettings?: Record<string, string>;
+  afterSettings?: Record<string, string>;
+  beforePhoto?: string;
+  afterPhoto?: string;
   recommendations?: { parameter: string; current: string; recommended: string }[];
   [key: string]: unknown;
 }
@@ -69,6 +73,7 @@ function HistoryContent() {
   const router = useRouter();
   const [records, setRecords] = useState<HistoryRecord[]>([]);
   const [expanded, setExpanded] = useState<string | null>(null);
+  const [reportRecord, setReportRecord] = useState<HistoryRecord | null>(null);
 
   useEffect(() => {
     try {
@@ -86,6 +91,11 @@ function HistoryContent() {
 
   const defectLabel = (r: HistoryRecord) =>
     locale === 'en' ? (r.defect_type?.en ?? '—') : (r.defect_type?.ko ?? r.defect_type?.en ?? '—');
+
+  // ReportModal outside the list render
+  if (reportRecord) {
+    return <ReportModal record={reportRecord} onClose={() => setReportRecord(null)} />;
+  }
 
   return (
     <div className="max-w-2xl mx-auto px-4 py-8">
@@ -145,6 +155,26 @@ function HistoryContent() {
                     </div>
                   )}
 
+                  {/* Before / After 사진 나란히 */}
+                  {(r.beforePhoto || r.afterPhoto) && (
+                    <div className="flex gap-3">
+                      {r.beforePhoto && (
+                        <div className="flex-1">
+                          <div className="text-xs text-faint mb-1">{t('history.before_photo')}</div>
+                          <img src={`data:image/jpeg;base64,${r.beforePhoto}`} alt="before"
+                            className="w-full h-28 object-cover rounded-lg border border-border" />
+                        </div>
+                      )}
+                      {r.afterPhoto && (
+                        <div className="flex-1">
+                          <div className="text-xs text-faint mb-1">{t('history.after_photo')}</div>
+                          <img src={`data:image/jpeg;base64,${r.afterPhoto}`} alt="after"
+                            className="w-full h-28 object-cover rounded-lg border border-[var(--ok-border)]" />
+                        </div>
+                      )}
+                    </div>
+                  )}
+
                   {/* Before settings */}
                   {r.beforeSettings && Object.values(r.beforeSettings).some(Boolean) && (
                     <div>
@@ -182,13 +212,22 @@ function HistoryContent() {
                   </div>
 
                   {/* Actions */}
-                  <button
-                    type="button"
-                    onClick={() => handleRestore(r)}
-                    className="w-full bg-brand text-on-brand py-3 rounded-xl font-bold text-base hover:bg-brand-ink transition-colors min-h-[44px]"
-                  >
-                    {t('history.restore')}
-                  </button>
+                  <div className="flex gap-2">
+                    <button
+                      type="button"
+                      onClick={() => handleRestore(r)}
+                      className="flex-1 bg-brand text-on-brand py-3 rounded-xl font-bold text-base hover:bg-brand-ink transition-colors min-h-[44px]"
+                    >
+                      {t('history.restore')}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setReportRecord(r)}
+                      className="px-4 py-3 rounded-xl border border-border text-muted font-medium hover:bg-surface-sunken transition-colors min-h-[44px] text-sm"
+                    >
+                      {t('history.pdf_report')}
+                    </button>
+                  </div>
                 </div>
               )}
             </div>
