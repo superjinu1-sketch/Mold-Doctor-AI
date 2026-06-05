@@ -297,13 +297,14 @@ interface Props {
   round?: number;
   followUpHistory?: FollowUpHistoryItem[];
   onResolved?: () => void;
+  onResolvedWithStatus?: (status: string, memo: string) => void;
   onStartFollowUp?: () => void;
   resinType?: string;
   machineSettings?: Record<string, unknown>;
   sessionId?: string | null;
 }
 
-export default function DiagnosisResultPanel({ result, onSavePDF, round = 1, followUpHistory = [], onResolved, onStartFollowUp, resinType, machineSettings, sessionId }: Props) {
+export default function DiagnosisResultPanel({ result, onSavePDF, round = 1, followUpHistory = [], onResolved, onResolvedWithStatus, onStartFollowUp, resinType, machineSettings, sessionId }: Props) {
   const { t, locale } = useLocale();
   const [checkedItems, setCheckedItems] = useState<Set<number>>(new Set());
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
@@ -311,6 +312,9 @@ export default function DiagnosisResultPanel({ result, onSavePDF, round = 1, fol
   const [isChatLoading, setIsChatLoading] = useState(false);
   const [chatError, setChatError] = useState('');
   const [isDebug, setIsDebug] = useState(false);
+  const [showResolvedForm, setShowResolvedForm] = useState(false);
+  const [resolvedStatus, setResolvedStatus] = useState('solved');
+  const [resolvedMemo, setResolvedMemo] = useState('');
   const chatBottomRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -867,24 +871,72 @@ export default function DiagnosisResultPanel({ result, onSavePDF, round = 1, fol
           {/* Follow-up Actions */}
           <div className="bg-surface rounded-2xl p-4 sm:p-6 border border-border">
             <div className="text-base font-bold text-muted mb-3">{t('action.prompt')}</div>
-            <div className="flex flex-col sm:flex-row gap-3">
-              <button
-                type="button"
-                onClick={onResolved}
-                className="flex-1 flex items-center justify-center gap-2 bg-brand-tint hover:bg-brand-tint text-brand-ink border border-[var(--brand-border)] px-4 py-3 rounded-xl text-base font-bold transition-colors min-h-[var(--touch-cta)]"
-              >
-                <span className="text-lg">✓</span>
-                {t('action.resolved')}
-              </button>
-              <button
-                type="button"
-                onClick={onStartFollowUp}
-                className="flex-1 flex items-center justify-center gap-2 bg-[var(--warn-bg)] hover:bg-[var(--warn-bg)] text-warn border border-[var(--warn-border)] px-4 py-3 rounded-xl text-base font-bold transition-colors min-h-[var(--touch-cta)]"
-              >
-                <span className="text-lg">→</span>
-                {t('action.followup')}
-              </button>
-            </div>
+            {showResolvedForm ? (
+              <div className="space-y-3">
+                <div className="flex flex-col gap-2">
+                  {(['solved', 'partial', 'unsolved'] as const).map((s) => (
+                    <button
+                      key={s}
+                      type="button"
+                      onClick={() => setResolvedStatus(s)}
+                      className={`flex items-center gap-2 px-4 py-3 rounded-xl text-base font-medium border transition-colors min-h-[44px] ${
+                        resolvedStatus === s
+                          ? 'bg-brand text-on-brand border-brand'
+                          : 'bg-surface-sunken text-muted border-border hover:border-[var(--brand-border)]'
+                      }`}
+                    >
+                      {s === 'solved' ? '✓' : s === 'partial' ? '△' : '✗'} {t(`history.${s}`)}
+                    </button>
+                  ))}
+                </div>
+                <textarea
+                  className="w-full bg-surface-sunken border border-border rounded-xl px-3 py-3 text-base text-ink placeholder:text-faint focus:outline-none focus:ring-2 focus:ring-brand resize-none"
+                  rows={2}
+                  placeholder={t('history.memo_placeholder')}
+                  value={resolvedMemo}
+                  onChange={(e) => setResolvedMemo(e.target.value)}
+                />
+                <div className="flex gap-2">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      onResolvedWithStatus?.(resolvedStatus, resolvedMemo);
+                      onResolved?.();
+                      setShowResolvedForm(false);
+                    }}
+                    className="flex-1 bg-brand text-on-brand py-3 rounded-xl font-bold text-base hover:bg-brand-ink transition-colors min-h-[var(--touch-cta)]"
+                  >
+                    {t('history.save_record')}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setShowResolvedForm(false)}
+                    className="px-5 py-3 rounded-xl border border-border text-muted font-medium hover:bg-surface-sunken transition-colors min-h-[var(--touch-cta)]"
+                  >
+                    {t('history.cancel')}
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <div className="flex flex-col sm:flex-row gap-3">
+                <button
+                  type="button"
+                  onClick={() => setShowResolvedForm(true)}
+                  className="flex-1 flex items-center justify-center gap-2 bg-brand-tint hover:bg-brand-tint text-brand-ink border border-[var(--brand-border)] px-4 py-3 rounded-xl text-base font-bold transition-colors min-h-[var(--touch-cta)]"
+                >
+                  <span className="text-lg">✓</span>
+                  {t('action.resolved')}
+                </button>
+                <button
+                  type="button"
+                  onClick={onStartFollowUp}
+                  className="flex-1 flex items-center justify-center gap-2 bg-[var(--warn-bg)] hover:bg-[var(--warn-bg)] text-warn border border-[var(--warn-border)] px-4 py-3 rounded-xl text-base font-bold transition-colors min-h-[var(--touch-cta)]"
+                >
+                  <span className="text-lg">→</span>
+                  {t('action.followup')}
+                </button>
+              </div>
+            )}
           </div>
         </>
       )}

@@ -2,6 +2,7 @@
 
 import { useState, useRef, useCallback, useEffect, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
+import Link from 'next/link';
 import DiagnosisResultPanel from '@/components/DiagnosisResultPanel';
 import { useLocale } from '@/contexts/LocaleContext';
 import { useAuth } from '@/contexts/AuthContext';
@@ -211,6 +212,7 @@ function DiagnoseContent() {
   const [result, setResult] = useState<DiagnosisResult | null>(null);
   const [sessionId, setSessionId] = useState<string | null>(null);
   const [demoSnapshot, setDemoSnapshot] = useState<string | null>(null);
+  const [historyCount, setHistoryCount] = useState(0);
   const [error, setError] = useState('');
 
   // Follow-up state
@@ -340,6 +342,26 @@ function DiagnoseContent() {
       if (matched) setDefectType(matched);
     }
   }, [searchParams]);
+
+  // 히스토리 카운트 로드 + sessionStorage 복원 (history 페이지에서 "다시 보기" 클릭 시)
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem('diagnoseHistory');
+      const history = JSON.parse(raw || '[]');
+      setHistoryCount(history.length);
+    } catch { /* ignore */ }
+    try {
+      const restore = sessionStorage.getItem('molddoctor_restore');
+      if (restore) {
+        sessionStorage.removeItem('molddoctor_restore');
+        const record = JSON.parse(restore);
+        setResult(record);
+        setSessionId(record.session_id ?? null);
+        setTimeout(() => resultRef.current?.scrollIntoView({ behavior: 'smooth' }), 150);
+      }
+    } catch { /* ignore */ }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const processFile = useCallback(async (file: File): Promise<ImageFile | null> => {
     if (!file.type.startsWith('image/')) return null;
@@ -532,7 +554,14 @@ function DiagnoseContent() {
       try {
         const raw = typeof window !== 'undefined' ? localStorage.getItem('diagnoseHistory') : null;
         const history = JSON.parse(raw || '[]');
-        history.unshift({ ...data, timestamp: new Date().toISOString(), id: newId, round: diagnosisRound });
+        history.unshift({
+          ...data,
+          timestamp: new Date().toISOString(),
+          id: newId,
+          round: diagnosisRound,
+          beforeResin: resinType === '기타 (직접 입력)' ? customResin : resinType,
+          beforeSettings: { ...settings },
+        });
         localStorage.setItem('diagnoseHistory', JSON.stringify(history.slice(0, 20)));
       } catch { /* ignore */ }
 
@@ -564,17 +593,23 @@ function DiagnoseContent() {
   };
 
   const handleResolved = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleResolvedWithStatus = (status: string, memo: string) => {
     try {
       const raw = typeof window !== 'undefined' ? localStorage.getItem('diagnoseHistory') : null;
       const history = JSON.parse(raw || '[]');
       const idx = history.findIndex((h: { id: string }) => h.id === diagnosisId);
       if (idx !== -1) {
-        history[idx].resolved = true;
+        history[idx].resolved = status;
         history[idx].resolvedAt = new Date().toISOString();
+        history[idx].resolvedMemo = memo || undefined;
+        // after-settings: 현재 settings 캡처 (조건 바꾼 뒤 해결 시 자동 기록)
+        history[idx].afterSettings = { ...settings };
         localStorage.setItem('diagnoseHistory', JSON.stringify(history));
       }
     } catch { /* ignore */ }
-    alert(t('msg.resolved'));
   };
 
   const handleStartFollowUp = () => {
@@ -619,6 +654,19 @@ function DiagnoseContent() {
           <p className="text-muted text-base">{t('diagnose.subtitle')}</p>
         </div>
       </div>
+
+      {/* 지난 기록 진입점 — 1건 이상 있을 때만 노출 */}
+      {historyCount > 0 && (
+        <div className="mb-4 flex items-center justify-between bg-brand-tint border border-[var(--brand-border)] rounded-xl px-4 py-3">
+          <span className="text-brand-ink text-sm font-semibold">
+            📋 {t('history.recent_n')} {historyCount}{locale === 'en' ? '' : '건'}
+          </span>
+          <Link href="/history"
+            className="text-brand-ink text-sm font-bold hover:underline min-h-[44px] flex items-center">
+            {t('history.view_all')} →
+          </Link>
+        </div>
+      )}
 
       {/* Sample cases */}
       <div className="mb-6 bg-surface border border-border rounded-xl p-4">
@@ -1218,6 +1266,7 @@ function DiagnoseContent() {
               round={round}
               followUpHistory={followUpHistory}
               onResolved={handleResolved}
+              onResolvedWithStatus={handleResolvedWithStatus}
               onStartFollowUp={handleStartFollowUp}
               resinType={resinType === '기타 (직접 입력)' ? customResin : resinType}
               machineSettings={{ ...settings, ...advSettings }}
