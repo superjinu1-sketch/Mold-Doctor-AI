@@ -90,7 +90,7 @@ function CauseCard({ cause }: { cause: CauseItem }) {
   const catColor =
     cause.category?.includes('Material') || cause.category?.includes('Drying') || cause.category === '건조' || cause.category === '수지' ? 'bg-brand-tint text-brand-ink' :
     cause.category?.includes('Machine') || cause.category?.includes('Temperature') || cause.category?.includes('Pressure') || cause.category === '온도' || cause.category === '압력' ? 'bg-[var(--danger-bg)] text-danger' :
-    cause.category?.includes('Mold') || cause.category === '금형' ? 'bg-purple-500/15 text-brand-ink' :
+    cause.category?.includes('Mold') || cause.category === '금형' ? 'bg-[var(--ok-bg)] text-ok' :
     cause.category?.includes('Method') ? 'bg-[var(--warn-bg)] text-warn' :
     'bg-surface-sunken text-faint';
 
@@ -108,8 +108,8 @@ function CauseCard({ cause }: { cause: CauseItem }) {
       label: t('result.cause_evidence'),
       icon: '📊',
       value: cause.evidence,
-      headerCls: 'bg-emerald-500/10 hover:bg-emerald-500/15 text-emerald-400',
-      bodyCls: 'bg-emerald-500/10 border-emerald-500/20 text-emerald-300',
+      headerCls: 'bg-[var(--ok-bg)] hover:bg-[var(--ok-bg)] text-ok',
+      bodyCls: 'bg-[var(--ok-bg)] border-[var(--ok-border)] text-ink',
     },
     {
       key: 'elimination',
@@ -124,8 +124,8 @@ function CauseCard({ cause }: { cause: CauseItem }) {
       label: t('result.cause_verification'),
       icon: '✓',
       value: cause.verification,
-      headerCls: 'bg-brand-tint hover:bg-purple-500/15 text-brand-ink',
-      bodyCls: 'bg-brand-tint border-[var(--brand-border)] text-purple-300',
+      headerCls: 'bg-brand-tint hover:bg-brand-tint text-brand-ink',
+      bodyCls: 'bg-brand-tint border-[var(--brand-border)] text-ink',
     },
   ].filter(p => p.value);
 

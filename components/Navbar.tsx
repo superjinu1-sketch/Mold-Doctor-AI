@@ -64,7 +64,7 @@ export default function Navbar() {
                 <button
                   type="button"
                   onClick={signInWithGoogle}
-                  className="min-h-[44px] flex items-center gap-2 bg-white hover:bg-surface-sunken text-ink border border-border-strong shadow-sm px-4 rounded-full text-sm font-semibold transition-colors"
+                  className="min-h-[44px] flex items-center gap-2 bg-surface hover:bg-surface-sunken text-ink border border-border-strong shadow-sm px-4 rounded-full text-sm font-semibold transition-colors"
                 >
                   <GoogleIcon />
                   {t('auth.signin')}
@@ -192,7 +192,7 @@ export default function Navbar() {
                 <button
                   type="button"
                   onClick={() => { signInWithGoogle(); setMenuOpen(false); }}
-                  className="mt-2 flex items-center justify-center gap-2 bg-white text-ink border border-border-strong shadow-sm px-4 py-3 rounded-full font-bold text-sm min-h-[44px]"
+                  className="mt-2 flex items-center justify-center gap-2 bg-surface text-ink border border-border-strong shadow-sm px-4 py-3 rounded-full font-bold text-sm min-h-[44px]"
                 >
                   <GoogleIcon />
                   {t('auth.signin')}
