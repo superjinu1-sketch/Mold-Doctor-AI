@@ -1,10 +1,10 @@
-// lib/defect-kb.ts — 불량 진단 트리 KB v1
+// lib/defect-kb.ts — 불량 진단 트리 KB v1.1
 // 정본: docs/defect_taxonomy.md. 수치 범위: lib/resin-kb.ts 참조(중복 금지).
 // 거버넌스: 출력은 "추정/조정안", 게이트는 "조언"톤("~일 수 있다"), 제조사 브랜드명 0.
 // 수정 순서: taxonomy.md → 이 파일 → KB_VERSION bump → eval 회귀.
 import type { ResinSpec } from './resin-kb';
 
-export const KB_VERSION = 'defect-kb-v1.0';
+export const KB_VERSION = 'defect-kb-v1.1';
 
 export type Cause = {
   rank: number;
@@ -23,6 +23,7 @@ export type DefectNode = {
   nameEn: string;
   phase: string;
   discriminators: string;
+  typicalSeverity?: string;   // 통상 심각도 힌트 — 모델 과대평가 방지용 가이드
   causes: Cause[];
   patternHints?: Record<string, string>;
   sharedGates?: string[];
@@ -63,6 +64,7 @@ export const DEFECT_KB: Record<string, DefectNode> = {
   // ─── 1. Short Shot (미성형) ─────────────────────────────────
   short_shot: {
     id: 'short_shot', nameKo: '미성형', nameEn: 'Short Shot', phase: '충전',
+    typicalSeverity: 'medium~high (전수 미충전·기능부품 강도 직결 시 high)',
     discriminators: '말단·리브·보스 미충전. 단면 매끄럽고 광택=단순 미충전 / 끝단 탄화=Air Trap 겸발 / 복수 캐비티 균등=사출량·밸런스 문제.',
     causes: [
       { rank: 1, cause: '사출 압력·속도·멜트온도 부족', category: 'Machine',
@@ -97,6 +99,7 @@ export const DEFECT_KB: Record<string, DefectNode> = {
   // ─── 2. Flash (플래시/버) ──────────────────────────────────
   flash: {
     id: 'flash', nameKo: '플래시/버', nameEn: 'Flash', phase: '충전',
+    typicalSeverity: 'medium (소량·외관). 치수·기능 직결 시 medium~high',
     discriminators: '파팅면 전체둘레=클램프 부족·과압 / 특정위치 반복=금형마모·핀 clearance / 이젝터핀 주변=clearance.',
     causes: [
       { rank: 1, cause: '클램프력 부족 + 과도 사출·홀드압', category: 'Machine',
@@ -111,9 +114,15 @@ export const DEFECT_KB: Record<string, DefectNode> = {
         evidence: '게이트 타입. 불량 위치 패턴.',
         verification: '블루마킹(파팅면 밀착 패턴). 이물 육안 확인.',
         adjustment: '파팅면 재연마, 이물 제거, 이젝터핀 clearance 수정.' },
-      { rank: 3, cause: '저점도 수지 + 고온', category: 'Material',
-        baseProbability: 15,
-        trigger: 'PP·PA·POM·LCP 등 저점도 수지, 멜트온도 과고',
+      { rank: 3, cause: '극저점도 super EP(LCP·PPS·PA4T·PA6T) — 홀딩압·정밀도 우선', category: 'Material',
+        baseProbability: 10,
+        trigger: 'resin-kb super-engineering 수지(LCP·PPS·PA4T·PA6T 등) + 파팅면 전체 or 미세 버.',
+        evidence: '수지 종류(resin-kb tier=super-engineering). 불량 분포.',
+        verification: '홀딩압↓ + V/P 전환 앞당김 후 재시험.',
+        adjustment: 'holding/packing 압력 최소화, V/P 전환 위치 앞당김, PL면 정밀도 점검. (단순 클램프력↑만으론 한계)' },
+      { rank: 4, cause: '저점도 수지 + 고온', category: 'Material',
+        baseProbability: 5,
+        trigger: 'PP·PA·POM 등 저점도 수지, 멜트온도 과고',
         evidence: '수지 종류(resin-kb 참조). 멜트온도.',
         verification: '멜트온도 10°C↓ 후 재시험.',
         adjustment: '멜트온도 소폭↓, 사출속도↓.' },
@@ -122,15 +131,17 @@ export const DEFECT_KB: Record<string, DefectNode> = {
       '전체 둘레': '1순위(클램프·과압) 강점 분기',
       '특정 위치': '2순위(금형마모) 강점 분기',
       '이젝터 주변': '이젝터 clearance 확인',
+      'LCP|PPS|극저점도': '3순위(super EP) — holding압↓+V/P 앞당김 우선',
     },
     sharedGates: [],
-    priorityLogic: '역설 주의: 클램프력 과도 → 벤트 압착 → Diesel 겸발. 필요최소 클램프력 사용.',
+    priorityLogic: '역설 주의: 클램프력 과도 → 벤트 압착 → Diesel 겸발. 필요최소 클램프력 사용. LCP·PPS 등 극저점도=holding압↓+V/P 전환+PL면 정밀도 우선.',
     source: 'synthesis-1.2,taxonomy-2', confidence: 'high',
   },
 
   // ─── 3. Jetting (제팅) ─────────────────────────────────────
   jetting: {
     id: 'jetting', nameKo: '제팅', nameEn: 'Jetting', phase: '충전',
+    typicalSeverity: 'medium (외관)',
     discriminators: '게이트서 시작하는 구불구불한 지렁이·뱀 줄무늬. 동심원=흐름자국 / 직선=웰드라인(게이트서 시작 X)과 구분.',
     causes: [
       { rank: 1, cause: '게이트 위치·크기 부적절 + 사출속도 과고', category: 'Mold',
@@ -157,6 +168,7 @@ export const DEFECT_KB: Record<string, DefectNode> = {
   // ─── 4. Weld Line (웰드라인) ───────────────────────────────
   weld_line: {
     id: 'weld_line', nameKo: '웰드라인', nameEn: 'Weld Line', phase: '충전',
+    typicalSeverity: 'medium (외관). GF 수지 강도 직결·기능부품 시 high',
     discriminators: '홀·보스·코어핀 주변, 멀티게이트 합류부 가는 선. 합류각<135°=weld(강도저하 큼) / >135°=meld. GF수지=강도 모재 50~80%↓.',
     causes: [
       { rank: 1, cause: '멜트온도 부족 (강도 기여 71%)', category: 'Method',
@@ -191,6 +203,7 @@ export const DEFECT_KB: Record<string, DefectNode> = {
   // ─── 5. Air Trap / Burn Mark (에어트랩·버닝) ───────────────
   air_trap_burn: {
     id: 'air_trap_burn', nameKo: '버닝/가스마크', nameEn: 'Burn Mark', phase: '충전',
+    typicalSeverity: 'high (탄화·열분해 가스 안전 위험. POM=포름알데히드)',
     discriminators: '흑갈~흑색 탄화, 최말단·리브끝·보스내부·코너, 탄냄새. 은선(흰색·게이트서 시작·탄화없음)·변색(전체·위치 비선택)과 구분.',
     causes: [
       { rank: 1, cause: '벤트 부족·막힘', category: 'Mold',
@@ -225,6 +238,7 @@ export const DEFECT_KB: Record<string, DefectNode> = {
   // ─── 6. Flow Mark (흐름자국) ───────────────────────────────
   flow_mark: {
     id: 'flow_mark', nameKo: '흐름자국', nameEn: 'Flow Mark', phase: '충전',
+    typicalSeverity: 'medium (외관)',
     discriminators: '유동방향 물결·줄무늬. 제팅(구불선)·타이거스트라이프(유동수직 광택밴드)·레코드홈(동심원)과 구분.',
     causes: [
       { rank: 1, cause: '금형온도 과저', category: 'Mold',
@@ -251,6 +265,7 @@ export const DEFECT_KB: Record<string, DefectNode> = {
   // ─── 7. Sink Mark (싱크마크) ───────────────────────────────
   sink_mark: {
     id: 'sink_mark', nameKo: '싱크마크', nameEn: 'Sink Mark', phase: '보압',
+    typicalSeverity: 'medium (외관)',
     discriminators: '두꺼운 벽·리브·보스 이면 얕은 함몰. Void/Bubble과 감별: 가열 시 더 꺼짐=진공보이드 / 부풂=가스포켓.',
     causes: [
       { rank: 1, cause: '보압·보압시간 부족', category: 'Machine',
@@ -283,6 +298,7 @@ export const DEFECT_KB: Record<string, DefectNode> = {
   // ─── 8. Void / Bubble (보이드/기포) ───────────────────────
   void_bubble: {
     id: 'void_bubble', nameKo: '기포/보이드', nameEn: 'Void/Bubble', phase: '보압',
+    typicalSeverity: 'medium~high (구조부품 강도 직결 시 high)',
     discriminators: '내부 공동. 진공보이드(보압부족·스킨 견고) vs 가스포켓(수분·공기·압해제 팽창). 가열 감별: 꺼짐=진공 / 부풂=가스.',
     causes: [
       { rank: 1, cause: '결정성+두꺼운벽+보압 부족', category: 'Machine',
@@ -311,6 +327,7 @@ export const DEFECT_KB: Record<string, DefectNode> = {
   // ─── 9. Warpage (휨/변형) ──────────────────────────────────
   warpage: {
     id: 'warpage', nameKo: '휨/변형', nameEn: 'Warpage', phase: '냉각',
+    typicalSeverity: 'medium~high (치수규격 이탈·조립불가 시 high)',
     discriminators: '이젝트 후 형상 이탈. 전체 한방향 틀어짐=warpage / 균일 크기 변화=수축 문제(구분). GF 결정성 수지=최악.',
     causes: [
       { rank: 1, cause: 'GF 결정성 수지 + 비대칭 냉각(최악)', category: 'Mold',
@@ -345,20 +362,21 @@ export const DEFECT_KB: Record<string, DefectNode> = {
   // ─── 10. Crack / Crazing (크랙/균열) ──────────────────────
   crack: {
     id: 'crack', nameKo: '크랙/균열', nameEn: 'Crack/Crazing', phase: '냉각/이형',
+    typicalSeverity: 'medium~high (파단·강도 직결·안전 시 high, 외관 미세균열 medium)',
     discriminators: '이젝터핀 주변=이젝트 크랙 / 게이트 방사상=과보압 / 웰드부=후발 / 시간차+용제노출=ESC(잔류응력).',
     causes: [
       { rank: 1, cause: '미건조/가수분해 (PA·PC·PBT·PET 최다)', category: 'Material',
-        baseProbability: 40,
-        trigger: '흡습성 수지(PA·PC·PBT·PET) + 건조 조건 미흡.',
+        baseProbability: 35,
+        trigger: '흡습성 수지(PA·PC·PBT·PET) + 건조 조건 미흡 또는 미입력.',
         evidence: '건조 조건. resin-kb drying 권장 대비.',
         verification: '건조 강화 후 재시험. 수분계(Karl Fischer) 측정.',
         adjustment: '건조 규정 엄수. 재생재↓(<20~30%).' },
-      { rank: 2, cause: '과보압 → 잔류응력 (PC·이형지연)', category: 'Machine',
-        baseProbability: 30,
-        trigger: '홀드압 > 사출1차압의 60~70%. 게이트 방사상 크랙. 시간차 발현(ESC).',
-        evidence: '홀드압 입력값. 발생 시점(즉시 vs 시간차).',
+      { rank: 2, cause: '과보압 → 잔류응력 (PC·비결정성 수지)', category: 'Machine',
+        baseProbability: 35,
+        trigger: '홀드압 > 사출1차압의 60~70%. 게이트 방사상 크랙. 시간차 발현(ESC). 특히 PC.',
+        evidence: '홀드압 입력값. 발생 시점(즉시 vs 시간차). 보압 이력(싱크 해결 위해 올린 경우).',
         verification: '보압 10% 단계↓ 후 재시험. 편광 응력분석.',
-        adjustment: '보압↓(1차압의 40~60%), 금형온도↑(PC: 잔류응력↓), PC 어닐링(125~135°C×1~4h).' },
+        adjustment: '보압↓(1차압의 40~60%), 금형온도↑(잔류응력 완화, resin-kb moldC 범위 내 상향), PC 어닐링(125~135°C×1~4h). 주의: 금형온도↑는 싱크 재발 가능 → 게이트 확대 병행 검토.' },
       { rank: 3, cause: '이젝터 불량(과대·불균일)', category: 'Mold',
         baseProbability: 20,
         trigger: '이젝터핀 주변 집중. 냉각시간 부족+조기 이젝션.',
@@ -367,17 +385,20 @@ export const DEFECT_KB: Record<string, DefectNode> = {
         adjustment: '냉각시간↑, 이젝터 면적↑·균일화, 드래프트↑.' },
     ],
     patternHints: {
-      '시간차 발현': '잔류응력(ESC) — 보압↓ + 어닐링',
+      '시간차 발현': '2순위(잔류응력·ESC) 강점 분기 — 보압↓ + 금형온도↑ + 어닐링',
       '이젝터 주변': '3순위(이젝트 크랙) 강점 분기',
-      '용제 접촉': 'ESC — 잔류응력 >15MPa 의심',
+      '용제 접촉': '2순위(ESC) — 잔류응력 >15MPa 의심',
+      '싱크마크 해결 후 발생': '2순위(과보압) 강점 분기 — 보압↓ + 금형온도↑ 병행',
     },
     sharedGates: [],
+    priorityLogic: '건조 조건(dryTemp·dryTime)이 resin-kb 권장 범위를 충족하면 수분(1순위) 분기를 하향하고 과보압(2순위)를 우선 검토. 홀드압이 1차압 60% 초과+시간차 발현=잔류응력 거의 확진.',
     source: 'synthesis-2.4,taxonomy-10', confidence: 'high',
   },
 
   // ─── 11. Silver Streak (은선/은줄) — 5분기 풀 ─────────────
   silver_streak: {
     id: 'silver_streak', nameKo: '은선/은줄', nameEn: 'Silver Streak', phase: '재료준비',
+    typicalSeverity: 'medium (외관)',
     discriminators: '게이트서 유동방향 방사상 은빛 줄무늬. 3종 변별: moisture(전면분산·건조후 소멸) / shear(게이트주변·지속) / thermal(황변·냄새 동반). 박리(층분리)·버닝(탄화·흑갈색)과 구분.',
     causes: [
       { rank: 1, cause: '잔류 수분에 의한 가스 발생 (moisture splay)', category: 'Material',
@@ -394,10 +415,10 @@ export const DEFECT_KB: Record<string, DefectNode> = {
         adjustment: '배럴온도↓, 사이클단축, 체류↓(shot 비율 20~80% 범위 유지).' },
       { rank: 3, cause: '과도 전단에 의한 가스 발생 (shear splay)', category: 'Machine',
         baseProbability: 15,
-        trigger: '게이트 과소 또는 사출속도·스크루 RPM 과다. 게이트 주변 집중, 건조 정상인데 지속.',
-        evidence: '사출속도·배압·RPM 입력값. 게이트 타입.',
-        verification: '사출속도 30~50%↓ 재시험. 배압↓ 테스트.',
-        adjustment: '사출속도↓, 배압↓, 게이트 확대, 배럴온도 소폭↑.' },
+        trigger: '게이트 과소, 또는 사출속도·스크루 RPM이 수지 권장 상한(resin-kb 참조) 초과. 게이트 주변 집중, 건조 정상인데 지속.',
+        evidence: '사출속도·배압·RPM 입력값(resin-kb 권장 상한 대비). 게이트 타입.',
+        verification: '사출속도 30~50%↓ 재시험. RPM↓(GF 수지=섬유파손 주의). 배압↓ 테스트.',
+        adjustment: '사출속도↓, 스크루 RPM↓(권장 상한 이하로), 배압↓(단 계량 불안정 주의), 게이트 확대, 배럴온도 소폭↑.' },
       { rank: 4, cause: '공기 혼입 (air inclusion splay)', category: 'Method',
         baseProbability: 7,
         trigger: '서크백(감압) 과다 또는 벤팅 불량. 비흡습 수지(PP·PE·PS)에서 발생.',
@@ -417,15 +438,21 @@ export const DEFECT_KB: Record<string, DefectNode> = {
       '게이트주변 지속': '3순위(전단) 강점 분기',
       'PP|PE|PS|비흡습': '즉시 3~4순위(전단/공기) 분기. 수분 원인 아님.',
       '재가동 첫 샷': '1순위(수분 재흡수) 또는 2순위(체류 열분해)',
+      '오후|시간경과|간헐|N샷마다': '열축적 누적(배럴온도↑) 또는 전단 누적(RPM·속도) → 2순위(thermal)·3순위(shear) 우선. 건조 정상이면 1순위(수분) 아님.',
     },
     sharedGates: [],   // 금형온도 게이트 미적용(taxonomy §4.1 명시)
-    priorityLogic: '흡습성 수지=건조 먼저 확인. 비흡습 수지=즉시 전단/공기. resin-kb 멜트 상한 초과=열분해 선검토. 복합 원인 가능(수분+전단 동시 작용 시 더 심화).',
+    priorityLogic: `건조 조건(dryTemp·dryTime)이 resin-kb drying 권장 범위를 충족하면 moisture splay(1순위) 확률을 대폭 하향 → shear/thermal로 우선순위 이양.
+스크루 RPM 또는 사출속도가 resin-kb 권장 상한 초과 시 → shear splay(3순위) 우선 분기.
+배럴온도가 resin-kb meltC.degradeAbove 초과 시 → thermal splay(2순위) 우선 분기.
+비흡습 수지(PP·PE·PS) → 즉시 전단/공기 분기.
+복합 원인(수분+전단 동시 작용 시 더 심화) 가능.`,
     source: 'synthesis-3.1,taxonomy-11', confidence: 'high',
   },
 
   // ─── 12. Discoloration (변색) ──────────────────────────────
   discoloration: {
     id: 'discoloration', nameKo: '변색', nameEn: 'Discoloration', phase: '재료준비',
+    typicalSeverity: 'medium. POM·ABS 포름알데히드·유해가스 동반 시 high',
     discriminators: '전체 황변=체류·온도 과다(사이클 재개후 개선) / 국부 흑줄=핫러너·데드존(위치 반복) / 흑점=탄화잔류(퍼지후 개선) / 끝단 burn=벤팅 diesel / 색불균일=안료·마스터배치.',
     causes: [
       { rank: 1, cause: '배럴온도·체류 과다 (열분해)', category: 'Machine',
@@ -573,14 +600,33 @@ export const DEFECT_KB: Record<string, DefectNode> = {
 
   color_streaks: {
     id: 'color_streaks', nameKo: '색줄', nameEn: 'Color Streaks', phase: '재료준비',
-    discriminators: '안료·마스터배치 분산 불량 줄무늬.',
+    typicalSeverity: 'medium (외관)',
+    discriminators: '안료·마스터배치 분산 불량 줄무늬. 이종수지 박리(층 분리)·변색(전체)과 구분.',
     causes: [
-      { rank: 1, cause: '안료·마스터배치 분산 불량', category: 'Material',
-        trigger: '배압 낮음. 마스터배치 비율·캐리어 불일치.',
-        evidence: '배압. 마스터배치 정보.',
-        verification: '배압↑ 후 재시험.',
-        adjustment: '배압↑, 마스터배치 비율·혼련 검토.' },
+      { rank: 1, cause: '배압 부족 → 마스터배치 분산 불량', category: 'Machine',
+        baseProbability: 55,
+        trigger: '배압이 낮아 전단에너지 부족. 마스터배치 캐리어 수지 불일치.',
+        evidence: '배압 입력값. 마스터배치 비율·캐리어 정보. resin-kb 권장 배압 대비.',
+        verification: '배압 단계적 대폭↑(현재의 2배 수준까지) 후 줄무늬 감소 확인.',
+        adjustment: '배압 대폭 상향(단계적, 현재 대비 2배 수준 목표, GF 수지=섬유파손 주의), 마스터배치 비율·캐리어 수지 적합성 확인.' },
+      { rank: 2, cause: '스크루 전단·혼련 부족', category: 'Machine',
+        baseProbability: 30,
+        trigger: '스크루 RPM 과저(혼련 불충분) 또는 체류시간 부족.',
+        evidence: 'RPM 입력값. 사이클 시간(체류).',
+        verification: 'RPM 소폭↓(체류시간 늘리기) 후 재시험. 혼련 구간 확인.',
+        adjustment: '스크루 RPM↓(체류·혼련 시간 확보), 배압↑ 병행.' },
+      { rank: 3, cause: '이종수지·오염 혼입', category: 'Material',
+        baseProbability: 15,
+        trigger: '재료교체 이력. 리그라인드 오염. 내추럴 컬러에서는 없음.',
+        evidence: '원료 로트 이력. 리그라인드 비율.',
+        verification: '버진 수지+마스터배치 단독 런 후 소멸=오염 확진.',
+        adjustment: '완전 퍼지·원료검사·리그라인드 배제.' },
     ],
+    patternHints: {
+      '내추럴 컬러서 없음': '1~2순위(배압·혼련) 분기. 마스터배치 관련.',
+      '배압↑후 개선': '1순위(배압) 확진',
+      '재료교체 후 발생': '3순위(오염) 강점 분기',
+    },
     source: 'synthesis-4,taxonomy-20', confidence: 'high',
   },
 
@@ -765,6 +811,9 @@ export function formatDefectGuide(
   const lines: string[] = [];
   lines.push(`## 불량 진단 가이드레일 (KB ${KB_VERSION})`);
   lines.push(`불량: ${node.nameKo} (${node.nameEn}) | ${node.phase} Phase`);
+  if (node.typicalSeverity) {
+    lines.push(`통상 심각도: ${node.typicalSeverity} — 외관 불량은 원칙 medium 이하. high는 안전·전수·파단·탄화만. 과대평가 금지.`);
+  }
   lines.push(`식별 포인트: ${node.discriminators}`);
 
   lines.push('\n우선순위 분기 조언:');
