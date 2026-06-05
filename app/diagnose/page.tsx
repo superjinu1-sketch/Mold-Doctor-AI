@@ -597,7 +597,7 @@ function DiagnoseContent() {
   const handleSavePDF = async () => {
     if (!result) return;
     try {
-      const { default: html2canvas } = await import('html2canvas');
+      const { default: html2canvas } = await import('html2canvas-pro');
       const { jsPDF } = await import('jspdf');
       const el = resultRef.current;
       if (!el) return;
@@ -608,7 +608,8 @@ function DiagnoseContent() {
       const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
       pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
       pdf.save(`mold-doctor-${result.defect_type.en.replace(/\s/g, '-')}-${Date.now()}.pdf`);
-    } catch {
+    } catch (e) {
+      console.error('PDF save failed:', e);
       alert(t('err.pdf_error'));
     }
   };

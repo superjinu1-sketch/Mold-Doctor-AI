@@ -270,7 +270,7 @@ export function ReportModal({ record, onClose }: ReportModalProps) {
     setGenerating(true);
     try {
       const [{ default: html2canvas }, { jsPDF }] = await Promise.all([
-        import('html2canvas'),
+        import('html2canvas-pro'),
         import('jspdf').then(m => ({ jsPDF: m.jsPDF })),
       ]);
       const canvas = await html2canvas(reportRef.current, { scale: 2, useCORS: true, backgroundColor: '#ffffff' });
