@@ -168,8 +168,9 @@ export const en: Record<string, string> = {
   'step3.clamp': 'Clamp Force',
 
   /* Advanced */
-  'adv.toggle_expand': 'Show Advanced (V/P transfer, decomp, measured values, drying, hot runner, regrind, machine info)',
-  'adv.toggle_collapse': 'Hide Advanced (V/P transfer, decomp, measured values, drying, hot runner, regrind, machine info)',
+  'adv.toggle_expand': 'Show Advanced Settings',
+  'adv.toggle_collapse': 'Hide Advanced Settings',
+  'adv.toggle_hint': 'Mold / machine specs / measured values, etc. (optional)',
   'adv.vp_section': 'V/P Transfer & Decompression (Suck-back)',
   'adv.vp_pos': 'V/P Transfer Position',
   'adv.vp_pressure': 'V/P Transfer Pressure',

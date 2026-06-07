@@ -168,8 +168,9 @@ export const ko: Record<string, string> = {
   'step3.clamp': '형체력',
 
   /* Advanced settings */
-  'adv.toggle_expand': '고급 설정 펼치기 (V/P전환·감압·실측값·건조·핫러너·재생재·사출기 정보)',
-  'adv.toggle_collapse': '고급 설정 접기 (V/P전환·감압·실측값·건조·핫러너·재생재·사출기 정보)',
+  'adv.toggle_expand': '고급 설정 펼치기',
+  'adv.toggle_collapse': '고급 설정 접기',
+  'adv.toggle_hint': '금형·사출기 스펙·실측값 등 상세 입력 (선택)',
   'adv.vp_section': 'V/P 전환 & 감압(석백)',
   'adv.vp_pos': 'V/P 전환 위치',
   'adv.vp_pressure': 'V/P 전환 압력',

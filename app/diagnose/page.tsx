@@ -980,12 +980,20 @@ function DiagnoseContent() {
             <button
               type="button"
               onClick={() => setShowAdvanced(!showAdvanced)}
-              className="flex items-center gap-2 text-sm font-medium text-muted hover:text-muted transition-colors"
+              className="w-full bg-surface-sunken border border-border rounded-xl px-4 py-3 min-h-[var(--touch-min)] flex items-center justify-between hover:bg-surface-sunken transition-colors"
             >
-              <svg className={`w-4 h-4 transition-transform ${showAdvanced ? 'rotate-90' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="flex items-center gap-3">
+                <svg className="w-5 h-5 text-muted shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
+                </svg>
+                <div className="text-left">
+                  <div className="text-base font-semibold text-ink">{showAdvanced ? t('adv.toggle_collapse') : t('adv.toggle_expand')}</div>
+                  <div className="text-[length:var(--text-label)] text-muted">{t('adv.toggle_hint')}</div>
+                </div>
+              </div>
+              <svg className={`w-4 h-4 transition-transform shrink-0 text-muted ${showAdvanced ? 'rotate-90' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
               </svg>
-              {showAdvanced ? t('adv.toggle_collapse') : t('adv.toggle_expand')}
             </button>
 
             {showAdvanced && (
