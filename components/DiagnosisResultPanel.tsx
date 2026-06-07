@@ -86,47 +86,14 @@ function CauseCard({ cause }: { cause: CauseItem }) {
   const toggle = (key: string) => setOpenPanel(prev => prev === key ? null : key);
 
   const rankColor = cause.rank === 1 ? 'bg-danger' : cause.rank === 2 ? 'bg-warn' : 'bg-surface-sunken';
-  const rankBg = cause.rank === 1 ? 'bg-[var(--danger-bg)] text-danger' : cause.rank === 2 ? 'bg-[var(--warn-bg)] text-warn' : 'bg-surface-sunken text-faint';
-  const catColor =
-    cause.category?.includes('Material') || cause.category?.includes('Drying') || cause.category === '건조' || cause.category === '수지' ? 'bg-brand-tint text-brand-ink' :
-    cause.category?.includes('Machine') || cause.category?.includes('Temperature') || cause.category?.includes('Pressure') || cause.category === '온도' || cause.category === '압력' ? 'bg-[var(--danger-bg)] text-danger' :
-    cause.category?.includes('Mold') || cause.category === '금형' ? 'bg-[var(--ok-bg)] text-ok' :
-    cause.category?.includes('Method') ? 'bg-[var(--warn-bg)] text-warn' :
-    'bg-surface-sunken text-faint';
+  const rankBg = cause.rank === 1 ? 'bg-[var(--danger-bg)] text-danger' : cause.rank === 2 ? 'bg-[var(--warn-bg)] text-warn' : 'bg-surface-sunken text-muted';
+  const catColor = 'bg-surface-sunken text-muted';
 
-  const panels: { key: string; label: string; icon: string; value: string | undefined; headerCls: string; bodyCls: string }[] = [
-    {
-      key: 'scientific_reasoning',
-      label: t('result.cause_why'),
-      icon: '🔬',
-      value: cause.scientific_reasoning || cause.detail,
-      headerCls: 'bg-brand-tint hover:bg-brand-tint text-brand-ink',
-      bodyCls: 'bg-brand-tint border-[var(--brand-border)] text-brand-ink',
-    },
-    {
-      key: 'evidence',
-      label: t('result.cause_evidence'),
-      icon: '📊',
-      value: cause.evidence,
-      headerCls: 'bg-[var(--ok-bg)] hover:bg-[var(--ok-bg)] text-ok',
-      bodyCls: 'bg-[var(--ok-bg)] border-[var(--ok-border)] text-ink',
-    },
-    {
-      key: 'elimination',
-      label: t('result.cause_elimination'),
-      icon: '✕',
-      value: cause.elimination,
-      headerCls: 'bg-[var(--warn-bg)] hover:bg-[var(--warn-bg)] text-warn',
-      bodyCls: 'bg-[var(--warn-bg)] border-[var(--warn-border)] text-warn',
-    },
-    {
-      key: 'verification',
-      label: t('result.cause_verification'),
-      icon: '✓',
-      value: cause.verification,
-      headerCls: 'bg-brand-tint hover:bg-brand-tint text-brand-ink',
-      bodyCls: 'bg-brand-tint border-[var(--brand-border)] text-ink',
-    },
+  const panels: { key: string; label: string; icon: string; value: string | undefined }[] = [
+    { key: 'scientific_reasoning', label: t('result.cause_why'), icon: '🔬', value: cause.scientific_reasoning || cause.detail },
+    { key: 'evidence', label: t('result.cause_evidence'), icon: '📊', value: cause.evidence },
+    { key: 'elimination', label: t('result.cause_elimination'), icon: '✕', value: cause.elimination },
+    { key: 'verification', label: t('result.cause_verification'), icon: '✓', value: cause.verification },
   ].filter(p => p.value);
 
   return (
@@ -138,7 +105,7 @@ function CauseCard({ cause }: { cause: CauseItem }) {
           </span>
           <span className="font-semibold text-ink text-base sm:text-lg">{cause.description}</span>
         </div>
-        <span className={`shrink-0 text-xl font-bold px-3 py-1 rounded ${rankBg}`}>{cause.probability}%</span>
+        <span className={`shrink-0 text-xl font-bold tabular-nums px-3 py-1 rounded ${rankBg}`}>{cause.probability}%</span>
       </div>
       <div className="w-full bg-surface-sunken rounded-full h-2 mb-3">
         <div className={`h-2 rounded-full ${rankColor}`} style={{ width: `${cause.probability}%` }} />
@@ -146,26 +113,29 @@ function CauseCard({ cause }: { cause: CauseItem }) {
       <span className={`inline-block text-xs px-2 py-0.5 rounded-full font-medium mb-3 ${catColor}`}>{cause.category}</span>
       {panels.length > 0 && (
         <div className="space-y-1">
-          {panels.map(({ key, label, icon, value, headerCls, bodyCls }) => (
-            <div key={key} className="rounded-lg overflow-hidden">
-              <button
-                type="button"
-                onClick={() => toggle(key)}
-                className={`w-full flex items-center justify-between px-3 py-2.5 text-sm font-semibold transition-colors min-h-[44px] ${headerCls}`}
-              >
-                <span className="flex items-center gap-1.5">
-                  <span>{icon}</span>
-                  <span>{label}</span>
-                </span>
-                <span className={`text-sm transition-transform inline-block ${openPanel === key ? 'rotate-180' : ''}`}>▾</span>
-              </button>
-              {openPanel === key && (
-                <div className={`px-3 py-3 text-sm leading-relaxed border-x border-b rounded-b-lg ${bodyCls}`}>
-                  {value}
-                </div>
-              )}
-            </div>
-          ))}
+          {panels.map(({ key, label, icon, value }) => {
+            const isOpen = openPanel === key;
+            return (
+              <div key={key} className={`rounded-lg overflow-hidden${isOpen ? ' border-l-2 border-[var(--brand-border)]' : ''}`}>
+                <button
+                  type="button"
+                  onClick={() => toggle(key)}
+                  className={`w-full flex items-center justify-between px-3 py-2.5 text-base font-semibold transition-colors min-h-[44px] ${isOpen ? 'bg-brand-tint text-brand-ink' : 'bg-surface-sunken text-ink hover:bg-surface-sunken'}`}
+                >
+                  <span className="flex items-center gap-1.5">
+                    <span>{icon}</span>
+                    <span>{label}</span>
+                  </span>
+                  <span className={`text-sm transition-transform inline-block ${isOpen ? 'rotate-180' : ''}`}>▾</span>
+                </button>
+                {isOpen && (
+                  <div className="px-3 py-3 text-[length:var(--text-body)] leading-relaxed border-b border-r border-[var(--brand-border)] bg-brand-tint text-ink tabular-nums">
+                    {value}
+                  </div>
+                )}
+              </div>
+            );
+          })}
         </div>
       )}
     </div>
