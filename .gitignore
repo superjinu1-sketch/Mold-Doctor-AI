@@ -43,3 +43,10 @@ next-env.d.ts
 .mcp.json
 
 .vercel
+
+# Capacitor / Android
+/android/.gradle
+/android/app/build
+/android/build
+/android/capacitor-cordova-android-plugins
+/android/local.properties

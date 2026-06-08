@@ -88,6 +88,7 @@ export const en: Record<string, string> = {
   'nav.guide': 'Defect Guide',
   'nav.pricing': 'Pricing',
   'nav.free': 'Free Trial',
+  'nav.credits': 'Credits',
   'nav.locale_toggle': 'KO',
 
   /* ── Page: /diagnose ─────────────────────────── */

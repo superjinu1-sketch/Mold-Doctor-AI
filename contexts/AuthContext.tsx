@@ -9,6 +9,9 @@ interface AuthCtx {
   loading: boolean;
   signInWithGoogle: () => Promise<void>;
   signOut: () => Promise<void>;
+  credits: number | null;
+  setCredits: (n: number | null) => void;
+  refreshCredits: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthCtx>({
@@ -16,11 +19,15 @@ const AuthContext = createContext<AuthCtx>({
   loading: true,
   signInWithGoogle: async () => {},
   signOut: async () => {},
+  credits: null,
+  setCredits: () => {},
+  refreshCredits: async () => {},
 });
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const [credits, setCredits] = useState<number | null>(null);
 
   useEffect(() => {
     // Read existing session on mount
@@ -40,6 +47,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return () => subscription.unsubscribe();
   }, []);
 
+  const refreshCredits = async () => {
+    const { data: { user: u } } = await supabase.auth.getUser();
+    if (!u) { setCredits(null); return; }
+    const { data } = await supabase
+      .from('user_credits')
+      .select('credit_balance')
+      .eq('user_id', u.id)
+      .maybeSingle();
+    setCredits(data?.credit_balance ?? null);
+  };
+
+  useEffect(() => {
+    if (user) { refreshCredits(); } else { setCredits(null); }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user]);
+
   const signInWithGoogle = async () => {
     await supabase.auth.signInWithOAuth({
       provider: 'google',
@@ -54,7 +77,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, signInWithGoogle, signOut }}>
+    <AuthContext.Provider value={{ user, loading, signInWithGoogle, signOut, credits, setCredits, refreshCredits }}>
       {children}
     </AuthContext.Provider>
   );

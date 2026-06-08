@@ -88,6 +88,7 @@ export const ko: Record<string, string> = {
   'nav.guide': '불량 가이드',
   'nav.pricing': '가격',
   'nav.free': '무료 추정',
+  'nav.credits': '크레딧',
   'nav.locale_toggle': 'EN',
 
   /* ── Page: /diagnose ─────────────────────────── */

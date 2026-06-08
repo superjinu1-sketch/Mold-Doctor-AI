@@ -20,7 +20,7 @@ export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const { locale, setLocale, t } = useLocale();
-  const { user, loading, signInWithGoogle, signOut } = useAuth();
+  const { user, loading, signInWithGoogle, signOut, credits } = useAuth();
 
   const toggleLocale = () => setLocale(locale === 'ko' ? 'en' : 'ko');
   const email = user?.email ?? '';
@@ -58,6 +58,18 @@ export default function Navbar() {
               >
                 {t('nav.locale_toggle')}
               </button>
+
+              {/* Credit badge */}
+              {!loading && user && credits !== null && (
+                <Link
+                  href="/pricing"
+                  className="min-h-[44px] flex items-center gap-1 px-3 rounded-full bg-brand-tint text-brand-ink text-xs font-bold border border-[var(--brand-border)] hover:bg-brand-tint/70 transition-colors"
+                  aria-label={`${t('nav.credits')} ${credits}`}
+                >
+                  <span>{t('nav.credits')}</span>
+                  <span className="tabular-nums">{credits}</span>
+                </Link>
+              )}
 
               {/* Auth button */}
               {!loading && !user && (
@@ -138,6 +150,12 @@ export default function Navbar() {
                 </button>
               )}
 
+              {!loading && user && credits !== null && (
+                <Link href="/pricing" className="min-h-[44px] flex items-center px-2.5 rounded-full bg-brand-tint text-brand-ink text-xs font-bold tabular-nums shrink-0">
+                  {credits}
+                </Link>
+              )}
+
               {!loading && user && (
                 <button
                   type="button"
@@ -212,6 +230,9 @@ export default function Navbar() {
                     )}
                     <span className="text-faint text-xs truncate flex-1">{email}</span>
                   </div>
+                  {credits !== null && (
+                    <div className="text-sm text-muted px-2">{t('nav.credits')}: {credits}</div>
+                  )}
                   <button
                     type="button"
                     onClick={() => { signOut(); setMenuOpen(false); }}

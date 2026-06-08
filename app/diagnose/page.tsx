@@ -8,6 +8,7 @@ import { useLocale } from '@/contexts/LocaleContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { authHeaders } from '@/lib/supabase/authHeader';
 import { downscaleImageClient, safeLocalStorageSet } from '@/lib/clientDownscale';
+import { apiUrl } from '@/lib/apiBase';
 
 // --- Types ---
 interface ImageFile {
@@ -176,7 +177,7 @@ const SAMPLE_CASES = [
 function DiagnoseContent() {
   const searchParams = useSearchParams();
   const { t, locale } = useLocale();
-  const { user, signInWithGoogle } = useAuth();
+  const { user, signInWithGoogle, setCredits } = useAuth();
   const router = useRouter();
 
   const [images, setImages] = useState<ImageFile[]>([]);
@@ -308,7 +309,7 @@ function DiagnoseContent() {
         reader.onload = (e) => resolve((e.target?.result as string).split(',')[1]);
         reader.readAsDataURL(file);
       });
-      const res = await fetch('/api/extract-settings', {
+      const res = await fetch(apiUrl('/api/extract-settings'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', ...(await authHeaders()) },
         body: JSON.stringify({ image: { data: base64, mediaType: file.type } }),
@@ -515,7 +516,7 @@ function DiagnoseContent() {
         }),
       };
 
-      const res = await fetch('/api/diagnose', {
+      const res = await fetch(apiUrl('/api/diagnose'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', ...(isDemo ? {} : await authHeaders()) },
         body: JSON.stringify({ ...payload, isDemo }),
@@ -535,6 +536,8 @@ function DiagnoseContent() {
       const diagnosisRound = Number(res.headers.get('X-Diagnosis-Round') || round);
       const newSessionId = res.headers.get('X-Session-Id');   // 데모는 null
       setSessionId(newSessionId);   // 데모면 null → 팔로업 비활성
+      const creditHeader = res.headers.get('X-Credit-Balance');
+      if (creditHeader !== null) setCredits(Number(creditHeader));
 
       const data = await res.json();
       data.tier = diagnosisTier;
@@ -748,7 +751,6 @@ function DiagnoseContent() {
                 type="file"
                 accept="image/*"
                 multiple
-                capture="environment"
                 className="hidden"
                 onChange={(e) => e.target.files && addImages(e.target.files)}
               />
@@ -928,7 +930,6 @@ function DiagnoseContent() {
               ref={settingsImageRef}
               type="file"
               accept="image/*"
-              capture="environment"
               className="hidden"
               onChange={(e) => e.target.files?.[0] && handleSettingsImage(e.target.files[0])}
             />
