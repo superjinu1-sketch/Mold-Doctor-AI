@@ -422,12 +422,13 @@ export async function POST(request: NextRequest) {
       // ────────────────────────────────────────────────────
     }
     const {
-      defectType, defectDescription, resinInfo, settings, advSettings, moldInfo, productInfo, images, moldDrawings,
+      defectType, defectDescription, resinInfo, settings, advSettings, pressureUnit, moldInfo, productInfo, images, moldDrawings,
       isFollowUp, previousDiagnosis, actionsTaken, changeDescription, round: bodyRound, locale,
     }: {
   defectType?: string; defectDescription?: string;
   resinInfo?: { resinType?: string; filler?: string; fillerContent?: string; flameRetardant?: string; flameRetardantThickness?: string; flameRetardantType?: string; resinDetail?: string; resinGrade?: string };
   settings?: Record<string, string>; advSettings?: Record<string, string>;
+  pressureUnit?: string;
   moldInfo?: Record<string, string>; productInfo?: Record<string, string>;
   images?: { mediaType: string; data: string }[];
   moldDrawings?: { mediaType: string; data: string }[];
@@ -506,8 +507,16 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    const s = settings || {};
-    const a = advSettings || {};
+    const s = { ...(settings || {}) };
+    const a = { ...(advSettings || {}) };
+    const divide = pressureUnit === 'bar' || pressureUnit === 'kgf/cm2' || pressureUnit === 'kgf';
+    const toMPa = (v?: string) => {
+      const n = parseFloat(v ?? '');
+      if (!isFinite(n)) return v ?? '';
+      return divide ? String(Math.round((n / 10) * 100) / 100) : (v ?? '');
+    };
+    for (const k of ['injPressure1', 'holdPressure', 'backPressure'] as const) s[k] = toMPa(s[k]);
+    for (const k of ['vpTransferPressure', 'actualPeakPressure', 'maxInjPressure'] as const) a[k] = toMPa(a[k]);
 
     // KB 수치 대조(가이드레일). spec 있는 수지만, 없으면 빈 문자열(기존 동작 유지).
     const resinSpec = getResinSpec(resinInfo?.resinType || '');
@@ -573,6 +582,13 @@ export async function POST(request: NextRequest) {
       else if (screwD > 60)
         rules.push(`- 스크류경 ${screwD}mm(대경): 전단↓·계량 안정성 확인.`);
 
+      const bpN = parseFloat(s.backPressure || '0');
+      const ipN = parseFloat(s.injPressure1 || '0');
+      if (bpN > 30)
+        rules.push(`- ⚠ 배압 ${bpN}MPa는 비현실적으로 높음(통상 5~20MPa). 단위 오인(bar↔MPa) 가능성 — 배압 기반 원인은 신중히 판단하고, 권고에 "화면 압력 단위(bar 여부) 확인"을 포함하라.`);
+      if (ipN > 350)
+        rules.push(`- ⚠ 1차 사출압 ${ipN}MPa는 비정상적으로 높음. 단위 확인 필요.`);
+
       if (rules.length === 0) return '';
       return `[금형·기계 해석 가이드]\n${rules.join('\n')}`;
     })();
@@ -612,6 +628,7 @@ ${noImageGuard}다음 사출 불량 정보를 Scientific Molding 방법론으로
 - 보압 시간: ${s.holdTime || '-'}sec, 냉각 시간: ${s.coolTime || '-'}sec, 사출 시간: ${s.injTime || '-'}sec
 - 계량: ${s.metering || '-'}mm, 쿠션(설정): ${s.cushion || '-'}mm
 - 배압: ${s.backPressure || '-'} MPa, 스크류 회전수: ${s.screwRpm || '-'}rpm, 형체력: ${s.clampForce || '-'}ton
+- (압력 입력 단위: ${pressureUnit || 'MPa'}, 내부 MPa 환산 적용)
 
 ${(a.vpTransferPos || a.vpTransferPressure || a.preInjectDecompDist || a.postMeterDecompDist) ? `## V/P 전환 & 감압(석백)
 - V/P 전환 위치: ${a.vpTransferPos || '-'}mm, V/P 전환 압력: ${a.vpTransferPressure || '-'} MPa

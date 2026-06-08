@@ -167,7 +167,7 @@ const SAMPLE_CASES = [
     nozzleTemp: '285', zone1Temp: '280', zone2Temp: '275', zone3Temp: '265', zone4Temp: '255',
     moldTempFixed: '80', moldTempMoving: '80', injPressure1: '120', holdPressure: '80',
     injSpeed1: '60', injSpeed2: '40', holdTime: '8', coolTime: '15', injTime: '3',
-    metering: '85', cushion: '5', backPressure: '5', screwRpm: '80', clampForce: '',
+    metering: '85', cushion: '5', backPressure: '5', screwRpm: '80', clampForce: '', pressureUnit: 'MPa',
     moldType: '2판', gateType: '사이드', cavities: '4', runnerType: '콜드', weight: '45', wallThicknessMin: '1.5', wallThicknessMax: '3.0',
   },
 ];
@@ -200,6 +200,7 @@ function DiagnoseContent() {
     injSpeed1: '', injSpeed2: '',
     holdTime: '', coolTime: '', injTime: '',
     metering: '', cushion: '', backPressure: '', screwRpm: '', clampForce: '',
+    pressureUnit: 'bar',
   });
   const [moldType, setMoldType] = useState('');
   const [gateType, setGateType] = useState('');
@@ -320,10 +321,14 @@ function DiagnoseContent() {
       setSettings(prev => {
         const updated = { ...prev };
         for (const key of Object.keys(extracted)) {
+          if (key === 'pressureUnit') continue; // 유효값 가드 후 아래에서 처리
           if (key in updated && extracted[key]) {
             (updated as Record<string, string>)[key] = extracted[key];
             filledKeys.push(key);
           }
+        }
+        if (extracted.pressureUnit && ['bar', 'MPa', 'kgf/cm2'].includes(extracted.pressureUnit)) {
+          updated.pressureUnit = extracted.pressureUnit;
         }
         return updated;
       });
@@ -452,6 +457,7 @@ function DiagnoseContent() {
       holdTime: d.holdTime, coolTime: d.coolTime, injTime: d.injTime,
       metering: d.metering, cushion: d.cushion, backPressure: d.backPressure,
       screwRpm: d.screwRpm, clampForce: d.clampForce,
+      pressureUnit: d.pressureUnit ?? 'bar',
     });
     setMoldType(d.moldType);
     setGateType(d.gateType);
@@ -503,6 +509,7 @@ function DiagnoseContent() {
         },
         settings,
         advSettings,
+        pressureUnit: settings.pressureUnit,
         moldInfo: { moldType, gateType, cavities, runnerType },
         productInfo: { weight, wallThicknessMin, wallThicknessMax, notes: productNotes },
         images: [...images, ...followUpImages].map(img => ({ data: img.base64, mediaType: img.mediaType })),
@@ -966,6 +973,19 @@ function DiagnoseContent() {
                   </div>
                 ))}
               </div>
+            </div>
+            <div className="flex items-center gap-2 mb-2">
+              <span className="text-faint text-sm">{t('step3.pressure_unit')}</span>
+              {(['bar', 'MPa'] as const).map(u => (
+                <button key={u} type="button"
+                  onClick={() => setSettings(prev => ({ ...prev, pressureUnit: u }))}
+                  className={`min-h-[44px] px-4 rounded-lg border text-sm font-bold transition-colors ${
+                    settings.pressureUnit === u
+                      ? 'bg-brand-tint text-brand-ink border-[var(--brand-border)]'
+                      : 'bg-surface text-muted border-border hover:border-border-strong'}`}>
+                  {u}
+                </button>
+              ))}
             </div>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
               {machineParams.map(({ key, label, placeholder }) => (

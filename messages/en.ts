@@ -155,6 +155,7 @@ export const en: Record<string, string> = {
   'step3.mold_temp': 'Mold Temperature (℃)',
   'step3.fixed': 'Fixed',
   'step3.moving': 'Moving',
+  'step3.pressure_unit': 'Pressure unit',
   'step3.inj_pressure': 'Inj. Pressure 1st',
   'step3.hold_pressure': 'Hold Pressure',
   'step3.inj_speed1': 'Inj. Speed 1st',

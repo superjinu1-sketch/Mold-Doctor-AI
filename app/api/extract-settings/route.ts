@@ -96,6 +96,7 @@ export async function POST(request: NextRequest) {
   "zone4Temp": "",
   "moldTempFixed": "",
   "moldTempMoving": "",
+  "pressureUnit": "",
   "injPressure1": "",
   "holdPressure": "",
   "injSpeed1": "",
@@ -115,8 +116,10 @@ export async function POST(request: NextRequest) {
 - zone1~4Temp: 실린더 1~4존 온도 (℃)
 - moldTempFixed: 고정측 금형온도 (℃)
 - moldTempMoving: 가동측 금형온도 (℃)
-- injPressure1: 1차 사출압력 (MPa 또는 bar)
-- holdPressure: 보압 (MPa 또는 bar)
+- pressureUnit: 화면에 표시된 압력 단위. 압력 항목 헤더/옆의 [bar], [MPa], [kgf/cm²] 표기를 그대로 읽어 "bar" | "MPa" | "kgf/cm2" 중 하나로 반환. 판단 불가 시 "".
+- 중요: 압력 값(injPressure1·holdPressure·backPressure)은 화면에 보이는 숫자 그대로 반환하라(단위 환산하지 말 것). 환산은 앱이 한다.
+- injPressure1: 1차 사출압력 (화면 단위 그대로)
+- holdPressure: 보압 (화면 단위 그대로)
 - injSpeed1: 1차 사출속도 (% 또는 mm/s)
 - injSpeed2: 2차 사출속도
 - holdTime: 보압 시간 (sec)
@@ -124,7 +127,7 @@ export async function POST(request: NextRequest) {
 - injTime: 사출 시간 (sec)
 - metering: 계량 위치 (mm)
 - cushion: 쿠션 (mm)
-- backPressure: 배압 (MPa)
+- backPressure: 배압 (화면 단위 그대로)
 - screwRpm: 스크류 회전수 (rpm)
 - clampForce: 형체력 (ton)`,
           },

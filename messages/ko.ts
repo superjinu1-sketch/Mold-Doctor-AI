@@ -155,6 +155,7 @@ export const ko: Record<string, string> = {
   'step3.mold_temp': '금형 온도 (℃)',
   'step3.fixed': '고정측',
   'step3.moving': '가동측',
+  'step3.pressure_unit': '압력 단위',
   'step3.inj_pressure': '사출압력 1차',
   'step3.hold_pressure': '보압',
   'step3.inj_speed1': '사출속도 1차',
