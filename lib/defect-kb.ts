@@ -809,7 +809,7 @@ export function formatDefectGuide(
   if (!node) return '';
 
   const lines: string[] = [];
-  lines.push(`## 불량 진단 가이드레일 (KB ${KB_VERSION})`);
+  lines.push(`## 불량 추정 가이드레일 (KB ${KB_VERSION})`);
   lines.push(`불량: ${node.nameKo} (${node.nameEn}) | ${node.phase} Phase`);
   if (node.typicalSeverity) {
     lines.push(`통상 심각도: ${node.typicalSeverity} — 외관 불량은 원칙 medium 이하. high는 안전·전수·파단·탄화만. 과대평가 금지.`);

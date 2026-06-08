@@ -112,7 +112,7 @@ export function ReportLayout({ record, authorName, companyName }: ReportProps) {
             </div>
             {record.beforePhoto && (
               <div style={{ width: 180, flexShrink: 0 }}>
-                <div style={{ fontSize: 11, color: '#6B7280', marginBottom: 4 }}>불량 사진 (진단 전)</div>
+                <div style={{ fontSize: 11, color: '#6B7280', marginBottom: 4 }}>불량 사진 (분석 전)</div>
                 <img src={`data:image/jpeg;base64,${record.beforePhoto}`}
                   style={{ width: 180, height: 130, objectFit: 'cover', borderRadius: 8, border: '1px solid #E3E6EA' }} alt="before" />
               </div>
@@ -154,7 +154,7 @@ export function ReportLayout({ record, authorName, companyName }: ReportProps) {
               <thead>
                 <tr style={{ background: '#EEF1F5' }}>
                   <th style={{ padding: '5px 8px', textAlign: 'left', fontWeight: 700 }}>항목</th>
-                  <th style={{ padding: '5px 8px', textAlign: 'center', fontWeight: 700, color: '#B42318' }}>진단 전</th>
+                  <th style={{ padding: '5px 8px', textAlign: 'center', fontWeight: 700, color: '#B42318' }}>분석 전</th>
                   <th style={{ padding: '5px 8px', textAlign: 'center', fontWeight: 700, color: '#047857' }}>조치 후</th>
                 </tr>
               </thead>

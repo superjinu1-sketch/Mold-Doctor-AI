@@ -127,7 +127,7 @@ export const en: Record<string, string> = {
   'step2.detail_label': 'Resin Detail',
   'step2.detail_placeholder': 'e.g. PA66 GF33% Halogen-free FR',
   'step2.grade_label': 'Resin Manufacturer/Grade',
-  'step2.grade_placeholder': 'e.g. DSM Stanyl TW341',
+  'step2.grade_placeholder': 'e.g. PA46-GF33, PA66-GF30',
 
   /* Resin option group names */
   'resin.group.polyamide': 'Polyamide (Nylon)',
@@ -210,7 +210,7 @@ export const en: Record<string, string> = {
   'adv.color_ratio': 'Colorant Ratio',
   'adv.machine_section': 'Machine Info (optional)',
   'adv.machine_model': 'Machine Manufacturer/Model',
-  'adv.machine_model_placeholder': 'e.g. Fanuc 100T, Engel 150',
+  'adv.machine_model_placeholder': 'e.g. 100-ton electric, 150-ton hydraulic',
   'adv.screw_dia': 'Screw Diameter',
   'adv.max_clamp': 'Max Clamp Force',
   'adv.max_pressure': 'Max Injection Pressure',
@@ -313,7 +313,7 @@ export const en: Record<string, string> = {
   'chat.limit': ' used',
   'chat.limit_msg': 'Follow-up question limit (%d) reached.',
   'chat.placeholder': 'Ask about the analysis results...',
-  'demo.notice': 'This is a sample preview. Run a real diagnosis with your own photo and settings to ask follow-up questions.',
+  'demo.notice': 'This is a sample preview. Run a real analysis with your own photo and settings to ask follow-up questions.',
   'chat.followup_limit': 'You have used all 5 follow-up questions for this estimate. Start a new estimate.',
   'chat.error': 'An error occurred while getting a chat response.',
   'chat.send': 'Send',

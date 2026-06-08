@@ -12,12 +12,12 @@ const creditPacks = [
 
 const creditPoints = [
   {
-    ko: '1크레딧 = 진단 1건 + 그 건 추가 질문 5회',
-    en: '1 credit = 1 diagnosis + 5 follow-up questions',
+    ko: '1크레딧 = 분석 1건 + 그 건 추가 질문 5회',
+    en: '1 credit = 1 analysis + 5 follow-up questions',
   },
   {
-    ko: '셋팅 바꿔 다시 진단하면 새 크레딧 1개',
-    en: 'Re-diagnosing with new settings uses 1 new credit',
+    ko: '셋팅 바꿔 다시 분석하면 새 크레딧 1개',
+    en: 'Re-running analysis with new settings uses 1 new credit',
   },
   {
     ko: '저장된 결과 다시 보기는 무료',
@@ -29,7 +29,7 @@ const faqs = [
   {
     qKo: '크레딧은 어떻게 쓰나요?',
     qEn: 'How do credits work?',
-    aKo: '크레딧 1개로 추정 1건을 받고, 그 결과에 대한 추가 질문을 5번까지 무료로 할 수 있어요. 셋팅을 바꿔 다시 진단하면 새 크레딧 1개가 쓰이고, 저장된 결과를 다시 보는 건 무료입니다.',
+    aKo: '크레딧 1개로 추정 1건을 받고, 그 결과에 대한 추가 질문을 5번까지 무료로 할 수 있어요. 셋팅을 바꿔 다시 분석하면 새 크레딧 1개가 쓰이고, 저장된 결과를 다시 보는 건 무료입니다.',
     aEn: '1 credit gives you 1 analysis result plus up to 5 free follow-up questions on that result. Re-running with new settings uses 1 new credit. Viewing saved results is always free.',
   },
   {

@@ -77,16 +77,16 @@ export async function POST(req: NextRequest) {
       '당신은 사출 성형 불량 추정 전문가입니다. 이전 추정 결과를 바탕으로 사용자의 후속 질문에 답변합니다.',
       '',
       '사용자의 질문에 대해:',
-      '1. 진단 결과와 관련된 질문이면 구체적으로 답변',
+      '1. 추정 결과와 관련된 질문이면 구체적으로 답변',
       '2. 추가 조건 변경이 필요하면 구체적 수치로 제안',
-      '3. 진단과 무관한 질문이면 정중히 범위를 안내',
+      '3. 분석과 무관한 질문이면 정중히 범위를 안내',
       '4. 한국어로 답변, 기술 용어는 영문 병기',
       '5. 답변은 간결하게 2~3문단 이내',
     ];
 
     if (resinType) contextLines.push(`\n수지 종류: ${resinType}`);
     if (machineSettings) contextLines.push(`사출기 설정: ${JSON.stringify(machineSettings)}`);
-    if (contextResult) contextLines.push(`\n이전 진단 결과:\n${JSON.stringify(contextResult, null, 2)}`);
+    if (contextResult) contextLines.push(`\n이전 추정 결과:\n${JSON.stringify(contextResult, null, 2)}`);
 
     const systemPrompt = contextLines.join('\n');
 
