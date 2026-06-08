@@ -5,6 +5,7 @@ export async function downscaleImageClient(
   base64: string,
   maxPx = 400,
   quality = 0.75,
+  srcMime = 'image/jpeg',
 ): Promise<string> {
   return new Promise((resolve) => {
     const img = new window.Image();
@@ -22,7 +23,7 @@ export async function downscaleImageClient(
       resolve(dataUrl.split(',')[1] ?? base64);
     };
     img.onerror = () => resolve(base64);
-    img.src = `data:image/jpeg;base64,${base64}`;
+    img.src = `data:${srcMime};base64,${base64}`;
   });
 }
 

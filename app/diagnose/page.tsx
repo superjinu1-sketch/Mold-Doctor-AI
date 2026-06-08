@@ -369,15 +369,16 @@ function DiagnoseContent() {
     if (!file.type.startsWith('image/')) return null;
     return new Promise((resolve) => {
       const reader = new FileReader();
-      reader.onload = (e) => {
+      reader.onload = async (e) => {
         const dataUrl = e.target?.result as string;
-        const base64 = dataUrl.split(',')[1];
+        const rawBase64 = dataUrl.split(',')[1];
+        const scaled = await downscaleImageClient(rawBase64, 1568, 0.82, file.type);
         resolve({
           id: Math.random().toString(36).slice(2),
           file,
-          preview: dataUrl,
-          base64,
-          mediaType: file.type,
+          preview: `data:image/jpeg;base64,${scaled}`,
+          base64: scaled,
+          mediaType: 'image/jpeg',
         });
       };
       reader.readAsDataURL(file);
