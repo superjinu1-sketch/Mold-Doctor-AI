@@ -342,6 +342,42 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const mock = tryMock(body); if (mock) return mock;
 
+    // ── 파일 크기·MIME 검증 (크레딧 차감 전) ─────────────
+    {
+      const ALLOWED_IMG = new Set(['image/jpeg', 'image/png', 'image/webp', 'image/gif']);
+      const ALLOWED_ALL = new Set([...ALLOWED_IMG, 'application/pdf']);
+      const MAX_IMG = 8 * 1024 * 1024;   // 8 MB
+      const MAX_PDF = 20 * 1024 * 1024;  // 20 MB
+      const bodyImgs: { mediaType?: string; data?: string }[] = Array.isArray(body.images) ? body.images : [];
+      const bodyDrawings: { mediaType?: string; data?: string }[] = Array.isArray(body.moldDrawings) ? body.moldDrawings : [];
+      if (bodyImgs.length > 5) {
+        return NextResponse.json({ error: '이미지는 최대 5개까지 허용됩니다.' }, { status: 413 });
+      }
+      if (bodyDrawings.length > 3) {
+        return NextResponse.json({ error: '도면은 최대 3개까지 허용됩니다.' }, { status: 413 });
+      }
+      for (const img of bodyImgs) {
+        if (!img.mediaType || !ALLOWED_IMG.has(img.mediaType)) {
+          return NextResponse.json({ error: '지원하지 않는 이미지 형식 (허용: jpeg/png/webp/gif)' }, { status: 415 });
+        }
+        if (img.data && Buffer.byteLength(img.data, 'base64') > MAX_IMG) {
+          return NextResponse.json({ error: `이미지가 너무 큽니다. 최대 8 MB` }, { status: 413 });
+        }
+      }
+      for (const d of bodyDrawings) {
+        if (!d.mediaType || !ALLOWED_ALL.has(d.mediaType)) {
+          return NextResponse.json({ error: '지원하지 않는 파일 형식 (허용: jpeg/png/webp/gif/pdf)' }, { status: 415 });
+        }
+        if (d.data) {
+          const bytes = Buffer.byteLength(d.data, 'base64');
+          const maxBytes = d.mediaType === 'application/pdf' ? MAX_PDF : MAX_IMG;
+          if (bytes > maxBytes) {
+            return NextResponse.json({ error: '파일이 너무 큽니다. 이미지 8 MB / PDF 20 MB 초과' }, { status: 413 });
+          }
+        }
+      }
+    }
+
     // ── 샘플 무료 체험 데모: 인증·크레딧·Anthropic 호출 없이 고정 결과 반환 ──
     if (body?.isDemo === true) {
       return NextResponse.json(SAMPLE_DEMO_RESULT, {

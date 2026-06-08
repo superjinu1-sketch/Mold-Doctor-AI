@@ -1,6 +1,12 @@
 import Anthropic from '@anthropic-ai/sdk';
 import { NextRequest, NextResponse } from 'next/server';
 import { tryMock } from '@/lib/mock';
+import { supabaseAdmin } from '@/lib/supabase/server';
+
+const ALLOWED_IMAGE_TYPES = new Set(['image/jpeg', 'image/png', 'image/webp', 'image/gif']);
+const MAX_IMAGE_BYTES = 8 * 1024 * 1024; // 8 MB
+const DAILY_LIMIT = 20;
+
 function getApiKey(): string {
   return process.env.ANTHROPIC_API_KEY || '';
 }
@@ -9,12 +15,57 @@ export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
     const mock = tryMock(body, 'extract'); if (mock) return mock;
+
+    // ── 인증 ──────────────────────────────────────────────
+    const authHeader = request.headers.get('authorization') || '';
+    const token = authHeader.startsWith('Bearer ') ? authHeader.slice(7) : '';
+    if (!token) {
+      return NextResponse.json({ error: '로그인이 필요합니다.', code: 'AUTH_REQUIRED' }, { status: 401 });
+    }
+    const { data: userData, error: userErr } = await supabaseAdmin.auth.getUser(token);
+    if (userErr || !userData?.user) {
+      return NextResponse.json({ error: '로그인이 필요합니다.', code: 'AUTH_REQUIRED' }, { status: 401 });
+    }
+    const userId = userData.user.id;
+
+    // ── 일일 rate limit (20회/일) ──────────────────────────
+    const today = new Date().toISOString().split('T')[0];
+    const { data: rlData, error: rlErr } = await supabaseAdmin.rpc('increment_extract_count', {
+      p_user_id: userId,
+      p_date: today,
+      p_limit: DAILY_LIMIT,
+    });
+    if (rlErr) {
+      return NextResponse.json({ error: 'Rate limit 확인 중 오류', code: 'RL_ERROR' }, { status: 500 });
+    }
+    const rl = rlData as { ok: boolean; count: number };
+    if (!rl?.ok) {
+      return NextResponse.json(
+        { error: `일일 사용 한도(${DAILY_LIMIT}회)를 초과했습니다. 내일 다시 시도하세요.`, code: 'RATE_LIMIT' },
+        { status: 429 }
+      );
+    }
+
+    // ── 입력 검증 (MIME + 크기) ───────────────────────────
     const { image } = body;
     if (!image) return NextResponse.json({ error: '이미지가 없습니다.' }, { status: 400 });
+    if (!ALLOWED_IMAGE_TYPES.has(image.mediaType)) {
+      return NextResponse.json(
+        { error: '지원하지 않는 파일 형식입니다. (허용: jpeg/png/webp/gif)' },
+        { status: 415 }
+      );
+    }
+    const decodedBytes = Buffer.byteLength(image.data ?? '', 'base64');
+    if (decodedBytes > MAX_IMAGE_BYTES) {
+      return NextResponse.json(
+        { error: `이미지가 너무 큽니다. 최대 8 MB (${(decodedBytes / 1024 / 1024).toFixed(1)} MB 수신)` },
+        { status: 413 }
+      );
+    }
 
-    // TODO: rate-limit 구현 (과금/크레딧 보호)
+    // ── Anthropic 호출 ────────────────────────────────────
     const apiKey = getApiKey();
-    if (!apiKey) return NextResponse.json({ error: '서버 환경변수 ANTHROPIC_API_KEY 미설정' }, { status: 401 });
+    if (!apiKey) return NextResponse.json({ error: '서버 환경변수 ANTHROPIC_API_KEY 미설정' }, { status: 500 });
     const client = new Anthropic({ apiKey });
     const response = await client.messages.create({
       model: 'claude-sonnet-4-6',

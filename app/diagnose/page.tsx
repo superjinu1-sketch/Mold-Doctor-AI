@@ -310,7 +310,7 @@ function DiagnoseContent() {
       });
       const res = await fetch('/api/extract-settings', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', ...(await authHeaders()) },
         body: JSON.stringify({ image: { data: base64, mediaType: file.type } }),
       });
       if (!res.ok) throw new Error(t('err.extract_fail'));
