@@ -69,7 +69,7 @@ export async function POST(request: NextRequest) {
     const client = new Anthropic({ apiKey });
     const response = await client.messages.create({
       model: 'claude-sonnet-4-6',
-      max_tokens: 1024,
+      max_tokens: 2048,
       messages: [{
         role: 'user',
         content: [
@@ -103,7 +103,7 @@ export async function POST(request: NextRequest) {
   · 금형 → 금형온도. '상측'=고정측(moldTempFixed), '하측'=가동측(moldTempMoving). '온수기 설정온도'는 금형온도 항목이 따로 없을 때만 보조로 사용.
 - 온도존 라벨은 제조사마다 N/NH/N1/N2(노즐 계열)·H1~H4·Z1~Z4 등으로 다르다. 라벨 글자에 의존하지 말고 아래 온도존 물리규칙(노즐 최고온, 호퍼/피드존 최저온)으로 매핑하라. 온도값이 5개 이상이면 내림차순 정렬해 가장 높은 값을 nozzleTemp, 그다음을 zone1~zone4로 넣는다(최저값=호퍼쪽=zone4).
 
-반드시 아래 JSON 형식만 반환하세요 (마크다운 없이):
+반드시 JSON 객체 하나만 반환하세요. 머리말·설명·주석·마크다운 코드펜스 없이 첫 글자가 '{'로 시작해야 합니다. 형식:
 {
   "nozzleTemp": "",
   "zone1Temp": "",
@@ -161,6 +161,12 @@ export async function POST(request: NextRequest) {
     let jsonText = textBlock.text.trim()
       .replace(/^```json\s*/i, '').replace(/\s*```$/, '')
       .replace(/^```\s*/i, '').replace(/\s*```$/, '');
+    // 모델이 JSON 앞뒤에 설명을 붙여도 객체만 추출
+    const firstBrace = jsonText.indexOf('{');
+    const lastBrace = jsonText.lastIndexOf('}');
+    if (firstBrace !== -1 && lastBrace > firstBrace) {
+      jsonText = jsonText.slice(firstBrace, lastBrace + 1);
+    }
 
     try {
       const result = JSON.parse(jsonText);
@@ -175,6 +181,7 @@ export async function POST(request: NextRequest) {
         },
       });
     } catch {
+      console.error('[extract-settings] JSON parse fail. raw head:', textBlock.text.slice(0, 500));
       return NextResponse.json({ error: 'AI 응답을 파싱할 수 없습니다. 사출기 화면이 선명한 사진을 사용해주세요.' }, { status: 422 });
     }
   } catch (error) {
