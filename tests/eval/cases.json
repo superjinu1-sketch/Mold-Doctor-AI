@@ -338,5 +338,32 @@
       "expected_phase": "packing",
       "severity": "high"
     }
+  },
+  {
+    "id": "pom-colorstreak-lowmelt",
+    "source": "실케이스 — 사출 카페",
+    "title": "POM 마스터배치 색줄 — 저멜트온도 함정 (흑점/탄화물 오선택)",
+    "difficulty": "hard",
+    "description": "POM 사출품에 마스터배치 투입 후 불규칙한 색줄/마블링 발생. 사용자가 불량유형을 '흑점/탄화물'로 수동 선택. 노즐 180℃는 POM 권장 하한(190℃) 미달, 분해온도(220℃)보다 40℃ 낮아 과열탄화는 물리적으로 불가능한 온도.",
+    "input": {
+      "defect_type": "흑점/탄화물 (Black Spot)",
+      "resin_type": "POM(아세탈)",
+      "resin_detail": "POM 코폴리머 블랙 마스터배치 2%",
+      "machine_settings": {
+        "nozzle_temp": 180, "zone1_temp": 180, "zone2_temp": 175, "zone3_temp": 165, "zone4_temp": 155,
+        "mold_temp_fixed": 80, "mold_temp_moving": 80,
+        "injection_pressure": 100, "holding_pressure": 70,
+        "injection_speed_1": 60, "back_pressure": 3, "screw_rpm": 100
+      },
+      "color_info": { "masterbatch_ratio": 2, "masterbatch_type": "마스터배치" },
+      "defect_description": "블랙 마스터배치 2% 투입 후 제품 표면에 불규칙한 색줄·마블링 발생. 내추럴 컬러에서는 문제없음."
+    },
+    "expected": {
+      "root_cause": "멜트온도 180℃는 POM 권장 하한(190℃) 미달 → 마스터배치 색소 분산 불량으로 색줄/마블링 발생. 과열탄화(스크류 마모·데드존)는 180℃에서 물리적으로 불가능.",
+      "key_recommendations": ["멜트온도 상향 180→195~205℃", "배압 3→8~12MPa로 증가(분산 개선)", "스크류 RPM 100→80으로 감소(전단 밸런스)"],
+      "expected_phase": "material",
+      "severity": "medium",
+      "trap": "흑점/탄화물로 선택했으나 180℃는 POM 분해온도(220℃) 미달 → 과열탄화 불가. 스크류 마모·데드존 탄화를 1순위로 오진하면 함정. 정답은 저멜트온도 기인 색소 분산 불량."
+    }
   }
 ]

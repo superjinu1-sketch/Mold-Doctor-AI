@@ -318,7 +318,8 @@ function buildSystemBlocks(resinType: string, tier: 'simple' | 'complex' = 'simp
 1. 이미 시도해서 효과 없었던 조치는 다시 추천하지 마세요
 2. 부분 개선된 조치는 방향이 맞다는 뜻 — 더 강하게 조정하거나 보조 조치를 추가하세요
 3. 1차 추정에서 미처 고려하지 못한 원인을 탐색하세요: 금형 구조적 원인(벤트/게이트/냉각), 소재 로트 변화, 사출기 기계적 문제(체크링/스크류 마모), 환경 요인(습도/온도)
-4. 1차가 material/method 원인이었다면, 2차는 machine/mold 원인을 우선 검토하세요` : '',
+4. 1차가 material/method 원인이었다면, 2차는 machine/mold 원인을 우선 검토하세요
+5. 단, 1차 권고 조치를 전부 시도했는데 변화가 없다면, 새 원인을 machine/mold로만 좁히지 마라. 1차 추정의 방향(불량유형 분류·원인 카테고리) 자체가 틀렸을 가능성을 먼저 재검토하라. 특히 'KB 가공윈도우 사전 대조'에 '낮음⚠'/'높음⚠' 플래그가 있으면 그 항목(멜트온도 등)을 최우선 후보로 다시 열어라. "더 깊고 희귀한 원인"으로 가기 전에 "처음 분류가 틀렸나"를 먼저 물어라.` : '',
     round >= 3 ? `\nREPEAT ANALYSIS ALERT (3차+ 반복 추정):
 이 케이스는 3회 이상 반복 추정입니다. 일반적인 성형 조건 조정으로는 해결이 어려운 상태입니다.
 다음을 반드시 검토하세요:
@@ -593,6 +594,26 @@ export async function POST(request: NextRequest) {
       return `[금형·기계 해석 가이드]\n${rules.join('\n')}`;
     })();
 
+    // 불량유형↔온도 정합성 가드 — 과열탄화 계열 선택인데 멜트가 분해온도 미달이면 재검토 유도
+    const defectTempGuard = (() => {
+      if (!resinSpec) return '';
+      const dt = defectType || '';
+      const isBurnLike = /탄화|흑점|번\s*마크|burn|black\s*spot|디젤|변색|scorch/i.test(dt);
+      const nozzle = parseFloat(s.nozzleTemp || '');
+      const z1 = parseFloat(s.zone1Temp || '');
+      const meltMax = [nozzle, z1].filter(v => isFinite(v)).reduce((m, v) => Math.max(m, v), 0);
+      const degr = resinSpec.meltC?.degradeAbove;
+      const meltMin = resinSpec.meltC?.min;
+      const lines: string[] = [];
+      if (isBurnLike && degr && meltMax > 0 && meltMax < degr) {
+        lines.push(`- ⚠ 선택된 불량유형(${dt})은 과열탄화 계열인데, 현재 멜트온도(노즐/실린더 최고 ${meltMax}℃)는 ${resinSpec.id} 열분해 온도(${degr}℃)보다 낮다. 이 온도에서 수지 자체의 과열탄화(배럴 과열)는 발생하기 어렵다. 과열탄화를 1순위에서 신중히 배제하고 다음 비-과열 원인을 우선 검토하라: (a) 외부 이물·오염, (b) 마스터배치·색소 분산 불량(저온일수록 색줄·마블링 발생), (c) 핫러너 데드스팟·장시간 체류·재생재 열화 등 국부/체류성 탄화. 단 (c) 국부 탄화는 배럴온도와 무관하게 가능하니 별개로 검토하라.`);
+      }
+      if (meltMin && meltMax > 0 && meltMax < meltMin) {
+        lines.push(`- ⚠ 멜트온도(최고 ${meltMax}℃)가 ${resinSpec.id} 권장 하한(${meltMin}℃) 미달. 외관 불량(색줄/마블/광택저하/미성형)은 저(低)멜트온도와 직결되므로, 멜트온도 상향을 우선 원인·조정안으로 강하게 검토하라.`);
+      }
+      return lines.length ? `[불량유형·온도 정합성 가이드]\n${lines.join('\n')}` : '';
+    })();
+
     const noImageGuard = safeImages.length === 0 ? `[이미지 없음 — 텍스트 기반 추정 모드]
 - 불량 사진이 제공되지 않았다. IMAGE QUALITY CHECK 단계를 건너뛰어라.
 - No_Defect_Detected / Image_Unreadable 로 절대 분기하지 마라 (이미지가 없으므로 해당 없음).
@@ -672,7 +693,7 @@ ${(productInfo?.weight || productInfo?.wallThicknessMin || productInfo?.wallThic
 - 벽 두께: ${productInfo?.wallThicknessMin || '-'}~${productInfo?.wallThicknessMax || '-'}mm
 - 특이사항: ${productInfo?.notes || '없음'}
 ` : ''}
-${defectGuide ? `${defectGuide}\n\n` : ''}${moldMachineGuard ? `${moldMachineGuard}\n\n` : ''}${kbCompare ? `${kbCompare}\n\n` : ''}
+${defectGuide ? `${defectGuide}\n\n` : ''}${moldMachineGuard ? `${moldMachineGuard}\n\n` : ''}${defectTempGuard ? `${defectTempGuard}\n\n` : ''}${kbCompare ? `${kbCompare}\n\n` : ''}
 
 ${isFollowUp && previousDiagnosis ? `
 ## 후속 추정 정보 (${round}차 Follow-up)

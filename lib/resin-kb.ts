@@ -433,7 +433,11 @@ export function formatKbCompare(spec: ResinSpec, checks: SettingCheck[]): string
   const lines = checks
     .map(c => `- ${c.label} ${c.value}${c.unit}: ${spec.id} 권장 ${c.rangeText} → ${STATUS_MARK[c.status]}`)
     .join('\n');
+  const hasFlag = checks.some(c => c.status !== 'ok');
+  const flagNote = hasFlag
+    ? '\n※ 위 ⚠ 항목은 가공윈도우 이탈이다. 외관·치수 불량의 직접 원인일 수 있으니 원인 후보에서 우선 검토하라.'
+    : '';
   return `## 가공윈도우 사전 대조 (KB 기준, 참고용)
-${lines}
+${lines}${flagNote}
 ※ 일반 가공윈도우 기준이다. 등급·충전재·벽두께에 따라 적정값이 달라질 수 있어 절대 기준이 아니다. 최종 판단은 전체 맥락으로 하라.`;
 }
