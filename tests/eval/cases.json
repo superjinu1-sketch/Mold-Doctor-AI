@@ -365,5 +365,34 @@
       "severity": "medium",
       "trap": "흑점/탄화물로 선택했으나 180℃는 POM 분해온도(220℃) 미달 → 과열탄화 불가. 스크류 마모·데드존 탄화를 1순위로 오진하면 함정. 정답은 저멜트온도 기인 색소 분산 불량."
     }
+  },
+  {
+    "id": "pp-td20-surfacestain-airtrap",
+    "source": "실케이스 — 사출 카페",
+    "title": "PP TD20% 표면 얼룩 — 온도 역순 입력 + air_trap 함정",
+    "difficulty": "hard",
+    "description": "자동차 외장재 PP TD20% 회색 부품. 표면 얼룩(플로우 마크) 유저 분류. 온도는 역순 입력 함정: nozzle=180, Z1=190, Z2=220, Z3=225, Z4=225(실제 멜트 225℃=정상). 불량이 충전 90%↑에서만·전체 동시 발생·조건 무관·신규 금형. 교과서적 air_trap/벤팅 불량 시그니처.",
+    "input": {
+      "defect_type": "표면 얼룩 (Flow Mark)",
+      "resin_type": "PP",
+      "resin_detail": "PP TD20% 자동차 외장재",
+      "machine_settings": {
+        "nozzle_temp": 180, "zone1_temp": 190, "zone2_temp": 220, "zone3_temp": 225, "zone4_temp": 225,
+        "mold_temp_fixed": 40, "mold_temp_moving": 40,
+        "injection_pressure": 130, "holding_pressure": 90,
+        "injection_speed_1": 60, "back_pressure": 5, "screw_rpm": 80,
+        "holding_time": 8, "cooling_time": 25
+      },
+      "mold_info": { "mold_type": "2판", "gate_type": "사이드", "cavity_count": 2 },
+      "product_info": { "wall_thickness_min": 2.0, "wall_thickness_max": 3.5 },
+      "defect_description": "충전 90% 미만(≤1100g)에서는 전 부위 깨끗. 90% 이상(≥1100g)에서 여러 군데 동시 발생. 온도·속도·압력 방향 무관하게 발생. 신규 금형(금형업체 샘플 시에는 정상). 동일 재료를 다른 금형에서 성형 시 문제없음."
+    },
+    "expected": {
+      "root_cause": "last-fill 에어트랩 기인 표면 얼룩 — 충전 90%↑ 구간의 벤팅 불량으로 포집된 가스가 표면에 흔적을 남김. 신규 금형 벤트 설계 누락 가능성 높음.",
+      "key_recommendations": ["Progressive Short-Shot으로 얼룩 발생 위치(last-fill point) 매핑", "해당 위치에 벤트 홈(0.02mm 깊이×3~5mm 폭) 추가", "기존 벤트 청소 및 막힘 확인"],
+      "expected_phase": "filling",
+      "severity": "medium",
+      "trap": "①온도 역순 입력(nozzle=180, Z4=225) → 가짜 저멜트온도 오판 → 배럴 승온 권고를 1순위로 내면 함정. 실제 멜트는 225℃로 PP TD20%에 정상. ②flow_mark 분류 → air_trap 교차 라우팅 누락 시 조건 변경만 권고하면 함정. 벤팅 추가가 정답."
+    }
   }
 ]

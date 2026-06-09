@@ -257,6 +257,8 @@ export const DEFECT_KB: Record<string, DefectNode> = {
     patternHints: {
       '초기 샷에만': '워밍업 부족. 금형온도 안정화 후 재확인.',
       '레코드홈(동심원)': 'record_groove 분기 참조. 게이트 확대 검토.',
+      '충전 끝(90%↑)에서만·전체 동시 발생': 'air_trap_burn 분기 우선 검토. 온도·속도·압력 방향과 무관하게 충전율(중량)에만 의존하면 유동현상이 아니라 last-fill 가스 포집(벤팅 불량)이다. Progressive Short-Shot으로 얼룩 첫 발생 위치 매핑 → 그 자리가 last-fill = 벤트 가공 대상.',
+      '신규 금형·이관 직후': 'air_trap_burn 분기 참조. 신금형은 벤트 설계 누락이 흔하다. 같은 재료가 다른 금형에서 정상이면 재료 원인은 강등하고 금형(벤팅) 우선.',
     },
     sharedGates: ['mold_temp_insufficient'],
     source: 'synthesis-3.2,taxonomy-6', confidence: 'high',

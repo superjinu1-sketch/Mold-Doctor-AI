@@ -573,6 +573,20 @@ function DiagnoseContent() {
           round: diagnosisRound,
           beforeResin: resinType === '기타 (직접 입력)' ? customResin : resinType,
           beforeSettings: { ...settings },
+          beforeInput: {
+            defectType: defectType === '기타 (직접 입력)' ? customDefect : defectType,
+            defectDescription,
+            resinInfo: {
+              resinType: resinType === '기타 (직접 입력)' ? customResin : resinType,
+              filler, fillerContent, flameRetardant, flameRetardantThickness, flameRetardantType, resinDetail, resinGrade,
+            },
+            settings: { ...settings },
+            advSettings: { ...advSettings },
+            pressureUnit: settings.pressureUnit,
+            moldInfo: { moldType, gateType, cavities, runnerType },
+            productInfo: { weight, wallThicknessMin, wallThicknessMax, notes: productNotes },
+            locale,
+          },
         };
         history.unshift(record);
         const trimmed = history.slice(0, 20);

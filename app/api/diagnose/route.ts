@@ -5,7 +5,7 @@ import { tryMock } from '@/lib/mock';
 import { getResinSpec, checkSettings, formatKbCompare } from '@/lib/resin-kb';
 import { formatDefectGuide } from '@/lib/defect-kb';
 import { supabaseAdmin } from '@/lib/supabase/server';
-import { SAMPLE_DEMO_RESULT } from '@/lib/sample-demo';
+import { getSampleDemo } from '@/lib/sample-demo';
 
 // JSON 문자열 값 안의 실제 줄바꿈을 공백으로 치환 (문자 단위 파싱)
 function sanitizeJsonNewlines(text: string): string {
@@ -381,7 +381,7 @@ export async function POST(request: NextRequest) {
 
     // ── 샘플 무료 체험 데모: 인증·크레딧·Anthropic 호출 없이 고정 결과 반환 ──
     if (body?.isDemo === true) {
-      return NextResponse.json(SAMPLE_DEMO_RESULT, {
+      return NextResponse.json(getSampleDemo(body.locale), {
         headers: { 'X-Diagnosis-Tier': 'simple', 'X-Diagnosis-Round': '1', 'X-Demo': '1' },
         // X-Session-Id 없음(데모는 세션 미생성) → 클라가 팔로업 비활성 처리
       });
@@ -405,21 +405,28 @@ export async function POST(request: NextRequest) {
       }
       const userId = userData.user.id;
 
-      // 진단 본 호출 전 크레딧 원자 차감(신규는 lazy 5크레딧 grant 후 1 차감)
-      const { data: sessRaw, error: sessErr } = await supabaseAdmin.rpc('start_session', { p_user_id: userId });
-      if (sessErr) {
-        return NextResponse.json({ error: '크레딧 처리 중 오류가 발생했습니다.', code: 'CREDIT_ERROR' }, { status: 500 });
+      // ── isRetest dev 화이트리스트 검증 (크레딧 스킵) ──────────
+      const devEmails = (process.env.DEV_EMAILS || '').split(',').map(e => e.trim().toLowerCase()).filter(Boolean);
+      const authEmail = (userData.user.email || '').toLowerCase();
+      const isRetestFree = body?.isRetest === true && devEmails.length > 0 && devEmails.includes(authEmail);
+
+      if (!isRetestFree) {
+        // 진단 본 호출 전 크레딧 원자 차감(신규는 lazy 5크레딧 grant 후 1 차감)
+        const { data: sessRaw, error: sessErr } = await supabaseAdmin.rpc('start_session', { p_user_id: userId });
+        if (sessErr) {
+          return NextResponse.json({ error: '크레딧 처리 중 오류가 발생했습니다.', code: 'CREDIT_ERROR' }, { status: 500 });
+        }
+        const sess = sessRaw as { ok: boolean; code?: string; session_id?: string; credit_balance?: number };
+        if (!sess?.ok) {
+          return NextResponse.json(
+            { error: '크레딧이 부족합니다.', code: 'INSUFFICIENT', credit_balance: sess?.credit_balance ?? 0 },
+            { status: 402 }
+          );
+        }
+        sessionId = sess.session_id as string;
+        creditBalance = sess.credit_balance as number;
+        refundCtx = { sessionId, userId };
       }
-      const sess = sessRaw as { ok: boolean; code?: string; session_id?: string; credit_balance?: number };
-      if (!sess?.ok) {
-        return NextResponse.json(
-          { error: '크레딧이 부족합니다.', code: 'INSUFFICIENT', credit_balance: sess?.credit_balance ?? 0 },
-          { status: 402 }
-        );
-      }
-      sessionId = sess.session_id as string;
-      creditBalance = sess.credit_balance as number;
-      refundCtx = { sessionId, userId };
       // ────────────────────────────────────────────────────
     }
     const {
@@ -599,9 +606,10 @@ export async function POST(request: NextRequest) {
       if (!resinSpec) return '';
       const dt = defectType || '';
       const isBurnLike = /탄화|흑점|번\s*마크|burn|black\s*spot|디젤|변색|scorch/i.test(dt);
+      const tempVals = [s.nozzleTemp, s.zone1Temp, s.zone2Temp, s.zone3Temp, s.zone4Temp]
+        .map(v => parseFloat(v || '')).filter(v => isFinite(v));
       const nozzle = parseFloat(s.nozzleTemp || '');
-      const z1 = parseFloat(s.zone1Temp || '');
-      const meltMax = [nozzle, z1].filter(v => isFinite(v)).reduce((m, v) => Math.max(m, v), 0);
+      const meltMax = tempVals.length ? tempVals.reduce((m, v) => Math.max(m, v), 0) : 0;
       const degr = resinSpec.meltC?.degradeAbove;
       const meltMin = resinSpec.meltC?.min;
       const lines: string[] = [];
@@ -612,6 +620,20 @@ export async function POST(request: NextRequest) {
         lines.push(`- ⚠ 멜트온도(최고 ${meltMax}℃)가 ${resinSpec.id} 권장 하한(${meltMin}℃) 미달. 외관 불량(색줄/마블/광택저하/미성형)은 저(低)멜트온도와 직결되므로, 멜트온도 상향을 우선 원인·조정안으로 강하게 검토하라.`);
       }
       return lines.length ? `[불량유형·온도 정합성 가이드]\n${lines.join('\n')}` : '';
+    })();
+
+    // 온도존 역순 입력 가드 — 노즐이 실린더 존보다 현저히 낮으면 입력 순서 역전 의심
+    const tempOrderGuard = (() => {
+      const nozzleV = parseFloat(s.nozzleTemp || '');
+      const zoneVals = [s.zone1Temp, s.zone2Temp, s.zone3Temp, s.zone4Temp]
+        .map(v => parseFloat(v || '')).filter(v => isFinite(v));
+      if (!isFinite(nozzleV) || zoneVals.length === 0) return '';
+      const zoneMax = zoneVals.reduce((m, v) => Math.max(m, v), 0);
+      if (nozzleV < zoneMax - 15) {
+        return `[온도존 입력 정합성 가이드]
+- ⚠ 입력된 노즐온도(${nozzleV}℃)가 실린더 존 최고온도(${zoneMax}℃)보다 ${Math.round(zoneMax - nozzleV)}℃ 낮다. 통상 사출기는 노즐(전방)이 가장 뜨겁고 호퍼/피드존(후방)이 가장 낮다. 노즐이 존보다 현저히 낮은 건 물리적으로 비정상(노즐 프리즈오프·콜드슬러그)이라, 화면 온도존 순서가 역으로 입력됐을 가능성이 높다. 실제 멜트온도는 입력 노즐값이 아니라 실린더 최고값(${zoneMax}℃ 부근)으로 보고, "저(低)멜트온도"라는 결론을 성급히 내리지 마라. 멜트온도 상향(배럴 승온)을 권고하기 전에 입력 순서부터 의심하라.`;
+      }
+      return '';
     })();
 
     const noImageGuard = safeImages.length === 0 ? `[이미지 없음 — 텍스트 기반 추정 모드]
@@ -693,7 +715,7 @@ ${(productInfo?.weight || productInfo?.wallThicknessMin || productInfo?.wallThic
 - 벽 두께: ${productInfo?.wallThicknessMin || '-'}~${productInfo?.wallThicknessMax || '-'}mm
 - 특이사항: ${productInfo?.notes || '없음'}
 ` : ''}
-${defectGuide ? `${defectGuide}\n\n` : ''}${moldMachineGuard ? `${moldMachineGuard}\n\n` : ''}${defectTempGuard ? `${defectTempGuard}\n\n` : ''}${kbCompare ? `${kbCompare}\n\n` : ''}
+${defectGuide ? `${defectGuide}\n\n` : ''}${moldMachineGuard ? `${moldMachineGuard}\n\n` : ''}${defectTempGuard ? `${defectTempGuard}\n\n` : ''}${tempOrderGuard ? `${tempOrderGuard}\n\n` : ''}${kbCompare ? `${kbCompare}\n\n` : ''}
 
 ${isFollowUp && previousDiagnosis ? `
 ## 후속 추정 정보 (${round}차 Follow-up)
