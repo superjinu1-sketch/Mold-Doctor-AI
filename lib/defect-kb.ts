@@ -4,7 +4,7 @@
 // 수정 순서: taxonomy.md → 이 파일 → KB_VERSION bump → eval 회귀.
 import type { ResinSpec } from './resin-kb';
 
-export const KB_VERSION = 'defect-kb-v1.1';
+export const KB_VERSION = 'defect-kb-v1.2';
 
 export type Cause = {
   rank: number;
@@ -169,7 +169,7 @@ export const DEFECT_KB: Record<string, DefectNode> = {
   weld_line: {
     id: 'weld_line', nameKo: '웰드라인', nameEn: 'Weld Line', phase: '충전',
     typicalSeverity: 'medium (외관). GF 수지 강도 직결·기능부품 시 high',
-    discriminators: '홀·보스·코어핀 주변, 멀티게이트 합류부 가는 선. 합류각<135°=weld(강도저하 큼) / >135°=meld. GF수지=강도 모재 50~80%↓.',
+    discriminators: '홀·보스·코어핀 주변, 멀티게이트 합류부 가는 선. 합류각<135°=weld(강도저하 큼) / >135°=meld. GF수지=강도 모재 50~80%↓. 닦아도 안 지워지는 구조적 선. 닦으면 옅어지는 백색 잔류물이면 웰드 아님 → mold_deposit(석출) 검토.',
     causes: [
       { rank: 1, cause: '멜트온도 부족 (강도 기여 71%)', category: 'Method',
         baseProbability: 45,
@@ -239,7 +239,7 @@ export const DEFECT_KB: Record<string, DefectNode> = {
   flow_mark: {
     id: 'flow_mark', nameKo: '흐름자국', nameEn: 'Flow Mark', phase: '충전',
     typicalSeverity: 'medium (외관)',
-    discriminators: '유동방향 물결·줄무늬. 제팅(구불선)·타이거스트라이프(유동수직 광택밴드)·레코드홈(동심원)과 구분.',
+    discriminators: '유동방향 물결·줄무늬. 제팅(구불선)·타이거스트라이프(유동수직 광택밴드)·레코드홈(동심원)과 구분. 닦아도 안 지워지는 표면 요철. 닦으면 옅어지는 백색 가루·얼룩이면 flow 아님 → mold_deposit(석출)·가스 응축 검토.',
     causes: [
       { rank: 1, cause: '금형온도 과저', category: 'Mold',
         baseProbability: 50,
@@ -748,6 +748,42 @@ export const DEFECT_KB: Record<string, DefectNode> = {
     ],
     sharedGates: ['mold_temp_insufficient'],
     source: 'synthesis,taxonomy-29', confidence: 'med',
+  },
+
+  // ─── 31. Mold Deposit / Plate-out (금형 석출/플레이트아웃) ───
+  mold_deposit: {
+    id: 'mold_deposit', nameKo: '금형 석출', nameEn: 'Mold Deposit', phase: '표면',
+    typicalSeverity: 'medium (외관). 누적·전수화 시 수율 직결',
+    discriminators: '닦으면 옅어지는 백색·뿌연 잔류물(표면 부착물). 닦아도 안 지워지는 구조적 불량(웰드선·플로우마크·은선 지속형·표면 요철)과 결정적으로 구분. 게이트·벤트 주변·특정 캐비티 집중. 반복생산 시 점진 누적, 금형 세정 직후 일시 소멸·재누적.',
+    causes: [
+      { rank: 1, cause: '수지 휘발분·첨가제 금형표면 석출(plate-out)', category: 'Material',
+        baseProbability: 45,
+        trigger: '고멜트온도·장시간 체류. 저분자 첨가제·난연제·활제 휘발. 금형 세정 직후 소멸 후 재누적.',
+        evidence: '멜트온도·체류(사이클)시간. 세정주기 대비 재발.',
+        verification: '금형 게이트·벤트 주변 표면 닦아내고 N샷 후 재출현 확인. 소멸→재누적이면 plate-out 확진.',
+        adjustment: '멜트온도↓·사이클(체류)단축·금형 표면 주기 세정·벤트 추가/청소.' },
+      { rank: 2, cause: '벤트 부족·막힘 → 가스 응축', category: 'Mold',
+        baseProbability: 30,
+        trigger: '벤트 막힘·last-fill·게이트 주변. 가스 미배출 응축.',
+        evidence: '벤트 상태. 얼룩 위치(게이트·충전말단).',
+        verification: '벤트 청소·추가 후 재시험.',
+        adjustment: '벤트 청소·추가, 사출속도↓, 멜트온도↓.' },
+      { rank: 3, cause: '이형제 과다 전사', category: 'Mold',
+        baseProbability: 20,
+        trigger: '외부 이형제 분무 과다.',
+        evidence: '이형제 사용 로그.',
+        verification: '이형제 없이 테스트.',
+        adjustment: '이형제 최소화·금형 세정.' },
+    ],
+    patternHints: {
+      '닦으면 흐려짐·지워짐': '표면 부착물 확정 — 웰드/플로우/은선(구조적·지속형) 배제, plate-out·가스 응축·이형제 우선.',
+      '특정 캐비티만': '그 캐비티 표면·벤트·핫러너 노즐 데드스팟 집중. 러너밸런스·노즐온도 편차 검토.',
+      '게이트 주변 반달·헤일로': 'gate_blush 병발 검토. 닦이면 석출, 안 닦이면 블러시(표면 거칠기).',
+      '핫러너 청소·밸브교환에도 지속': '핫러너 내부 아닌 캐비티 표면·벤트 원인 가중. 그 캐비티 표면 세정·벤트 점검.',
+    },
+    sharedGates: [],
+    priorityLogic: '"닦임=표면 부착물"이 분류 결정 단서. 금형 세정 후 일시 소멸·재누적이면 plate-out 확진. 닦이는 잔류물을 웰드/플로우로 분류하지 마라.',
+    source: 'synthesis,taxonomy-31', confidence: 'med',
   },
 
 };

@@ -180,6 +180,7 @@ ANALYSIS FRAMEWORK — apply in order:
 STEP 1: DEFECT CLASSIFICATION
 - Identify defect type from photo and/or description
 - Classify phase: FILLING (short shot, jetting, burn, weld line) / PACKING (sink, void, flash) / COOLING (warpage, crack) / MATERIAL (silver streak, discoloration, delamination)
+- TEXTURE DISCRIMINATOR (표면 잔류물): 백색·뿌연 얼룩/가루가 "닦으면 옅어지거나 지워진다"면 표면 부착물(금형 석출 plate-out·가스 응축·이형제 전사)이다. 닦아도 안 지워지는 구조적 불량(weld line·flow mark·지속형 silver streak·표면 요철)으로 분류하지 마라. 이 경우 defect_type을 Mold Deposit/Plate-out(금형 석출) 계열로 추정하라.
 IMAGE QUALITY CHECK (evaluate before any other step):
 - If the image shows a molded part but NO clear defect pattern → defect_type.en = "No_Defect_Detected", causes = [], recommendations = [], summary = "불량 형상 미검출. 의심 부위 확대 촬영 권장."
 - If the image is a solid color / too blurry / overexposed / unrelated to injection molding → defect_type.en = "Image_Unreadable", causes = [], recommendations = [], summary = "이미지 판독 불가. 밝은 곳에서 불량 부위 선명하게 재촬영 필요."
@@ -663,6 +664,27 @@ export async function POST(request: NextRequest) {
       return '';
     })();
 
+    // 표면 잔류물 텍스처 가드 — "닦으면 옅어진다" 단서면 표면 석출(plate-out)·가스 응축·이형제를 구조적 불량보다 우선
+    const surfaceDepositGuard = (() => {
+      const t = defectDescription || '';
+      const wipes = /닦으?면|닦이|문지르|문질러|wipe|rub/i.test(t);
+      const fades = /흐려|옅|연해|사라|지워|줄어|없어|연하게/i.test(t);
+      const whitish = /백색|흰|뿌옇|뿌연|가루|분말|얼룩|백분/i.test(t);
+      if (wipes && (fades || whitish)) {
+        return `[표면 잔류물 텍스처 가이드]
+- ⚠ "닦으면 옅어진다/지워진다" 단서가 있다. 이는 표면 부착물(금형 석출 plate-out·가스 응축물·이형제 전사)이다. 닦아도 안 지워지는 구조적 불량(웰드라인·플로우마크·은선 지속형·표면 요철)을 1순위에서 배제하라.
+- 우선 검토: (1) 금형 석출/plate-out(수지 휘발분·첨가제가 금형 표면에 응축 누적 → 제품 전사. 고멜트온도·장체류·세정주기 부족), (2) 벤트 부족·막힘에 의한 가스 응축(게이트·충전말단 집중), (3) 이형제 과다 전사.
+- 검증: 금형 해당 부위 표면을 닦아낸 뒤 N샷 후 재출현 여부 확인. 세정 직후 소멸→재누적이면 plate-out 확진.
+- 특정 캐비티만 + 핫러너 청소·밸브교환에도 지속이면, 원인은 핫러너 내부가 아니라 그 캐비티 표면·벤트일 가능성이 높다(그 캐비티 표면 세정·벤트 점검 우선).`;
+      }
+      return '';
+    })();
+
+    // 권장B: 닦임 감지 시 mold_deposit 가이드 병행 주입
+    const depositGuide = surfaceDepositGuard
+      ? formatDefectGuide('금형 석출', resinSpec, s, a, resinInfo?.filler)
+      : '';
+
     const noImageGuard = safeImages.length === 0 ? `[이미지 없음 — 텍스트 기반 추정 모드]
 - 불량 사진이 제공되지 않았다. IMAGE QUALITY CHECK 단계를 건너뛰어라.
 - No_Defect_Detected / Image_Unreadable 로 절대 분기하지 마라 (이미지가 없으므로 해당 없음).
@@ -742,7 +764,7 @@ ${(productInfo?.weight || productInfo?.wallThicknessMin || productInfo?.wallThic
 - 벽 두께: ${productInfo?.wallThicknessMin || '-'}~${productInfo?.wallThicknessMax || '-'}mm
 - 특이사항: ${productInfo?.notes || '없음'}
 ` : ''}
-${defectGuide ? `${defectGuide}\n\n` : ''}${moldMachineGuard ? `${moldMachineGuard}\n\n` : ''}${defectTempGuard ? `${defectTempGuard}\n\n` : ''}${tempOrderGuard ? `${tempOrderGuard}\n\n` : ''}${kbCompare ? `${kbCompare}\n\n` : ''}
+${defectGuide ? `${defectGuide}\n\n` : ''}${moldMachineGuard ? `${moldMachineGuard}\n\n` : ''}${defectTempGuard ? `${defectTempGuard}\n\n` : ''}${tempOrderGuard ? `${tempOrderGuard}\n\n` : ''}${surfaceDepositGuard ? `${surfaceDepositGuard}\n\n` : ''}${depositGuide ? `${depositGuide}\n\n` : ''}${kbCompare ? `${kbCompare}\n\n` : ''}
 
 ${isFollowUp && previousDiagnosis ? `
 ## 후속 추정 정보 (${round}차 Follow-up)
