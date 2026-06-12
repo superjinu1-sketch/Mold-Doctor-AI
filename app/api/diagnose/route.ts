@@ -179,7 +179,10 @@ ANALYSIS FRAMEWORK — apply in order:
 
 STEP 1: DEFECT CLASSIFICATION
 - Identify defect type from photo and/or description
-- Classify phase: FILLING (short shot, jetting, burn, weld line) / PACKING (sink, void, flash) / COOLING (warpage, crack) / MATERIAL (silver streak, discoloration, delamination)
+- Classify phase by the ROOT CAUSE you adopt as rank 1, NOT by defect type alone. The phase is the molding stage where the adopted rank-1 mechanism originates.
+  · Default mapping by defect type (참고용 기본값, 채택 원인이 다른 단계를 가리키면 덮어써라): FILLING (short shot, jetting, burn, weld line) / PACKING (sink, void, flash) / COOLING (warpage) / MATERIAL (silver streak, discoloration, delamination)
+  · Override the default when the adopted mechanism originates in another stage. 예: crack — 과보압·잔류응력 기인이면 PACKING, 이형응력·냉각응력·ESC 기인이면 COOLING. flash — 형체력 부족·극저점도가 보압 피크에서 침투해 발생하면 PACKING.
+  · State the phase reasoning in one clause (어느 원인이 어느 단계에서 발생하는지).
 - TEXTURE DISCRIMINATOR (표면 잔류물): 백색·뿌연 얼룩/가루가 "닦으면 옅어지거나 지워진다"면 표면 부착물(금형 석출 plate-out·가스 응축·이형제 전사)이다. 닦아도 안 지워지는 구조적 불량(weld line·flow mark·지속형 silver streak·표면 요철)으로 분류하지 마라. 이 경우 defect_type을 Mold Deposit/Plate-out(금형 석출) 계열로 추정하라.
 IMAGE QUALITY CHECK (evaluate before any other step):
 - If the image shows a molded part but NO clear defect pattern → defect_type.en = "No_Defect_Detected", causes = [], recommendations = [], summary = "불량 형상 미검출. 의심 부위 확대 촬영 권장."

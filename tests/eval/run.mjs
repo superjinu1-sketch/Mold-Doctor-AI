@@ -37,7 +37,7 @@ const PASS_THRESHOLD = 70;
 const INTERVAL_MS = 6000; // rate-limit 회피 간격
 const MAX_RETRIES = 5;    // 529 overloaded 재시도 (diagnose + judge 공통)
 const JUDGE_MODEL = 'claude-haiku-4-5-20251001'; // Sonnet 대비 ~1/10 비용
-const PROMPT_VERSION = 'v7';  // defect-kb-v1.1 주입 → 캐시 무효화
+const PROMPT_VERSION = 'v8';  // defect-kb-v1.3 (phase 동적판정 + GF웰드 강도 가중치) → 캐시 무효화
 const CACHE_DIR = join(ROOT, 'tests/eval/.cache');
 const CACHE_TTL_MS = 7 * 24 * 3600 * 1000; // 7일
 
@@ -68,6 +68,15 @@ function loadApiKey() {
     if (m) return m[1].trim();
   }
   return null;
+}
+
+/* ── KB_VERSION 추출 (lib/defect-kb.ts에서 — 하드코딩 회피) ─── */
+function loadKbVersion() {
+  try {
+    const f = readFileSync(join(ROOT, 'lib/defect-kb.ts'), 'utf-8');
+    const m = f.match(/KB_VERSION\s*=\s*'([^']+)'/);
+    return m ? m[1] : 'unknown';
+  } catch { return 'unknown'; }
 }
 
 /* ── field mapping: cases.json → /api/diagnose body ─── */
@@ -450,6 +459,36 @@ async function main() {
   console.log(`\n${'═'.repeat(60)}`);
   console.log(`  FINAL: ${Math.round(passed/total*100)}% PASS  (${passed}/${total})  평균 ${avgScore}/100`);
   console.log(`${'═'.repeat(60)}\n`);
+
+  // ── 결과 영속화 (git-tracked, v6 per-case 데이터 부재 재발 방지) ──
+  // 판정 로직·점수 산식은 손대지 않고 저장만 추가한다.
+  const kbVersion = loadKbVersion();
+  const now = new Date();
+  const pad = n => String(n).padStart(2, '0');
+  const stamp = `${now.getFullYear()}${pad(now.getMonth() + 1)}${pad(now.getDate())}-${pad(now.getHours())}${pad(now.getMinutes())}`;
+  const RESULTS_DIR = join(__dir, 'results');
+  if (!existsSync(RESULTS_DIR)) mkdirSync(RESULTS_DIR, { recursive: true });
+  const persisted = {
+    kb_version: kbVersion,
+    prompt_version: PROMPT_VERSION,
+    timestamp: now.toISOString(),
+    summary: {
+      total, passed, pass_rate: Math.round(passed / total * 100), avg_score: avgScore,
+      basic: { total: basicResults.length, passed: basicPass, avg: basicAvg },
+      hard:  { total: hardResults.length,  passed: hardPass,  avg: hardAvg },
+    },
+    cases: results.map(r => ({
+      id: r.id,
+      difficulty: r.difficulty,
+      score: r.score,
+      pass: r.pass,
+      trap_avoided: r.trap_avoided ?? null,
+      judge_reasoning: r.reasoning || r.error || '',
+    })),
+  };
+  const resultsPath = join(RESULTS_DIR, `eval-${kbVersion}-${stamp}.json`);
+  writeFileSync(resultsPath, JSON.stringify(persisted, null, 2));
+  console.log(`  결과 영속화 저장: ${resultsPath}\n`);
 
   // ── Cost report (--measure-cost 시) ─────────────────────
   if (MEASURE_COST && costRows.length > 0) {

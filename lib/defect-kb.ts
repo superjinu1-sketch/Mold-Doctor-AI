@@ -1,10 +1,10 @@
-// lib/defect-kb.ts — 불량 진단 트리 KB v1.1
+// lib/defect-kb.ts — 불량 진단 트리 KB v1.3
 // 정본: docs/defect_taxonomy.md. 수치 범위: lib/resin-kb.ts 참조(중복 금지).
 // 거버넌스: 출력은 "추정/조정안", 게이트는 "조언"톤("~일 수 있다"), 제조사 브랜드명 0.
 // 수정 순서: taxonomy.md → 이 파일 → KB_VERSION bump → eval 회귀.
 import type { ResinSpec } from './resin-kb';
 
-export const KB_VERSION = 'defect-kb-v1.2';
+export const KB_VERSION = 'defect-kb-v1.3';
 
 export type Cause = {
   rank: number;
@@ -98,7 +98,7 @@ export const DEFECT_KB: Record<string, DefectNode> = {
 
   // ─── 2. Flash (플래시/버) ──────────────────────────────────
   flash: {
-    id: 'flash', nameKo: '플래시/버', nameEn: 'Flash', phase: '충전',
+    id: 'flash', nameKo: '플래시/버', nameEn: 'Flash', phase: '충전/보압(형체력·점도 침투)',
     typicalSeverity: 'medium (소량·외관). 치수·기능 직결 시 medium~high',
     discriminators: '파팅면 전체둘레=클램프 부족·과압 / 특정위치 반복=금형마모·핀 clearance / 이젝터핀 주변=clearance.',
     causes: [
@@ -185,8 +185,8 @@ export const DEFECT_KB: Record<string, DefectNode> = {
         adjustment: '홀드압↑, 사출속도↑.' },
       { rank: 3, cause: '게이트 위치·구조적 웰드 불가피', category: 'Mold',
         baseProbability: 20,
-        trigger: '홀·보스·코어핀 존재. 멀티게이트. 구조상 합류 위치 이동 필요.',
-        evidence: '게이트 수·위치. 제품 구조(홀·보스 유무).',
+        trigger: '홀·보스·코어핀 존재. 멀티게이트. 구조상 합류 위치 이동 필요. GF 함유 + 강도·파단 요구 기능부품이면 본 순위를 우선 검토.',
+        evidence: '게이트 수·위치. 제품 구조(홀·보스 유무). GF 함유 여부·강도/파단 요구 여부.',
         verification: '게이트 위치 이동 시뮬레이션(Moldflow).',
         adjustment: '게이트 위치 이동(근본), 웰드 예측위치 벤트, 고유동 그레이드.' },
     ],
@@ -194,9 +194,10 @@ export const DEFECT_KB: Record<string, DefectNode> = {
       '홀 주변 반복': '3순위(구조적 웰드) — 게이트 위치 변경 검토',
       '특정 캐비티': '런너 밸런스 검토',
       '강도 저하': 'GF 수지=섬유 배향 문제. 조건 조정 한계 → 게이트 위치 검토',
+      '파단|부러짐|강도 부족|기능 불량': 'GF 수지면 섬유 배향 단절 = 조건 조정으로 해결 불가 영역. 게이트 위치 이동·웰드 위치 이동(금형)이 근본 대책. 조건 권고 시 한계를 명시할 것',
     },
     sharedGates: ['mold_temp_insufficient'],
-    priorityLogic: '멜트온도 최우선(Taguchi 71% 기여). 구조적 웰드=조건만으론 한계, 게이트 위치 이동이 근본.',
+    priorityLogic: '멜트온도 최우선(Taguchi 71% 기여). 구조적 웰드=조건만으론 한계, 게이트 위치 이동이 근본. 강도·파단 요구 시나리오(기능부품·GF 수지)에서는 Mold(게이트 위치) 원인을 우선 검토 — 멜트온도↑·보압↑은 V홈 외관을 개선해도 섬유 배향 단절로 인한 웰드부 강도는 모재 대비 크게 회복 못 함. 외관 양품 ≠ 강도 OK.',
     source: 'synthesis-1.4,taxonomy-4', confidence: 'high',
   },
 
@@ -363,7 +364,7 @@ export const DEFECT_KB: Record<string, DefectNode> = {
 
   // ─── 10. Crack / Crazing (크랙/균열) ──────────────────────
   crack: {
-    id: 'crack', nameKo: '크랙/균열', nameEn: 'Crack/Crazing', phase: '냉각/이형',
+    id: 'crack', nameKo: '크랙/균열', nameEn: 'Crack/Crazing', phase: '보압(과보압 잔류응력)/냉각·이형(이형응력·ESC)',
     typicalSeverity: 'medium~high (파단·강도 직결·안전 시 high, 외관 미세균열 medium)',
     discriminators: '이젝터핀 주변=이젝트 크랙 / 게이트 방사상=과보압 / 웰드부=후발 / 시간차+용제노출=ESC(잔류응력).',
     causes: [
@@ -849,6 +850,7 @@ export function formatDefectGuide(
   const lines: string[] = [];
   lines.push(`## 불량 추정 가이드레일 (KB ${KB_VERSION})`);
   lines.push(`불량: ${node.nameKo} (${node.nameEn}) | ${node.phase} Phase`);
+  lines.push(`phase는 채택한 1순위 원인의 발생 단계 기준으로 판정(위 노드 phase는 기본값 — 채택 원인이 다른 단계를 가리키면 그 단계로).`);
   if (node.typicalSeverity) {
     lines.push(`통상 심각도: ${node.typicalSeverity} — 외관 불량은 원칙 medium 이하. high는 안전·전수·파단·탄화만. 과대평가 금지.`);
   }
