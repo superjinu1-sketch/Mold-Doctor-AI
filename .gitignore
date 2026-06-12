@@ -13,6 +13,7 @@
 # testing
 /coverage
 /tests/eval/.cache/
+/test-results/
 
 # next.js
 /.next/
