@@ -14,8 +14,8 @@
 - Vercel 배포
 
 ## 폴더 구조
-- app/ — 페이지 (/, /diagnose, /guide, /pricing)
-- app/api/ — API 라우트 (diagnose, analyze-image)
+- app/ — 페이지 (/, /diagnose, /guide, /pricing, /history, /auth)
+- app/api/ — API 라우트 (diagnose, diagnose-chat, extract-settings)
 - components/ — 공통 컴포넌트 (Navbar, Footer, 노드 등)
 - lib/ — 유틸리티, 수지 데이터, 타입 정의
 - public/ — 정적 파일
@@ -34,11 +34,13 @@
 - / — 랜딩 페이지
 - /diagnose — 트러블슈팅 메인 (핵심)
 - /guide — 불량 유형별 가이드 12종
-- /pricing — Free/Pro/Enterprise
+- /pricing — 크레딧 모델 (가입 5크레딧, 추가 구매 placeholder)
+- /history — 트러블슈팅 일지 (기록 보기·결과 복원·해결 상태)
 
 ## API
 - /api/diagnose — POST, Claude API 호출, 수지별 프롬프트 분리
-- /api/analyze-image — POST, Claude vision으로 불량 사진 분석
+- /api/diagnose-chat — POST, 진단 결과 팔로업 질문 (세션 기반, 크레딧 차감 없음)
+- /api/extract-settings — POST, Claude vision OCR — 사출기 화면/종이 조건표에서 셋팅값 추출 (인증+rate limit)
 
 ## 디자인 시스템 — 5대 규율
 

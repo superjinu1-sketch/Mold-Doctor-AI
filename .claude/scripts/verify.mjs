@@ -103,7 +103,8 @@ if (keyMatches.length === 0) {
 console.log('\n[5/5] 필수 파일 확인...');
 const required = [
   'app/api/diagnose/route.ts',
-  'app/api/analyze-image/route.ts',
+  'app/api/diagnose-chat/route.ts',
+  'app/api/extract-settings/route.ts',
   'components/DiagnosisResultPanel.tsx',
 ];
 const missing = required.filter(f => !existsSync(join(ROOT, f)));
