@@ -281,6 +281,7 @@ export const en: Record<string, string> = {
   'followup.settings_hint': 'If you changed settings, update the machine settings form above before starting follow-up analysis.',
 
   /* Error/status */
+  'err.defect_required': 'Enter at least one of: defect type, description, or photo. (Inputs are empty — cannot start estimation)',
   'err.resin_required': 'Please select a resin type. (Required)',
   'err.estimate_fail': 'Analysis failed',
   'err.estimate_error': 'An error occurred during analysis.',
@@ -348,6 +349,7 @@ export const en: Record<string, string> = {
   'summary.phase_filling': 'Filling Defect',
   'summary.phase_packing': 'Packing Defect',
   'summary.phase_cooling': 'Cooling Defect',
+  'summary.phase_ejection': 'Ejection Defect',
   'summary.phase_material': 'Material Defect',
   'summary.process_check': 'Process Window Check',
   'summary.pw_melt': 'Melt Temp',

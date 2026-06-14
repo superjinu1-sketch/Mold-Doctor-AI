@@ -1,10 +1,10 @@
-// lib/defect-kb.ts — 불량 진단 트리 KB v1.3
+// lib/defect-kb.ts — 불량 진단 트리 KB v1.4
 // 정본: docs/defect_taxonomy.md. 수치 범위: lib/resin-kb.ts 참조(중복 금지).
 // 거버넌스: 출력은 "추정/조정안", 게이트는 "조언"톤("~일 수 있다"), 제조사 브랜드명 0.
 // 수정 순서: taxonomy.md → 이 파일 → KB_VERSION bump → eval 회귀.
 import type { ResinSpec } from './resin-kb';
 
-export const KB_VERSION = 'defect-kb-v1.3';
+export const KB_VERSION = 'defect-kb-v1.4';
 
 export type Cause = {
   rank: number;
@@ -481,6 +481,7 @@ export const DEFECT_KB: Record<string, DefectNode> = {
       '사이클 재개후 개선': '2순위(체류) 거의 확진',
       '퍼지후 개선': '잔류탄화(스크루 마모·데드존)',
       '위치 고정': '벤팅 diesel 또는 핫러너 과열',
+      '색불균일|분산 줄무늬|마스터배치 분산': '안료·MB 분산 불량(전체 열변색 아님 — 분산 줄무늬는 color_streaks 계열). 배압 상향은 소폭이 아니라 단계적 대폭(현재 대비 2배 수준 목표) + 스크루 RPM 하향 병행(체류·혼련 확보). GF 수지는 섬유 파손 주의.',
     },
     sharedGates: [],
     source: 'synthesis-3.3,taxonomy-12', confidence: 'high',
@@ -850,7 +851,7 @@ export function formatDefectGuide(
   const lines: string[] = [];
   lines.push(`## 불량 추정 가이드레일 (KB ${KB_VERSION})`);
   lines.push(`불량: ${node.nameKo} (${node.nameEn}) | ${node.phase} Phase`);
-  lines.push(`phase는 채택한 1순위 원인의 발생 단계 기준으로 판정(위 노드 phase는 기본값 — 채택 원인이 다른 단계를 가리키면 그 단계로).`);
+  lines.push(`phase는 결함 메커니즘이 작동하는 단계 기준으로 판정(채택 원인의 소속 시스템 아님 — 위 노드 phase는 기본값, 결함이 형성되는 단계가 다르면 그 단계로).`);
   if (node.typicalSeverity) {
     lines.push(`통상 심각도: ${node.typicalSeverity} — 외관 불량은 원칙 medium 이하. high는 안전·전수·파단·탄화만. 과대평가 금지.`);
   }
@@ -861,6 +862,10 @@ export function formatDefectGuide(
     lines.push(`${c.rank}순위 [${c.category}] ${c.cause} — 활성조건: ${c.trigger}`);
     lines.push(`  증거: ${c.evidence}`);
     lines.push(`  조정안: ${c.adjustment}`);
+  }
+
+  if (node.id === 'weld_line') {
+    lines.push('★ 강도·파단 요구 시나리오(기능부품·GF/필러 수지)면 금형(게이트 위치 이동·웰드 위치 이동) 대책을 권고 1순위로 명시하라. 멜트온도↑·보압↑은 V홈 외관만 개선하고 섬유 배향 단절로 인한 웰드부 강도는 모재 대비 크게 회복 못 함 — 외관 양품 ≠ 강도 OK.');
   }
 
   if (node.patternHints) {

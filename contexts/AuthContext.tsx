@@ -37,9 +37,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     });
 
     // Subscribe to auth state changes (login, logout, token refresh)
+    // TOKEN_REFRESHED / tab-focus 이벤트는 동일 유저인데 새 객체를 준다 →
+    // id가 같으면 참조를 유지해 불필요한 리렌더·다운스트림 effect 재실행을 막는다 (폼 상태 churn 방지).
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (_event, session) => {
-        setUser(session?.user ?? null);
+        const nextUser = session?.user ?? null;
+        setUser(prev => (prev?.id === nextUser?.id ? prev : nextUser));
         setLoading(false);
       }
     );

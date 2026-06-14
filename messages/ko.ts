@@ -281,6 +281,7 @@ export const ko: Record<string, string> = {
   'followup.settings_hint': '변경된 셋팅값이 있으면 위의 사출기 셋팅 폼에서 직접 수정 후 후속 추정을 시작하세요.',
 
   /* Error / status messages */
+  'err.defect_required': '불량 유형·설명·사진 중 하나는 입력해주세요. (입력이 비어 있어 추정을 시작할 수 없습니다)',
   'err.resin_required': '수지 종류를 선택해주세요. (필수 항목)',
   'err.estimate_fail': '추정 실패',
   'err.estimate_error': '추정 중 오류가 발생했습니다.',
@@ -354,6 +355,7 @@ export const ko: Record<string, string> = {
   'summary.phase_filling': '충전(Filling) 불량',
   'summary.phase_packing': '보압(Packing) 불량',
   'summary.phase_cooling': '냉각(Cooling) 불량',
+  'summary.phase_ejection': '이형(Ejection) 불량',
   'summary.phase_material': '재료(Material) 불량',
   'summary.process_check': '프로세스 윈도우 체크',
   'summary.pw_melt': '용융 온도',

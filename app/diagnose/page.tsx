@@ -173,6 +173,9 @@ const SAMPLE_CASES = [
 ];
 
 
+// 폼 상태 sessionStorage 방어선 — 리마운트/새로고침/토큰 리프레시로 인한 입력 소실 방지
+const FORM_SS_KEY = 'molddoctor_form_v1';
+
 // --- Main Diagnose Content ---
 function DiagnoseContent() {
   const searchParams = useSearchParams();
@@ -251,6 +254,7 @@ function DiagnoseContent() {
   const moldDrawingInputRef = useRef<HTMLInputElement>(null);
   const resultRef = useRef<HTMLDivElement>(null);
   const followUpFormRef = useRef<HTMLDivElement>(null);
+  const errorRef = useRef<HTMLDivElement>(null);
 
   // Computed label arrays (use t() — must be inside component)
   const machineParams = [
@@ -367,8 +371,59 @@ function DiagnoseContent() {
         setTimeout(() => resultRef.current?.scrollIntoView({ behavior: 'smooth' }), 150);
       }
     } catch { /* ignore */ }
+    // 폼 입력 복원 (리마운트/새로고침/토큰 리프레시 방어선) — 텍스트 입력만, 이미지 제외
+    try {
+      const savedForm = sessionStorage.getItem(FORM_SS_KEY);
+      if (savedForm) {
+        const f = JSON.parse(savedForm);
+        if (f.defectType) setDefectType(f.defectType);
+        if (f.customDefect) setCustomDefect(f.customDefect);
+        if (f.defectDescription) setDefectDescription(f.defectDescription);
+        if (f.resinType) setResinType(f.resinType);
+        if (f.customResin) setCustomResin(f.customResin);
+        if (f.filler) setFiller(f.filler);
+        if (f.fillerContent) setFillerContent(f.fillerContent);
+        if (f.flameRetardant) setFlameRetardant(f.flameRetardant);
+        if (f.flameRetardantThickness) setFlameRetardantThickness(f.flameRetardantThickness);
+        if (f.flameRetardantType) setFlameRetardantType(f.flameRetardantType);
+        if (f.resinDetail) setResinDetail(f.resinDetail);
+        if (f.resinGrade) setResinGrade(f.resinGrade);
+        if (f.settings) setSettings(prev => ({ ...prev, ...f.settings }));
+        if (f.advSettings) setAdvSettings(prev => ({ ...prev, ...f.advSettings }));
+        if (f.moldType) setMoldType(f.moldType);
+        if (f.gateType) setGateType(f.gateType);
+        if (f.cavities) setCavities(f.cavities);
+        if (f.runnerType) setRunnerType(f.runnerType);
+        if (f.weight) setWeight(f.weight);
+        if (f.wallThicknessMin) setWallThicknessMin(f.wallThicknessMin);
+        if (f.wallThicknessMax) setWallThicknessMax(f.wallThicknessMax);
+        if (f.productNotes) setProductNotes(f.productNotes);
+      }
+    } catch { /* ignore */ }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // 폼 상태를 sessionStorage에 디바운스 저장 (내용이 있을 때만) — 소실 방어선
+  useEffect(() => {
+    const hasContent = !!(defectType || customDefect || defectDescription || resinType);
+    if (!hasContent) return;
+    const handle = setTimeout(() => {
+      try {
+        sessionStorage.setItem(FORM_SS_KEY, JSON.stringify({
+          defectType, customDefect, defectDescription, resinType, customResin,
+          filler, fillerContent, flameRetardant, flameRetardantThickness, flameRetardantType,
+          resinDetail, resinGrade, settings, advSettings,
+          moldType, gateType, cavities, runnerType,
+          weight, wallThicknessMin, wallThicknessMax, productNotes,
+        }));
+      } catch { /* quota/직렬화 실패 무시 */ }
+    }, 400);
+    return () => clearTimeout(handle);
+  }, [defectType, customDefect, defectDescription, resinType, customResin,
+      filler, fillerContent, flameRetardant, flameRetardantThickness, flameRetardantType,
+      resinDetail, resinGrade, settings, advSettings,
+      moldType, gateType, cavities, runnerType,
+      weight, wallThicknessMin, wallThicknessMax, productNotes]);
 
   const processFile = useCallback(async (file: File): Promise<ImageFile | null> => {
     if (!file.type.startsWith('image/')) return null;
@@ -476,9 +531,20 @@ function DiagnoseContent() {
   };
 
   const handleDiagnose = async () => {
+    // 검증 실패 시 조용한 무반응 금지 — 명시적 메시지 + 에러 위치로 스크롤
+    const showValidationError = (msg: string) => {
+      setError(msg);
+      setTimeout(() => errorRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' }), 50);
+    };
+    // 필수: 불량 정보(유형·설명·이미지 중 최소 1개). 섹션1 입력 소실 시 빈 채로 제출되어 오진되는 것을 차단.
+    const effectiveDefect = defectType === '기타 (직접 입력)' ? customDefect : defectType;
+    if (!effectiveDefect && !defectDescription.trim() && images.length === 0) {
+      showValidationError(t('err.defect_required'));
+      return;
+    }
     const effectiveResin = resinType === '기타 (직접 입력)' ? customResin : resinType;
     if (!effectiveResin) {
-      setError(t('err.resin_required'));
+      showValidationError(t('err.resin_required'));
       return;
     }
     const currentSnapshot = JSON.stringify({
@@ -553,6 +619,8 @@ function DiagnoseContent() {
       if (newSessionId) data.session_id = newSessionId;
       setResult(data);
       setShowFollowUpForm(false);
+      // 진단 성공 → 폼 방어선 스냅샷 클리어 (다음 방문 시 stale 복원 방지)
+      try { sessionStorage.removeItem(FORM_SS_KEY); } catch { /* ignore */ }
 
       if (round > 1) {
         setFollowUpHistory(prev => [
@@ -1324,7 +1392,7 @@ function DiagnoseContent() {
         </button>
 
         {error && (
-          <div className="bg-[var(--danger-bg)] border border-[var(--danger-border)] text-danger rounded-xl p-4 text-base">
+          <div ref={errorRef} className="bg-[var(--danger-bg)] border border-[var(--danger-border)] text-danger rounded-xl p-4 text-base">
             {error}
           </div>
         )}

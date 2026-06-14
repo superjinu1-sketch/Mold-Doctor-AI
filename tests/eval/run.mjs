@@ -37,7 +37,7 @@ const PASS_THRESHOLD = 70;
 const INTERVAL_MS = 6000; // rate-limit 회피 간격
 const MAX_RETRIES = 5;    // 529 overloaded 재시도 (diagnose + judge 공통)
 const JUDGE_MODEL = 'claude-haiku-4-5-20251001'; // Sonnet 대비 ~1/10 비용
-const PROMPT_VERSION = 'v9';  // resin-kb v2 batch1 (11종 verified 수치 보정) → 캐시 무효화
+const PROMPT_VERSION = 'v10';  // defect-kb v1.4 (ejection phase 신설 + MB분산 magnitude + 형성단계 phase) → 캐시 무효화
 const CACHE_DIR = join(ROOT, 'tests/eval/.cache');
 const CACHE_TTL_MS = 7 * 24 * 3600 * 1000; // 7일
 
@@ -378,6 +378,25 @@ async function main() {
       judgment = { score: 0, pass: false, reasoning: `Judge 오류: ${e.message}`, phase_ok: false, trap_avoided: null };
     }
 
+    // 2b. judge 안정화 (v1.4) — 경계 점수(65~75)는 judge만 2회 추가 실행 후 3회 중앙값으로 확정.
+    //     diagnose 응답·채점 기준·threshold(70)는 불변. 동일 aiRaw 재사용(추가 비용=haiku 2회).
+    const judgeScores = [judgment.score];
+    if (judgment.score >= 65 && judgment.score <= 75) {
+      for (let k = 0; k < 2; k++) {
+        try {
+          const extra = await judgeCase(c, aiRaw, client);
+          if (typeof extra.score === 'number') judgeScores.push(extra.score);
+        } catch { /* 추가 judge 실패 시 첫 점수 유지 */ }
+      }
+      if (judgeScores.length === 3) {
+        const median = [...judgeScores].sort((a, b) => a - b)[1];
+        judgment.score = median;
+        judgment.pass = median >= PASS_THRESHOLD;
+        process.stdout.write(` [judge×3 ${judgeScores.join('/')}→med ${median}]`);
+      }
+    }
+    judgment.judge_scores = judgeScores;
+
     // cost 집계 (--measure-cost 시)
     if (MEASURE_COST) {
       const usageIn  = parseInt(diagHeaders['x-usage-in']        || '0', 10);
@@ -404,6 +423,7 @@ async function main() {
       pass: judgment.pass,
       phase_ok: judgment.phase_ok,
       trap_avoided: judgment.trap_avoided,
+      judge_scores: judgment.judge_scores || [judgment.score],
       reasoning: judgment.reasoning || '',
       error: null,
     });
@@ -483,6 +503,7 @@ async function main() {
       score: r.score,
       pass: r.pass,
       trap_avoided: r.trap_avoided ?? null,
+      judge_scores: r.judge_scores ?? [r.score],
       judge_reasoning: r.reasoning || r.error || '',
     })),
   };

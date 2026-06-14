@@ -1,0 +1,287 @@
+{
+  "kb_version": "defect-kb-v1.4",
+  "prompt_version": "v10",
+  "timestamp": "2026-06-12T11:24:35.816Z",
+  "summary": {
+    "total": 24,
+    "passed": 8,
+    "pass_rate": 33,
+    "avg_score": 28,
+    "basic": {
+      "total": 13,
+      "passed": 5,
+      "avg": 33
+    },
+    "hard": {
+      "total": 11,
+      "passed": 3,
+      "avg": 22
+    }
+  },
+  "cases": [
+    {
+      "id": "case-001",
+      "difficulty": "basic",
+      "score": 85,
+      "pass": true,
+      "trap_avoided": null,
+      "judge_scores": [
+        85
+      ],
+      "judge_reasoning": "AI가 건조 부족을 핵심 근본원인으로 정확히 지목했으나, 배압 증가(3→5~8MPa)라는 정답 권장사항을 누락했다. 건조 시간 연장(2hr→4-6hr)은 정답 범위(4~8hr)와 부분 일치하며, 제습식 건조기 제시는 우수한 추가 인사이트이다."
+    },
+    {
+      "id": "case-002",
+      "difficulty": "basic",
+      "score": 85,
+      "pass": true,
+      "trap_avoided": "POM 포름알데히드 분해 위험을 정확히 식별하여 온도 과다 원인을 핵심으로 파악",
+      "judge_scores": [
+        85
+      ],
+      "judge_reasoning": "Phase와 severity 모두 정확. 근본 원인에서 가공온도 초과와 사출속도 과다를 모두 언급했으나 온도 초과가 주 원인임을 명확히 강조하지 않은 점 감점. 권장사항은 노즐온도, 사출속도, 벤트 조치 모두 정답과 일치하여 높은 점수 부여."
+    },
+    {
+      "id": "case-003",
+      "difficulty": "basic",
+      "score": 88,
+      "pass": true,
+      "trap_avoided": null,
+      "judge_scores": [
+        88
+      ],
+      "judge_reasoning": "Phase와 severity 완벽 일치. 근본원인에서 금형 양면 온도차 15°C와 벽두께 편차를 정확히 지목(38/40). 조치안에서 금형온도 균일화(차이≤5°C), 냉각시간 연장, 보압 최적화를 모두 제시하여 정답 key_recommendations 충족(28/30). 수량화된 구체적 수치 제시로 실행력 우수."
+    },
+    {
+      "id": "case-004",
+      "difficulty": "basic",
+      "score": 88,
+      "pass": true,
+      "trap_avoided": true,
+      "judge_scores": [
+        88
+      ],
+      "judge_reasoning": "Phase, severity 완벽 일치. Root cause에서 보압 25MPa 미달(70% 확도)과 보압시간 3sec 게이트씰 전 종료(20% 확도)를 정확히 지목했으며, 주요 조치에서 보압 50~60MPa 상향, 보압시간 6~8sec 연장을 올바르게 제시. 정답의 8~12sec보다 다소 보수적이나 방향성 완전 일치. 벽두께 개선까지 추가 제안으로 종합적 접근."
+    },
+    {
+      "id": "case-005",
+      "difficulty": "basic",
+      "score": 88,
+      "pass": true,
+      "trap_avoided": "LCP 극저점도와 형체력 부족을 동시에 지목하여 단순 유동성 문제로 귀착하지 않음",
+      "judge_scores": [
+        88
+      ],
+      "judge_reasoning": "Phase와 Severity 완벽 일치. Root cause에서 LCP 극저점도+5μm 틈새 침투+형체력 150ton 대비 8캐비티 투영면적 부족을 정확히 지목했으나, 보압 50MPa 절대값 문제보다 PL면 정밀도 이슈를 더 강조해야 함. Recommendations에서 보압 감소, V/P 전환 최적화, PL면 재연마 등이 정답 방향과 정렬되었으나 형체력 증가 방안이 명확하지 않음."
+    },
+    {
+      "id": "case-006",
+      "difficulty": "hard",
+      "score": 78,
+      "pass": true,
+      "trap_avoided": true,
+      "judge_scores": [
+        78
+      ],
+      "judge_reasoning": "Phase와 severity 정확. Root cause에서 열축적+전단발열 메커니즘은 정답과 방향 일치하나, RPM 과다를 65% 확률로 평가하여 주요도를 약간 과소평가(정답은 RPM 과다가 primary). Recommendations에서 RPM 감소(180→120)는 정답 범위 내이고 배압 조정 누락이 약간의 감점 요인. 건조 원인을 배제하고 시간대별 열축적 패턴을 핵심으로 해석하여 hard trap을 성공적으로 회피."
+    },
+    {
+      "id": "case-007",
+      "difficulty": "hard",
+      "score": 78,
+      "pass": true,
+      "trap_avoided": true,
+      "judge_scores": [
+        78
+      ],
+      "judge_reasoning": "Phase(packing)와 root cause(과보압→잔류응력→지연크랙)를 정확히 진단했고, 보압 감소·금형온도 상향·어닐링 등 정답 방향 조치를 제시했으나, severity를 medium으로 평가한 것이 오류(정답: high). 24시간 지연 ESC 발현과 수분/이형 함정을 올바르게 회피한 점은 긍정적."
+    },
+    {
+      "id": "case-008",
+      "difficulty": "hard",
+      "score": 82,
+      "pass": true,
+      "trap_avoided": true,
+      "judge_scores": [
+        82
+      ],
+      "judge_reasoning": "Phase(filling)와 trap 회피(특정 캐비티만의 문제를 금형으로 진단)는 정확. Root cause에서 노즐 온도 저하/히터 부분 단선을 65% 최상위로 지목했으나, 정답의 '온도 센서 오류'는 미언급(부분감점). Recommendations에서 실측 온도 점검·히터 저항값 측정·밸브게이트 점검 등이 정답과 방향 일치하나 세부도가 낮음. Severity를 medium으로 판정한 것은 오류(정답: high)로 -10점 감점."
+    },
+    {
+      "id": "case-009",
+      "difficulty": "hard",
+      "score": 0,
+      "pass": false,
+      "trap_avoided": null,
+      "judge_scores": [
+        0
+      ],
+      "judge_reasoning": "Judge 오류: Connection error."
+    },
+    {
+      "id": "case-010",
+      "difficulty": "hard",
+      "score": 0,
+      "pass": false,
+      "trap_avoided": null,
+      "judge_scores": [
+        0
+      ],
+      "judge_reasoning": "HTTP 500: {\"error\":\"Connection error.\"}"
+    },
+    {
+      "id": "text-001",
+      "difficulty": "basic",
+      "score": 0,
+      "pass": false,
+      "trap_avoided": null,
+      "judge_scores": [
+        0
+      ],
+      "judge_reasoning": "HTTP 500: {\"error\":\"Connection error.\"}"
+    },
+    {
+      "id": "text-002",
+      "difficulty": "basic",
+      "score": 0,
+      "pass": false,
+      "trap_avoided": null,
+      "judge_scores": [
+        0
+      ],
+      "judge_reasoning": "HTTP 500: {\"error\":\"Connection error.\"}"
+    },
+    {
+      "id": "text-003",
+      "difficulty": "basic",
+      "score": 0,
+      "pass": false,
+      "trap_avoided": null,
+      "judge_scores": [
+        0
+      ],
+      "judge_reasoning": "HTTP 500: {\"error\":\"Connection error.\"}"
+    },
+    {
+      "id": "pom-colorstreak-lowmelt",
+      "difficulty": "hard",
+      "score": 0,
+      "pass": false,
+      "trap_avoided": null,
+      "judge_scores": [
+        0
+      ],
+      "judge_reasoning": "HTTP 500: {\"error\":\"Connection error.\"}"
+    },
+    {
+      "id": "pp-td20-surfacestain-airtrap",
+      "difficulty": "hard",
+      "score": 0,
+      "pass": false,
+      "trap_avoided": null,
+      "judge_scores": [
+        0
+      ],
+      "judge_reasoning": "HTTP 500: {\"error\":\"Connection error.\"}"
+    },
+    {
+      "id": "pom-jetting-gatespeed",
+      "difficulty": "basic",
+      "score": 0,
+      "pass": false,
+      "trap_avoided": null,
+      "judge_scores": [
+        0
+      ],
+      "judge_reasoning": "HTTP 500: {\"error\":\"Connection error.\"}"
+    },
+    {
+      "id": "pc-void-vacuum-thick",
+      "difficulty": "basic",
+      "score": 0,
+      "pass": false,
+      "trap_avoided": null,
+      "judge_scores": [
+        0
+      ],
+      "judge_reasoning": "HTTP 500: {\"error\":\"Connection error.\"}"
+    },
+    {
+      "id": "pp-delam-regrind-contam",
+      "difficulty": "hard",
+      "score": 0,
+      "pass": false,
+      "trap_avoided": null,
+      "judge_scores": [
+        0
+      ],
+      "judge_reasoning": "HTTP 500: {\"error\":\"Connection error.\"}"
+    },
+    {
+      "id": "abs-molddeposit-wipeable",
+      "difficulty": "hard",
+      "score": 0,
+      "pass": false,
+      "trap_avoided": null,
+      "judge_scores": [
+        0
+      ],
+      "judge_reasoning": "HTTP 500: {\"error\":\"Connection error.\"}"
+    },
+    {
+      "id": "abs-gateblush-fastfill",
+      "difficulty": "basic",
+      "score": 0,
+      "pass": false,
+      "trap_avoided": null,
+      "judge_scores": [
+        0
+      ],
+      "judge_reasoning": "HTTP 500: {\"error\":\"Connection error.\"}"
+    },
+    {
+      "id": "pptd-tigerstripe-wallslip",
+      "difficulty": "hard",
+      "score": 0,
+      "pass": false,
+      "trap_avoided": null,
+      "judge_scores": [
+        0
+      ],
+      "judge_reasoning": "HTTP 500: {\"error\":\"Connection error.\"}"
+    },
+    {
+      "id": "pc-esc-ipa-overpack",
+      "difficulty": "hard",
+      "score": 0,
+      "pass": false,
+      "trap_avoided": null,
+      "judge_scores": [
+        0
+      ],
+      "judge_reasoning": "HTTP 500: {\"error\":\"Connection error.\"}"
+    },
+    {
+      "id": "pa66-coldslug-lowmelt",
+      "difficulty": "basic",
+      "score": 0,
+      "pass": false,
+      "trap_avoided": null,
+      "judge_scores": [
+        0
+      ],
+      "judge_reasoning": "HTTP 500: {\"error\":\"Connection error.\"}"
+    },
+    {
+      "id": "abs-sticking-overpack",
+      "difficulty": "basic",
+      "score": 0,
+      "pass": false,
+      "trap_avoided": null,
+      "judge_scores": [
+        0
+      ],
+      "judge_reasoning": "HTTP 500: {\"error\":\"Connection error.\"}"
+    }
+  ]
+}

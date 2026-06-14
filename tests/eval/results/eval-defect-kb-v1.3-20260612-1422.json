@@ -1,0 +1,215 @@
+{
+  "kb_version": "defect-kb-v1.3",
+  "prompt_version": "v9",
+  "timestamp": "2026-06-12T06:22:52.782Z",
+  "summary": {
+    "total": 24,
+    "passed": 21,
+    "pass_rate": 88,
+    "avg_score": 83,
+    "basic": {
+      "total": 13,
+      "passed": 12,
+      "avg": 85
+    },
+    "hard": {
+      "total": 11,
+      "passed": 9,
+      "avg": 80
+    }
+  },
+  "cases": [
+    {
+      "id": "case-001",
+      "difficulty": "basic",
+      "score": 85,
+      "pass": true,
+      "trap_avoided": null,
+      "judge_reasoning": "Phase와 severity 모두 정확히 일치했고, 건조 부족을 핵심 원인으로 올바르게 지목(70% 가중치)했으며, 건조 시간 연장 4-6hr 권장이 정답 4-8hr와 방향이 일치함. 배압 증가 미언급은 감점 요인이나 건조 개선 중심의 체계적 분석으로 충분한 수준."
+    },
+    {
+      "id": "case-002",
+      "difficulty": "basic",
+      "score": 88,
+      "pass": true,
+      "trap_avoided": true,
+      "judge_reasoning": "Phase와 severity 완벽 일치. 근본원인을 온도 초과(215°C)와 속도 과다의 복합 요인으로 정확히 지목했으나, 가스 압축 메커니즘을 벤트 부족(65%)으로 우선 제시하여 인과관계 순서에서 미세한 편차 있음. 주요 조치는 온도·속도·벤트 모두 정답과 방향이 일치하며, 말단 감속 다단 설정 등 구체성 높음. Hard trap(온도 측정값 신뢰성 검증 누락)을 회피하여 보너스 적용."
+    },
+    {
+      "id": "case-003",
+      "difficulty": "basic",
+      "score": 95,
+      "pass": true,
+      "trap_avoided": true,
+      "judge_reasoning": "AI가 cooling phase를 정확히 진단했고, 금형 양면 온도차(15°C) + 벽두께 편차를 핵심 근본원인으로 명확히 지목했습니다. 금형 온도 균일화(≤5°C), 냉각시간 연장, 보압 최적화 등 정답 권장사항과 완벽하게 일치하며, 추가로 이젝트 후 냉각 지그 적용까지 제시하여 실무 가치를 높였습니다. Severity medium도 정확합니다."
+    },
+    {
+      "id": "case-004",
+      "difficulty": "basic",
+      "score": 88,
+      "pass": true,
+      "trap_avoided": true,
+      "judge_reasoning": "Packing phase 정확 지목(20점). 보압 25MPa(1차압의 25%)를 핵심 원인으로 정확히 파악(38점/40점: 수축 리스크 부가언급은 accuracy 우수). 보압 55~65MPa 상향+보압시간 8~10sec 조정이 정답 50~60MPa, 8~12sec와 방향 정합(28점/30점: 게이트 크기 확인 언급 없음). 게이트 seal 미달 메커니즘 이해 명확+PBT 고수축성 고려한 다층적 분석으로 과도한 진단 함정 회피(+10 bonus)."
+    },
+    {
+      "id": "case-005",
+      "difficulty": "basic",
+      "score": 85,
+      "pass": true,
+      "trap_avoided": "LCP 극저점도의 물리적 특성과 금형 PL면 정밀도 간 인과관계를 명확히 인식하여 형체력 부족과 보압 과고의 상호작용을 정확히 진단",
+      "judge_reasoning": "Phase와 severity 완벽 일치. Root cause에서 LCP 극저점도와 PL면 미세 틈 침투 메커니즘을 60% 비중으로 정확히 지목하고, 형체력 부족(30%)과 PL면 마모(10%)를 보조 원인으로 계층화. 추천 조치 5개가 정답의 4대 핵심(형체력, PL면 재연마, 사출압력 최소화, VP전환)을 모두 포함하여 방향성 일치."
+    },
+    {
+      "id": "case-006",
+      "difficulty": "hard",
+      "score": 68,
+      "pass": false,
+      "trap_avoided": false,
+      "judge_reasoning": "Phase와 severity는 정확하나, 근본 원인 분석에서 오류 발생. AI가 열축적을 1순위(65%)로 지목했으나 정답은 스크류 RPM 과다 전단발열이 핵심 원인이며, 건조 문제를 10% 포함시켜 hard trap(건조 탓으로 돌림)에 부분 걸림. 권장사항은 방향은 맞으나 배압 증가 미언급으로 점수 감소."
+    },
+    {
+      "id": "case-007",
+      "difficulty": "hard",
+      "score": 78,
+      "pass": true,
+      "trap_avoided": true,
+      "judge_reasoning": "Phase(packing)와 근본원인(과보압→잔류응력→24hr ESC)을 정확히 진단했고 trap을 회피(건조/이형제 탓 아님)하여 +10 bonus 획득. 다만 severity를 medium으로 낮춰 평가(-10점)했고, 보압 감량 범위(80-85 MPa)가 정답(80-90 MPa)과 소폭 보수적이나 방향성은 일치. 금형온도 상향(100-105°C)도 정답(100-110°C) 범위 내 적절."
+    },
+    {
+      "id": "case-008",
+      "difficulty": "hard",
+      "score": 78,
+      "pass": true,
+      "trap_avoided": true,
+      "judge_reasoning": "phase와 root cause 방향(핫러너 노즐 온도/히터 문제)은 정답과 일치하나, severity를 medium으로 과소평가. 특정 캐비티만 미성형 단서를 올바르게 금형 문제로 귀결했으며 성형 조건 상향 함정을 회피했으나, 온도 센서 오류 언급 부족과 매니폴드 탄화 확인 미포함으로 세부 원인 분석 깊이 부족."
+    },
+    {
+      "id": "case-009",
+      "difficulty": "hard",
+      "score": 78,
+      "pass": true,
+      "trap_avoided": true,
+      "judge_reasoning": "Phase와 severity 정확. Root cause에서 MB 분산 불량의 핵심(배압 과소)을 65% 확률로 지목했으나, 정답의 '배압 3→10~15MPa 대폭 증가' 강도에 비해 7-10MPa 제시로 다소 보수적. 권장사항은 배압 상향, 사출 속도, 온도 조정 등 방향성이 맞으나 RPM 감소와 텀블러 혼합은 미제시. 내추럴 무결 단서로 열분해 아님을 암시하여 함정 회피."
+    },
+    {
+      "id": "case-010",
+      "difficulty": "hard",
+      "score": 68,
+      "pass": false,
+      "trap_avoided": false,
+      "judge_reasoning": "Phase와 severity는 정확하나, 근본 원인 진단에서 GF40% 소재의 웰드라인 섬유 배향 문제를 명확히 지목하지 못함. 게이트 위치 변경은 언급했으나 금형 설계 변경이 필수인 점을 충분히 강조하지 않았고, 정답의 금형온도 140→150~160℃ 상향, 사출속도 70→85% 증가 같은 핵심 조치를 누락. 외관 양품이라 사출 조건 최적화로 해결 가능하다는 오진 함정에 부분적으로 빠짐."
+    },
+    {
+      "id": "text-001",
+      "difficulty": "basic",
+      "score": 88,
+      "pass": true,
+      "trap_avoided": "PA66 수분 가수분해 메커니즘을 정확히 인식하고 제습건조기 권장으로 수분율 기준(≤0.08%) 제시",
+      "judge_reasoning": "phase와 severity 완벽 일치. 건조 시간 부족을 70% 확률로 정확히 지목하고 2hr→6hr 이상 연장 제시로 정답(4~8hr)과 방향 일치. 제습건조기·노점·Karl Fischer 측정 등 구체적 조치가 우수하나, 배압 증가(정답 key_rec)를 스크류 RPM 감소로 치환한 점과 근본원인 표현의 세부도 미흡으로 감점."
+    },
+    {
+      "id": "text-002",
+      "difficulty": "basic",
+      "score": 88,
+      "pass": true,
+      "trap_avoided": "POM 고분자 열분해 메커니즘(포름알데히드 분해)을 정확히 인식하고 온도-전단 복합 발열의 우선순위를 올바르게 배정",
+      "judge_reasoning": "Phase와 severity 100% 정확. Root cause에서 벤트 막힘(55%)을 1순위로 지목했으나 정답은 노즐 온도 초과로 인한 POM 화학 분해가 핵심이므로 -2점. Recommendations는 노즐 218→205℃, 사출속도·회전수 감소, 벤트 청소 모두 정답 방향과 일치하나 온도 감소 폭이 정답(205℃)보다 높음(205-208℃)으로 -2점. 종합적 진단 역량 충분함."
+    },
+    {
+      "id": "text-003",
+      "difficulty": "basic",
+      "score": 88,
+      "pass": true,
+      "trap_avoided": true,
+      "judge_reasoning": "Phase와 severity 완벽 일치. 근본원인에서 보압 과다(65%)를 최우선으로 올바르게 지목했으며, ESC 메커니즘도 정확히 파악. 보압 감소(108→88-96 MPa)와 보압 시간 조정 등 주요 조치가 정답 방향과 일치하나, 금형온도 증가 조치는 미언급. 편광판 검증 추가 제시로 신뢰성 강화."
+    },
+    {
+      "id": "pom-colorstreak-lowmelt",
+      "difficulty": "hard",
+      "score": 82,
+      "pass": true,
+      "trap_avoided": true,
+      "judge_reasoning": "AI가 저멜트온도(180°C)를 1순위 원인으로 정확히 지목했고, 색줄/분산 불량을 올바르게 진단하여 hard trap(탄화물/스크류 마모)을 회피했다. 온도 상향(180→200°C) 및 배압 증가(3→6~8MPa) 권고도 정답 방향과 일치하나, 배압 범위가 다소 낮고(정답 8~12MPa) 스크류 RPM 감소 비율에서 미세한 편차가 있어 부분 감점했다."
+    },
+    {
+      "id": "pp-td20-surfacestain-airtrap",
+      "difficulty": "hard",
+      "score": 85,
+      "pass": true,
+      "trap_avoided": true,
+      "judge_reasoning": "Phase와 severity 정확. Root cause에서 신규 금형 벤트 미설계(80%)를 최우선으로 지목하여 정답과 일치. Progressive Short-Shot 매핑과 벤트 가공을 핵심 조치로 올바르게 제시. 노즐온도 역순 입력 가능성을 언급하되 검증 단계로 제시하여 가짜 저멜트온도 오판 함정 회피."
+    },
+    {
+      "id": "pom-jetting-gatespeed",
+      "difficulty": "basic",
+      "score": 88,
+      "pass": true,
+      "trap_avoided": "온도 상향을 보조 수단으로 정확히 분류(5% 가중치)",
+      "judge_reasoning": "Phase와 severity 완벽 일치. Root cause에서 제팅의 핵심(고속 직진 분사 + 게이트 배치)을 65%로 정확 지목하였으나, 온도 정상 범위 판단에서 +5°C 제시는 정답의 '보조 수단' 관점과 약간 불일치. 다단 속도 프로파일과 게이트 위치 변경을 상위 조치로 우선순위 올바르게 제시하여 recommendations 적합성 우수."
+    },
+    {
+      "id": "pc-void-vacuum-thick",
+      "difficulty": "basic",
+      "score": 88,
+      "pass": true,
+      "trap_avoided": true,
+      "judge_reasoning": "AI가 packing phase와 medium severity를 정확히 판단했으며, 보압 부족(45→65~75 MPa)을 핵심 원인(70%)으로 명확히 지목했다. 건조 정상 데이터를 언급하지는 않았으나 수분/가스 가설을 제시하지 않아 오진 함정을 회피했다. 보압 시간 미입력, 냉각 시간 미입력 등 실행 결함도 포착했고 조치 방향(보압 상향, 보압시간 연장, 냉각시간)이 정답과 일치한다. 다만 게이트 확대/위치 변경, 후육부 코어링 등 설계 근본 조치는 미언급한 점이 제약."
+    },
+    {
+      "id": "pp-delam-regrind-contam",
+      "difficulty": "hard",
+      "score": 88,
+      "pass": true,
+      "trap_avoided": true,
+      "judge_reasoning": "AI가 재생재 공급처 변경 시점과 불량 발생의 인과관계를 올바르게 포착하고, 이종수지 혼입을 주요 원인(80%)으로 지목했으며, 조건 변경 없음을 암시적으로 인식하여 성형조건 오진 함정을 회피함. 조치는 정답의 A/B 테스트 및 DSC 분석과 방향이 일치하나, '금형 캐비티 세정'(오인) 항목 포함으로 추천 점수 감소."
+    },
+    {
+      "id": "abs-molddeposit-wipeable",
+      "difficulty": "hard",
+      "score": 88,
+      "pass": true,
+      "trap_avoided": true,
+      "judge_reasoning": "AI가 plate-out을 65% 최우선 원인으로 정확히 지목하고 '닦으면 지워짐' 특성을 암묵적으로 반영한 금형 세정·벤트 청소 조치를 권고함. 흐름자락 오진함정을 회피하고 첨가제·휘발분 억제 방향의 멜트온도 하향을 포함하여 재료단계 근본 처방을 제시함. 유일한 감점은 불량유형 명시적 재분류 언급 부재(38→40)와 난연제 그레이드 검토 권고 강도 미흡(28→30)."
+    },
+    {
+      "id": "abs-gateblush-fastfill",
+      "difficulty": "basic",
+      "score": 78,
+      "pass": true,
+      "trap_avoided": null,
+      "judge_reasoning": "Phase와 근본원인(게이트 과소+사출속도 과고+금형저온)을 올바르게 진단했으나, Severity를 medium으로 평가하여 정답 low에서 1단계 상향 판정. 추천조치의 핵심(다단 속도제어, 금형온도 상향, 게이트 확대 검토)도 포함되어 방향성은 맞음."
+    },
+    {
+      "id": "pptd-tigerstripe-wallslip",
+      "difficulty": "hard",
+      "score": 82,
+      "pass": true,
+      "trap_avoided": true,
+      "judge_reasoning": "Phase와 severity 정확. Slip-stick 유동 불안정을 핵심으로 지목하여 타이거 스트라이프의 본질을 포착했으나, '재료 기인 한계' 및 '고유동 그레이드 검토' 명시 부재로 부분 감점. 속도 하향 권고로 hard trap(속도 상향 오진)을 회피했고, 온도·보압 상향 조합으로 정답 방향성을 충족. 게이트/유동길이 설계 검토 미언급이 최종 감점 요인."
+    },
+    {
+      "id": "pc-esc-ipa-overpack",
+      "difficulty": "hard",
+      "score": 88,
+      "pass": true,
+      "trap_avoided": true,
+      "judge_reasoning": "AI가 packing phase를 정확히 지목하고, 과보압 잔류응력과 IPA ESC의 상호작용을 75% 확률로 올바르게 식별했으며, 보압 하향(110→65~75 MPa)이라는 근본 대책과 IPA 희석/시간 제한 같은 후공정 대책을 균형있게 제시했다. 잔류응력 정량화(편광 응력계)를 통한 검증도구 제안이 정답 기준과 잘 부합한다. 다만 어닐링 미언급과 세척제 변경 옵션 부재로 약간의 감점."
+    },
+    {
+      "id": "pa66-coldslug-lowmelt",
+      "difficulty": "basic",
+      "score": 78,
+      "pass": true,
+      "trap_avoided": "cold_slug_vs_process_delay",
+      "judge_reasoning": "Phase(filling)와 콜드슬러그 근본원인을 정확히 식별하고 노즐 온도, 콜드슬러그 웰, 퍼지 절차 등 핵심 조치를 제시했으나, severity를 medium으로 과평가(정답: low)한 점과 노즐 온도 하한값 논거(PA66 275~300℃)를 명시하지 않은 점에서 감점. 사이클 지연과 고화의 연동을 간접 언급했으므로 hard case trap 회피로 평가."
+    },
+    {
+      "id": "abs-sticking-overpack",
+      "difficulty": "basic",
+      "score": 65,
+      "pass": false,
+      "trap_avoided": false,
+      "judge_reasoning": "AI가 packing phase로 진단했으나 정답은 cooling phase (이형 단계 불량). 근본 원인으로 과보압을 지목했으나 '수축 방지 → 캐비티 밀착' 메커니즘 연결이 약함. 보압 하향 조치는 맞으나 냉각시간 부족이 '미고화 상태 이형'을 초래한다는 인과관계를 명확히 하지 못했고, 이젝터 핀 자국을 기계 문제와 혼동한 함정에 부분 빠짐."
+    }
+  ]
+}

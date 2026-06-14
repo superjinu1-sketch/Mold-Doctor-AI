@@ -8,7 +8,7 @@ import { apiUrl } from '@/lib/apiBase';
 
 interface DiagnosisResult {
   defect_type: { ko: string; en: string };
-  defect_phase?: 'filling' | 'packing' | 'cooling' | 'material';
+  defect_phase?: 'filling' | 'packing' | 'cooling' | 'ejection' | 'material';
   severity: 'high' | 'medium' | 'low';
   tier?: 'simple' | 'complex';
   summary: string;
@@ -582,7 +582,8 @@ export default function DiagnosisResultPanel({ result, onSavePDF, round = 1, fol
             <span className="text-xs px-2 py-1 rounded-full bg-brand-tint text-brand-ink font-medium">
               {result.defect_phase === 'filling' ? t('summary.phase_filling') :
                result.defect_phase === 'packing' ? t('summary.phase_packing') :
-               result.defect_phase === 'cooling' ? t('summary.phase_cooling') : t('summary.phase_material')}
+               result.defect_phase === 'cooling' ? t('summary.phase_cooling') :
+               result.defect_phase === 'ejection' ? t('summary.phase_ejection') : t('summary.phase_material')}
             </span>
           </div>
         )}

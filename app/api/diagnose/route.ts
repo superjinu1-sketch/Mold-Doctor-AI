@@ -179,10 +179,11 @@ ANALYSIS FRAMEWORK — apply in order:
 
 STEP 1: DEFECT CLASSIFICATION
 - Identify defect type from photo and/or description
-- Classify phase by the ROOT CAUSE you adopt as rank 1, NOT by defect type alone. The phase is the molding stage where the adopted rank-1 mechanism originates.
-  · Default mapping by defect type (참고용 기본값, 채택 원인이 다른 단계를 가리키면 덮어써라): FILLING (short shot, jetting, burn, weld line) / PACKING (sink, void, flash) / COOLING (warpage) / MATERIAL (silver streak, discoloration, delamination)
-  · Override the default when the adopted mechanism originates in another stage. 예: crack — 과보압·잔류응력 기인이면 PACKING, 이형응력·냉각응력·ESC 기인이면 COOLING. flash — 형체력 부족·극저점도가 보압 피크에서 침투해 발생하면 PACKING.
-  · State the phase reasoning in one clause (어느 원인이 어느 단계에서 발생하는지).
+- Classify phase by the stage where the DEFECT-FORMING MECHANISM operates — NOT by defect type alone, and NOT by where a contributing condition (mold temp, drying, ejector hardware) lives.
+  · Default mapping by defect type (참고용 기본값, 메커니즘이 다른 단계를 가리키면 덮어써라): FILLING (short shot, jetting, burn, weld line) / PACKING (sink, void, flash) / COOLING (warpage) / EJECTION (sticking, ejector blush, drag marks) / MATERIAL (silver streak, discoloration, delamination)
+  · 결함이 형성되는 단계로 판정하라. short shot: 충전 중 응고로 미충전 = FILLING (원인이 금형온도=냉각 시스템이어도 FILLING). crack/ESC: 균열의 근원인 잔류응력이 형성된 단계로 — 과보압 잔류응력이면 PACKING(용제·환경이 균열을 뒤늦게 유발해도 응력원이 과보압이면 PACKING), 이형응력·냉각수축 응력 기인이면 COOLING. flash: 형체력 부족·극저점도가 보압 피크에서 침투 = PACKING. post-crystallization 치수변화: 냉각 결정화 메커니즘 = COOLING.
+  · 이형 시 발생하는 불량(부착·이젝터 백화·이형 크랙·드래그 마크)은 EJECTION — 근본 원인이 과보압이어도 불량 발생 단계가 이형이면 EJECTION으로 하고, 근본 원인이 속한 단계는 원인 분석 본문에 명시.
+  · 기여 조건(금형온도·건조 등)의 단계는 phase가 아니라 원인 분석 본문에서 설명. State the phase reasoning in one clause (어느 메커니즘이 어느 단계에서 결함을 형성하는지).
 - TEXTURE DISCRIMINATOR (표면 잔류물): 백색·뿌연 얼룩/가루가 "닦으면 옅어지거나 지워진다"면 표면 부착물(금형 석출 plate-out·가스 응축·이형제 전사)이다. 닦아도 안 지워지는 구조적 불량(weld line·flow mark·지속형 silver streak·표면 요철)으로 분류하지 마라. 이 경우 defect_type을 Mold Deposit/Plate-out(금형 석출) 계열로 추정하라.
 IMAGE QUALITY CHECK (evaluate before any other step):
 - If the image shows a molded part but NO clear defect pattern → defect_type.en = "No_Defect_Detected", causes = [], recommendations = [], summary = "불량 형상 미검출. 의심 부위 확대 촬영 권장."
@@ -280,7 +281,7 @@ Be concise. Korean only where specified. No extra explanation outside JSON.
 OUTPUT FORMAT (return as JSON only, no markdown):
 {
   "defect_type": {"ko": "한국어명", "en": "English name"},
-  "defect_phase": "filling/packing/cooling/material/none",
+  "defect_phase": "filling/packing/cooling/ejection/material/none",
   "severity": "high/medium/low",
   "summary": "1-line Korean summary",
   "process_window_check": {
