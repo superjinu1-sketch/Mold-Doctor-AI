@@ -167,6 +167,10 @@ export const ko: Record<string, string> = {
   'grade.err_unauth': '자동 입력은 로그인 후 이용할 수 있습니다. 직접 입력은 계속 가능합니다.',
   'grade.err_rate': '오늘 자동 입력 한도를 초과했습니다. 직접 입력은 계속 가능합니다.',
   'grade.err_fail': '일시적인 오류입니다. 잠시 후 다시 시도하거나 직접 입력해주세요.',
+  'grade.label_button': '수지 포대 라벨 찍어 자동 입력',
+  'grade.photo_busy': '사진 분석 중...',
+  'grade.err_photo': '사진에서 그레이드명을 읽지 못했습니다. 라벨이 선명하게 나오게 다시 찍거나 직접 입력해주세요.',
+  'grade.err_image': '이미지 형식이 맞지 않거나 너무 큽니다(최대 8MB). 다른 사진을 사용해주세요.',
 
   /* Resin option group names */
   'resin.group.polyamide': '폴리아미드 (나일론)',

@@ -198,8 +198,9 @@ function DiagnoseContent() {
   const [flameRetardantType, setFlameRetardantType] = useState('해당없음');
   const [resinDetail, setResinDetail] = useState('');
   const [resinGrade, setResinGrade] = useState('');
-  // 그레이드 자동 입력 (resolve-grade)
+  // 그레이드 자동 입력 (resolve-grade) + 라벨 사진 OCR (extract-grade)
   const [gradeBusy, setGradeBusy] = useState(false);
+  const [gradeImgBusy, setGradeImgBusy] = useState(false);
   const [gradeStatus, setGradeStatus] = useState<{ tone: 'brand' | 'warn'; text: string } | null>(null);
   const [manualResinOpen, setManualResinOpen] = useState(false);
   const [authOpen, setAuthOpen] = useState(false);
@@ -258,6 +259,7 @@ function DiagnoseContent() {
   const [extractedFields, setExtractedFields] = useState<Set<string>>(new Set());
   const fileInputRef = useRef<HTMLInputElement>(null);
   const settingsImageRef = useRef<HTMLInputElement>(null);
+  const gradeImageRef = useRef<HTMLInputElement>(null);
   const moldDrawingInputRef = useRef<HTMLInputElement>(null);
   const resultRef = useRef<HTMLDivElement>(null);
   const followUpFormRef = useRef<HTMLDivElement>(null);
@@ -466,29 +468,74 @@ function DiagnoseContent() {
         return;
       }
       const data = await res.json();
-      if (!data || data.resinType == null) {
-        // 미상 → 자동채움 금지(환각0), 수기 펼침
-        setManualResinOpen(true);
-        setGradeStatus({ tone: 'warn', text: t('grade.err_unknown') });
-        return;
-      }
-      // 자동채움 (enum 1:1). thickness·detail·customResin 미손상.
-      setResinType(data.resinType);
-      if (typeof data.filler === 'string') setFiller(data.filler);
-      setFillerContent(typeof data.fillerContent === 'string' ? data.fillerContent : '');
-      if (typeof data.flameRetardant === 'string') setFlameRetardant(data.flameRetardant);
-      if (typeof data.flameRetardantType === 'string') setFlameRetardantType(data.flameRetardantType);
-      setManualResinOpen(true);
-      if (data.confidence === 'low') {
-        setGradeStatus({ tone: 'warn', text: t('grade.warn_low') });
-      } else {
-        setGradeStatus({ tone: 'brand', text: t('grade.filled') });
-      }
+      applyResolved(data); // null(미상)이면 환각0 처리
     } catch {
       setManualResinOpen(true);
       setGradeStatus({ tone: 'warn', text: t('grade.err_fail') });
     } finally {
       setGradeBusy(false);
+    }
+  };
+
+  // resolve 결과를 폼에 적용 (작업1·작업3 공용). resinType=null이면 자동채움 금지(환각0).
+  const applyResolved = (data: {
+    resinType?: string | null; filler?: string; fillerContent?: string;
+    flameRetardant?: string; flameRetardantType?: string; confidence?: string;
+  } | null) => {
+    if (!data || data.resinType == null) {
+      setManualResinOpen(true);
+      setGradeStatus({ tone: 'warn', text: t('grade.err_unknown') });
+      return;
+    }
+    // enum 1:1 set. flameRetardantThickness·resinDetail·customResin 미손상.
+    setResinType(data.resinType);
+    if (typeof data.filler === 'string') setFiller(data.filler);
+    setFillerContent(typeof data.fillerContent === 'string' ? data.fillerContent : '');
+    if (typeof data.flameRetardant === 'string') setFlameRetardant(data.flameRetardant);
+    if (typeof data.flameRetardantType === 'string') setFlameRetardantType(data.flameRetardantType);
+    setManualResinOpen(true);
+    setGradeStatus(data.confidence === 'low'
+      ? { tone: 'warn', text: t('grade.warn_low') }
+      : { tone: 'brand', text: t('grade.filled') });
+  };
+
+  // 📷 포대 라벨 사진 OCR → 그레이드명 인식 + 자동채움 (extract-grade)
+  const handleLabelImage = async (file: File) => {
+    if (!file.type.startsWith('image/') || gradeImgBusy) return;
+    setGradeImgBusy(true);
+    setGradeStatus(null);
+    try {
+      const base64 = await new Promise<string>((resolve) => {
+        const reader = new FileReader();
+        reader.onload = (e) => resolve((e.target?.result as string).split(',')[1]);
+        reader.readAsDataURL(file);
+      });
+      const res = await fetch(apiUrl('/api/extract-grade'), {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', ...(await authHeaders()) },
+        body: JSON.stringify({ image: { data: base64, mediaType: file.type } }),
+      });
+      if (res.status === 401) { setAuthOpen(true); setManualResinOpen(true); setGradeStatus({ tone: 'warn', text: t('grade.err_unauth') }); return; }
+      if (res.status === 429) { setManualResinOpen(true); setGradeStatus({ tone: 'warn', text: t('grade.err_rate') }); return; }
+      if (res.status === 413 || res.status === 415) { setGradeStatus({ tone: 'warn', text: t('grade.err_image') }); return; }
+      if (!res.ok) { setGradeStatus({ tone: 'warn', text: t('grade.err_fail') }); return; }
+      const data = await res.json(); // { ocr, resolved, cached }
+      const gname = typeof data?.ocr?.gradeName === 'string' ? data.ocr.gradeName : '';
+      if (gname) setResinGrade(gname); // 인식한 그레이드명 표시
+      if (data?.resolved && data.resolved.resinType != null) {
+        applyResolved(data.resolved);
+      } else if (gname) {
+        setManualResinOpen(true);
+        setGradeStatus({ tone: 'warn', text: t('grade.err_unknown') });
+      } else {
+        setManualResinOpen(true);
+        setGradeStatus({ tone: 'warn', text: t('grade.err_photo') });
+      }
+    } catch {
+      setGradeStatus({ tone: 'warn', text: t('grade.err_fail') });
+    } finally {
+      setGradeImgBusy(false);
+      if (gradeImageRef.current) gradeImageRef.current.value = ''; // 같은 파일 재선택 허용
     }
   };
 
@@ -993,6 +1040,23 @@ function DiagnoseContent() {
             <span className="bg-brand text-on-brand w-7 h-7 rounded-full flex items-center justify-center text-sm font-bold">2</span>
             {t('step2.title')}
           </h2>
+          {/* 📷 포대 라벨 사진 자동 입력 */}
+          <button
+            type="button"
+            onClick={() => gradeImageRef.current?.click()}
+            disabled={gradeImgBusy}
+            className="w-full mb-3 flex items-center justify-center gap-2 min-h-[var(--touch-cta)] rounded-xl border border-border-strong bg-surface-sunken text-ink font-semibold text-body hover:bg-surface disabled:opacity-50 transition-colors"
+          >
+            {gradeImgBusy ? t('grade.photo_busy') : `📷 ${t('grade.label_button')}`}
+          </button>
+          <input
+            ref={gradeImageRef}
+            type="file"
+            accept="image/*"
+            className="hidden"
+            onChange={(e) => e.target.files?.[0] && handleLabelImage(e.target.files[0])}
+          />
+
           {/* 그레이드명 우선 입력 + 자동 입력(추정) */}
           <div className="mb-4">
             <label className={labelCls}>{t('step2.grade_label')}</label>

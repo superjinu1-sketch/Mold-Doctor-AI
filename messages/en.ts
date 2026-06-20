@@ -167,6 +167,10 @@ export const en: Record<string, string> = {
   'grade.err_unauth': 'Auto-fill requires login. You can still enter the details manually.',
   'grade.err_rate': "You've reached today's auto-fill limit. Manual entry is still available.",
   'grade.err_fail': 'Temporary error. Please try again later or enter manually.',
+  'grade.label_button': 'Scan resin bag label to auto-fill',
+  'grade.photo_busy': 'Analyzing photo...',
+  'grade.err_photo': "Couldn't read a grade name from the photo. Retake it clearly or enter manually.",
+  'grade.err_image': 'Unsupported or too-large image (max 8MB). Please use another photo.',
 
   /* Resin option group names */
   'resin.group.polyamide': 'Polyamide (Nylon)',
