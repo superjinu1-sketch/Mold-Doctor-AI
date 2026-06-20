@@ -8,6 +8,8 @@ interface AuthCtx {
   user: User | null;
   loading: boolean;
   signInWithGoogle: () => Promise<void>;
+  signInWithEmail: (email: string, password: string) => Promise<{ error: string | null }>;
+  signUpWithEmail: (email: string, password: string) => Promise<{ error: string | null; needsConfirm: boolean }>;
   signOut: () => Promise<void>;
   credits: number | null;
   setCredits: (n: number | null) => void;
@@ -18,6 +20,8 @@ const AuthContext = createContext<AuthCtx>({
   user: null,
   loading: true,
   signInWithGoogle: async () => {},
+  signInWithEmail: async () => ({ error: null }),
+  signUpWithEmail: async () => ({ error: null, needsConfirm: false }),
   signOut: async () => {},
   credits: null,
   setCredits: () => {},
@@ -75,12 +79,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     });
   };
 
+  // 이메일/비번 — 기존 구글 OAuth와 병행 추가. onAuthStateChange가 user/credits 자동 갱신.
+  const signInWithEmail = async (email: string, password: string) => {
+    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    return { error: error?.message ?? null };
+  };
+  const signUpWithEmail = async (email: string, password: string) => {
+    const { data, error } = await supabase.auth.signUp({ email, password });
+    // Confirm email ON이면 session=null(인증 메일 대기), OFF면 즉시 session 존재.
+    return { error: error?.message ?? null, needsConfirm: !error && !data.session };
+  };
+
   const signOut = async () => {
     await supabase.auth.signOut();
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, signInWithGoogle, signOut, credits, setCredits, refreshCredits }}>
+    <AuthContext.Provider value={{ user, loading, signInWithGoogle, signInWithEmail, signUpWithEmail, signOut, credits, setCredits, refreshCredits }}>
       {children}
     </AuthContext.Provider>
   );
