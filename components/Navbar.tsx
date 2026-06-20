@@ -98,6 +98,13 @@ export default function Navbar() {
                       <div className="fixed inset-0 z-10" onClick={() => setUserMenuOpen(false)} />
                       <div className="absolute right-0 top-full mt-2 w-44 bg-surface-solid border border-border rounded-xl shadow-xl z-20 py-1">
                         <div className="px-4 py-2 text-xs text-faint border-b border-border">{email}</div>
+                        <Link
+                          href="/account"
+                          onClick={() => setUserMenuOpen(false)}
+                          className="block px-4 py-2.5 text-sm text-muted hover:text-ink hover:bg-surface-sunken transition-colors"
+                        >
+                          {t('nav.account')}
+                        </Link>
                         <button
                           type="button"
                           onClick={() => { signOut(); setUserMenuOpen(false); }}
@@ -222,6 +229,13 @@ export default function Navbar() {
                   {credits !== null && (
                     <div className="text-sm text-muted px-2">{t('nav.credits')}: {credits}</div>
                   )}
+                  <Link
+                    href="/account"
+                    onClick={() => setMenuOpen(false)}
+                    className="w-full text-left text-sm text-faint hover:text-ink py-2 px-2 rounded-lg hover:bg-surface-sunken transition-colors min-h-[44px] flex items-center"
+                  >
+                    {t('nav.account')}
+                  </Link>
                   <button
                     type="button"
                     onClick={() => { signOut(); setMenuOpen(false); }}

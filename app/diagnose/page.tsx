@@ -9,6 +9,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { authHeaders } from '@/lib/supabase/authHeader';
 import { downscaleImageClient, safeLocalStorageSet } from '@/lib/clientDownscale';
 import { apiUrl } from '@/lib/apiBase';
+import { saveDiagnosisRecord, updateResolution, patchRecordFields, type HistoryRecord } from '@/lib/history-sync';
 
 // --- Types ---
 interface ImageFile {
@@ -663,6 +664,8 @@ function DiagnoseContent() {
           trimmed.forEach((r: Record<string, unknown>) => { delete r.beforePhoto; delete r.afterPhoto; });
           safeLocalStorageSet('diagnoseHistory', JSON.stringify(trimmed));
         }
+        // 서버 동기화 (로그인 시) — localStorage는 폴백으로 유지
+        if (user) { void saveDiagnosisRecord(record as unknown as HistoryRecord, user.id); }
         // 비동기: 첫 번째 불량 사진을 축소해 beforePhoto로 추가 저장
         if (images.length > 0) {
           downscaleImageClient(images[0].base64, 400).then(thumb => {
@@ -675,6 +678,7 @@ function DiagnoseContent() {
                 safeLocalStorageSet('diagnoseHistory', JSON.stringify(h2));
               }
             } catch { /* ignore */ }
+            if (user) { void patchRecordFields(newId, user.id, { beforePhoto: thumb }); }
           });
         }
       } catch { /* ignore */ }
@@ -729,6 +733,16 @@ function DiagnoseContent() {
           safeLocalStorageSet('diagnoseHistory', JSON.stringify(history));
         }
         setHistoryCount(history.length);
+        // 서버 동기화 (로그인 시)
+        if (user) {
+          void updateResolution(diagnosisId, user.id, {
+            resolved: status,
+            resolvedAt: new Date().toISOString(),
+            ...(memo ? { resolvedMemo: memo } : {}),
+            afterSettings: { ...settings },
+            ...(afterPhoto ? { afterPhoto } : {}),
+          });
+        }
       }
     } catch { /* ignore */ }
   };
