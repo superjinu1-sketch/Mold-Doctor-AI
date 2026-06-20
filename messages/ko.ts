@@ -158,6 +158,15 @@ export const ko: Record<string, string> = {
   'step2.detail_placeholder': '예: PA66 GF33% 할로겐프리 난연',
   'step2.grade_label': '수지 제조사/Grade',
   'step2.grade_placeholder': '예: PA46-GF33, PA66-GF30',
+  'grade.autofill': '자동 입력',
+  'grade.busy': '조회 중...',
+  'grade.manual_toggle': '그레이드명이 없나요? (파일럿·컴파운드 등) 직접 입력',
+  'grade.filled': '그레이드 기준 자동 입력(추정)됨 — 확인 후 수정하세요.',
+  'grade.warn_low': '자동 입력 신뢰도가 낮습니다. 수지 종류와 함량을 확인해주세요.',
+  'grade.err_unknown': '이 그레이드 정보를 확인하지 못했습니다. 오타를 확인하거나 아래에서 직접 입력해주세요.',
+  'grade.err_unauth': '자동 입력은 로그인 후 이용할 수 있습니다. 직접 입력은 계속 가능합니다.',
+  'grade.err_rate': '오늘 자동 입력 한도를 초과했습니다. 직접 입력은 계속 가능합니다.',
+  'grade.err_fail': '일시적인 오류입니다. 잠시 후 다시 시도하거나 직접 입력해주세요.',
 
   /* Resin option group names */
   'resin.group.polyamide': '폴리아미드 (나일론)',

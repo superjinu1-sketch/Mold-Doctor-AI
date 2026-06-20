@@ -4,6 +4,7 @@ import { useState, useRef, useCallback, useEffect, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import DiagnosisResultPanel from '@/components/DiagnosisResultPanel';
+import AuthModal from '@/components/AuthModal';
 import { useLocale } from '@/contexts/LocaleContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { authHeaders } from '@/lib/supabase/authHeader';
@@ -197,6 +198,11 @@ function DiagnoseContent() {
   const [flameRetardantType, setFlameRetardantType] = useState('해당없음');
   const [resinDetail, setResinDetail] = useState('');
   const [resinGrade, setResinGrade] = useState('');
+  // 그레이드 자동 입력 (resolve-grade)
+  const [gradeBusy, setGradeBusy] = useState(false);
+  const [gradeStatus, setGradeStatus] = useState<{ tone: 'brand' | 'warn'; text: string } | null>(null);
+  const [manualResinOpen, setManualResinOpen] = useState(false);
+  const [authOpen, setAuthOpen] = useState(false);
   const [settings, setSettings] = useState({
     nozzleTemp: '', zone1Temp: '', zone2Temp: '', zone3Temp: '', zone4Temp: '',
     moldTempFixed: '', moldTempMoving: '',
@@ -426,6 +432,66 @@ function DiagnoseContent() {
       moldType, gateType, cavities, runnerType,
       weight, wallThicknessMin, wallThicknessMax, productNotes]);
 
+  // 수기 수지 필드: 저장값·복원·샘플·자동채움으로 resinType이 채워지면 펼침 (기본 접힘)
+  useEffect(() => {
+    if (resinType || customResin) setManualResinOpen(true);
+  }, [resinType, customResin]);
+
+  // 그레이드명 → resolve-grade 자동 입력. 응답 enum을 폼 setter에 그대로 set(환각0: null이면 미채움).
+  const handleAutoFillGrade = async () => {
+    const grade = resinGrade.trim();
+    if (!grade || gradeBusy) return;
+    setGradeBusy(true);
+    setGradeStatus(null);
+    try {
+      const res = await fetch(apiUrl('/api/resolve-grade'), {
+        method: 'POST',
+        headers: { ...(await authHeaders()), 'Content-Type': 'application/json' },
+        body: JSON.stringify({ grade }),
+      });
+      if (res.status === 401) {
+        setAuthOpen(true);
+        setManualResinOpen(true);
+        setGradeStatus({ tone: 'warn', text: t('grade.err_unauth') });
+        return;
+      }
+      if (res.status === 429) {
+        setManualResinOpen(true);
+        setGradeStatus({ tone: 'warn', text: t('grade.err_rate') });
+        return;
+      }
+      if (!res.ok) {
+        setManualResinOpen(true);
+        setGradeStatus({ tone: 'warn', text: t('grade.err_fail') });
+        return;
+      }
+      const data = await res.json();
+      if (!data || data.resinType == null) {
+        // 미상 → 자동채움 금지(환각0), 수기 펼침
+        setManualResinOpen(true);
+        setGradeStatus({ tone: 'warn', text: t('grade.err_unknown') });
+        return;
+      }
+      // 자동채움 (enum 1:1). thickness·detail·customResin 미손상.
+      setResinType(data.resinType);
+      if (typeof data.filler === 'string') setFiller(data.filler);
+      setFillerContent(typeof data.fillerContent === 'string' ? data.fillerContent : '');
+      if (typeof data.flameRetardant === 'string') setFlameRetardant(data.flameRetardant);
+      if (typeof data.flameRetardantType === 'string') setFlameRetardantType(data.flameRetardantType);
+      setManualResinOpen(true);
+      if (data.confidence === 'low') {
+        setGradeStatus({ tone: 'warn', text: t('grade.warn_low') });
+      } else {
+        setGradeStatus({ tone: 'brand', text: t('grade.filled') });
+      }
+    } catch {
+      setManualResinOpen(true);
+      setGradeStatus({ tone: 'warn', text: t('grade.err_fail') });
+    } finally {
+      setGradeBusy(false);
+    }
+  };
+
   const processFile = useCallback(async (file: File): Promise<ImageFile | null> => {
     if (!file.type.startsWith('image/')) return null;
     return new Promise((resolve) => {
@@ -545,6 +611,7 @@ function DiagnoseContent() {
     }
     const effectiveResin = resinType === '기타 (직접 입력)' ? customResin : resinType;
     if (!effectiveResin) {
+      setManualResinOpen(true); // 접혀 있으면 필수 수지 필드 펼쳐 보이게
       showValidationError(t('err.resin_required'));
       return;
     }
@@ -926,74 +993,111 @@ function DiagnoseContent() {
             <span className="bg-brand text-on-brand w-7 h-7 rounded-full flex items-center justify-center text-sm font-bold">2</span>
             {t('step2.title')}
           </h2>
-          <div className="grid sm:grid-cols-2 gap-4">
-            <div className="sm:col-span-2">
-              <label className={labelCls}>{t('step2.resin_label')} <span className="text-danger">*</span></label>
-              <select
-                className={inputCls}
-                value={resinType}
-                onChange={(e) => setResinType(e.target.value)}
+          {/* 그레이드명 우선 입력 + 자동 입력(추정) */}
+          <div className="mb-4">
+            <label className={labelCls}>{t('step2.grade_label')}</label>
+            <div className="flex gap-2">
+              <input
+                type="text"
+                className={`${inputCls} flex-1`}
+                placeholder={t('step2.grade_placeholder')}
+                value={resinGrade}
+                onChange={(e) => setResinGrade(e.target.value)}
+                onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); handleAutoFillGrade(); } }}
+              />
+              <button
+                type="button"
+                onClick={handleAutoFillGrade}
+                disabled={gradeBusy || !resinGrade.trim()}
+                className="shrink-0 min-h-[var(--touch-cta)] px-4 rounded-xl bg-brand text-on-brand font-bold text-sm hover:bg-brand-ink disabled:opacity-50 transition-colors"
               >
-                <option value="">{t('step2.resin_placeholder')}</option>
-                {RESIN_OPTIONS.map(group => (
-                  <optgroup key={group.group} label={t(group.groupKey)}>
-                    {group.options.map(opt => (
-                      <option key={opt} value={opt}>
-                        {opt === '기타 (직접 입력)'
-                          ? t('resin.custom_option')
-                          : locale === 'en'
-                            ? (RESIN_OPTION_EN_LABEL[opt] ?? opt)
-                            : opt}
-                      </option>
-                    ))}
-                  </optgroup>
-                ))}
-              </select>
-              {resinType === '기타 (직접 입력)' && (
-                <input type="text" className={`${inputCls} mt-2`} placeholder={t('step2.resin_custom')} value={customResin} onChange={(e) => setCustomResin(e.target.value)} />
-              )}
+                {gradeBusy ? t('grade.busy') : t('grade.autofill')}
+              </button>
             </div>
-            <div>
-              <label className={labelCls}>{t('step2.filler_label')}</label>
-              <select className={inputCls} value={filler} onChange={(e) => setFiller(e.target.value)}>
-                {fillerOptions.map(([val, key]) => <option key={val} value={val}>{t(key)}</option>)}
-              </select>
-            </div>
-            <div>
-              <label className={labelCls}>{t('step2.filler_pct')}</label>
-              <input type="text" inputMode="numeric" className={inputCls} placeholder={t('step2.filler_placeholder')} value={fillerContent} onChange={(e) => setFillerContent(e.target.value)} />
-            </div>
-            <div>
-              <label className={labelCls}>{t('step2.fr_label')}</label>
-              <select className={inputCls} value={flameRetardant} onChange={(e) => setFlameRetardant(e.target.value)}>
-                {['없음', 'UL94 V-0', 'UL94 V-1', 'UL94 V-2', 'UL94 HB', 'UL94 5VA', 'UL94 5VB'].map(val => (
-                  <option key={val} value={val}>{val === '없음' ? t('common.none') : val}</option>
-                ))}
-              </select>
-            </div>
-            <div>
-              <label className={labelCls}>{t('step2.fr_thickness')}</label>
-              <select className={inputCls} value={flameRetardantThickness} onChange={(e) => setFlameRetardantThickness(e.target.value)}>
-                {['미입력', '0.4', '0.75', '0.8', '1.0', '1.5', '1.6', '2.0', '3.0', '3.2'].map(val => (
-                  <option key={val} value={val}>{val === '미입력' ? t('step2.fr_thickness_default') : val}</option>
-                ))}
-              </select>
-            </div>
-            <div>
-              <label className={labelCls}>{t('step2.fr_type')}</label>
-              <select className={inputCls} value={flameRetardantType} onChange={(e) => setFlameRetardantType(e.target.value)}>
-                {frTypeOptions.map(([val, key]) => <option key={val} value={val}>{t(key)}</option>)}
-              </select>
-            </div>
-            <div>
-              <label className={labelCls}>{t('step2.detail_label')}</label>
-              <input type="text" className={inputCls} placeholder={t('step2.detail_placeholder')} value={resinDetail} onChange={(e) => setResinDetail(e.target.value)} />
-            </div>
-            <div>
-              <label className={labelCls}>{t('step2.grade_label')}</label>
-              <input type="text" className={inputCls} placeholder={t('step2.grade_placeholder')} value={resinGrade} onChange={(e) => setResinGrade(e.target.value)} />
-            </div>
+            {gradeStatus && (
+              <div className={`mt-2 rounded-xl px-3 py-2 text-body ${gradeStatus.tone === 'brand'
+                ? 'bg-brand-tint text-brand-ink border border-[var(--brand-border)]'
+                : 'bg-[var(--warn-bg)] text-warn border border-[var(--warn-border)]'}`}>
+                {gradeStatus.text}
+              </div>
+            )}
           </div>
+
+          {/* 수기 입력 그룹 — 기본 접힘, 토글·자동채움·임시저장값이면 펼침 */}
+          {!manualResinOpen ? (
+            <button
+              type="button"
+              onClick={() => setManualResinOpen(true)}
+              className="w-full text-left text-body text-brand hover:text-brand-ink min-h-[var(--touch-min)] flex items-center gap-1"
+            >
+              {t('grade.manual_toggle')}
+            </button>
+          ) : (
+            <div className="grid sm:grid-cols-2 gap-4">
+              <div className="sm:col-span-2">
+                <label className={labelCls}>{t('step2.resin_label')} <span className="text-danger">*</span></label>
+                <select
+                  className={inputCls}
+                  value={resinType}
+                  onChange={(e) => setResinType(e.target.value)}
+                >
+                  <option value="">{t('step2.resin_placeholder')}</option>
+                  {RESIN_OPTIONS.map(group => (
+                    <optgroup key={group.group} label={t(group.groupKey)}>
+                      {group.options.map(opt => (
+                        <option key={opt} value={opt}>
+                          {opt === '기타 (직접 입력)'
+                            ? t('resin.custom_option')
+                            : locale === 'en'
+                              ? (RESIN_OPTION_EN_LABEL[opt] ?? opt)
+                              : opt}
+                        </option>
+                      ))}
+                    </optgroup>
+                  ))}
+                </select>
+                {resinType === '기타 (직접 입력)' && (
+                  <input type="text" className={`${inputCls} mt-2`} placeholder={t('step2.resin_custom')} value={customResin} onChange={(e) => setCustomResin(e.target.value)} />
+                )}
+              </div>
+              <div>
+                <label className={labelCls}>{t('step2.filler_label')}</label>
+                <select className={inputCls} value={filler} onChange={(e) => setFiller(e.target.value)}>
+                  {fillerOptions.map(([val, key]) => <option key={val} value={val}>{t(key)}</option>)}
+                </select>
+              </div>
+              <div>
+                <label className={labelCls}>{t('step2.filler_pct')}</label>
+                <input type="text" inputMode="numeric" className={inputCls} placeholder={t('step2.filler_placeholder')} value={fillerContent} onChange={(e) => setFillerContent(e.target.value)} />
+              </div>
+              <div>
+                <label className={labelCls}>{t('step2.fr_label')}</label>
+                <select className={inputCls} value={flameRetardant} onChange={(e) => setFlameRetardant(e.target.value)}>
+                  {['없음', 'UL94 V-0', 'UL94 V-1', 'UL94 V-2', 'UL94 HB', 'UL94 5VA', 'UL94 5VB'].map(val => (
+                    <option key={val} value={val}>{val === '없음' ? t('common.none') : val}</option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <label className={labelCls}>{t('step2.fr_thickness')}</label>
+                <select className={inputCls} value={flameRetardantThickness} onChange={(e) => setFlameRetardantThickness(e.target.value)}>
+                  {['미입력', '0.4', '0.75', '0.8', '1.0', '1.5', '1.6', '2.0', '3.0', '3.2'].map(val => (
+                    <option key={val} value={val}>{val === '미입력' ? t('step2.fr_thickness_default') : val}</option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <label className={labelCls}>{t('step2.fr_type')}</label>
+                <select className={inputCls} value={flameRetardantType} onChange={(e) => setFlameRetardantType(e.target.value)}>
+                  {frTypeOptions.map(([val, key]) => <option key={val} value={val}>{t(key)}</option>)}
+                </select>
+              </div>
+              <div className="sm:col-span-2">
+                <label className={labelCls}>{t('step2.detail_label')}</label>
+                <input type="text" className={inputCls} placeholder={t('step2.detail_placeholder')} value={resinDetail} onChange={(e) => setResinDetail(e.target.value)} />
+              </div>
+            </div>
+          )}
         </section>
 
         {/* STEP 3: Machine Settings */}
@@ -1556,6 +1660,8 @@ function DiagnoseContent() {
           </div>
         )}
       </div>
+
+      <AuthModal open={authOpen} onClose={() => setAuthOpen(false)} />
     </div>
   );
 }

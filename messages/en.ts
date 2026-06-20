@@ -158,6 +158,15 @@ export const en: Record<string, string> = {
   'step2.detail_placeholder': 'e.g. PA66 GF33% Halogen-free FR',
   'step2.grade_label': 'Resin Manufacturer/Grade',
   'step2.grade_placeholder': 'e.g. PA46-GF33, PA66-GF30',
+  'grade.autofill': 'Auto-fill',
+  'grade.busy': 'Looking up...',
+  'grade.manual_toggle': "No grade name? Enter manually (pilot, compound, etc.)",
+  'grade.filled': 'Auto-filled (estimated) from grade — please review and adjust.',
+  'grade.warn_low': 'Low confidence on the auto-fill. Please verify resin type and filler content.',
+  'grade.err_unknown': "Couldn't identify this grade. Check for typos or enter the details manually below.",
+  'grade.err_unauth': 'Auto-fill requires login. You can still enter the details manually.',
+  'grade.err_rate': "You've reached today's auto-fill limit. Manual entry is still available.",
+  'grade.err_fail': 'Temporary error. Please try again later or enter manually.',
 
   /* Resin option group names */
   'resin.group.polyamide': 'Polyamide (Nylon)',
