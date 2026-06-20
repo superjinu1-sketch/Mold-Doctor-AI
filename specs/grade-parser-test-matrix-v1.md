@@ -49,7 +49,7 @@
 | 23 | `Noryl GFN3` | `m-PPE` | `GF(유리섬유)` | `""` | `없음` | med | 브랜드 high, 필러% 벤더코드 불명→비움 |
 | 24 | `케피탈 F20-03` | `POM(아세탈)` | `없음` | `""` | `없음` | high | 한글 브랜드 KEP POM, F20-03은 MFR(필러 아님) |
 | 25 | `Hostaform C9021` | `POM(아세탈)` | `없음` | `""` | `없음` | high | Celanese POM |
-| 26 | `Crastin SK605` | `PBT` | `GF(유리섬유)` | `""` | `없음` | med | DuPont PBT, 605는 등급코드(필러 추측 금지) |
+| 26 | `Crastin SK605` | `PBT` | `없음` | `""` | `없음` | med | DuPont PBT. `SK605`에 필러 토큰 없음 → 추측 금지 = `없음` (정정 2026-06-15: 기존 GF 셀은 오기. 입력 문자열에 GF 토큰 부재) |
 | 27 | `Stanyl TW341` | `PA46` | `없음` | `""` | `없음` | high | DSM PA46 |
 | 28 | `Akulon K222-D` | `PA6` | `없음` | `""` | `없음` | med | DSM, 계열 high/세부 med |
 
