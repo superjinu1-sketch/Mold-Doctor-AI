@@ -759,5 +759,535 @@
       "severity": "medium",
       "trap": "이젝터 핀(기계) 문제로만 보면 반쪽 — 근본은 과보압 과충전. phase는 이형 단계 발생 불량이므로 ejection."
     }
+  },
+  {
+    "id": "gf-readout-coldmold",
+    "source": "배치3 커버리지 — fiber_readout 첫 측정",
+    "title": "PA66-GF30 흑색 부품 표면 백화 — 금형온도 과소",
+    "difficulty": "basic",
+    "description": "PA66-GF30 흑색 하우징 표면에 흰 방사상 흔적·거칠음. 건조 정상.",
+    "input": {
+      "defect_type": "GF 표면백화 (Fiber Read-out)",
+      "resin_type": "PA66",
+      "resin_detail": "PA66 GF30%",
+      "machine_settings": {
+        "nozzle_temp": 300,
+        "zone1_temp": 295,
+        "zone2_temp": 290,
+        "zone3_temp": 280,
+        "zone4_temp": 270,
+        "mold_temp_fixed": 45,
+        "mold_temp_moving": 45,
+        "injection_pressure": 130,
+        "holding_pressure": 70,
+        "injection_speed_1": 60,
+        "back_pressure": 8,
+        "screw_rpm": 120,
+        "drying_temp": 80,
+        "drying_time": 6,
+        "dryer_type": "제습식"
+      },
+      "defect_description": "흑색 PA66-GF30 표면에 유리섬유가 비치는 흰 방사상 흔적과 거친 느낌. 건조 80℃ 6h 제습 정상. 금형온도 45℃."
+    },
+    "expected": {
+      "root_cause": "금형온도 과소(45℃, PA66-GF 권장 80~120 미달)로 표면 스킨이 급속 고화 → 유리섬유 캡슐화 실패 = GF 표면백화. 멜트·건조 정상.",
+      "key_recommendations": [
+        "금형온도 대폭 상향(45→80~100℃) — 단일 최대 효과",
+        "배럴온도 비강화 대비 10~30℃ 상향(섬유 표면 젖음 개선)",
+        "사출속도 상향(스킨 고화 전 충전 완료)",
+        "건조·멜트는 정상이므로 수분 대책 불필요"
+      ],
+      "expected_phase": "cooling",
+      "severity": "medium",
+      "trap": null
+    }
+  },
+  {
+    "id": "gf-readout-trap-silverstreak",
+    "source": "배치3 — fiber_readout vs silver_streak 분류전환",
+    "title": "PBT-GF30 흰 줄무늬 — 유저는 은줄 선택(건조 정상)",
+    "difficulty": "hard",
+    "description": "유저가 '은줄'로 선택했으나 건조 정상 + GF수지 흑색 방사상 백화 = GF readout. 분류전환 측정.",
+    "input": {
+      "defect_type": "은줄 (Silver Streak)",
+      "resin_type": "PBT",
+      "resin_detail": "PBT GF30%",
+      "machine_settings": {
+        "nozzle_temp": 255,
+        "zone1_temp": 250,
+        "zone2_temp": 245,
+        "zone3_temp": 240,
+        "zone4_temp": 230,
+        "mold_temp_fixed": 50,
+        "mold_temp_moving": 50,
+        "injection_pressure": 120,
+        "holding_pressure": 65,
+        "injection_speed_1": 55,
+        "back_pressure": 8,
+        "screw_rpm": 110,
+        "drying_temp": 140,
+        "drying_time": 4,
+        "dryer_type": "제습식"
+      },
+      "defect_description": "흑색 PBT-GF30 하우징 표면에 흰 방사상 줄무늬·거칠음. 마른 천으로 닦아도 안 지워짐. 건조 140℃ 4h 제습 정상(이슬점 OK). 금형온도 50℃."
+    },
+    "expected": {
+      "root_cause": "분류 전환 필요 — 은줄(수분/가스 splay) 아님. GF 표면백화 — 금형온도 과소(50℃, PBT-GF 권장 미달)로 섬유 캡슐화 실패. 건조 정상 → 수분 splay 배제. GF수지+흑색+안 닦이는 방사상 백화가 readout 단서.",
+      "key_recommendations": [
+        "불량 재분류: 은줄 → GF 표면백화(fiber read-out)",
+        "금형온도 상향(50→80~100℃)",
+        "배럴온도 소폭 상향",
+        "건조 정상이므로 수분 대책 불필요"
+      ],
+      "expected_phase": "cooling",
+      "severity": "medium",
+      "trap": "건조 정상인데 '은줄=수분'으로 단정하면 오진. GF수지·흑색·안 닦이는 방사상 백화 = 섬유 readout. 분류 전환 + 금형온도가 핵심."
+    }
+  },
+  {
+    "id": "surface-gloss-coldmold",
+    "source": "배치3 — surface_gloss 첫 측정",
+    "title": "ABS 표면 광택 저하·불균일 — 금형온도 과저+보압 부족",
+    "difficulty": "basic",
+    "description": "ABS 외관부 표면 광택이 낮고 부위별 불균일.",
+    "input": {
+      "defect_type": "표면거침/광택불균일 (Surface Roughness/Gloss)",
+      "resin_type": "ABS",
+      "machine_settings": {
+        "nozzle_temp": 235,
+        "zone1_temp": 230,
+        "zone2_temp": 225,
+        "zone3_temp": 215,
+        "zone4_temp": 205,
+        "mold_temp_fixed": 30,
+        "mold_temp_moving": 30,
+        "injection_pressure": 95,
+        "holding_pressure": 40,
+        "injection_speed_1": 55,
+        "back_pressure": 8,
+        "screw_rpm": 90,
+        "drying_temp": 80,
+        "drying_time": 3,
+        "dryer_type": "열풍식"
+      },
+      "defect_description": "ABS 외관부 표면 전체 광택이 낮고 게이트서 멀어질수록·부위별로 광택이 들쭉날쭉. 금형온도 30℃, 보압 낮음."
+    },
+    "expected": {
+      "root_cause": "금형온도 과저(30℃, ABS 권장 40~80 미달)로 표면 복제 불충분 + 보압 과소(사출압의 42%) → 광택 저하·불균일.",
+      "key_recommendations": [
+        "금형온도 상향(30→50~60℃)",
+        "보압 상향(표면 복제 개선)",
+        "냉각채널 점검(금형면 온도 편차 축소)",
+        "필요 시 금형 표면 폴리싱"
+      ],
+      "expected_phase": "cooling",
+      "severity": "low",
+      "trap": null
+    }
+  },
+  {
+    "id": "dim-instability-packvar",
+    "source": "배치3 — dimensional_instability 첫 측정",
+    "title": "POM 기어 lot간 치수 변동 — 보압·사이클 불안정",
+    "difficulty": "basic",
+    "description": "POM 기어 동일조건인데 lot마다 치수가 달라짐. 형상 변형(휨)은 아님.",
+    "input": {
+      "defect_type": "치수 불안정 (Dimensional Instability)",
+      "resin_type": "POM(아세탈)",
+      "resin_detail": "POM 코폴리머",
+      "machine_settings": {
+        "nozzle_temp": 200,
+        "zone1_temp": 195,
+        "zone2_temp": 190,
+        "zone3_temp": 185,
+        "zone4_temp": 175,
+        "mold_temp_fixed": 90,
+        "mold_temp_moving": 90,
+        "injection_pressure": 100,
+        "holding_pressure": 55,
+        "injection_speed_1": 60,
+        "back_pressure": 8,
+        "screw_rpm": 100,
+        "cooling_time": 12
+      },
+      "defect_description": "POM 기어, 같은 셋팅인데 lot간·시간대별로 외경 치수가 ±0.05mm 들쭉날쭉. 휨(형상 변형)은 없고 크기만 변동. 보압·사이클이 들쑥날쑥하다는 현장 메모."
+    },
+    "expected": {
+      "root_cause": "결정성 수지(POM) 보압·사이클 변동으로 lot간 수축 편차 → 치수 불안정. warpage(형상)가 아니라 치수 변동.",
+      "key_recommendations": [
+        "보압 안정화(피크·시간 일정)",
+        "냉각시간 연장·일정 유지(결정화 안정)",
+        "사이클 타임 일정화",
+        "사이클 중량 ±0.5% 모니터링으로 공정 안정성 추적"
+      ],
+      "expected_phase": "packing",
+      "severity": "medium",
+      "trap": null
+    }
+  },
+  {
+    "id": "dim-instability-trap-pa-moisture",
+    "source": "배치3 — 치수변동 시간차 함정(흡습)",
+    "title": "PA66 부품 출하 직후 양품, 이틀 뒤 치수 초과",
+    "difficulty": "hard",
+    "description": "이젝트 직후 측정은 정상, 1~2일 뒤 치수가 커짐. 공정 아닌 흡습·측정타이밍 함정.",
+    "input": {
+      "defect_type": "치수 불안정 (Dimensional Instability)",
+      "resin_type": "PA66",
+      "machine_settings": {
+        "nozzle_temp": 285,
+        "zone1_temp": 280,
+        "zone2_temp": 275,
+        "zone3_temp": 265,
+        "zone4_temp": 255,
+        "mold_temp_fixed": 80,
+        "mold_temp_moving": 80,
+        "injection_pressure": 110,
+        "holding_pressure": 65,
+        "injection_speed_1": 55,
+        "back_pressure": 8,
+        "screw_rpm": 110,
+        "drying_temp": 80,
+        "drying_time": 5,
+        "dryer_type": "제습식",
+        "cooling_time": 15
+      },
+      "defect_description": "PA66 부품, 이젝트 직후 측정은 전수 도면 내. 그런데 창고(다습) 보관 1~2일 뒤 측정하면 치수가 0.2~0.3% 커져 상한 초과. 성형 조건은 안정적."
+    },
+    "expected": {
+      "root_cause": "PA66 흡습 팽창 — 이젝트 직후엔 정상이나 흡습으로 시간차 치수 증가(수분 1%≈치수 0.2~0.3%). 성형 조건 문제 아님 — 측정 타이밍·보관 환경 이슈.",
+      "key_recommendations": [
+        "측정 타이밍 표준화(이젝트 24h 후 65%RH 안정화 후 측정)",
+        "어닐링(후수축·흡습 선처리)로 치수 안정화",
+        "보관 환경 관리(흡습 차단)",
+        "성형 조건(보압·냉각) 임의 변경 보류 — 공정 원인 아님"
+      ],
+      "expected_phase": "material",
+      "severity": "medium",
+      "trap": "직후 양품인데 시간차 치수 증가를 보압/냉각 등 공정 탓으로 조정하면 오진. PA 흡습 팽창 = 측정·환경 이슈."
+    }
+  },
+  {
+    "id": "record-groove-smallgate",
+    "source": "배치3 — record_groove 첫 측정",
+    "title": "PA6 게이트부 동심원 미세홈 — 게이트 과소+금형온도 낮음",
+    "difficulty": "basic",
+    "description": "PA6 부품 핀포인트 게이트 중심으로 동심원 미세홈(레코드판 모양).",
+    "input": {
+      "defect_type": "레코드홈 (Record Groove)",
+      "resin_type": "PA6",
+      "machine_settings": {
+        "nozzle_temp": 255,
+        "zone1_temp": 250,
+        "zone2_temp": 245,
+        "zone3_temp": 235,
+        "zone4_temp": 225,
+        "mold_temp_fixed": 40,
+        "mold_temp_moving": 40,
+        "injection_pressure": 110,
+        "holding_pressure": 60,
+        "injection_speed_1": 45,
+        "back_pressure": 8,
+        "screw_rpm": 110,
+        "drying_temp": 80,
+        "drying_time": 5,
+        "dryer_type": "제습식"
+      },
+      "defect_description": "PA6 부품, 핀포인트 게이트(0.8mm) 중심으로 동심원 모양 미세홈이 퍼짐. 금형온도 40℃, 사출속도 낮음."
+    },
+    "expected": {
+      "root_cause": "게이트 과소(0.8mm) + 금형온도 낮음(40℃, PA6 권장 미달) + 저속 충전 → 게이트부 유동 정체·맥동 → 동심원 미세홈(레코드홈).",
+      "key_recommendations": [
+        "게이트 확대(0.8→1.2mm급)",
+        "금형온도 상향(40→60~80℃)",
+        "사출속도 상향(게이트 통과 후 가속)"
+      ],
+      "expected_phase": "filling",
+      "severity": "low",
+      "trap": null
+    }
+  },
+  {
+    "id": "ejector-marks-shortcool",
+    "source": "배치3 — ejector_marks 첫 측정",
+    "title": "PC 후육 부품 이젝터 핀 함몰·백화 — 냉각 부족",
+    "difficulty": "basic",
+    "description": "PC 부품 이젝터 핀 위치가 함몰·백화. 냉각 짧음, 이젝터 면적 작음.",
+    "input": {
+      "defect_type": "이젝터 마크 (Ejector Marks)",
+      "resin_type": "PC",
+      "machine_settings": {
+        "nozzle_temp": 300,
+        "zone1_temp": 295,
+        "zone2_temp": 290,
+        "zone3_temp": 280,
+        "zone4_temp": 270,
+        "mold_temp_fixed": 90,
+        "mold_temp_moving": 90,
+        "injection_pressure": 120,
+        "holding_pressure": 65,
+        "injection_speed_1": 45,
+        "back_pressure": 10,
+        "screw_rpm": 80,
+        "drying_temp": 120,
+        "drying_time": 4,
+        "dryer_type": "제습식",
+        "cooling_time": 6
+      },
+      "defect_description": "PC 후육 부품, 이젝터 핀 위치마다 함몰 자국과 핀 주변 백화. 냉각시간 6초로 짧고 이젝터 핀 개수·면적이 작음."
+    },
+    "expected": {
+      "root_cause": "냉각 부족(6초, 후육 PC엔 불충분) + 이젝터 면적 부족 → 미고화 상태 조기 이젝션으로 핀 위치 함몰·백화.",
+      "key_recommendations": [
+        "냉각시간 연장(충분 고화까지)",
+        "이젝터 면적 확대·균일 배치(면압 분산)",
+        "이젝션 속도 감속",
+        "필요 시 금형온도 소폭 조정으로 고화 균일화"
+      ],
+      "expected_phase": "ejection",
+      "severity": "medium",
+      "trap": null
+    }
+  },
+  {
+    "id": "stringing-hotnozzle",
+    "source": "배치3 — stringing 첫 측정",
+    "title": "PA6 노즐 실끌림 — 노즐온도 과고+서크백 부족",
+    "difficulty": "basic",
+    "description": "개형 시 노즐서 수지가 실처럼 끌려 부품·런너에 붙음.",
+    "input": {
+      "defect_type": "실끌림 (Stringing/Drooling)",
+      "resin_type": "PA6",
+      "machine_settings": {
+        "nozzle_temp": 290,
+        "zone1_temp": 260,
+        "zone2_temp": 255,
+        "zone3_temp": 245,
+        "zone4_temp": 235,
+        "mold_temp_fixed": 70,
+        "mold_temp_moving": 70,
+        "injection_pressure": 100,
+        "holding_pressure": 55,
+        "injection_speed_1": 55,
+        "back_pressure": 8,
+        "screw_rpm": 110,
+        "drying_temp": 80,
+        "drying_time": 5,
+        "dryer_type": "제습식"
+      },
+      "defect_description": "개형(이형) 시 노즐 선단에서 수지가 가는 실처럼 늘어져 부품·런너에 붙음. 노즐온도 290℃(배럴보다 높음), 서크백(석백) 설정이 거의 0."
+    },
+    "expected": {
+      "root_cause": "노즐온도 과고(290℃, 배럴 상한 초과) + 서크백 부족 → 노즐 선단 저점도 수지가 실처럼 끌림(stringing).",
+      "key_recommendations": [
+        "노즐온도 하향(290→260~270℃)",
+        "서크백(석백) 증가",
+        "필요 시 개형 지연·콜드슬러그 웰 확보",
+        "노즐 히터·열전대 점검(실측 온도)"
+      ],
+      "expected_phase": "ejection",
+      "severity": "low",
+      "trap": null
+    }
+  },
+  {
+    "id": "parting-line-mismatch-moldwear",
+    "source": "배치3 — parting_line_mismatch 첫 측정(금형 귀착)",
+    "title": "PP 장기사용 금형 파팅라인 단차 — 조건 아닌 금형 문제",
+    "difficulty": "hard",
+    "description": "파팅면에 단차. 성형조건으로 안 풀리는 금형 마모 문제. 조건 귀착 함정.",
+    "input": {
+      "defect_type": "파팅라인 단차 (Parting Line Mismatch)",
+      "resin_type": "PP",
+      "machine_settings": {
+        "nozzle_temp": 230,
+        "zone1_temp": 225,
+        "zone2_temp": 220,
+        "zone3_temp": 210,
+        "zone4_temp": 200,
+        "mold_temp_fixed": 40,
+        "mold_temp_moving": 40,
+        "injection_pressure": 90,
+        "holding_pressure": 50,
+        "injection_speed_1": 60,
+        "back_pressure": 6,
+        "screw_rpm": 100
+      },
+      "defect_description": "PP 부품 파팅면을 따라 한쪽이 어긋난 단차. 10년 넘은 금형, 최근 심해짐. 압력·속도를 바꿔도 단차는 그대로. 파팅면에 눌림·마모 흔적."
+    },
+    "expected": {
+      "root_cause": "금형 마모·파팅면 평행도 불량(장기 사용) → 파팅라인 단차. 성형 조건과 무관(조건 변경에도 불변이 단서).",
+      "key_recommendations": [
+        "금형 정비·파팅면 재연마",
+        "블루마킹으로 접촉·평행도 점검",
+        "가이드핀·부싱 마모 점검",
+        "성형 조건 조정으로는 해결 불가임을 명시(금형 이슈)"
+      ],
+      "expected_phase": "ejection",
+      "severity": "medium",
+      "trap": "압력·속도 등 성형조건으로 해결하려 하면 오진 — 조건 무관(바꿔도 불변). 파팅라인 단차는 금형 마모·평행도 → 금형 정비가 답."
+    }
+  },
+  {
+    "id": "brittleness-regrind",
+    "source": "배치3 — brittleness 첫 측정",
+    "title": "PC 부품 충격 취성 — 재생재 과다",
+    "difficulty": "basic",
+    "description": "PC 부품이 충격에 쉽게 깨짐. 재생재 30% 사용.",
+    "input": {
+      "defect_type": "취성 (Brittleness)",
+      "resin_type": "PC",
+      "resin_detail": "PC + 재생재 30%",
+      "machine_settings": {
+        "nozzle_temp": 300,
+        "zone1_temp": 295,
+        "zone2_temp": 290,
+        "zone3_temp": 280,
+        "zone4_temp": 270,
+        "mold_temp_fixed": 90,
+        "mold_temp_moving": 90,
+        "injection_pressure": 115,
+        "holding_pressure": 60,
+        "injection_speed_1": 50,
+        "back_pressure": 10,
+        "screw_rpm": 80,
+        "drying_temp": 120,
+        "drying_time": 4,
+        "dryer_type": "제습식"
+      },
+      "defect_description": "PC 부품이 가벼운 충격에도 쉽게 깨지고 인장강도가 낮음. 재생재 30% 투입 중. 건조는 120℃ 4h 제습 정상."
+    },
+    "expected": {
+      "root_cause": "재생재 과다(30%)·이종/오염 가능 → 반복 열이력으로 분자량 저하·계면 취약 → 취성. 건조 정상이므로 미건조 가수분해는 아님.",
+      "key_recommendations": [
+        "재생재 비율 하향(<20%)",
+        "버진 수지 단독 런으로 확진(A/B)",
+        "원료 로트·이종 오염 검사",
+        "건조 적정 유지(과건조도 금지)"
+      ],
+      "expected_phase": "material",
+      "severity": "high",
+      "trap": null
+    }
+  },
+  {
+    "id": "brittleness-trap-overdry",
+    "source": "배치3 — 취성 과건조 함정(반직관)",
+    "title": "PA66 취성 — 건조 '과도'가 원인(120℃ 12h)",
+    "difficulty": "hard",
+    "description": "건조가 충분/과해 보이는데 오히려 그게 취성 원인. 미건조로 오판하기 쉬운 반직관 케이스.",
+    "input": {
+      "defect_type": "취성 (Brittleness)",
+      "resin_type": "PA66",
+      "machine_settings": {
+        "nozzle_temp": 290,
+        "zone1_temp": 285,
+        "zone2_temp": 280,
+        "zone3_temp": 270,
+        "zone4_temp": 260,
+        "mold_temp_fixed": 80,
+        "mold_temp_moving": 80,
+        "injection_pressure": 115,
+        "holding_pressure": 65,
+        "injection_speed_1": 55,
+        "back_pressure": 8,
+        "screw_rpm": 110,
+        "drying_temp": 120,
+        "drying_time": 12,
+        "dryer_type": "제습식"
+      },
+      "defect_description": "PA66 부품이 잘 부서짐. 변색은 거의 없음. 재생재 미사용 버진. 건조를 '확실히' 하려고 120℃에서 12시간 돌림(권장 80℃ 4~6h)."
+    },
+    "expected": {
+      "root_cause": "과건조 — PA66를 120℃·12h(권장 80℃ 4~6h 초과)로 건조해 열·산화 열화 → 분자량 저하 → 취성. 원인은 건조 '부족'이 아니라 '과도'.",
+      "key_recommendations": [
+        "건조조건 정상화(80℃ 4~6h, 과온·과장 금지)",
+        "신재 로트로 재현 확인",
+        "건조기 실측 온도·체류 점검",
+        "수분(미건조) 대책은 불필요 — 방향 반대"
+      ],
+      "expected_phase": "material",
+      "severity": "high",
+      "trap": "건조가 충분/과해 보여 '수분 아님'까지만 보고 끝내거나, 반대로 미건조로 오판하기 쉬움. PA는 과건조도 취성(분자량↓). 건조 '과도'를 원인으로 잡아야 정답."
+    }
+  },
+  {
+    "id": "overpacking-vplate",
+    "source": "배치3 — overpacking 첫 측정",
+    "title": "ABS 과충전 복합불량 — V/P 전환 지연+홀드압 과고",
+    "difficulty": "basic",
+    "description": "플래시+이형불량+잔류응력이 같이 나타남. V/P 전환 늦고 홀드압 과다.",
+    "input": {
+      "defect_type": "과충전 (Overpacking)",
+      "resin_type": "ABS",
+      "machine_settings": {
+        "nozzle_temp": 240,
+        "zone1_temp": 235,
+        "zone2_temp": 230,
+        "zone3_temp": 220,
+        "zone4_temp": 210,
+        "mold_temp_fixed": 55,
+        "mold_temp_moving": 55,
+        "injection_pressure": 100,
+        "holding_pressure": 95,
+        "injection_speed_1": 55,
+        "back_pressure": 8,
+        "screw_rpm": 90,
+        "drying_temp": 80,
+        "drying_time": 3,
+        "dryer_type": "열풍식"
+      },
+      "defect_description": "ABS 부품에 미세 플래시 + 이형 시 달라붙음 + 게이트 주변 잔류응력(편광 무늬)이 동시 발생. V/P 전환이 충전 98%로 늦고 홀드압이 사출압의 95%."
+    },
+    "expected": {
+      "root_cause": "V/P 전환 지연(충전 98%에서 전환) + 홀드압 과고(사출압의 95%) → 캐비티 과충전 → 플래시·이형불량·잔류응력 복합. 근본은 과충전.",
+      "key_recommendations": [
+        "V/P 전환 앞당김(체적 95~98% 전, 압력 피크 전 전환)",
+        "홀드압 하향(사출압의 50~80%)",
+        "보압시간 재조정(게이트 씰까지만)",
+        "형체력 부족이 아니라 과충전이 1차 — 압력·전환부터"
+      ],
+      "expected_phase": "packing",
+      "severity": "medium",
+      "trap": null
+    }
+  },
+  {
+    "id": "overpacking-trap-flash",
+    "source": "배치3 — 플래시 근본=과충전 분기",
+    "title": "PP 플래시 — 유저는 플래시 선택, 근본은 과충전",
+    "difficulty": "hard",
+    "description": "유저가 '플래시'로 선택. 형체력 부족으로 보기 쉬우나 근본은 V/P 늦음+홀드압 과고.",
+    "input": {
+      "defect_type": "플래시 (Flash)",
+      "resin_type": "PP",
+      "machine_settings": {
+        "nozzle_temp": 230,
+        "zone1_temp": 225,
+        "zone2_temp": 220,
+        "zone3_temp": 210,
+        "zone4_temp": 200,
+        "mold_temp_fixed": 40,
+        "mold_temp_moving": 40,
+        "injection_pressure": 95,
+        "holding_pressure": 90,
+        "injection_speed_1": 70,
+        "back_pressure": 6,
+        "screw_rpm": 100
+      },
+      "defect_description": "PP 부품 파팅면에 플래시. 형체력은 사양 내(정상)인데도 발생. V/P 전환이 충전 99%로 매우 늦고 홀드압이 사출압의 95%로 높음. 홀드압 낮추면 플래시 감소."
+    },
+    "expected": {
+      "root_cause": "플래시이나 근본은 과충전 — V/P 전환 지연(99%) + 홀드압 과고(95%)로 캐비티 과충전 → 파팅면 넘침. 형체력은 정상이므로 톤수 부족 아님('홀드압↓ 시 감소' 단서).",
+      "key_recommendations": [
+        "V/P 전환 앞당김(압력 피크 전)",
+        "홀드압 하향(사출압의 50~80%)",
+        "사출속도 소폭 하향(말단 과충전 완화)",
+        "형체력 점검은 보조 — 1차는 과충전 제어"
+      ],
+      "expected_phase": "packing",
+      "severity": "medium",
+      "trap": "플래시를 '형체력 부족'으로만 보면 오진 — 형체력 정상 + 홀드압↓ 시 감소 = 과충전(V/P 늦음·홀드압 과고)이 근본."
+    }
   }
 ]
