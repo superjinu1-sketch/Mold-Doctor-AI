@@ -59,12 +59,15 @@ function saveDiagnoseCache(caseId, body) {
   writeFileSync(join(CACHE_DIR, `${cacheKey(caseId)}.json`), JSON.stringify({ ts: Date.now(), body }));
 }
 
-/* ── API key (from env or .env.local) ───────────────── */
+/* ── API key — EVAL 전용 (billing 격리) ──────────────────
+ * eval은 ANTHROPIC_API_KEY_EVAL만 사용한다. prod 키(ANTHROPIC_API_KEY)로의 silent fallback 금지.
+ * (2026-06-21: eval이 prod와 같은 잔액을 써서 라이브 진단이 다운된 사고 재발 방지.)
+ * 미설정 시 null 반환 → 호출부에서 명시적 에러로 중단. */
 function loadApiKey() {
-  if (process.env.ANTHROPIC_API_KEY) return process.env.ANTHROPIC_API_KEY;
+  if (process.env.ANTHROPIC_API_KEY_EVAL) return process.env.ANTHROPIC_API_KEY_EVAL;
   const envFile = join(ROOT, '.env.local');
   if (existsSync(envFile)) {
-    const m = readFileSync(envFile, 'utf-8').match(/ANTHROPIC_API_KEY=(.+)/);
+    const m = readFileSync(envFile, 'utf-8').match(/^\s*ANTHROPIC_API_KEY_EVAL\s*=\s*(.+?)\s*$/m);
     if (m) return m[1].trim();
   }
   return null;
@@ -290,7 +293,8 @@ async function main() {
   // API key
   const apiKey = loadApiKey();
   if (!apiKey) {
-    console.error('ANTHROPIC_API_KEY 없음 — .env.local 또는 환경변수 필요');
+    console.error('[eval] ANTHROPIC_API_KEY_EVAL 미설정 — eval은 EVAL 전용 키만 사용합니다(prod 키 fallback 금지).');
+    console.error('       .env.local에 ANTHROPIC_API_KEY_EVAL=<dev-eval 워크스페이스 키> 추가 후 다시 실행하세요.');
     process.exit(1);
   }
   const client = new Anthropic({ apiKey });

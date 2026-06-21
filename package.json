@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
+    "dev:eval": "node scripts/dev-eval.mjs",
     "build": "next build",
     "start": "next start",
     "verify": "node .claude/scripts/verify.mjs",
