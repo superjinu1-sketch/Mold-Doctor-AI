@@ -430,6 +430,9 @@ export const ko: Record<string, string> = {
   'mold.suggestions': '금형 수정 제안',
 
   /* Additional notes */
+  'notes.section_title': '수지·건조·금형 노트',
+  'conclusion.cause': '핵심 원인',
+  'conclusion.actions': '지금 바꿀 셋팅',
   'notes.resin': '수지 특성 주의사항',
   'notes.drying': '건조 조건 평가',
   'notes.advice': '추가 조언',

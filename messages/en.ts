@@ -420,6 +420,9 @@ export const en: Record<string, string> = {
   'mold.risks': 'Design Risk Factors',
   'mold.suggestions': 'Mold Modification',
 
+  'notes.section_title': 'Resin / Drying / Mold Notes',
+  'conclusion.cause': 'Key cause',
+  'conclusion.actions': 'Change these now',
   'notes.resin': 'Resin-Specific Notes',
   'notes.drying': 'Drying Assessment',
   'notes.advice': 'Additional Advice',

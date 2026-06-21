@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, type ReactNode } from 'react';
 import { useLocale } from '@/contexts/LocaleContext';
 import { authHeaders } from '@/lib/supabase/authHeader';
 import { downscaleImageClient } from '@/lib/clientDownscale';
@@ -77,6 +77,25 @@ function DirectionArrow({ direction }: { direction?: string }) {
   if (direction === 'up') return <span className="text-danger font-bold">↑</span>;
   if (direction === 'down') return <span className="text-brand font-bold">↓</span>;
   return <span className="text-ok font-bold">✓</span>;
+}
+
+// 상세 섹션 접이식 카드 (표현 전용, 기본 접힘). 결론 우선 — 상세는 펼쳐서 확인.
+function Collapsible({ title, children, defaultOpen = false, accent = false }: { title: string; children: ReactNode; defaultOpen?: boolean; accent?: boolean }) {
+  const [open, setOpen] = useState(defaultOpen);
+  return (
+    <div className={`bg-surface rounded-2xl border overflow-hidden ${accent ? 'border-[var(--brand-border)]' : 'border-border'}`}>
+      <button
+        type="button"
+        onClick={() => setOpen(o => !o)}
+        aria-expanded={open}
+        className="w-full flex items-center justify-between gap-3 px-4 sm:px-6 py-4 min-h-[var(--touch-min)] text-left hover:bg-surface-sunken transition-colors"
+      >
+        <span className="text-lg font-bold text-ink">{title}</span>
+        <span className="text-faint shrink-0 text-base">{open ? '▲' : '▼'}</span>
+      </button>
+      {open && <div className="px-4 sm:px-6 pb-5 pt-1">{children}</div>}
+    </div>
+  );
 }
 
 type CauseItem = DiagnosisResult['causes'][number];
@@ -504,6 +523,11 @@ export default function DiagnosisResultPanel({ result, onSavePDF, round = 1, fol
     drying: t('summary.pw_dry'),
   };
 
+  // 결론 카드용: "지금 바꿀 셋팅" 상위 1~3개 (변경 필요한 것 우선, 없으면 상위 3). 데이터 가공 없음.
+  const changedRecs = recommendations.filter(r => r.current !== r.recommended && r.direction !== 'same');
+  const topActions = (changedRecs.length > 0 ? changedRecs : recommendations).slice(0, 3);
+  const topCause = causes[0]?.description;
+
   return (
     <div className="space-y-5">
       {/* Follow-up Timeline */}
@@ -577,6 +601,31 @@ export default function DiagnosisResultPanel({ result, onSavePDF, round = 1, fol
         </div>
         <p className="text-muted text-base leading-relaxed bg-surface-sunken rounded-lg p-4">{summary}</p>
 
+        {/* 결론: 원인 1줄 (한눈) */}
+        {topCause && (
+          <div className="mt-4">
+            <div className="text-xs font-bold text-faint uppercase tracking-wider mb-1">{t('conclusion.cause')}</div>
+            <p className="text-[length:var(--text-h2)] font-bold text-ink leading-snug">{topCause}</p>
+          </div>
+        )}
+
+        {/* 결론: 지금 바꿀 셋팅 1~3 (현재 → 권장) */}
+        {topActions.length > 0 && (
+          <div className="mt-4">
+            <div className="text-xs font-bold text-faint uppercase tracking-wider mb-2">{t('conclusion.actions')}</div>
+            <div className="space-y-2">
+              {topActions.map((rec, i) => (
+                <div key={i} className="flex items-center gap-2 sm:gap-3 bg-surface-sunken rounded-xl p-3 border border-[var(--brand-border)]">
+                  <span className="font-semibold text-muted text-base flex-1 min-w-0 truncate">{rec.parameter}</span>
+                  <span className="text-muted text-base tabular-nums shrink-0">{rec.current || '-'}</span>
+                  <span className="text-faint shrink-0">→</span>
+                  <span className="text-ink font-bold text-lg tabular-nums flex items-center gap-1 shrink-0"><DirectionArrow direction={rec.direction} />{rec.recommended}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
         {result?.defect_phase && (
           <div className="mt-4 flex flex-wrap gap-2">
             <span className="text-xs px-2 py-1 rounded-full bg-brand-tint text-brand-ink font-medium">
@@ -587,34 +636,31 @@ export default function DiagnosisResultPanel({ result, onSavePDF, round = 1, fol
             </span>
           </div>
         )}
-        {Object.keys(processWindow).length > 0 && (
-          <div className="mt-4">
-            <div className="text-xs font-bold text-faint uppercase tracking-wider mb-2">{t('summary.process_check')}</div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-              {Object.entries(processWindow).map(([key, val]) => {
-                if (!val) return null;
-                const colorMap = { ok: 'bg-brand-tint border-[var(--brand-border)] text-brand-ink', warning: 'bg-[var(--warn-bg)] border-[var(--warn-border)] text-warn', critical: 'bg-[var(--danger-bg)] border-[var(--danger-border)] text-danger' };
-                const iconMap = { ok: '✓', warning: '⚠', critical: '✕' };
-                const c = colorMap[val.status as keyof typeof colorMap] || colorMap.warning;
-                return (
-                  <div key={key} className={`flex items-start gap-2 text-xs p-2 rounded-lg border ${c}`}>
-                    <span className="font-bold shrink-0">{iconMap[val.status as keyof typeof iconMap]} {processWindowLabelMap[key] || key}</span>
-                    <span>{val.note}</span>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-        )}
       </div>
+
+      {/* 공정 윈도우 체크 (접힘) */}
+      {Object.keys(processWindow).length > 0 && (
+        <Collapsible title={t('summary.process_check')}>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+            {Object.entries(processWindow).map(([key, val]) => {
+              if (!val) return null;
+              const colorMap = { ok: 'bg-brand-tint border-[var(--brand-border)] text-brand-ink', warning: 'bg-[var(--warn-bg)] border-[var(--warn-border)] text-warn', critical: 'bg-[var(--danger-bg)] border-[var(--danger-border)] text-danger' };
+              const iconMap = { ok: '✓', warning: '⚠', critical: '✕' };
+              const c = colorMap[val.status as keyof typeof colorMap] || colorMap.warning;
+              return (
+                <div key={key} className={`flex items-start gap-2 text-xs p-2 rounded-lg border ${c}`}>
+                  <span className="font-bold shrink-0">{iconMap[val.status as keyof typeof iconMap]} {processWindowLabelMap[key] || key}</span>
+                  <span>{val.note}</span>
+                </div>
+              );
+            })}
+          </div>
+        </Collapsible>
+      )}
 
       {/* Top 5 Actions */}
       {result?.top5_actions && result.top5_actions.length > 0 && (
-        <div className="bg-surface rounded-2xl p-4 sm:p-6 border border-border">
-          <h3 className="text-ink font-bold text-lg mb-4 flex items-center gap-2">
-            <span className="bg-brand text-on-brand text-xs px-2 py-1 rounded-full font-bold">{t('top5.badge')}</span>
-            {t('top5.title')}
-          </h3>
+        <Collapsible title={t('top5.title')}>
           <div className="space-y-3">
             {result.top5_actions.map((item) => {
               const colors = [
@@ -638,25 +684,23 @@ export default function DiagnosisResultPanel({ result, onSavePDF, round = 1, fol
               );
             })}
           </div>
-        </div>
+        </Collapsible>
       )}
 
       {/* Causes */}
       {causes.length > 0 && (
-        <div className="bg-surface rounded-2xl p-4 sm:p-6 border border-border">
-          <h3 className="text-lg font-bold text-ink mb-4">{t('causes.title')}</h3>
+        <Collapsible title={t('causes.title')}>
           <div className="space-y-4">
             {causes.map((cause) => (
               <CauseCard key={cause.rank} cause={cause} />
             ))}
           </div>
-        </div>
+        </Collapsible>
       )}
 
       {/* Recommendations */}
       {recommendations.length > 0 && (
-        <div className="bg-surface rounded-2xl p-4 sm:p-6 border border-border">
-          <h3 className="text-lg font-bold text-ink mb-4">{t('rec.title')}</h3>
+        <Collapsible title={t('rec.title')}>
           {/* Desktop table */}
           <div className="hidden sm:block overflow-x-auto">
             <table className="w-full text-sm">
@@ -719,12 +763,11 @@ export default function DiagnosisResultPanel({ result, onSavePDF, round = 1, fol
               );
             })}
           </div>
-        </div>
+        </Collapsible>
       )}
 
       {/* Checklist */}
-      <div className="bg-surface rounded-2xl p-4 sm:p-6 border border-border">
-        <h3 className="text-lg font-bold text-ink mb-4">{t('checklist.title')}</h3>
+      <Collapsible title={t('checklist.title')}>
         {Array.isArray(checklist) ? (
           <div className="space-y-2">
             {(checklist as string[]).map((item, i) => (
@@ -759,17 +802,11 @@ export default function DiagnosisResultPanel({ result, onSavePDF, round = 1, fol
             })}
           </div>
         )}
-      </div>
+      </Collapsible>
 
       {/* Mold Analysis */}
       {result?.mold_analysis && (
-        <div className="bg-surface rounded-2xl p-4 sm:p-6 border border-[var(--brand-border)]">
-          <h3 className="text-lg font-bold text-ink mb-4 flex items-center gap-2">
-            <svg className="w-5 h-5 text-brand-ink" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-            </svg>
-            {t('mold.title')}
-          </h3>
+        <Collapsible title={t('mold.title')} accent>
           <div className="space-y-3">
             {result.mold_analysis.gate_assessment && (
               <div className="bg-brand-tint rounded-xl p-3 border border-[var(--brand-border)]">
@@ -810,12 +847,13 @@ export default function DiagnosisResultPanel({ result, onSavePDF, round = 1, fol
               </div>
             )}
           </div>
-        </div>
+        </Collapsible>
       )}
 
       {/* Additional Notes */}
       {(result?.resin_specific_notes || result?.drying_assessment || result?.additional_advice) && (
-        <div className="bg-surface border border-border rounded-2xl p-4 sm:p-6 space-y-4">
+        <Collapsible title={t('notes.section_title')}>
+          <div className="space-y-4">
           {result?.resin_specific_notes && (
             <div>
               <h3 className="font-bold text-brand-ink mb-2">{t('notes.resin')}</h3>
@@ -834,7 +872,8 @@ export default function DiagnosisResultPanel({ result, onSavePDF, round = 1, fol
               <p className="text-muted text-base leading-relaxed">{result.additional_advice}</p>
             </div>
           )}
-        </div>
+          </div>
+        </Collapsible>
       )}
 
       {result.is_demo ? (
