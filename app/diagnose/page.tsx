@@ -203,6 +203,7 @@ function DiagnoseContent() {
   const [gradeImgBusy, setGradeImgBusy] = useState(false);
   const [gradeStatus, setGradeStatus] = useState<{ tone: 'brand' | 'warn'; text: string } | null>(null);
   const [manualResinOpen, setManualResinOpen] = useState(false);
+  const [defectGridOpen, setDefectGridOpen] = useState(false);
   const [authOpen, setAuthOpen] = useState(false);
   const [settings, setSettings] = useState({
     nozzleTemp: '', zone1Temp: '', zone2Temp: '', zone3Temp: '', zone4Temp: '',
@@ -991,25 +992,57 @@ function DiagnoseContent() {
             )}
           </div>
 
-          {/* Defect type */}
+          {/* Defect type — 선택사항(AI가 사진 판단). 기본 접힘 + 펼치면 컴팩트 2열 */}
           <div className="mb-4">
             <label className={labelCls}>{t('step1.type_label')}</label>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
-              {DEFECT_TYPES.map((type) => (
-                <button
-                  key={type}
-                  type="button"
-                  onClick={() => setDefectType(defectType === type ? '' : type)}
-                  className={`px-3 py-3 rounded-lg text-sm font-medium text-left transition-all border min-h-[44px] flex items-center ${
-                    defectType === type
-                      ? 'bg-brand text-on-brand border-[var(--brand-border)]'
-                      : 'bg-surface-sunken text-muted border-border hover:border-[var(--brand-border)] hover:text-ink'
-                  }`}
-                >
-                  {t(DEFECT_KEY_MAP[type] || type)}
-                </button>
-              ))}
-            </div>
+
+            {!defectGridOpen ? (
+              <div className="flex flex-wrap items-center gap-2">
+                {defectType ? (
+                  <>
+                    <span className="inline-flex items-center px-3 py-2 rounded-full bg-brand text-on-brand text-base font-semibold min-h-[44px]">
+                      {t(DEFECT_KEY_MAP[defectType] || defectType)}
+                    </span>
+                    <button type="button" onClick={() => setDefectGridOpen(true)}
+                      className="text-brand hover:text-brand-ink text-base font-medium min-h-[44px] px-2">
+                      {t('step1.type_change')}
+                    </button>
+                    <button type="button" onClick={() => { setDefectType(''); setCustomDefect(''); }}
+                      className="text-faint hover:text-ink text-base min-h-[44px] px-2" aria-label={t('step1.type_clear')}>
+                      ×
+                    </button>
+                  </>
+                ) : (
+                  <button type="button" onClick={() => setDefectGridOpen(true)}
+                    className="w-full sm:w-auto flex items-center justify-center gap-1.5 min-h-[var(--touch-cta)] px-4 rounded-xl border border-border-strong bg-surface-sunken text-ink font-semibold text-base hover:bg-surface transition-colors">
+                    {t('step1.type_select')} <span className="text-faint font-normal">{t('step1.type_optional')}</span>
+                  </button>
+                )}
+              </div>
+            ) : (
+              <div className="grid grid-cols-2 gap-2">
+                {DEFECT_TYPES.map((type) => (
+                  <button
+                    key={type}
+                    type="button"
+                    onClick={() => {
+                      const next = defectType === type ? '' : type;
+                      setDefectType(next);
+                      // 선택 즉시 접기. '기타'는 직접 입력을 위해 펼친 상태 유지.
+                      if (next && next !== '기타 (직접 입력)') setDefectGridOpen(false);
+                    }}
+                    className={`px-3 py-3 rounded-lg text-sm font-medium text-left transition-all border min-h-[44px] flex items-center ${
+                      defectType === type
+                        ? 'bg-brand text-on-brand border-[var(--brand-border)]'
+                        : 'bg-surface-sunken text-muted border-border hover:border-[var(--brand-border)] hover:text-ink'
+                    }`}
+                  >
+                    {t(DEFECT_KEY_MAP[type] || type)}
+                  </button>
+                ))}
+              </div>
+            )}
+
             {defectType === '기타 (직접 입력)' && (
               <input
                 type="text"
