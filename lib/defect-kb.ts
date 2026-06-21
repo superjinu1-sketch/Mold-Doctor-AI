@@ -1,10 +1,10 @@
-// lib/defect-kb.ts — 불량 진단 트리 KB v1.4
+// lib/defect-kb.ts — 불량 진단 트리 KB v1.5
 // 정본: docs/defect_taxonomy.md. 수치 범위: lib/resin-kb.ts 참조(중복 금지).
 // 거버넌스: 출력은 "추정/조정안", 게이트는 "조언"톤("~일 수 있다"), 제조사 브랜드명 0.
 // 수정 순서: taxonomy.md → 이 파일 → KB_VERSION bump → eval 회귀.
 import type { ResinSpec } from './resin-kb';
 
-export const KB_VERSION = 'defect-kb-v1.4';
+export const KB_VERSION = 'defect-kb-v1.5';
 
 export type Cause = {
   rank: number;
@@ -444,8 +444,8 @@ export const DEFECT_KB: Record<string, DefectNode> = {
       '오후|시간경과|간헐|N샷마다': '열축적 누적(배럴온도↑) 또는 전단 누적(RPM·속도) → 2순위(thermal)·3순위(shear) 우선. 건조 정상이면 1순위(수분) 아님.',
     },
     sharedGates: [],   // 금형온도 게이트 미적용(taxonomy §4.1 명시)
-    priorityLogic: `건조 조건(dryTemp·dryTime)이 resin-kb drying 권장 범위를 충족하면 moisture splay(1순위) 확률을 대폭 하향 → shear/thermal로 우선순위 이양.
-스크루 RPM 또는 사출속도가 resin-kb 권장 상한 초과 시 → shear splay(3순위) 우선 분기.
+    priorityLogic: `★ 건조 조건(dryTemp·dryTime)이 resin-kb drying 권장을 충족하면 moisture splay(1순위)를 원인 목록에서 제외하라. 언급해야 하면 "건조 정상 → 수분 해당 없음"으로 명기.
+★ 스크루 RPM 또는 사출속도가 resin-kb 권장 상한 초과면 shear splay(3순위)를 1순위로 끌어올려라(thermal보다 우선). 단 황변·냄새 단서가 없으면 thermal splay(2순위)를 1순위로 과대평가하지 말 것.
 배럴온도가 resin-kb meltC.degradeAbove 초과 시 → thermal splay(2순위) 우선 분기.
 비흡습 수지(PP·PE·PS) → 즉시 전단/공기 분기.
 복합 원인(수분+전단 동시 작용 시 더 심화) 가능.`,
@@ -562,15 +562,25 @@ export const DEFECT_KB: Record<string, DefectNode> = {
 
   tiger_stripe: {
     id: 'tiger_stripe', nameKo: '타이거스트라이프', nameEn: 'Tiger Stripe', phase: '충전',
-    discriminators: 'PP·PP/EPDM/talc에서 유동 수직 광택/무광 교대 밴드. flow mark(유동방향)와 구분.',
+    discriminators: 'PP·PP/EPDM/talc에서 유동 수직 광택/무광 교대 밴드. flow mark(유동방향)와 구분. 사출속도↑ 시 밴드 악화·간격 좁아짐 = 타이거스트라이프 확정 단서 (flow mark은 속도·온도↑로 개선 → 정반대).',
     causes: [
       { rank: 1, cause: 'PP 벽면 미끄럼(wall slip)+결정화', category: 'Material',
         baseProbability: 50,
         trigger: 'PP 계열 + 금형온도 낮음.',
         evidence: '수지 종류. 금형온도.',
         verification: '금형온도↑ 후 밴드 감소 확인.',
-        adjustment: '금형온도↑(단일 최대 효과), 사출속도 균일화.' },
+        adjustment: '금형·멜트온도↑(벽면 고화층 안정화, 단일 최대 효과) + 사출속도 하향(감속)·등속(일정속도) 충전 프로파일. ★ 사출속도 상향 금지 — 악화시킴.' },
+      { rank: 2, cause: '재료·유동길이 기인 한계 (조건조정 한계)', category: 'Material',
+        baseProbability: 30,
+        trigger: 'PP/talc 장거리 유동(범퍼류). 조건만으론 완전 해소 어려움.',
+        evidence: '유동길이, 수지 MI/그레이드(resin-kb 참조).',
+        verification: '고유동(고MI)·개질 그레이드로 시험사출 후 밴드 감소 확인.',
+        adjustment: '고유동(고MI)·핵제 개질 그레이드 검토, 게이트 위치·유동길이 설계 재검토 — 재료 기인 한계임을 명시.' },
     ],
+    patternHints: {
+      '속도 올리니 악화|속도↑ 악화|빠르게 하니 악화|속도 높이니|60→70': '타이거스트라이프 확정 → 사출속도↓·등속 프로파일. 속도↑ 권고 절대 금지.',
+      '범퍼|장거리 유동|게이트서 멀어질수록|먼 곳일수록 심함': '유동길이 기인 → 게이트·유동길이 설계 + 고유동 그레이드 검토(재료한계).',
+    },
     sharedGates: ['mold_temp_insufficient'],
     source: 'synthesis-3.2,taxonomy-17', confidence: 'med',
   },
