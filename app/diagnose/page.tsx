@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef, useCallback, useEffect, Suspense } from 'react';
+import { useState, useRef, useCallback, useEffect, Suspense, type ReactNode } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import DiagnosisResultPanel from '@/components/DiagnosisResultPanel';
@@ -178,11 +178,34 @@ const SAMPLE_CASES = [
 // 폼 상태 sessionStorage 방어선 — 리마운트/새로고침/토큰 리프레시로 인한 입력 소실 방지
 const FORM_SS_KEY = 'molddoctor_form_v1';
 
+// 폼 섹션 아코디언 (표현 전용). 한 번에 하나 펼침 + 완료 시 ✓.
+function FormSection({ step, title, open, complete, optional = false, onToggle, children }: {
+  step: number; title: string; open: boolean; complete: boolean; optional?: boolean; onToggle: () => void; children: ReactNode;
+}) {
+  return (
+    <section className="bg-surface rounded-2xl border border-border overflow-hidden">
+      <button
+        type="button"
+        onClick={onToggle}
+        aria-expanded={open}
+        className="w-full flex items-center gap-3 px-4 sm:px-6 py-4 min-h-[var(--touch-min)] text-left hover:bg-surface-sunken transition-colors"
+      >
+        <span className={`shrink-0 w-7 h-7 rounded-full flex items-center justify-center text-sm font-bold ${complete ? 'bg-ok text-on-brand' : optional ? 'bg-surface-sunken text-muted' : 'bg-brand text-on-brand'}`}>
+          {complete ? '✓' : step}
+        </span>
+        <span className="text-lg font-bold text-ink flex-1 min-w-0">{title}</span>
+        <span className="text-faint shrink-0 text-base">{open ? '▲' : '▼'}</span>
+      </button>
+      {open && <div className="px-4 sm:px-6 pb-6">{children}</div>}
+    </section>
+  );
+}
+
 // --- Main Diagnose Content ---
 function DiagnoseContent() {
   const searchParams = useSearchParams();
   const { t, locale } = useLocale();
-  const { user, signInWithGoogle, setCredits } = useAuth();
+  const { user, signInWithGoogle, setCredits, credits } = useAuth();
   const router = useRouter();
 
   const [images, setImages] = useState<ImageFile[]>([]);
@@ -204,6 +227,7 @@ function DiagnoseContent() {
   const [gradeStatus, setGradeStatus] = useState<{ tone: 'brand' | 'warn'; text: string } | null>(null);
   const [manualResinOpen, setManualResinOpen] = useState(false);
   const [defectGridOpen, setDefectGridOpen] = useState(false);
+  const [openSection, setOpenSection] = useState<number | null>(1);
   const [authOpen, setAuthOpen] = useState(false);
   const [settings, setSettings] = useState({
     nozzleTemp: '', zone1Temp: '', zone2Temp: '', zone3Temp: '', zone4Temp: '',
@@ -654,11 +678,13 @@ function DiagnoseContent() {
     // 필수: 불량 정보(유형·설명·이미지 중 최소 1개). 섹션1 입력 소실 시 빈 채로 제출되어 오진되는 것을 차단.
     const effectiveDefect = defectType === '기타 (직접 입력)' ? customDefect : defectType;
     if (!effectiveDefect && !defectDescription.trim() && images.length === 0) {
+      setOpenSection(1); // 접힌 섹션 펼쳐 입력 가능하게
       showValidationError(t('err.defect_required'));
       return;
     }
     const effectiveResin = resinType === '기타 (직접 입력)' ? customResin : resinType;
     if (!effectiveResin) {
+      setOpenSection(2);
       setManualResinOpen(true); // 접혀 있으면 필수 수지 필드 펼쳐 보이게
       showValidationError(t('err.resin_required'));
       return;
@@ -940,13 +966,11 @@ function DiagnoseContent() {
         </div>
       </div>
 
-      <div className="space-y-6">
+      <div className={`space-y-4 ${!result ? 'pb-28' : ''}`}>
         {/* STEP 1: Defect Info */}
-        <section className="bg-surface rounded-2xl p-4 sm:p-6 border border-border">
-          <h2 className="text-lg font-bold text-ink mb-5 flex items-center gap-2">
-            <span className="bg-brand text-on-brand w-7 h-7 rounded-full flex items-center justify-center text-sm font-bold">1</span>
-            {t('step1.title')}
-          </h2>
+        <FormSection step={1} title={t('step1.title')} open={openSection === 1}
+          complete={!!(defectType || customDefect || defectDescription || images.length)}
+          onToggle={() => setOpenSection(s => (s === 1 ? null : 1))}>
 
           {/* Image upload */}
           <div className="mb-5">
@@ -1065,14 +1089,12 @@ function DiagnoseContent() {
             />
             <p className="mt-1.5 text-[length:var(--text-label)] text-faint">{t('step1.desc_hint')}</p>
           </div>
-        </section>
+        </FormSection>
 
         {/* STEP 2: Resin Info */}
-        <section className="bg-surface rounded-2xl p-4 sm:p-6 border border-border">
-          <h2 className="text-lg font-bold text-ink mb-5 flex items-center gap-2">
-            <span className="bg-brand text-on-brand w-7 h-7 rounded-full flex items-center justify-center text-sm font-bold">2</span>
-            {t('step2.title')}
-          </h2>
+        <FormSection step={2} title={t('step2.title')} open={openSection === 2}
+          complete={!!(resinType || customResin)}
+          onToggle={() => setOpenSection(s => (s === 2 ? null : 2))}>
           {/* 📷 포대 라벨 사진 자동 입력 */}
           <button
             type="button"
@@ -1195,14 +1217,12 @@ function DiagnoseContent() {
               </div>
             </div>
           )}
-        </section>
+        </FormSection>
 
         {/* STEP 3: Machine Settings */}
-        <section className="bg-surface rounded-2xl p-4 sm:p-6 border border-border">
-          <h2 className="text-lg font-bold text-ink mb-4 flex items-center gap-2">
-            <span className="bg-brand text-on-brand w-7 h-7 rounded-full flex items-center justify-center text-sm font-bold shrink-0">3</span>
-            {t('step3.title')}
-          </h2>
+        <FormSection step={3} title={t('step3.title')} open={openSection === 3}
+          complete={!!(settings.nozzleTemp || settings.zone1Temp || settings.injPressure1 || settings.holdPressure || settings.injSpeed1)}
+          onToggle={() => setOpenSection(s => (s === 3 ? null : 3))}>
 
           {/* Camera auto-fill */}
           <div className="mb-5">
@@ -1472,14 +1492,12 @@ function DiagnoseContent() {
               </div>
             )}
           </div>
-        </section>
+        </FormSection>
 
         {/* STEP 4: Mold & Product Info */}
-        <section className="bg-surface rounded-2xl p-4 sm:p-6 border border-border">
-          <h2 className="text-lg font-bold text-ink mb-5 flex items-center gap-2">
-            <span className="bg-surface-sunken text-muted w-7 h-7 rounded-full flex items-center justify-center text-sm font-bold">4</span>
-            {t('step4.title')}
-          </h2>
+        <FormSection step={4} title={t('step4.title')} open={openSection === 4} optional
+          complete={!!(moldType || gateType || cavities || runnerType || weight || wallThicknessMin || wallThicknessMax || productNotes)}
+          onToggle={() => setOpenSection(s => (s === 4 ? null : 4))}>
           <div className="grid sm:grid-cols-2 gap-4">
             <div>
               <label className={labelCls}>{t('step4.mold_type')}</label>
@@ -1579,32 +1597,7 @@ function DiagnoseContent() {
               )}
             </div>
           </div>
-        </section>
-
-        {/* Submit Button */}
-        <button
-          type="button"
-          onClick={handleDiagnose}
-          disabled={isLoading}
-          className="w-full bg-brand hover:bg-brand/90 disabled:bg-surface-sunken disabled:text-faint text-on-brand py-4 rounded-xl font-bold text-xl transition-colors shadow-lg flex items-center justify-center gap-3 min-h-[var(--touch-cta)]"
-        >
-          {isLoading ? (
-            <>
-              <svg className="animate-spin w-6 h-6" fill="none" viewBox="0 0 24 24">
-                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-              </svg>
-              {t('submit.loading')}
-            </>
-          ) : (
-            <>
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
-              </svg>
-              {t('submit.start')}
-            </>
-          )}
-        </button>
+        </FormSection>
 
         {error && (
           <div ref={errorRef} className="bg-[var(--danger-bg)] border border-[var(--danger-border)] text-danger rounded-xl p-4 text-base">
@@ -1759,6 +1752,35 @@ function DiagnoseContent() {
       </div>
 
       <AuthModal open={authOpen} onClose={() => setAuthOpen(false)} />
+
+      {/* 하단 sticky 진단하기 바 (입력 단계에만) */}
+      {!result && (
+        <div className="fixed bottom-0 inset-x-0 z-40 border-t border-border bg-surface/95 backdrop-blur-md">
+          <div className="max-w-5xl mx-auto px-3 sm:px-4 py-3 flex items-center gap-3">
+            <div className="flex-1 min-w-0 text-sm text-faint leading-tight">
+              {user
+                ? <span>{t('nav.credits')} <span className="font-bold text-ink tabular-nums">{credits ?? '—'}</span></span>
+                : <span>{t('sticky.login_hint')}</span>}
+            </div>
+            <button
+              type="button"
+              onClick={handleDiagnose}
+              disabled={isLoading}
+              className="shrink-0 bg-brand hover:bg-brand-ink disabled:bg-surface-sunken disabled:text-faint text-on-brand px-6 rounded-xl font-bold text-lg transition-colors flex items-center justify-center gap-2 min-h-[var(--touch-cta)]"
+            >
+              {isLoading ? (
+                <>
+                  <svg className="animate-spin w-5 h-5" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                  </svg>
+                  {t('submit.loading')}
+                </>
+              ) : t('submit.start')}
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

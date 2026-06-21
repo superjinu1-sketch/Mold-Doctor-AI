@@ -133,6 +133,7 @@ export const en: Record<string, string> = {
   'step1.photo_alt': 'Defect photo',
   'step1.photo_del': 'Delete photo',
   'step1.type_label': 'Defect Type (optional — AI judges from photo)',
+  'sticky.login_hint': 'Log in to run a free analysis',
   'step1.type_select': 'Choose defect type',
   'step1.type_optional': '(optional)',
   'step1.type_change': 'Change',

@@ -133,6 +133,7 @@ export const ko: Record<string, string> = {
   'step1.photo_alt': '불량 사진',
   'step1.photo_del': '사진 삭제',
   'step1.type_label': '불량 유형 선택 (선택 사항 — AI가 사진으로 판단)',
+  'sticky.login_hint': '로그인하면 무료로 추정할 수 있어요',
   'step1.type_select': '불량유형 직접 선택',
   'step1.type_optional': '(선택)',
   'step1.type_change': '변경',
