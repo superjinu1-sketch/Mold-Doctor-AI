@@ -100,62 +100,52 @@ function Collapsible({ title, children, defaultOpen = false, accent = false }: {
 
 type CauseItem = DiagnosisResult['causes'][number];
 
-function CauseCard({ cause }: { cause: CauseItem }) {
+function CauseCard({ cause, defaultOpen = false }: { cause: CauseItem; defaultOpen?: boolean }) {
   const { t } = useLocale();
-  const [openPanel, setOpenPanel] = useState<string | null>('scientific_reasoning');
-  const toggle = (key: string) => setOpenPanel(prev => prev === key ? null : key);
+  const [open, setOpen] = useState(defaultOpen);
 
-  const rankColor = cause.rank === 1 ? 'bg-danger' : cause.rank === 2 ? 'bg-warn' : 'bg-surface-sunken';
-  const rankBg = cause.rank === 1 ? 'bg-[var(--danger-bg)] text-danger' : cause.rank === 2 ? 'bg-[var(--warn-bg)] text-warn' : 'bg-surface-sunken text-muted';
-  const catColor = 'bg-surface-sunken text-muted';
+  const rank = cause.rank;
+  const accent =
+    rank === 1
+      ? { num: 'bg-danger text-on-brand', pct: 'text-danger', bar: 'bg-danger', edge: 'border-l-4 border-[var(--danger-border)]' }
+      : rank === 2
+      ? { num: 'bg-warn text-on-brand', pct: 'text-warn', bar: 'bg-warn', edge: 'border-l-4 border-[var(--warn-border)]' }
+      : { num: 'bg-[var(--border-strong)] text-ink', pct: 'text-muted', bar: 'bg-[var(--border-strong)]', edge: 'border-l-4 border-border' };
 
-  const panels: { key: string; label: string; icon: string; value: string | undefined }[] = [
-    { key: 'scientific_reasoning', label: t('result.cause_why'), icon: '🔬', value: cause.scientific_reasoning || cause.detail },
-    { key: 'evidence', label: t('result.cause_evidence'), icon: '📊', value: cause.evidence },
-    { key: 'elimination', label: t('result.cause_elimination'), icon: '✕', value: cause.elimination },
-    { key: 'verification', label: t('result.cause_verification'), icon: '✓', value: cause.verification },
-  ].filter(p => p.value);
+  const why = cause.scientific_reasoning || cause.detail;
+  const detail = [
+    { label: t('result.cause_evidence'), value: cause.evidence },
+    { label: t('result.cause_elimination'), value: cause.elimination },
+    { label: t('result.cause_verification'), value: cause.verification },
+  ].filter((d) => d.value);
 
   return (
-    <div className="border border-border rounded-xl p-4 bg-surface">
-      <div className="flex items-start justify-between gap-2 mb-3">
-        <div className="flex items-center gap-2 flex-1 min-w-0">
-          <span className={`shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold text-ink ${rankColor}`}>
-            {cause.rank}
-          </span>
-          <span className="font-semibold text-ink text-base sm:text-lg">{cause.description}</span>
+    <div className={`bg-surface rounded-xl border border-border ${accent.edge} overflow-hidden`}>
+      <button
+        type="button"
+        onClick={() => setOpen((o) => !o)}
+        aria-expanded={open}
+        className="w-full text-left px-3 sm:px-4 py-3 min-h-[44px] hover:bg-surface-sunken transition-colors"
+      >
+        <div className="flex items-center gap-2.5">
+          <span className={`shrink-0 w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${accent.num}`}>{rank}</span>
+          <span className="flex-1 min-w-0 font-semibold text-ink text-base leading-snug">{cause.description}</span>
+          <span className={`shrink-0 text-base font-bold tabular-nums ${accent.pct}`}>{cause.probability}%</span>
+          <span className={`shrink-0 text-faint text-sm transition-transform inline-block ${open ? 'rotate-180' : ''}`}>▾</span>
         </div>
-        <span className={`shrink-0 text-xl font-bold tabular-nums px-3 py-1 rounded ${rankBg}`}>{cause.probability}%</span>
-      </div>
-      <div className="w-full bg-surface-sunken rounded-full h-2 mb-3">
-        <div className={`h-2 rounded-full ${rankColor}`} style={{ width: `${cause.probability}%` }} />
-      </div>
-      <span className={`inline-block text-xs px-2 py-0.5 rounded-full font-medium mb-3 ${catColor}`}>{cause.category}</span>
-      {panels.length > 0 && (
-        <div className="space-y-1">
-          {panels.map(({ key, label, icon, value }) => {
-            const isOpen = openPanel === key;
-            return (
-              <div key={key} className={`rounded-lg overflow-hidden${isOpen ? ' border-l-2 border-[var(--brand-border)]' : ''}`}>
-                <button
-                  type="button"
-                  onClick={() => toggle(key)}
-                  className={`w-full flex items-center justify-between px-3 py-2.5 text-base font-semibold transition-colors min-h-[44px] ${isOpen ? 'bg-brand-tint text-brand-ink' : 'bg-surface-sunken text-ink hover:bg-surface-sunken'}`}
-                >
-                  <span className="flex items-center gap-1.5">
-                    <span>{icon}</span>
-                    <span>{label}</span>
-                  </span>
-                  <span className={`text-sm transition-transform inline-block ${isOpen ? 'rotate-180' : ''}`}>▾</span>
-                </button>
-                {isOpen && (
-                  <div className="px-3 py-3 text-[length:var(--text-body)] leading-relaxed border-b border-r border-[var(--brand-border)] bg-brand-tint text-ink tabular-nums">
-                    {value}
-                  </div>
-                )}
-              </div>
-            );
-          })}
+        <div className="mt-2 w-full bg-surface-sunken rounded-full h-1.5">
+          <div className={`h-1.5 rounded-full ${accent.bar}`} style={{ width: `${cause.probability}%` }} />
+        </div>
+      </button>
+      {open && (why || detail.length > 0) && (
+        <div className="px-3 sm:px-4 pb-4 pt-1 space-y-3">
+          {why && <p className="text-[length:var(--text-body)] leading-relaxed text-muted">{why}</p>}
+          {detail.map(({ label, value }) => (
+            <div key={label}>
+              <div className="text-xs font-bold text-faint uppercase tracking-wider mb-0.5">{label}</div>
+              <p className="text-[length:var(--text-body)] leading-relaxed text-muted">{value}</p>
+            </div>
+          ))}
         </div>
       )}
     </div>
@@ -638,61 +628,12 @@ export default function DiagnosisResultPanel({ result, onSavePDF, round = 1, fol
         )}
       </div>
 
-      {/* 공정 윈도우 체크 (접힘) */}
-      {Object.keys(processWindow).length > 0 && (
-        <Collapsible title={t('summary.process_check')}>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-            {Object.entries(processWindow).map(([key, val]) => {
-              if (!val) return null;
-              const colorMap = { ok: 'bg-brand-tint border-[var(--brand-border)] text-brand-ink', warning: 'bg-[var(--warn-bg)] border-[var(--warn-border)] text-warn', critical: 'bg-[var(--danger-bg)] border-[var(--danger-border)] text-danger' };
-              const iconMap = { ok: '✓', warning: '⚠', critical: '✕' };
-              const c = colorMap[val.status as keyof typeof colorMap] || colorMap.warning;
-              return (
-                <div key={key} className={`flex items-start gap-2 text-xs p-2 rounded-lg border ${c}`}>
-                  <span className="font-bold shrink-0">{iconMap[val.status as keyof typeof iconMap]} {processWindowLabelMap[key] || key}</span>
-                  <span>{val.note}</span>
-                </div>
-              );
-            })}
-          </div>
-        </Collapsible>
-      )}
-
-      {/* Top 5 Actions */}
-      {result?.top5_actions && result.top5_actions.length > 0 && (
-        <Collapsible title={t('top5.title')}>
-          <div className="space-y-3">
-            {result.top5_actions.map((item) => {
-              const colors = [
-                { ring: 'bg-danger', badge: 'bg-danger/20 text-danger border-[var(--danger-border)]' },
-                { ring: 'bg-warn', badge: 'bg-warn/20 text-warn border-[var(--warn-border)]' },
-                { ring: 'bg-warn', badge: 'bg-warn/20 text-warn border-[var(--warn-border)]' },
-                { ring: 'bg-brand', badge: 'bg-brand-tint text-brand-ink border-[var(--brand-border)]' },
-                { ring: 'bg-surface-sunken', badge: 'bg-surface-sunken text-faint border-border' },
-              ];
-              const c = colors[(item.step - 1) % colors.length];
-              return (
-                <div key={item.step} className={`flex gap-3 p-3 rounded-xl border ${c.badge}`}>
-                  <div className={`shrink-0 w-7 h-7 rounded-full ${c.ring} flex items-center justify-center text-ink text-sm font-bold`}>
-                    {item.step}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-ink font-semibold text-base leading-snug">{item.action}</p>
-                    <p className="text-muted text-[length:var(--text-label)] mt-1">{item.why}</p>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </Collapsible>
-      )}
-
       {/* Causes */}
       {causes.length > 0 && (
-        <Collapsible title={t('causes.title')}>
-          <div className="space-y-4">
+        <Collapsible title={t('causes.title')} defaultOpen>
+          <div className="space-y-3">
             {causes.map((cause) => (
-              <CauseCard key={cause.rank} cause={cause} />
+              <CauseCard key={cause.rank} cause={cause} defaultOpen={cause.rank === 1} />
             ))}
           </div>
         </Collapsible>
@@ -804,74 +745,134 @@ export default function DiagnosisResultPanel({ result, onSavePDF, round = 1, fol
         )}
       </Collapsible>
 
-      {/* Mold Analysis */}
-      {result?.mold_analysis && (
-        <Collapsible title={t('mold.title')} accent>
-          <div className="space-y-3">
-            {result.mold_analysis.gate_assessment && (
-              <div className="bg-brand-tint rounded-xl p-3 border border-[var(--brand-border)]">
-                <div className="text-xs font-bold text-brand-ink uppercase tracking-wider mb-1">{t('mold.gate')}</div>
-                <p className="text-base text-muted">{result.mold_analysis.gate_assessment}</p>
-              </div>
-            )}
-            {result.mold_analysis.cooling_assessment && (
-              <div className="bg-brand-tint rounded-xl p-3 border border-[var(--brand-border)]">
-                <div className="text-xs font-bold text-brand-ink uppercase tracking-wider mb-1">{t('mold.cooling')}</div>
-                <p className="text-base text-muted">{result.mold_analysis.cooling_assessment}</p>
-              </div>
-            )}
-            {(result.mold_analysis.design_risk_factors?.length ?? 0) > 0 && (
-              <div className="bg-[var(--warn-bg)] rounded-xl p-3 border border-[var(--warn-border)]">
-                <div className="text-xs font-bold text-warn uppercase tracking-wider mb-2">{t('mold.risks')}</div>
-                <div className="space-y-1">
-                  {result.mold_analysis.design_risk_factors?.map((r, i) => (
-                    <div key={i} className="flex items-start gap-2 text-sm text-muted">
-                      <span className="shrink-0 text-warn font-bold">!</span>
-                      <span>{r}</span>
-                    </div>
-                  ))}
+      {/* 심화 정보 (공정윈도우 + 금형분석 + Top5 + 추가노트 묶음) */}
+      {(Object.keys(processWindow).length > 0 || result?.mold_analysis || result?.top5_actions?.length || result?.resin_specific_notes || result?.drying_assessment || result?.additional_advice) && (
+        <Collapsible title={locale === 'en' ? 'Advanced details' : '심화 정보'}>
+          <div className="space-y-5">
+            {/* 공정 윈도우 체크 */}
+            {Object.keys(processWindow).length > 0 && (
+              <section>
+                <h3 className="text-sm font-bold text-ink mb-2">{t('summary.process_check')}</h3>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                  {Object.entries(processWindow).map(([key, val]) => {
+                    if (!val) return null;
+                    const colorMap = { ok: 'bg-brand-tint border-[var(--brand-border)] text-brand-ink', warning: 'bg-[var(--warn-bg)] border-[var(--warn-border)] text-warn', critical: 'bg-[var(--danger-bg)] border-[var(--danger-border)] text-danger' };
+                    const iconMap = { ok: '✓', warning: '⚠', critical: '✕' };
+                    const c = colorMap[val.status as keyof typeof colorMap] || colorMap.warning;
+                    return (
+                      <div key={key} className={`flex items-start gap-2 text-xs p-2 rounded-lg border ${c}`}>
+                        <span className="font-bold shrink-0">{iconMap[val.status as keyof typeof iconMap]} {processWindowLabelMap[key] || key}</span>
+                        <span>{val.note}</span>
+                      </div>
+                    );
+                  })}
                 </div>
-              </div>
+              </section>
             )}
-            {(result.mold_analysis.recommendations?.length ?? 0) > 0 && (
-              <div className="bg-brand-tint rounded-xl p-3 border border-[var(--brand-border)]">
-                <div className="text-xs font-bold text-brand-ink/80 uppercase tracking-wider mb-2">{t('mold.suggestions')}</div>
-                <div className="space-y-1">
-                  {result.mold_analysis.recommendations?.map((r, i) => (
-                    <div key={i} className="flex items-start gap-2 text-sm text-muted">
-                      <span className="shrink-0 text-brand-ink font-bold">→</span>
-                      <span>{r}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-          </div>
-        </Collapsible>
-      )}
 
-      {/* Additional Notes */}
-      {(result?.resin_specific_notes || result?.drying_assessment || result?.additional_advice) && (
-        <Collapsible title={t('notes.section_title')}>
-          <div className="space-y-4">
-          {result?.resin_specific_notes && (
-            <div>
-              <h3 className="font-bold text-brand-ink mb-2">{t('notes.resin')}</h3>
-              <p className="text-muted text-base leading-relaxed">{result.resin_specific_notes}</p>
-            </div>
-          )}
-          {result?.drying_assessment && (
-            <div>
-              <h3 className="font-bold text-brand-ink mb-2">{t('notes.drying')}</h3>
-              <p className="text-muted text-base leading-relaxed">{result.drying_assessment}</p>
-            </div>
-          )}
-          {result?.additional_advice && (
-            <div>
-              <h3 className="font-bold text-warn mb-2">{t('notes.advice')}</h3>
-              <p className="text-muted text-base leading-relaxed">{result.additional_advice}</p>
-            </div>
-          )}
+            {/* 금형 분석 */}
+            {result?.mold_analysis && (
+              <section>
+                <h3 className="text-sm font-bold text-ink mb-2">{t('mold.title')}</h3>
+                <div className="space-y-3">
+                  {result.mold_analysis.gate_assessment && (
+                    <div className="bg-brand-tint rounded-xl p-3 border border-[var(--brand-border)]">
+                      <div className="text-xs font-bold text-brand-ink uppercase tracking-wider mb-1">{t('mold.gate')}</div>
+                      <p className="text-base text-muted">{result.mold_analysis.gate_assessment}</p>
+                    </div>
+                  )}
+                  {result.mold_analysis.cooling_assessment && (
+                    <div className="bg-brand-tint rounded-xl p-3 border border-[var(--brand-border)]">
+                      <div className="text-xs font-bold text-brand-ink uppercase tracking-wider mb-1">{t('mold.cooling')}</div>
+                      <p className="text-base text-muted">{result.mold_analysis.cooling_assessment}</p>
+                    </div>
+                  )}
+                  {(result.mold_analysis.design_risk_factors?.length ?? 0) > 0 && (
+                    <div className="bg-[var(--warn-bg)] rounded-xl p-3 border border-[var(--warn-border)]">
+                      <div className="text-xs font-bold text-warn uppercase tracking-wider mb-2">{t('mold.risks')}</div>
+                      <div className="space-y-1">
+                        {result.mold_analysis.design_risk_factors?.map((r, i) => (
+                          <div key={i} className="flex items-start gap-2 text-sm text-muted">
+                            <span className="shrink-0 text-warn font-bold">!</span>
+                            <span>{r}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                  {(result.mold_analysis.recommendations?.length ?? 0) > 0 && (
+                    <div className="bg-brand-tint rounded-xl p-3 border border-[var(--brand-border)]">
+                      <div className="text-xs font-bold text-brand-ink/80 uppercase tracking-wider mb-2">{t('mold.suggestions')}</div>
+                      <div className="space-y-1">
+                        {result.mold_analysis.recommendations?.map((r, i) => (
+                          <div key={i} className="flex items-start gap-2 text-sm text-muted">
+                            <span className="shrink-0 text-brand-ink font-bold">→</span>
+                            <span>{r}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </section>
+            )}
+
+            {/* Top 5 Actions */}
+            {result?.top5_actions && result.top5_actions.length > 0 && (
+              <section>
+                <h3 className="text-sm font-bold text-ink mb-2">{t('top5.title')}</h3>
+                <div className="space-y-3">
+                  {result.top5_actions.map((item) => {
+                    const colors = [
+                      { ring: 'bg-danger', badge: 'bg-danger/20 text-danger border-[var(--danger-border)]' },
+                      { ring: 'bg-warn', badge: 'bg-warn/20 text-warn border-[var(--warn-border)]' },
+                      { ring: 'bg-warn', badge: 'bg-warn/20 text-warn border-[var(--warn-border)]' },
+                      { ring: 'bg-brand', badge: 'bg-brand-tint text-brand-ink border-[var(--brand-border)]' },
+                      { ring: 'bg-surface-sunken', badge: 'bg-surface-sunken text-faint border-border' },
+                    ];
+                    const c = colors[(item.step - 1) % colors.length];
+                    return (
+                      <div key={item.step} className={`flex gap-3 p-3 rounded-xl border ${c.badge}`}>
+                        <div className={`shrink-0 w-7 h-7 rounded-full ${c.ring} flex items-center justify-center text-ink text-sm font-bold`}>
+                          {item.step}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-ink font-semibold text-base leading-snug">{item.action}</p>
+                          <p className="text-muted text-[length:var(--text-label)] mt-1">{item.why}</p>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </section>
+            )}
+
+            {/* 추가 노트 */}
+            {(result?.resin_specific_notes || result?.drying_assessment || result?.additional_advice) && (
+              <section>
+                <h3 className="text-sm font-bold text-ink mb-2">{t('notes.section_title')}</h3>
+                <div className="space-y-4">
+                  {result?.resin_specific_notes && (
+                    <div>
+                      <h3 className="font-bold text-brand-ink mb-2">{t('notes.resin')}</h3>
+                      <p className="text-muted text-base leading-relaxed">{result.resin_specific_notes}</p>
+                    </div>
+                  )}
+                  {result?.drying_assessment && (
+                    <div>
+                      <h3 className="font-bold text-brand-ink mb-2">{t('notes.drying')}</h3>
+                      <p className="text-muted text-base leading-relaxed">{result.drying_assessment}</p>
+                    </div>
+                  )}
+                  {result?.additional_advice && (
+                    <div>
+                      <h3 className="font-bold text-warn mb-2">{t('notes.advice')}</h3>
+                      <p className="text-muted text-base leading-relaxed">{result.additional_advice}</p>
+                    </div>
+                  )}
+                </div>
+              </section>
+            )}
           </div>
         </Collapsible>
       )}
