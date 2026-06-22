@@ -139,11 +139,11 @@ function CauseCard({ cause, defaultOpen = false }: { cause: CauseItem; defaultOp
       </button>
       {open && (why || detail.length > 0) && (
         <div className="px-3 sm:px-4 pb-4 pt-1 space-y-3">
-          {why && <p className="text-[length:var(--text-body)] leading-relaxed text-muted">{why}</p>}
+          {why && <p className="text-[length:var(--text-body)] leading-relaxed text-muted max-w-[68ch]">{why}</p>}
           {detail.map(({ label, value }) => (
             <div key={label}>
               <div className="text-xs font-bold text-faint uppercase tracking-wider mb-0.5">{label}</div>
-              <p className="text-[length:var(--text-body)] leading-relaxed text-muted">{value}</p>
+              <p className="text-[length:var(--text-body)] leading-relaxed text-muted max-w-[68ch]">{value}</p>
             </div>
           ))}
         </div>
@@ -589,7 +589,7 @@ export default function DiagnosisResultPanel({ result, onSavePDF, round = 1, fol
             {t('summary.pdf_btn')}
           </button>
         </div>
-        <p className="text-muted text-base leading-relaxed bg-surface-sunken rounded-lg p-4">{summary}</p>
+        <p className="text-muted text-base leading-relaxed bg-surface-sunken rounded-lg p-4 max-w-[68ch]">{summary}</p>
 
         {/* 결론: 원인 1줄 (한눈) */}
         {topCause && (
@@ -778,13 +778,13 @@ export default function DiagnosisResultPanel({ result, onSavePDF, round = 1, fol
                   {result.mold_analysis.gate_assessment && (
                     <div className="bg-brand-tint rounded-xl p-3 border border-[var(--brand-border)]">
                       <div className="text-xs font-bold text-brand-ink uppercase tracking-wider mb-1">{t('mold.gate')}</div>
-                      <p className="text-base text-muted">{result.mold_analysis.gate_assessment}</p>
+                      <p className="text-base text-muted max-w-[68ch]">{result.mold_analysis.gate_assessment}</p>
                     </div>
                   )}
                   {result.mold_analysis.cooling_assessment && (
                     <div className="bg-brand-tint rounded-xl p-3 border border-[var(--brand-border)]">
                       <div className="text-xs font-bold text-brand-ink uppercase tracking-wider mb-1">{t('mold.cooling')}</div>
-                      <p className="text-base text-muted">{result.mold_analysis.cooling_assessment}</p>
+                      <p className="text-base text-muted max-w-[68ch]">{result.mold_analysis.cooling_assessment}</p>
                     </div>
                   )}
                   {(result.mold_analysis.design_risk_factors?.length ?? 0) > 0 && (
@@ -855,19 +855,19 @@ export default function DiagnosisResultPanel({ result, onSavePDF, round = 1, fol
                   {result?.resin_specific_notes && (
                     <div>
                       <h3 className="font-bold text-brand-ink mb-2">{t('notes.resin')}</h3>
-                      <p className="text-muted text-base leading-relaxed">{result.resin_specific_notes}</p>
+                      <p className="text-muted text-base leading-relaxed max-w-[68ch]">{result.resin_specific_notes}</p>
                     </div>
                   )}
                   {result?.drying_assessment && (
                     <div>
                       <h3 className="font-bold text-brand-ink mb-2">{t('notes.drying')}</h3>
-                      <p className="text-muted text-base leading-relaxed">{result.drying_assessment}</p>
+                      <p className="text-muted text-base leading-relaxed max-w-[68ch]">{result.drying_assessment}</p>
                     </div>
                   )}
                   {result?.additional_advice && (
                     <div>
                       <h3 className="font-bold text-warn mb-2">{t('notes.advice')}</h3>
-                      <p className="text-muted text-base leading-relaxed">{result.additional_advice}</p>
+                      <p className="text-muted text-base leading-relaxed max-w-[68ch]">{result.additional_advice}</p>
                     </div>
                   )}
                 </div>
