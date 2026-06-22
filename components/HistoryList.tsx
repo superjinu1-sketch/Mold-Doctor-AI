@@ -44,6 +44,12 @@ function ResolvedBadge({ resolved, t }: { resolved?: boolean | string; t: (k: st
   return null;
 }
 
+function rankAccent(rank: number) {
+  if (rank === 1) return { num: 'bg-danger text-on-brand', pct: 'text-danger', bar: 'bg-danger' };
+  if (rank === 2) return { num: 'bg-warn text-on-brand', pct: 'text-warn', bar: 'bg-warn' };
+  return { num: 'bg-[var(--border-strong)] text-ink', pct: 'text-muted', bar: 'bg-[var(--border-strong)]' };
+}
+
 function formatDate(ts: string, locale: string) {
   try {
     return new Date(ts).toLocaleDateString(locale === 'en' ? 'en-US' : 'ko-KR', {
@@ -192,19 +198,49 @@ export default function HistoryList({ records }: { records: HistoryRecord[] }) {
                 </div>
               )}
 
+              {r.causes && r.causes.length > 0 && (
+                <div>
+                  <div className="text-xs font-bold text-faint uppercase tracking-wider mb-2">
+                    {locale === 'en' ? 'Likely cause' : '추정 원인'}
+                  </div>
+                  <div className="space-y-2">
+                    {r.causes.slice(0, 2).map((c) => {
+                      const a = rankAccent(c.rank);
+                      const hasP = typeof c.probability === 'number';
+                      return (
+                        <div key={c.rank} className="bg-surface-sunken rounded-lg p-2.5">
+                          <div className="flex items-start gap-2">
+                            <span className={`shrink-0 w-5 h-5 rounded-full flex items-center justify-center text-[11px] font-bold ${a.num}`}>{c.rank}</span>
+                            <span className="flex-1 min-w-0 text-sm font-medium text-ink leading-snug">{c.description}</span>
+                            {hasP && <span className={`shrink-0 text-sm font-bold tabular-nums ${a.pct}`}>{c.probability}%</span>}
+                          </div>
+                          {hasP && (
+                            <div className="mt-1.5 w-full bg-surface rounded-full h-1.5">
+                              <div className={`h-1.5 rounded-full ${a.bar}`} style={{ width: `${c.probability}%` }} />
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+
               {r.recommendations && r.recommendations.length > 0 && (
                 <div>
                   <div className="text-xs font-bold text-faint uppercase tracking-wider mb-2">
                     {locale === 'en' ? 'Key adjustments' : '주요 조정안'}
                   </div>
-                  <ul className="space-y-1">
+                  <div className="space-y-1.5">
                     {r.recommendations.slice(0, 3).map((rec, i) => (
-                      <li key={i} className="text-sm text-muted flex gap-2">
-                        <span className="text-brand-ink shrink-0">→</span>
-                        <span>{rec.parameter}: {rec.current} → {rec.recommended}</span>
-                      </li>
+                      <div key={i} className="flex items-center gap-2 bg-surface-sunken rounded-lg px-3 py-2 border border-[var(--brand-border)]">
+                        <span className="flex-1 min-w-0 text-sm font-medium text-muted truncate">{rec.parameter}</span>
+                        <span className="shrink-0 text-sm text-muted tabular-nums">{rec.current || '-'}</span>
+                        <span className="shrink-0 text-faint">→</span>
+                        <span className="shrink-0 text-sm font-bold text-ink tabular-nums">{rec.recommended}</span>
+                      </div>
                     ))}
-                  </ul>
+                  </div>
                 </div>
               )}
 
