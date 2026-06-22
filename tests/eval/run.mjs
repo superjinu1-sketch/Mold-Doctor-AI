@@ -32,12 +32,17 @@ const PORT = (() => {
   return idx !== -1 ? process.argv[idx + 1] : (process.env.EVAL_PORT || '3000');
 })();
 const MEASURE_COST = process.argv.includes('--measure-cost');
+const NO_CACHE = process.argv.includes('--no-cache'); // 캐시 우회(읽기·쓰기 안 함) — before/after 신선비교용
+const IDS_FILTER = (() => {
+  const i = process.argv.indexOf('--ids');
+  return i !== -1 && process.argv[i + 1] ? new Set(process.argv[i + 1].split(',').map(s => s.trim()).filter(Boolean)) : null;
+})();
 const HOST = '127.0.0.1';
 const PASS_THRESHOLD = 70;
 const INTERVAL_MS = 6000; // rate-limit 회피 간격
 const MAX_RETRIES = 5;    // 529 overloaded 재시도 (diagnose + judge 공통)
 const JUDGE_MODEL = 'claude-haiku-4-5-20251001'; // Sonnet 대비 ~1/10 비용
-const PROMPT_VERSION = 'v12';  // defect-kb v1.6 (silver_streak→fiber_readout 분류전환 가드 + dim_instability 흡습 patternHint) → 캐시 무효화
+const PROMPT_VERSION = 'v16';  // diagnose 프롬프트 glossing-only(괄호풀이) 레이어 v2 → 캐시 무효화
 const CACHE_DIR = join(ROOT, 'tests/eval/.cache');
 const CACHE_TTL_MS = 7 * 24 * 3600 * 1000; // 7일
 
@@ -309,7 +314,11 @@ async function main() {
   }
   console.log(`서버 준비 완료 (포트 ${PORT})\n`);
 
-  const cases = JSON.parse(readFileSync(join(__dir, 'cases.json'), 'utf-8'));
+  let cases = JSON.parse(readFileSync(join(__dir, 'cases.json'), 'utf-8'));
+  if (IDS_FILTER) {
+    cases = cases.filter(c => IDS_FILTER.has(c.id));
+    console.log(`  --ids: ${cases.length}건만 실행 → ${cases.map(c => c.id).join(', ')}\n`);
+  }
   const results = [];
   const costRows = [];      // --measure-cost 케이스별 비용
   let judgeTotalKrw = 0;    // judge(haiku) 원가 별도 집계
@@ -327,7 +336,7 @@ async function main() {
     let aiRaw = '';
     let diagError = null;
     let diagHeaders = {};
-    const cached = MEASURE_COST ? null : loadDiagnoseCache(c.id);
+    const cached = (MEASURE_COST || NO_CACHE) ? null : loadDiagnoseCache(c.id);
     if (cached) {
       process.stdout.write(' [cached]');
       aiRaw = cached;
@@ -346,7 +355,7 @@ async function main() {
       } else {
         aiRaw = diagRes.body;
         diagHeaders = diagRes.headers || {};
-        if (!MEASURE_COST) saveDiagnoseCache(c.id, aiRaw);
+        if (!MEASURE_COST && !NO_CACHE) saveDiagnoseCache(c.id, aiRaw);
       }
     } catch (e) {
       diagError = e.message;

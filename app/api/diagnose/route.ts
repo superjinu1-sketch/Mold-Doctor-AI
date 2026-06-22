@@ -206,7 +206,7 @@ STEP 3: ROOT CAUSE ANALYSIS — 분석 깊이 규칙
 
 1. MECHANISM (scientific_reasoning) — 왜 이 설정에서 이 불량이 발생하는지 물리화학적 메커니즘
    나쁜 예: "건조 부족으로 은줄 발생"
-   좋은 예: "PA66의 평형 수분율은 RH50%에서 2.5%. 열풍식 80°C/8hr는 노점 관리 불가 → 수분율 0.1%+ 잔류. 사출 시 280°C+에서 아미드 결합 가수분해 → CO2/NH3 가스 → 은줄"
+   좋은 예: "PA66의 평형수분율(특정 습도에서 머금는 수분량)은 RH50%에서 2.5%. 열풍식 80°C/8hr는 노점(공기 중 수분이 응결하는 온도) 관리 불가 → 수분율 0.1%+ 잔류. 사출 시 280°C+에서 아미드 결합 가수분해(수분이 열에 분해돼 가스 발생) → CO2/NH3 가스 → 은줄"
 
 2. EVIDENCE (evidence) — 사용자가 입력한 구체적 수치를 직접 인용해 이 원인을 뒷받침
    나쁜 예: "온도가 높다"
@@ -224,6 +224,13 @@ STEP 3: ROOT CAUSE ANALYSIS — 분석 깊이 규칙
 - 원인 간 상호작용 가능하면 언급 (예: 건조 부족 + 배럴 과열이 동시 작용 시 은줄 더 심화)
 - moldInfo(게이트 타입, 캐비티 수, 러너 타입)가 입력된 경우 원인 분석에 반영
 - 4M 프레임워크: Machine(V/P 전환, 쿠션, 체크링), Material(수분, 재분쇄율, 오염), Mold(벤팅, 게이트, 냉각), Method(설정값, 사이클 일관성)
+
+STEP 3.5: 용어 풀이 규칙 — 추론은 그대로, 어려운 용어만 풀어준다 (정확도·phase·severity·수치·메커니즘·원인 순서는 STEP 3 그대로, 절대 변경 금지)
+- 모든 출력 필드에서, "특수 학술/이론 용어"가 처음 나오면 즉시 괄호로 짧고 쉬운 풀이를 덧붙인다. 용어 자체는 그대로 둔다(삭제·치환 아님, 괄호만 추가).
+  예: "평형수분율(특정 습도에서 머금는 수분량)", "노점(공기 중 수분이 응결하는 온도)", "가수분해(수분이 열에 분해돼 가스가 됨)", "전단발열(재료가 빠르게 밀릴 때 생기는 마찰열)", "이방성(방향마다 수축이 다른 성질)".
+- 풀이 대상은 특수 용어만: 평형수분율·노점·아미드결합·후결정화·결정화도·비결정질·이방성·전단발열·가수분해·잔류응력·캡슐화 등.
+- 일반어(잔류 수분·건조·수축·압력·가스·균열)와 현장표준어(보압·게이트·사출속도·금형온도·V/P전환·런너·캐비티)는 풀지 말 것(과잉설명 금지).
+- 풀이는 한 필드당 1~2개만(길이 초과 방지). 문장 구조·원인 순서·phase·severity·수치는 기존과 동일하게 유지 — 괄호 풀이만 덧붙이는 변경이다.
 
 패턴 기반 추론 규칙 (MANDATORY — defect_description 단서 있을 때):
 defect_description에 다음 키워드/패턴이 있으면, 뻔한 1차 원인(건조/온도)보다 그 패턴이 가리키는 숨은 원인을 우선 검토하라:
@@ -251,7 +258,7 @@ CRITICAL RULES:
 4. For hygroscopic resins, evaluate drying FIRST.
 5. For GF-reinforced grades, consider fiber orientation effects.
 6. For hot runner molds, check zone temperature uniformity and dead spots.
-7. Respond in Korean. Technical terms may be in English with Korean explanation in parentheses.
+7. Respond in Korean. 특수 학술용어는 처음 등장 시 괄호로 짧은 쉬운 풀이를 덧붙인다(용어 자체는 유지, STEP 3.5). 일반어·현장표준어는 풀지 않는다.
 8. MOLD DRAWING ANALYSIS — if mold drawings are provided, analyze: gate location vs defect, runner balance, cooling near defect area, wall thickness variation, vent locations, ejector positions. Include in 'mold_analysis' field.
 9. In all Korean output text (summary, description, notes, actions), use "추정" instead of "진단". Do not use "진단" in any output JSON field values.
 10. FLAME RETARDANCY & THICKNESS
@@ -268,7 +275,7 @@ CRITICAL RULES:
 10. FLAME RETARDANCY & THICKNESS — if a flame retardant grade and certification thickness are provided, evaluate whether the product's actual wall thickness matches the certified thickness. Thinner walls typically require V-0 at thinner certification (e.g., 0.4mm vs 0.8mm). Thicker walls may relax the flame retardant additive loading but can increase sink/void risk. Flag mismatches between certified thickness and actual wall thickness in resin_specific_notes.
 
 OUTPUT LENGTH LIMITS — strictly enforce to prevent truncation:
-- causes: max 3 items. description max 50 chars. scientific_reasoning max 120 chars. evidence max 100 chars. elimination max 100 chars. verification max 120 chars.
+- causes: max 3 items. description max 50 chars. scientific_reasoning max 150 chars. evidence max 100 chars. elimination max 100 chars. verification max 120 chars.
 - recommendations: max 4 items. reason max 40 chars. expected_result max 35 chars. risk max 35 chars. interaction_note max 35 chars.
 - checklist each array: max 3 items, each max 35 chars.
 - process_window_check notes: max 25 chars each.
@@ -335,7 +342,7 @@ function buildSystemBlocks(resinType: string, tier: 'simple' | 'complex' = 'simp
   const variableText = [
     `RESIN IN USE: ${resinType || 'Unknown'}`,
     `RESIN KNOWLEDGE:\n${resinNote}`,
-    locale === 'en' ? `\nOUTPUT LANGUAGE: English. ALL JSON field string values (summary, description, scientific_reasoning, evidence, elimination, verification, resin_specific_notes, drying_assessment, additional_advice, note fields, action/why fields, checklist items, gate_assessment, cooling_assessment, design_risk_factors, recommendations text) MUST be written in English. Use English technical terms. No Korean text in any output field value. Category names in English (e.g. Material, Machine, Mold, Method, Drying).` : '',
+    locale === 'en' ? `\nOUTPUT LANGUAGE: English. ALL JSON field string values (summary, description, scientific_reasoning, evidence, elimination, verification, resin_specific_notes, drying_assessment, additional_advice, note fields, action/why fields, checklist items, gate_assessment, cooling_assessment, design_risk_factors, recommendations text) MUST be written in English. Use English technical terms. No Korean text in any output field value. Category names in English (e.g. Material, Machine, Mold, Method, Drying). TERM GLOSSING (mirror STEP 3.5): keep the same reasoning, cause order, phase, severity, and numbers — only add a short plain parenthetical the first time a specialized/academic term appears (keep the term itself). e.g., "equilibrium moisture content (moisture a resin holds at a given humidity)", "dew point (temperature at which air moisture condenses)", "hydrolysis (moisture breaks down under heat into gas)". Do NOT gloss common terms (residual moisture, drying, shrinkage) or shop-floor terms (holding pressure, gate, injection speed). Do not change anything except adding these parentheticals.` : '',
     tier === 'complex' ? `\nCOMPLEX CASE INSTRUCTIONS (복합 원인 케이스):
 이 케이스는 복합 원인 가능성이 높습니다.
 단순 원인(건조, 온도)으로 결론 내리지 마세요.
