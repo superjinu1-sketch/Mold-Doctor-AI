@@ -98,20 +98,23 @@ export default function HomePage() {
             <p className="text-muted text-base">{t('landing.defects_sub')}</p>
           </div>
 
-          {/* Defect chip cloud */}
-          <div className="flex flex-wrap gap-2 justify-center mb-6">
-            {defectChips.map((chip) => (
-              <Link
-                key={chip.en}
-                href="/diagnose"
-                className="px-3.5 py-2 bg-surface border border-border rounded-full text-sm font-medium text-muted hover:border-[var(--brand-border)] hover:text-brand-ink hover:bg-brand-tint transition-colors min-h-[44px] flex items-center"
-              >
-                {locale === 'en' ? chip.en : chip.ko}
-              </Link>
-            ))}
-            <span className="px-3.5 py-2 bg-surface-sunken rounded-full text-sm font-medium text-faint min-h-[44px] flex items-center select-none">
-              {locale === 'en' ? '+ many more' : '+ 그 외 다수'}
-            </span>
+          {/* Defect chip cloud — 모바일: 2줄 가로 스크롤 / 데스크탑(sm+): 중앙 wrap */}
+          <div className="relative mb-6">
+            <div className="grid grid-flow-col grid-rows-2 auto-cols-max gap-2 overflow-x-auto pb-2 -mx-4 px-4 snap-x [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:flex sm:flex-wrap sm:justify-center sm:overflow-visible sm:grid-rows-1 sm:mx-0 sm:px-0 sm:pb-0">
+              {defectChips.map((chip) => (
+                <Link
+                  key={chip.en}
+                  href="/diagnose"
+                  className="shrink-0 snap-start whitespace-nowrap px-3.5 py-2 bg-surface border border-border rounded-full text-sm font-medium text-muted hover:border-[var(--brand-border)] hover:text-brand-ink hover:bg-brand-tint transition-colors min-h-[44px] flex items-center"
+                >
+                  {locale === 'en' ? chip.en : chip.ko}
+                </Link>
+              ))}
+              <span className="shrink-0 snap-start whitespace-nowrap px-3.5 py-2 bg-surface-sunken rounded-full text-sm font-medium text-faint min-h-[44px] flex items-center select-none">
+                {locale === 'en' ? '+ many more' : '+ 그 외 다수'}
+              </span>
+            </div>
+            <div aria-hidden="true" className="pointer-events-none absolute inset-y-0 right-0 w-12 bg-gradient-to-l from-[var(--canvas)] to-transparent sm:hidden" />
           </div>
 
           {/* Safety net */}
