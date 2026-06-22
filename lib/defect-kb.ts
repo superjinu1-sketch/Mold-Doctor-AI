@@ -1,10 +1,10 @@
-// lib/defect-kb.ts — 불량 진단 트리 KB v1.5
+// lib/defect-kb.ts — 불량 진단 트리 KB v1.6
 // 정본: docs/defect_taxonomy.md. 수치 범위: lib/resin-kb.ts 참조(중복 금지).
 // 거버넌스: 출력은 "추정/조정안", 게이트는 "조언"톤("~일 수 있다"), 제조사 브랜드명 0.
 // 수정 순서: taxonomy.md → 이 파일 → KB_VERSION bump → eval 회귀.
 import type { ResinSpec } from './resin-kb';
 
-export const KB_VERSION = 'defect-kb-v1.5';
+export const KB_VERSION = 'defect-kb-v1.6';
 
 export type Cause = {
   rank: number;
@@ -402,7 +402,7 @@ export const DEFECT_KB: Record<string, DefectNode> = {
   silver_streak: {
     id: 'silver_streak', nameKo: '은선/은줄', nameEn: 'Silver Streak', phase: '재료준비',
     typicalSeverity: 'medium (외관)',
-    discriminators: '게이트서 유동방향 방사상 은빛 줄무늬. 3종 변별: moisture(전면분산·건조후 소멸) / shear(게이트주변·지속) / thermal(황변·냄새 동반). 박리(층분리)·버닝(탄화·흑갈색)과 구분.',
+    discriminators: '게이트서 유동방향 방사상 은빛 줄무늬. 3종 변별: moisture(전면분산·건조후 소멸) / shear(게이트주변·지속) / thermal(황변·냄새 동반). 박리(층분리)·버닝(탄화·흑갈색)과 구분. GF 강화수지에서 흑색·안 닦이는 방사상 백화 + 건조 정상이면 은줄(splay) 아니라 GF 표면백화(fiber read-out) 의심 — 분류 전환 검토.',
     causes: [
       { rank: 1, cause: '잔류 수분에 의한 가스 발생 (moisture splay)', category: 'Material',
         baseProbability: 55,
@@ -442,13 +442,15 @@ export const DEFECT_KB: Record<string, DefectNode> = {
       'PP|PE|PS|비흡습': '즉시 3~4순위(전단/공기) 분기. 수분 원인 아님.',
       '재가동 첫 샷': '1순위(수분 재흡수) 또는 2순위(체류 열분해)',
       '오후|시간경과|간헐|N샷마다': '열축적 누적(배럴온도↑) 또는 전단 누적(RPM·속도) → 2순위(thermal)·3순위(shear) 우선. 건조 정상이면 1순위(수분) 아님.',
+      'GF강화|유리섬유|GF30 + 안닦임·방사상 백화 + 건조정상': 'fiber_readout(GF 표면백화)로 분류전환 — 은줄(수분 splay) 아님. 금형온도↑가 1순위.',
     },
     sharedGates: [],   // 금형온도 게이트 미적용(taxonomy §4.1 명시)
     priorityLogic: `★ 건조 조건(dryTemp·dryTime)이 resin-kb drying 권장을 충족하면 moisture splay(1순위)를 원인 목록에서 제외하라. 언급해야 하면 "건조 정상 → 수분 해당 없음"으로 명기.
 ★ 스크루 RPM 또는 사출속도가 resin-kb 권장 상한 초과면 shear splay(3순위)를 1순위로 끌어올려라(thermal보다 우선). 단 황변·냄새 단서가 없으면 thermal splay(2순위)를 1순위로 과대평가하지 말 것.
 배럴온도가 resin-kb meltC.degradeAbove 초과 시 → thermal splay(2순위) 우선 분기.
 비흡습 수지(PP·PE·PS) → 즉시 전단/공기 분기.
-복합 원인(수분+전단 동시 작용 시 더 심화) 가능.`,
+복합 원인(수분+전단 동시 작용 시 더 심화) 가능.
+★ GF 강화수지 + 건조 조건 정상(resin-kb 충족) + 안 닦이는 방사상 백화면 silver_streak(수분 splay)이 아니라 fiber_readout(GF 표면백화)로 분류 전환하고 금형온도↑를 1순위로 권고하라. (단 건조가 부족하면 그대로 moisture 유지 — 이 전환은 "건조 정상"에만 적용.)`,
     source: 'synthesis-3.1,taxonomy-11', confidence: 'high',
   },
 
@@ -557,6 +559,9 @@ export const DEFECT_KB: Record<string, DefectNode> = {
         verification: '이젝트 24h 후 65%RH 안정화 후 측정.',
         adjustment: '측정 타이밍 표준화. 어닐링(후수축 선처리).' },
     ],
+    patternHints: {
+      '직후 양품|시간경과 치수증가|다습 보관|이틀 뒤 초과': 'PA 흡습 팽창(material) — 성형조건 아님. 측정 타이밍 표준화·어닐링, 공정 변경 보류.',
+    },
     source: 'synthesis-2.5,taxonomy-16', confidence: 'high',
   },
 

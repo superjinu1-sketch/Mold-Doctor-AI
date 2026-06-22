@@ -37,7 +37,7 @@ const PASS_THRESHOLD = 70;
 const INTERVAL_MS = 6000; // rate-limit 회피 간격
 const MAX_RETRIES = 5;    // 529 overloaded 재시도 (diagnose + judge 공통)
 const JUDGE_MODEL = 'claude-haiku-4-5-20251001'; // Sonnet 대비 ~1/10 비용
-const PROMPT_VERSION = 'v11';  // defect-kb v1.5 (tiger_stripe 속도방향·재료한계 + silver_streak 가드 하드닝) → 캐시 무효화
+const PROMPT_VERSION = 'v12';  // defect-kb v1.6 (silver_streak→fiber_readout 분류전환 가드 + dim_instability 흡습 patternHint) → 캐시 무효화
 const CACHE_DIR = join(ROOT, 'tests/eval/.cache');
 const CACHE_TTL_MS = 7 * 24 * 3600 * 1000; // 7일
 
