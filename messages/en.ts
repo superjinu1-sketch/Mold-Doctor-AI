@@ -191,6 +191,7 @@ export const en: Record<string, string> = {
   'step3.title': 'Machine Settings',
   'step3.camera_btn': '📷 Scan Machine Screen to Auto-Fill',
   'step3.camera_btn_count': '— 19 fields',
+  'step3.camera_hint': 'Click · drag · Ctrl+V · camera — auto-fills 19 fields',
   'step3.camera_loading': 'Reading settings...',
   'step3.extracted_hint': 'Green border = auto-filled · Edit to clear highlight',
   'step3.temp_label': 'Melt Temperature (℃)',

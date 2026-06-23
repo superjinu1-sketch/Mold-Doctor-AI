@@ -191,6 +191,7 @@ export const ko: Record<string, string> = {
   'step3.title': '사출기 셋팅값',
   'step3.camera_btn': '📷 사출기 화면 찍어 자동 입력',
   'step3.camera_btn_count': '— 19개 항목',
+  'step3.camera_hint': '클릭·드래그·Ctrl+V·카메라 · 19개 항목 자동 채움',
   'step3.camera_loading': '셋팅값 읽는 중...',
   'step3.extracted_hint': '초록 테두리 항목 = 자동 입력됨 · 수정하면 표시 사라짐',
   'step3.temp_label': '사출 온도 (℃)',

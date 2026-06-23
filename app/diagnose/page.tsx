@@ -281,6 +281,7 @@ function DiagnoseContent() {
   const [moldDrawings, setMoldDrawings] = useState<ImageFile[]>([]);
   const [isDraggingDrawing, setIsDraggingDrawing] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
+  const [isDraggingSettings, setIsDraggingSettings] = useState(false);
   const [isExtractingSettings, setIsExtractingSettings] = useState(false);
   const [extractMsg, setExtractMsg] = useState('');
   const [extractedFields, setExtractedFields] = useState<Set<string>>(new Set());
@@ -616,8 +617,10 @@ function DiagnoseContent() {
         if (file) imageFiles.push(file);
       }
     }
-    if (imageFiles.length > 0) addImages(imageFiles);
-  }, [addImages]);
+    if (imageFiles.length === 0) return;
+    if (openSection === 3) handleSettingsImage(imageFiles[0]); // 셋팅 OCR (단일) — Step3 열림 시
+    else addImages(imageFiles);                                 // 불량 (기존)
+  }, [addImages, openSection, handleSettingsImage]);
 
   useEffect(() => {
     document.addEventListener('paste', handlePaste);
@@ -1228,31 +1231,37 @@ function DiagnoseContent() {
 
           {/* Camera auto-fill */}
           <div className="mb-5">
-            <button
-              type="button"
-              onClick={() => settingsImageRef.current?.click()}
-              disabled={isExtractingSettings}
-              className="w-full flex items-center justify-center gap-3 bg-brand hover:bg-brand/90 active:bg-brand/80 disabled:bg-surface-sunken text-on-brand disabled:text-faint font-bold text-base py-4 rounded-xl transition-colors shadow-sm min-h-[56px]"
+            {/* 불량 업로더와 동일한 점선 드래그박스 — 클릭/드래그/Ctrl+V/카메라. 현장 발견성 위해 brand 톤 강조 */}
+            <div
+              role="button"
+              tabIndex={0}
+              aria-disabled={isExtractingSettings}
+              onClick={() => { if (!isExtractingSettings) settingsImageRef.current?.click(); }}
+              onKeyDown={(e) => { if ((e.key === 'Enter' || e.key === ' ') && !isExtractingSettings) { e.preventDefault(); settingsImageRef.current?.click(); } }}
+              onDragOver={(e) => { e.preventDefault(); if (!isExtractingSettings) setIsDraggingSettings(true); }}
+              onDragLeave={() => setIsDraggingSettings(false)}
+              onDrop={(e) => { e.preventDefault(); setIsDraggingSettings(false); if (!isExtractingSettings && e.dataTransfer.files[0]) handleSettingsImage(e.dataTransfer.files[0]); }}
+              className={`border-2 border-dashed rounded-xl p-5 sm:p-8 text-center transition-colors min-h-[56px] ${isExtractingSettings ? 'cursor-default opacity-80' : 'cursor-pointer'} ${isDraggingSettings ? 'border-[var(--brand-border)] bg-brand-tint' : 'border-[var(--brand-border)] hover:bg-brand-tint'}`}
             >
               {isExtractingSettings ? (
-                <>
+                <div className="flex items-center justify-center gap-3 text-brand-ink font-bold text-base">
                   <svg className="animate-spin w-5 h-5 shrink-0" fill="none" viewBox="0 0 24 24">
                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
                     <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
                   </svg>
                   {t('step3.camera_loading')}
-                </>
+                </div>
               ) : (
                 <>
-                  <svg className="w-6 h-6 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-8 h-8 mx-auto mb-2 text-brand" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/>
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/>
                   </svg>
-                  <span>{t('step3.camera_btn')}</span>
-                  <span className="text-on-brand/50 text-sm font-normal hidden sm:inline">{t('step3.camera_btn_count')}</span>
+                  <p className="text-brand-ink font-bold text-base">{t('step3.camera_btn')}</p>
+                  <p className="text-faint text-[length:var(--text-label)] mt-1">{t('step3.camera_hint')}</p>
                 </>
               )}
-            </button>
+            </div>
             <input
               ref={settingsImageRef}
               type="file"
