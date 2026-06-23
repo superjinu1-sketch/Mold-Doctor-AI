@@ -420,6 +420,12 @@ export const ko: Record<string, string> = {
   'rec.change_needed': '변경 필요',
   'rec.expected_prefix': '기대 효과: ',
   'rec.risk_prefix': '주의: ',
+  'rec.check_prefix': '확인 포인트: ',
+  'urgency.now': '지금 바로',
+  'urgency.next_shot': '다음 샷',
+  'urgency.root': '근본 개선',
+  'result.avoid_title': '이건 하지 마세요',
+  'cause.tell_prefix': '확인법: ',
 
   /* Checklist */
   'checklist.title': '현장 체크리스트',

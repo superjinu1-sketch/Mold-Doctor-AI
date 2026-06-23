@@ -277,6 +277,7 @@ CRITICAL RULES:
 OUTPUT LENGTH LIMITS — strictly enforce to prevent truncation:
 - causes: max 3 items. description max 50 chars. scientific_reasoning max 150 chars. evidence max 100 chars. elimination max 100 chars. verification max 120 chars.
 - recommendations: max 4 items. reason max 40 chars. expected_result max 35 chars. risk max 35 chars. interaction_note max 35 chars.
+- avoid: 0-2 items, each max 35 chars (omit or [] if none).
 - checklist each array: max 3 items, each max 35 chars.
 - process_window_check notes: max 25 chars each.
 - resin_specific_notes: max 60 chars.
@@ -284,6 +285,10 @@ OUTPUT LENGTH LIMITS — strictly enforce to prevent truncation:
 - mold_analysis (only if mold drawings/info provided): max 2 design_risk_factors, max 2 recommendations, each max 50 chars.
 - summary: max 35 chars.
 Be concise. Korean only where specified. No extra explanation outside JSON.
+
+ACTIONABILITY TAGS (additive — 분류·노출만, 추론·파라미터·값·순서·수치 절대 불변):
+- recommendations[].urgency: 각 추천에 시급도 태그만 부여. now=지금 사출기에서 바로 바꾸는 셋팅(온도·압력·속도·시간). next_shot=다음 샷에서 확인·미세조정. root=금형·설계·재료 교체 등 시간·비용 큰 근본 조치. 어떤 파라미터를 추천할지·값·순서·reason은 STEP 3 그대로 두고 태그만 붙인다.
+- avoid: 이 불량에서 작업자가 흔히 하지만 역효과인 조치 0~2개(예: 싱크에 쿨링타임↑, 플래시에 형체력만↑). 확신 없으면 빈 배열. 추측·일반론 금지, KB·추론과 모순되는 항목 금지.
 
 OUTPUT FORMAT (return as JSON only, no markdown):
 {
@@ -317,12 +322,14 @@ OUTPUT FORMAT (return as JSON only, no markdown):
       "current": "현재값",
       "recommended": "권장값",
       "reason": "변경 이유 (과학적 근거)",
-      "expected_result": "이 변경 후 기대되는 결과",
+      "expected_result": "기대 결과 (가능하면 관찰 가능한 형태)",
       "risk": "이 변경의 잠재적 부작용",
-      "interaction_note": "이 변경 시 함께 모니터링할 파라미터",
-      "direction": "up/down/same"
+      "interaction_note": "다음 샷에서 확인·측정할 구체 포인트 (무엇을 보고 성공/실패 판정)",
+      "direction": "up/down/same",
+      "urgency": "now/next_shot/root"
     }
   ],
+  "avoid": ["이 불량에서 흔하지만 역효과인 조치 (0-2개, 없으면 생략/빈배열)"],
   "checklist": {
     "before_changes": ["변경 전 확인 항목"],
     "after_changes": ["변경 후 모니터링 항목"],

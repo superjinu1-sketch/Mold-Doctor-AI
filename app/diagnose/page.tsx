@@ -66,7 +66,9 @@ interface DiagnosisResult {
     risk?: string;
     interaction_note?: string;
     direction?: 'up' | 'down' | 'same';
+    urgency?: 'now' | 'next_shot' | 'root';
   }[];
+  avoid?: string[];
   checklist: string[] | { before_changes: string[]; after_changes: string[]; escalation: string[] };
   top5_actions?: { step: number; action: string; why: string }[];
   resin_specific_notes: string;

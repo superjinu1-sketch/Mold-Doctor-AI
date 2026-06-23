@@ -40,7 +40,9 @@ interface DiagnosisResult {
     risk?: string;
     interaction_note?: string;
     direction?: 'up' | 'down' | 'same';
+    urgency?: 'now' | 'next_shot' | 'root';
   }[];
+  avoid?: string[];
   checklist: string[] | { before_changes: string[]; after_changes: string[]; escalation: string[] };
   top5_actions?: { step: number; action: string; why: string }[];
   resin_specific_notes: string;
@@ -100,6 +102,19 @@ function Collapsible({ title, children, defaultOpen = false, accent = false }: {
 
 type CauseItem = DiagnosisResult['causes'][number];
 
+// urgency 태그 칩 (now=brand / next_shot=중립 / root=warn). 누락 시 미표시(가드).
+function UrgencyChip({ urgency, t }: { urgency?: string; t: (k: string) => string }) {
+  if (!urgency) return null;
+  const map: Record<string, { label: string; cls: string }> = {
+    now:       { label: t('urgency.now'),       cls: 'bg-brand-tint text-brand-ink' },
+    next_shot: { label: t('urgency.next_shot'), cls: 'bg-surface-sunken text-muted' },
+    root:      { label: t('urgency.root'),      cls: 'bg-[var(--warn-bg)] text-warn' },
+  };
+  const u = map[urgency];
+  if (!u) return null;
+  return <span className={`shrink-0 text-[length:var(--text-label)] font-bold px-2 py-0.5 rounded-full ${u.cls}`}>{u.label}</span>;
+}
+
 function CauseCard({ cause, defaultOpen = false }: { cause: CauseItem; defaultOpen?: boolean }) {
   const { t } = useLocale();
   const [open, setOpen] = useState(defaultOpen);
@@ -137,6 +152,14 @@ function CauseCard({ cause, defaultOpen = false }: { cause: CauseItem; defaultOp
           <div className={`h-1.5 rounded-full ${accent.bar}`} style={{ width: `${cause.probability}%` }} />
         </div>
       </button>
+      {/* D — 감별 한 줄(the tell): 1순위에만, 항상 노출 */}
+      {rank === 1 && (cause.verification || cause.elimination) && (
+        <div className="px-3 sm:px-4 pt-2">
+          <p className="text-[length:var(--text-label)] text-brand-ink bg-brand-tint rounded-lg px-2.5 py-1.5 max-w-[68ch]">
+            <span className="font-bold">{t('cause.tell_prefix')}</span>{cause.verification || cause.elimination}
+          </p>
+        </div>
+      )}
       {open && (why || detail.length > 0) && (
         <div className="px-3 sm:px-4 pb-4 pt-1 space-y-3">
           {why && <p className="text-[length:var(--text-body)] leading-relaxed text-muted max-w-[68ch]">{why}</p>}
@@ -658,7 +681,9 @@ export default function DiagnosisResultPanel({ result, onSavePDF, round = 1, fol
                   const changed = rec.current !== rec.recommended && rec.direction !== 'same';
                   return (
                     <tr key={i} className={changed ? 'bg-warn/5' : ''}>
-                      <td className="px-4 py-3 font-medium text-muted">{rec.parameter}</td>
+                      <td className="px-4 py-3 font-medium text-muted">
+                        <span className="flex items-center gap-2"><UrgencyChip urgency={rec.urgency} t={t} />{rec.parameter}</span>
+                      </td>
                       <td className="px-4 py-3 text-center text-muted">{rec.current || '-'}</td>
                       <td className="px-4 py-3 text-center font-bold text-ink">
                         <span className="flex items-center justify-center gap-1">
@@ -679,9 +704,12 @@ export default function DiagnosisResultPanel({ result, onSavePDF, round = 1, fol
               const changed = rec.current !== rec.recommended && rec.direction !== 'same';
               return (
                 <div key={i} className={`rounded-xl p-3 border ${changed ? 'bg-[var(--warn-bg)] border-[var(--warn-border)]' : 'bg-surface border-border'}`}>
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="font-semibold text-muted text-sm">{rec.parameter}</span>
-                    {changed && <span className="text-xs bg-warn/20 text-warn px-2 py-0.5 rounded-full font-medium">{t('rec.change_needed')}</span>}
+                  <div className="flex items-center justify-between gap-2 mb-2">
+                    <span className="flex items-center gap-2 min-w-0">
+                      <UrgencyChip urgency={rec.urgency} t={t} />
+                      <span className="font-semibold text-muted text-sm truncate">{rec.parameter}</span>
+                    </span>
+                    {changed && <span className="shrink-0 text-xs bg-warn/20 text-warn px-2 py-0.5 rounded-full font-medium">{t('rec.change_needed')}</span>}
                   </div>
                   <div className="flex items-center gap-3 mb-2">
                     <div className="flex-1 text-center bg-surface-sunken rounded-lg p-2 border border-border">
@@ -699,12 +727,28 @@ export default function DiagnosisResultPanel({ result, onSavePDF, round = 1, fol
                   </div>
                   <p className="text-[length:var(--text-label)] text-muted mb-1">{rec.reason}</p>
                   {rec.expected_result && <p className="text-[length:var(--text-label)] text-muted bg-brand-tint rounded px-2 py-1">{t('rec.expected_prefix')}{rec.expected_result}</p>}
+                  {rec.interaction_note && <p className="text-[length:var(--text-label)] text-muted bg-surface-sunken rounded px-2 py-1 mt-1">{t('rec.check_prefix')}{rec.interaction_note}</p>}
                   {rec.risk && <p className="text-[length:var(--text-label)] text-warn bg-[var(--warn-bg)] rounded px-2 py-1 mt-1">{t('rec.risk_prefix')}{rec.risk}</p>}
                 </div>
               );
             })}
           </div>
         </Collapsible>
+      )}
+
+      {/* C — 하지 말 것(안티패턴) 경고: 값 있을 때만 노출(가드) */}
+      {Array.isArray(result?.avoid) && result.avoid.length > 0 && (
+        <div className="bg-[var(--warn-bg)] border border-[var(--warn-border)] rounded-2xl p-4">
+          <div className="text-sm font-bold text-warn uppercase tracking-wider mb-2">⚠ {t('result.avoid_title')}</div>
+          <div className="space-y-1.5">
+            {result.avoid.slice(0, 2).map((a, i) => (
+              <div key={i} className="flex items-start gap-2 text-base text-muted max-w-[68ch]">
+                <span className="shrink-0 text-warn font-bold">✕</span>
+                <span>{a}</span>
+              </div>
+            ))}
+          </div>
+        </div>
       )}
 
       {/* Checklist */}

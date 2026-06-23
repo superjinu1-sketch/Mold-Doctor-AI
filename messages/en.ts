@@ -413,6 +413,12 @@ export const en: Record<string, string> = {
   'rec.change_needed': 'Change needed',
   'rec.expected_prefix': 'Expected: ',
   'rec.risk_prefix': 'Risk: ',
+  'rec.check_prefix': 'Check: ',
+  'urgency.now': 'Do now',
+  'urgency.next_shot': 'Next shot',
+  'urgency.root': 'Root fix',
+  'result.avoid_title': "Don't do this",
+  'cause.tell_prefix': 'Tell: ',
 
   'checklist.title': 'Field Checklist',
   'checklist.before': 'Before Changes',
