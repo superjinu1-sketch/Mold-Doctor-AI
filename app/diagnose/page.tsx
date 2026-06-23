@@ -40,6 +40,7 @@ interface DiagnosisResult {
   tier?: 'simple' | 'complex';
   round?: number;
   summary: string;
+  beforePhoto?: string;   // 복원 레코드의 불량 사진 썸네일(raw base64)
   process_window_check?: {
     melt_temp?: { status: 'ok' | 'warning' | 'critical'; note: string };
     mold_temp?: { status: 'ok' | 'warning' | 'critical'; note: string };
@@ -848,8 +849,18 @@ function DiagnoseContent() {
       const imgData = canvas.toDataURL('image/png');
       const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
       const pdfWidth = pdf.internal.pageSize.getWidth();
+      const pageHeight = pdf.internal.pageSize.getHeight();
       const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+      // 멀티페이지 슬라이싱 — 긴 결과가 A4 1장에 잘리지 않도록 세로 분할
+      let position = 0;
       pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+      let heightLeft = pdfHeight - pageHeight;
+      while (heightLeft > 0) {
+        position -= pageHeight;
+        pdf.addPage();
+        pdf.addImage(imgData, 'PNG', 0, position, pdfWidth, pdfHeight);
+        heightLeft -= pageHeight;
+      }
       pdf.save(`mold-doctor-${result.defect_type.en.replace(/\s/g, '-')}-${Date.now()}.pdf`);
     } catch (e) {
       console.error('PDF save failed:', e);
@@ -1630,6 +1641,7 @@ function DiagnoseContent() {
               resinType={resinType === '기타 (직접 입력)' ? customResin : resinType}
               machineSettings={{ ...settings, ...advSettings }}
               sessionId={sessionId}
+              defectPhotos={result.beforePhoto ? [result.beforePhoto] : images.map(img => img.base64)}
             />
           </div>
         )}

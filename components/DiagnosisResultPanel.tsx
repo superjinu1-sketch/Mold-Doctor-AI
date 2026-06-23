@@ -306,9 +306,10 @@ interface Props {
   resinType?: string;
   machineSettings?: Record<string, unknown>;
   sessionId?: string | null;
+  defectPhotos?: string[];   // 분석한 불량 사진 (신선=업로드 base64 / 복원=beforePhoto 1장)
 }
 
-export default function DiagnosisResultPanel({ result, onSavePDF, round = 1, followUpHistory = [], onResolved, onResolvedWithStatus, onStartFollowUp, resinType, machineSettings, sessionId }: Props) {
+export default function DiagnosisResultPanel({ result, onSavePDF, round = 1, followUpHistory = [], onResolved, onResolvedWithStatus, onStartFollowUp, resinType, machineSettings, sessionId, defectPhotos = [] }: Props) {
   const { t, locale } = useLocale();
   const [checkedItems, setCheckedItems] = useState<Set<number>>(new Set());
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
@@ -613,6 +614,18 @@ export default function DiagnosisResultPanel({ result, onSavePDF, round = 1, fol
           </button>
         </div>
         <p className="text-muted text-base leading-relaxed bg-surface-sunken rounded-lg p-4 max-w-[68ch]">{summary}</p>
+
+        {/* 분석한 불량 사진 (신선=업로드 / 복원=beforePhoto 1장). 값 없으면 미표시 */}
+        {defectPhotos.length > 0 && (
+          <div className="mt-3">
+            <div className="text-[length:var(--text-label)] font-bold text-brand-ink mb-1.5">{locale === 'en' ? 'Analyzed defect photo' : '분석한 불량 사진'}</div>
+            <div className="flex gap-2 flex-wrap">
+              {defectPhotos.slice(0, 4).map((p, i) => (
+                <img key={i} src={p.startsWith('data:') ? p : `data:image/jpeg;base64,${p}`} alt="" className="w-24 h-24 object-cover rounded-lg border border-border" />
+              ))}
+            </div>
+          </div>
+        )}
 
         {/* 결론: 원인 1줄 (한눈) */}
         {topCause && (
