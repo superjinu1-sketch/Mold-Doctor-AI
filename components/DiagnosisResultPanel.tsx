@@ -161,11 +161,11 @@ function CauseCard({ cause, defaultOpen = false }: { cause: CauseItem; defaultOp
         </div>
       )}
       {open && (why || detail.length > 0) && (
-        <div className="px-3 sm:px-4 pb-4 pt-1 space-y-3">
+        <div className="px-3 sm:px-4 pb-4 pt-1 space-y-5">
           {why && <p className="text-[length:var(--text-body)] leading-relaxed text-muted max-w-[68ch]">{why}</p>}
           {detail.map(({ label, value }) => (
             <div key={label}>
-              <div className="text-xs font-bold text-faint uppercase tracking-wider mb-0.5">{label}</div>
+              <div className="text-[length:var(--text-h3)] font-bold text-brand-ink mb-1.5">{label}</div>
               <p className="text-[length:var(--text-body)] leading-relaxed text-muted max-w-[68ch]">{value}</p>
             </div>
           ))}
@@ -628,11 +628,13 @@ export default function DiagnosisResultPanel({ result, onSavePDF, round = 1, fol
             <div className="text-xs font-bold text-faint uppercase tracking-wider mb-2">{t('conclusion.actions')}</div>
             <div className="space-y-2">
               {topActions.map((rec, i) => (
-                <div key={i} className="flex items-center gap-2 sm:gap-3 bg-surface-sunken rounded-xl p-3 border border-[var(--brand-border)]">
-                  <span className="font-semibold text-muted text-base flex-1 min-w-0 truncate">{rec.parameter}</span>
-                  <span className="text-muted text-base tabular-nums shrink-0">{rec.current || '-'}</span>
-                  <span className="text-faint shrink-0">→</span>
-                  <span className="text-ink font-bold text-lg tabular-nums flex items-center gap-1 shrink-0"><DirectionArrow direction={rec.direction} />{rec.recommended}</span>
+                <div key={i} className="bg-surface-sunken rounded-xl p-3 border border-[var(--brand-border)]">
+                  <div className="font-semibold text-muted text-base mb-0.5">{rec.parameter}</div>
+                  <div className="flex items-start gap-1.5">
+                    <span className="text-muted text-base min-w-0 break-words">{rec.current || '-'}</span>
+                    <span className="text-faint shrink-0">→</span>
+                    <span className="text-ink font-bold text-base flex items-start gap-1 min-w-0 break-words"><DirectionArrow direction={rec.direction} />{rec.recommended}</span>
+                  </div>
                 </div>
               ))}
             </div>

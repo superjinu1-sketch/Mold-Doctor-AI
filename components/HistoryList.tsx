@@ -228,16 +228,18 @@ export default function HistoryList({ records }: { records: HistoryRecord[] }) {
 
               {r.recommendations && r.recommendations.length > 0 && (
                 <div>
-                  <div className="text-xs font-bold text-faint uppercase tracking-wider mb-2">
+                  <div className="text-[length:var(--text-label)] font-bold text-brand-ink mb-2">
                     {locale === 'en' ? 'Key adjustments' : '주요 조정안'}
                   </div>
                   <div className="space-y-1.5">
                     {r.recommendations.slice(0, 3).map((rec, i) => (
-                      <div key={i} className="flex items-center gap-2 bg-surface-sunken rounded-lg px-3 py-2 border border-[var(--brand-border)]">
-                        <span className="flex-1 min-w-0 text-sm font-medium text-muted truncate">{rec.parameter}</span>
-                        <span className="shrink-0 text-sm text-muted tabular-nums">{rec.current || '-'}</span>
-                        <span className="shrink-0 text-faint">→</span>
-                        <span className="shrink-0 text-sm font-bold text-ink tabular-nums">{rec.recommended}</span>
+                      <div key={i} className="bg-surface-sunken rounded-lg px-3 py-2 border border-[var(--brand-border)]">
+                        <div className="text-sm font-medium text-muted mb-0.5">{rec.parameter}</div>
+                        <div className="flex items-start gap-1.5 text-sm">
+                          <span className="min-w-0 break-words text-muted">{rec.current || '-'}</span>
+                          <span className="shrink-0 text-faint">→</span>
+                          <span className="min-w-0 break-words font-bold text-ink">{rec.recommended}</span>
+                        </div>
                       </div>
                     ))}
                   </div>
@@ -341,7 +343,7 @@ export default function HistoryList({ records }: { records: HistoryRecord[] }) {
                       </div>
 
                       <div>
-                        <div className="text-xs font-bold text-faint uppercase tracking-wider mb-2">조정안 TOP 3</div>
+                        <div className="text-[length:var(--text-label)] font-bold text-brand-ink mb-2">조정안 TOP 3</div>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                           <div className="bg-surface-sunken rounded-lg p-3 space-y-1">
                             <div className="text-xs text-faint mb-1 font-semibold">기존</div>
