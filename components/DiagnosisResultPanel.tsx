@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef, useEffect, type ReactNode } from 'react';
+import { useState, useRef, useEffect, createContext, useContext, type ReactNode } from 'react';
 import { useLocale } from '@/contexts/LocaleContext';
 import { authHeaders } from '@/lib/supabase/authHeader';
 import { downscaleImageClient } from '@/lib/clientDownscale';
@@ -81,9 +81,14 @@ function DirectionArrow({ direction }: { direction?: string }) {
   return <span className="text-ok font-bold">✓</span>;
 }
 
+// PDF 저장 시 모든 섹션을 강제 펼침(캡처 시점에만). 사용자 펼침 상태(각 useState)는 캡처 후 그대로 복원.
+const PdfExportContext = createContext(false);
+
 // 상세 섹션 접이식 카드 (표현 전용, 기본 접힘). 결론 우선 — 상세는 펼쳐서 확인.
 function Collapsible({ title, children, defaultOpen = false, accent = false, pdfBlock = false }: { title: string; children: ReactNode; defaultOpen?: boolean; accent?: boolean; pdfBlock?: boolean }) {
   const [open, setOpen] = useState(defaultOpen);
+  const forceOpen = useContext(PdfExportContext);
+  const isOpen = open || forceOpen;
   return (
     <div {...(pdfBlock ? { 'data-pdf-block': '' } : {})} className={`bg-surface rounded-2xl border overflow-hidden ${accent ? 'border-[var(--brand-border)]' : 'border-border'}`}>
       <button
@@ -95,7 +100,7 @@ function Collapsible({ title, children, defaultOpen = false, accent = false, pdf
         <span className="text-lg font-bold text-ink">{title}</span>
         <span className="text-faint shrink-0 text-base">{open ? '▲' : '▼'}</span>
       </button>
-      {open && <div className="px-4 sm:px-6 pb-5 pt-1">{children}</div>}
+      {isOpen && <div className="px-4 sm:px-6 pb-5 pt-1">{children}</div>}
     </div>
   );
 }
@@ -118,6 +123,8 @@ function UrgencyChip({ urgency, t }: { urgency?: string; t: (k: string) => strin
 function CauseCard({ cause, defaultOpen = false }: { cause: CauseItem; defaultOpen?: boolean }) {
   const { t } = useLocale();
   const [open, setOpen] = useState(defaultOpen);
+  const forceOpen = useContext(PdfExportContext);
+  const isOpen = open || forceOpen;
 
   const rank = cause.rank;
   const accent =
@@ -160,7 +167,7 @@ function CauseCard({ cause, defaultOpen = false }: { cause: CauseItem; defaultOp
           </p>
         </div>
       )}
-      {open && (why || detail.length > 0) && (
+      {isOpen && (why || detail.length > 0) && (
         <div className="px-3 sm:px-4 pb-4 pt-1 space-y-5">
           {why && <p className="text-[length:var(--text-body)] leading-relaxed text-muted max-w-[68ch]">{why}</p>}
           {detail.map(({ label, value }) => (
@@ -307,9 +314,10 @@ interface Props {
   machineSettings?: Record<string, unknown>;
   sessionId?: string | null;
   defectPhotos?: string[];   // 분석한 불량 사진 (신선=업로드 base64 / 복원=beforePhoto 1장)
+  pdfExporting?: boolean;    // PDF 저장 중: 모든 섹션 강제 펼침
 }
 
-export default function DiagnosisResultPanel({ result, onSavePDF, round = 1, followUpHistory = [], onResolved, onResolvedWithStatus, onStartFollowUp, resinType, machineSettings, sessionId, defectPhotos = [] }: Props) {
+export default function DiagnosisResultPanel({ result, onSavePDF, round = 1, followUpHistory = [], onResolved, onResolvedWithStatus, onStartFollowUp, resinType, machineSettings, sessionId, defectPhotos = [], pdfExporting = false }: Props) {
   const { t, locale } = useLocale();
   const [checkedItems, setCheckedItems] = useState<Set<number>>(new Set());
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
@@ -543,6 +551,7 @@ export default function DiagnosisResultPanel({ result, onSavePDF, round = 1, fol
   const topCause = causes[0]?.description;
 
   return (
+    <PdfExportContext.Provider value={pdfExporting}>
     <div className="space-y-5">
       {/* Follow-up Timeline */}
       {followUpHistory.length > 0 && (
@@ -1084,5 +1093,6 @@ export default function DiagnosisResultPanel({ result, onSavePDF, round = 1, fol
         />
       )}
     </div>
+    </PdfExportContext.Provider>
   );
 }

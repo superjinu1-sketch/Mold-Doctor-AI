@@ -283,6 +283,7 @@ function DiagnoseContent() {
   const [isDraggingDrawing, setIsDraggingDrawing] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
   const [isDraggingSettings, setIsDraggingSettings] = useState(false);
+  const [pdfExporting, setPdfExporting] = useState(false);
   const [isExtractingSettings, setIsExtractingSettings] = useState(false);
   const [extractMsg, setExtractMsg] = useState('');
   const [extractedFields, setExtractedFields] = useState<Set<string>>(new Set());
@@ -840,6 +841,10 @@ function DiagnoseContent() {
 
   const handleSavePDF = async () => {
     if (!result) return;
+    // 모든 섹션 강제 펼침 후 캡처 (finally에서 반드시 해제 → 사용자 펼침 상태 복원)
+    setPdfExporting(true);
+    // React 리렌더 + 레이아웃 반영 대기(2프레임)
+    await new Promise<void>(r => requestAnimationFrame(() => requestAnimationFrame(() => r())));
     try {
       const { default: html2canvas } = await import('html2canvas-pro');
       const { jsPDF } = await import('jspdf');
@@ -848,43 +853,62 @@ function DiagnoseContent() {
       const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
       const pageW = pdf.internal.pageSize.getWidth();
       const pageH = pdf.internal.pageSize.getHeight();
-      const M = 6;                    // 여백(mm)
+      const M = 6;                         // 여백(mm)
+      const GAP = 4;                       // 블록 간 간격(mm)
       const imgW = pageW - M * 2;
-      // 블록(카드) 단위로 떠서 "남은 공간에 안 들어가면 다음 페이지" — 카드 중간 잘림 방지.
-      // 마커가 하나도 없으면 기존 단일 캡처 폴백(안전).
+      const pageAvail = pageH - M * 2;     // 한 페이지 가용 높이
+      let y = M;
+
+      const placeBlock = async (node: HTMLElement): Promise<void> => {
+        const canvas = await html2canvas(node, { scale: 2, useCORS: true, backgroundColor: '#ffffff' });
+        if (!canvas.width || !canvas.height) return;
+        const imgH = (canvas.height * imgW) / canvas.width;
+
+        // (a) 한 페이지에 드는 블록: 남은 공간에 안 들어가면 새 페이지 → 통째 배치
+        if (imgH <= pageAvail) {
+          if (y + imgH > pageH - M) { pdf.addPage(); y = M; }
+          pdf.addImage(canvas.toDataURL('image/png'), 'PNG', M, y, imgW, imgH);
+          y += imgH + GAP;
+          return;
+        }
+
+        // (b) 페이지보다 큰 블록: 직계 자식으로 재귀 분할(픽셀 슬라이싱 회피)
+        const kids = Array.from(node.children).filter(
+          (c): c is HTMLElement => c instanceof HTMLElement && c.offsetHeight > 0
+        );
+        if (kids.length > 1) {
+          for (const kid of kids) await placeBlock(kid);
+          return;
+        }
+
+        // (c) 더 못 쪼개는 단일 거대 블록(희귀): 최후의 픽셀 슬라이싱
+        if (y > M) { pdf.addPage(); y = M; }
+        const data = canvas.toDataURL('image/png');
+        let pos = M;
+        let left = imgH;
+        pdf.addImage(data, 'PNG', M, pos, imgW, imgH);
+        left -= (pageH - M - pos);
+        while (left > 0) {
+          pdf.addPage();
+          pos = M - (imgH - left);
+          pdf.addImage(data, 'PNG', M, pos, imgW, imgH);
+          left -= (pageH - M * 2);
+        }
+        pdf.addPage();
+        y = M;
+      };
+
+      // 마커가 하나도 없으면 기존 단일 캡처 폴백(안전)
       const blocks = Array.from(el.querySelectorAll<HTMLElement>('[data-pdf-block]'));
       const target: HTMLElement[] = blocks.length ? blocks : [el];
-      let y = M;
-      for (const block of target) {
-        const canvas = await html2canvas(block, { scale: 2, useCORS: true, backgroundColor: '#ffffff' });
-        const imgH = (canvas.height * imgW) / canvas.width;
-        const data = canvas.toDataURL('image/png');
-        if (imgH <= pageH - M * 2) {
-          // 한 페이지에 들어가는 블록: 남은 공간에 안 들어가면 새 페이지
-          if (y + imgH > pageH - M) { pdf.addPage(); y = M; }
-          pdf.addImage(data, 'PNG', M, y, imgW, imgH);
-          y += imgH + 4;             // 블록 간 간격
-        } else {
-          // 한 페이지보다 큰 블록(희귀): 이 블록만 세로 슬라이싱
-          if (y > M) { pdf.addPage(); y = M; }
-          let pos = M;
-          let left = imgH;
-          pdf.addImage(data, 'PNG', M, pos, imgW, imgH);
-          left -= (pageH - M - pos);
-          while (left > 0) {
-            pdf.addPage();
-            pos = M - (imgH - left);
-            pdf.addImage(data, 'PNG', M, pos, imgW, imgH);
-            left -= (pageH - M * 2);
-          }
-          pdf.addPage();
-          y = M;                     // 다음 블록은 새 페이지에서
-        }
-      }
+      for (const block of target) await placeBlock(block);
+
       pdf.save(`mold-doctor-${result.defect_type.en.replace(/\s/g, '-')}-${Date.now()}.pdf`);
     } catch (e) {
       console.error('PDF save failed:', e);
       alert(t('err.pdf_error'));
+    } finally {
+      setPdfExporting(false);
     }
   };
 
@@ -1662,6 +1686,7 @@ function DiagnoseContent() {
               machineSettings={{ ...settings, ...advSettings }}
               sessionId={sessionId}
               defectPhotos={result.beforePhoto ? [result.beforePhoto] : images.map(img => img.base64)}
+              pdfExporting={pdfExporting}
             />
           </div>
         )}
