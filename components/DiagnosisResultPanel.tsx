@@ -82,10 +82,10 @@ function DirectionArrow({ direction }: { direction?: string }) {
 }
 
 // 상세 섹션 접이식 카드 (표현 전용, 기본 접힘). 결론 우선 — 상세는 펼쳐서 확인.
-function Collapsible({ title, children, defaultOpen = false, accent = false }: { title: string; children: ReactNode; defaultOpen?: boolean; accent?: boolean }) {
+function Collapsible({ title, children, defaultOpen = false, accent = false, pdfBlock = false }: { title: string; children: ReactNode; defaultOpen?: boolean; accent?: boolean; pdfBlock?: boolean }) {
   const [open, setOpen] = useState(defaultOpen);
   return (
-    <div className={`bg-surface rounded-2xl border overflow-hidden ${accent ? 'border-[var(--brand-border)]' : 'border-border'}`}>
+    <div {...(pdfBlock ? { 'data-pdf-block': '' } : {})} className={`bg-surface rounded-2xl border overflow-hidden ${accent ? 'border-[var(--brand-border)]' : 'border-border'}`}>
       <button
         type="button"
         onClick={() => setOpen(o => !o)}
@@ -135,7 +135,7 @@ function CauseCard({ cause, defaultOpen = false }: { cause: CauseItem; defaultOp
   ].filter((d) => d.value);
 
   return (
-    <div className={`bg-surface rounded-xl border border-border ${accent.edge} overflow-hidden`}>
+    <div data-pdf-block className={`bg-surface rounded-xl border border-border ${accent.edge} overflow-hidden`}>
       <button
         type="button"
         onClick={() => setOpen((o) => !o)}
@@ -586,7 +586,7 @@ export default function DiagnosisResultPanel({ result, onSavePDF, round = 1, fol
       )}
 
       {/* Summary Card */}
-      <div className="bg-surface rounded-2xl p-4 sm:p-6 border border-border">
+      <div data-pdf-block className="bg-surface rounded-2xl p-4 sm:p-6 border border-border">
         <div className="flex flex-wrap items-start justify-between gap-3 mb-4">
           <div>
             <h2 className="text-[length:var(--text-h2)] sm:text-[length:var(--text-h1)] font-bold text-ink leading-tight">
@@ -679,7 +679,7 @@ export default function DiagnosisResultPanel({ result, onSavePDF, round = 1, fol
 
       {/* Recommendations */}
       {recommendations.length > 0 && (
-        <Collapsible title={t('rec.title')}>
+        <Collapsible title={t('rec.title')} pdfBlock>
           {/* Desktop table */}
           <div className="hidden sm:block overflow-x-auto">
             <table className="w-full text-sm">
@@ -753,7 +753,7 @@ export default function DiagnosisResultPanel({ result, onSavePDF, round = 1, fol
 
       {/* C — 하지 말 것(안티패턴) 경고: 값 있을 때만 노출(가드) */}
       {Array.isArray(result?.avoid) && result.avoid.length > 0 && (
-        <div className="bg-[var(--warn-bg)] border border-[var(--warn-border)] rounded-2xl p-4">
+        <div data-pdf-block className="bg-[var(--warn-bg)] border border-[var(--warn-border)] rounded-2xl p-4">
           <div className="text-sm font-bold text-warn uppercase tracking-wider mb-2">⚠ {t('result.avoid_title')}</div>
           <div className="space-y-1.5">
             {result.avoid.slice(0, 2).map((a, i) => (
@@ -767,7 +767,7 @@ export default function DiagnosisResultPanel({ result, onSavePDF, round = 1, fol
       )}
 
       {/* Checklist */}
-      <Collapsible title={t('checklist.title')}>
+      <Collapsible title={t('checklist.title')} pdfBlock>
         {Array.isArray(checklist) ? (
           <div className="space-y-2">
             {(checklist as string[]).map((item, i) => (
@@ -810,7 +810,7 @@ export default function DiagnosisResultPanel({ result, onSavePDF, round = 1, fol
           <div className="space-y-5">
             {/* 공정 윈도우 체크 */}
             {Object.keys(processWindow).length > 0 && (
-              <section>
+              <section data-pdf-block>
                 <h3 className="text-sm font-bold text-ink mb-2">{t('summary.process_check')}</h3>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                   {Object.entries(processWindow).map(([key, val]) => {
@@ -831,7 +831,7 @@ export default function DiagnosisResultPanel({ result, onSavePDF, round = 1, fol
 
             {/* 금형 분석 */}
             {result?.mold_analysis && (
-              <section>
+              <section data-pdf-block>
                 <h3 className="text-sm font-bold text-ink mb-2">{t('mold.title')}</h3>
                 <div className="space-y-3">
                   {result.mold_analysis.gate_assessment && (
@@ -878,7 +878,7 @@ export default function DiagnosisResultPanel({ result, onSavePDF, round = 1, fol
 
             {/* Top 5 Actions */}
             {result?.top5_actions && result.top5_actions.length > 0 && (
-              <section>
+              <section data-pdf-block>
                 <h3 className="text-sm font-bold text-ink mb-2">{t('top5.title')}</h3>
                 <div className="space-y-3">
                   {result.top5_actions.map((item) => {
@@ -908,7 +908,7 @@ export default function DiagnosisResultPanel({ result, onSavePDF, round = 1, fol
 
             {/* 추가 노트 */}
             {(result?.resin_specific_notes || result?.drying_assessment || result?.additional_advice) && (
-              <section>
+              <section data-pdf-block>
                 <h3 className="text-sm font-bold text-ink mb-2">{t('notes.section_title')}</h3>
                 <div className="space-y-4">
                   {result?.resin_specific_notes && (

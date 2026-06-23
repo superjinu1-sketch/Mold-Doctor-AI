@@ -845,21 +845,41 @@ function DiagnoseContent() {
       const { jsPDF } = await import('jspdf');
       const el = resultRef.current;
       if (!el) return;
-      const canvas = await html2canvas(el, { scale: 2, useCORS: true });
-      const imgData = canvas.toDataURL('image/png');
       const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
-      const pdfWidth = pdf.internal.pageSize.getWidth();
-      const pageHeight = pdf.internal.pageSize.getHeight();
-      const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
-      // 멀티페이지 슬라이싱 — 긴 결과가 A4 1장에 잘리지 않도록 세로 분할
-      let position = 0;
-      pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
-      let heightLeft = pdfHeight - pageHeight;
-      while (heightLeft > 0) {
-        position -= pageHeight;
-        pdf.addPage();
-        pdf.addImage(imgData, 'PNG', 0, position, pdfWidth, pdfHeight);
-        heightLeft -= pageHeight;
+      const pageW = pdf.internal.pageSize.getWidth();
+      const pageH = pdf.internal.pageSize.getHeight();
+      const M = 6;                    // 여백(mm)
+      const imgW = pageW - M * 2;
+      // 블록(카드) 단위로 떠서 "남은 공간에 안 들어가면 다음 페이지" — 카드 중간 잘림 방지.
+      // 마커가 하나도 없으면 기존 단일 캡처 폴백(안전).
+      const blocks = Array.from(el.querySelectorAll<HTMLElement>('[data-pdf-block]'));
+      const target: HTMLElement[] = blocks.length ? blocks : [el];
+      let y = M;
+      for (const block of target) {
+        const canvas = await html2canvas(block, { scale: 2, useCORS: true, backgroundColor: '#ffffff' });
+        const imgH = (canvas.height * imgW) / canvas.width;
+        const data = canvas.toDataURL('image/png');
+        if (imgH <= pageH - M * 2) {
+          // 한 페이지에 들어가는 블록: 남은 공간에 안 들어가면 새 페이지
+          if (y + imgH > pageH - M) { pdf.addPage(); y = M; }
+          pdf.addImage(data, 'PNG', M, y, imgW, imgH);
+          y += imgH + 4;             // 블록 간 간격
+        } else {
+          // 한 페이지보다 큰 블록(희귀): 이 블록만 세로 슬라이싱
+          if (y > M) { pdf.addPage(); y = M; }
+          let pos = M;
+          let left = imgH;
+          pdf.addImage(data, 'PNG', M, pos, imgW, imgH);
+          left -= (pageH - M - pos);
+          while (left > 0) {
+            pdf.addPage();
+            pos = M - (imgH - left);
+            pdf.addImage(data, 'PNG', M, pos, imgW, imgH);
+            left -= (pageH - M * 2);
+          }
+          pdf.addPage();
+          y = M;                     // 다음 블록은 새 페이지에서
+        }
       }
       pdf.save(`mold-doctor-${result.defect_type.en.replace(/\s/g, '-')}-${Date.now()}.pdf`);
     } catch (e) {
