@@ -186,17 +186,17 @@ function FormSection({ step, title, open, complete, optional = false, onToggle, 
   step: number; title: string; open: boolean; complete: boolean; optional?: boolean; onToggle: () => void; children: ReactNode;
 }) {
   return (
-    <section className="bg-surface rounded-2xl border border-border overflow-hidden">
+    <section className="bg-surface rounded-[var(--radius-card-lg)] border border-border overflow-hidden">
       <button
         type="button"
         onClick={onToggle}
         aria-expanded={open}
         className="w-full flex items-center gap-3 px-4 sm:px-6 py-4 min-h-[var(--touch-min)] text-left hover:bg-surface-sunken transition-colors"
       >
-        <span className={`shrink-0 w-7 h-7 rounded-full flex items-center justify-center text-sm font-bold ${complete ? 'bg-ok text-on-brand' : optional ? 'bg-surface-sunken text-muted' : 'bg-brand text-on-brand'}`}>
+        <span className={`shrink-0 w-7 h-7 rounded-full flex items-center justify-center text-[length:var(--text-label)] font-bold tabular-nums ${complete ? 'bg-ok text-on-brand' : optional ? 'bg-surface-sunken text-muted' : 'bg-brand text-on-brand'}`}>
           {complete ? '✓' : step}
         </span>
-        <span className="text-lg font-bold text-ink flex-1 min-w-0">{title}</span>
+        <span className="text-[length:var(--text-subhead)] font-bold text-ink flex-1 min-w-0">{title}</span>
         <span className="text-faint shrink-0 text-base">{open ? '▲' : '▼'}</span>
       </button>
       {open && <div className="px-4 sm:px-6 pb-6">{children}</div>}
@@ -303,8 +303,8 @@ function DiagnoseContent() {
 
   // Computed label arrays (use t() — must be inside component)
   const machineParams = [
-    { key: 'injPressure1', label: t('step3.inj_pressure'), placeholder: 'MPa' },
-    { key: 'holdPressure', label: t('step3.hold_pressure'), placeholder: 'MPa' },
+    { key: 'injPressure1', label: t('step3.inj_pressure'), placeholder: settings.pressureUnit || 'MPa' },
+    { key: 'holdPressure', label: t('step3.hold_pressure'), placeholder: settings.pressureUnit || 'MPa' },
     { key: 'injSpeed1', label: t('step3.inj_speed1'), placeholder: '%' },
     { key: 'injSpeed2', label: t('step3.inj_speed2'), placeholder: '%' },
     { key: 'holdTime', label: t('step3.hold_time'), placeholder: 'sec' },
@@ -312,7 +312,7 @@ function DiagnoseContent() {
     { key: 'injTime', label: t('step3.inj_time'), placeholder: 'sec' },
     { key: 'metering', label: t('step3.metering'), placeholder: 'mm' },
     { key: 'cushion', label: t('step3.cushion'), placeholder: 'mm' },
-    { key: 'backPressure', label: t('step3.back_pressure'), placeholder: 'MPa' },
+    { key: 'backPressure', label: t('step3.back_pressure'), placeholder: settings.pressureUnit || 'MPa' },
     { key: 'screwRpm', label: t('step3.screw_rpm'), placeholder: 'rpm' },
     { key: 'clampForce', label: t('step3.clamp'), placeholder: 'ton' },
   ];
@@ -1044,8 +1044,9 @@ function DiagnoseContent() {
     setFollowUpImages(prev => [...prev, ...valid].slice(0, 5));
   }, [processFile]);
 
-  const inputCls = "w-full bg-surface-sunken border border-border rounded-lg px-3 py-3 text-base text-ink placeholder:text-faint focus:outline-none focus:ring-2 focus:ring-brand focus:border-[var(--brand-border)] min-h-[var(--touch-min)]";
-  const labelCls = "block text-sm font-medium text-muted mb-1.5";
+  const inputCls = "ui-input";
+  const labelCls = "ui-label";
+  const selectCls = "ui-input ui-select";
   const settingInputCls = (key: string) => extractedFields.has(key)
     ? "w-full bg-brand-tint border border-[var(--brand-border)] rounded-lg px-3 py-3 text-base text-ink placeholder:text-faint focus:outline-none focus:ring-2 focus:ring-brand focus:border-[var(--brand-border)] min-h-[var(--touch-min)]"
     : "w-full bg-surface-sunken border border-border rounded-lg px-3 py-3 text-base text-ink placeholder:text-faint focus:outline-none focus:ring-2 focus:ring-brand focus:border-[var(--brand-border)] min-h-[var(--touch-min)]";
@@ -1306,7 +1307,7 @@ function DiagnoseContent() {
               <div className="sm:col-span-2">
                 <label className={labelCls}>{t('step2.resin_label')} <span className="text-danger">*</span></label>
                 <select
-                  className={inputCls}
+                  className={selectCls}
                   value={resinType}
                   onChange={(e) => setResinType(e.target.value)}
                 >
@@ -1331,7 +1332,7 @@ function DiagnoseContent() {
               </div>
               <div>
                 <label className={labelCls}>{t('step2.filler_label')}</label>
-                <select className={inputCls} value={filler} onChange={(e) => setFiller(e.target.value)}>
+                <select className={selectCls} value={filler} onChange={(e) => setFiller(e.target.value)}>
                   {fillerOptions.map(([val, key]) => <option key={val} value={val}>{t(key)}</option>)}
                 </select>
               </div>
@@ -1341,7 +1342,7 @@ function DiagnoseContent() {
               </div>
               <div>
                 <label className={labelCls}>{t('step2.fr_label')}</label>
-                <select className={inputCls} value={flameRetardant} onChange={(e) => setFlameRetardant(e.target.value)}>
+                <select className={selectCls} value={flameRetardant} onChange={(e) => setFlameRetardant(e.target.value)}>
                   {['없음', 'UL94 V-0', 'UL94 V-1', 'UL94 V-2', 'UL94 HB', 'UL94 5VA', 'UL94 5VB'].map(val => (
                     <option key={val} value={val}>{val === '없음' ? t('common.none') : val}</option>
                   ))}
@@ -1349,7 +1350,7 @@ function DiagnoseContent() {
               </div>
               <div>
                 <label className={labelCls}>{t('step2.fr_thickness')}</label>
-                <select className={inputCls} value={flameRetardantThickness} onChange={(e) => setFlameRetardantThickness(e.target.value)}>
+                <select className={selectCls} value={flameRetardantThickness} onChange={(e) => setFlameRetardantThickness(e.target.value)}>
                   {['미입력', '0.4', '0.75', '0.8', '1.0', '1.5', '1.6', '2.0', '3.0', '3.2'].map(val => (
                     <option key={val} value={val}>{val === '미입력' ? t('step2.fr_thickness_default') : val}</option>
                   ))}
@@ -1357,7 +1358,7 @@ function DiagnoseContent() {
               </div>
               <div>
                 <label className={labelCls}>{t('step2.fr_type')}</label>
-                <select className={inputCls} value={flameRetardantType} onChange={(e) => setFlameRetardantType(e.target.value)}>
+                <select className={selectCls} value={flameRetardantType} onChange={(e) => setFlameRetardantType(e.target.value)}>
                   {frTypeOptions.map(([val, key]) => <option key={val} value={val}>{t(key)}</option>)}
                 </select>
               </div>
@@ -1517,7 +1518,7 @@ function DiagnoseContent() {
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                     {[
                       { key: 'vpTransferPos', label: t('adv.vp_pos'), placeholder: 'mm' },
-                      { key: 'vpTransferPressure', label: t('adv.vp_pressure'), placeholder: 'MPa' },
+                      { key: 'vpTransferPressure', label: t('adv.vp_pressure'), placeholder: settings.pressureUnit || 'MPa' },
                       { key: 'preInjectDecompDist', label: t('adv.decomp_pre'), placeholder: 'mm' },
                       { key: 'preInjectDecompSpeed', label: t('adv.decomp_pre_speed'), placeholder: 'mm/s' },
                       { key: 'postMeterDecompDist', label: t('adv.decomp_post'), placeholder: 'mm' },
@@ -1536,7 +1537,7 @@ function DiagnoseContent() {
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                     {[
                       { key: 'actualFillTime', label: t('adv.fill_time'), placeholder: 'sec' },
-                      { key: 'actualPeakPressure', label: t('adv.peak_pressure'), placeholder: 'MPa' },
+                      { key: 'actualPeakPressure', label: t('adv.peak_pressure'), placeholder: settings.pressureUnit || 'MPa' },
                       { key: 'actualCushion', label: t('adv.cushion'), placeholder: 'mm' },
                       { key: 'actualCycleTime', label: t('adv.cycle_time'), placeholder: 'sec' },
                       { key: 'actualPartWeight', label: t('adv.part_weight'), placeholder: 'g' },
@@ -1563,7 +1564,7 @@ function DiagnoseContent() {
                     </div>
                     <div>
                       <div className="text-xs text-muted mb-1">{t('adv.dryer_type')}</div>
-                      <select className={inputCls} value={advSettings.dryerType} onChange={(e) => setAdvSetting('dryerType', e.target.value)}>
+                      <select className={selectCls} value={advSettings.dryerType} onChange={(e) => setAdvSetting('dryerType', e.target.value)}>
                         <option value="없음">{t('adv.dryer_none')}</option>
                         <option value="제습식">{t('adv.dryer_dehum')}</option>
                         <option value="열풍식">{t('adv.dryer_hot')}</option>
@@ -1595,7 +1596,7 @@ function DiagnoseContent() {
                       ))}
                       <div>
                         <div className="text-[length:var(--text-label)] text-faint mb-1">{t('adv.valve_gate')}</div>
-                        <select className={inputCls} value={advSettings.valveGate} onChange={(e) => setAdvSetting('valveGate', e.target.value)}>
+                        <select className={selectCls} value={advSettings.valveGate} onChange={(e) => setAdvSetting('valveGate', e.target.value)}>
                           <option value="없음">{t('adv.valve_none')}</option>
                           <option value="있음">{t('adv.valve_yes')}</option>
                         </select>
@@ -1614,7 +1615,7 @@ function DiagnoseContent() {
                     </div>
                     <div>
                       <div className="text-xs text-muted mb-1">{t('adv.color_type')}</div>
-                      <select className={inputCls} value={advSettings.colorType} onChange={(e) => setAdvSetting('colorType', e.target.value)}>
+                      <select className={selectCls} value={advSettings.colorType} onChange={(e) => setAdvSetting('colorType', e.target.value)}>
                         <option value="없음">{t('adv.color_none')}</option>
                         <option value="마스터배치">{t('adv.color_mb')}</option>
                         <option value="액상컬러">{t('adv.color_liquid')}</option>
@@ -1648,12 +1649,12 @@ function DiagnoseContent() {
                     </div>
                     <div>
                       <div className="text-xs text-muted mb-1">{t('adv.max_pressure')}</div>
-                      <input type="text" inputMode="numeric" className={inputCls} placeholder="MPa" value={advSettings.maxInjPressure} onChange={(e) => setAdvSetting('maxInjPressure', e.target.value)} />
+                      <input type="text" inputMode="numeric" className={inputCls} placeholder={settings.pressureUnit || 'MPa'} value={advSettings.maxInjPressure} onChange={(e) => setAdvSetting('maxInjPressure', e.target.value)} />
                     </div>
                   </div>
                   <div>
                     <label className={labelCls}>{t('adv.heating_method')} <span className="text-faint text-xs">({t('adv.optional')})</span></label>
-                    <select className={inputCls} value={advSettings.heatingMethod} onChange={(e) => setAdvSetting('heatingMethod', e.target.value)}>
+                    <select className={selectCls} value={advSettings.heatingMethod} onChange={(e) => setAdvSetting('heatingMethod', e.target.value)}>
                       <option value="">{t('adv.heating_none')}</option>
                       <option value="온수기">{t('adv.heating_water')}</option>
                       <option value="온유기">{t('adv.heating_oil')}</option>
@@ -1674,7 +1675,7 @@ function DiagnoseContent() {
           <div className="grid sm:grid-cols-2 gap-4">
             <div>
               <label className={labelCls}>{t('step4.mold_type')}</label>
-              <select className={inputCls} value={moldType} onChange={(e) => setMoldType(e.target.value)}>
+              <select className={selectCls} value={moldType} onChange={(e) => setMoldType(e.target.value)}>
                 <option value="">{t('step4.mold_type_default')}</option>
                 <option value="2판">{t('step4.mold_2plate')}</option>
                 <option value="3판">{t('step4.mold_3plate')}</option>
@@ -1683,7 +1684,7 @@ function DiagnoseContent() {
             </div>
             <div>
               <label className={labelCls}>{t('step4.gate_type')}</label>
-              <select className={inputCls} value={gateType} onChange={(e) => setGateType(e.target.value)}>
+              <select className={selectCls} value={gateType} onChange={(e) => setGateType(e.target.value)}>
                 <option value="">{t('step4.mold_type_default')}</option>
                 <option value="사이드">{t('step4.gate_side')}</option>
                 <option value="핀포인트">{t('step4.gate_pinpoint')}</option>
@@ -1698,7 +1699,7 @@ function DiagnoseContent() {
             </div>
             <div>
               <label className={labelCls}>{t('step4.runner')}</label>
-              <select className={inputCls} value={runnerType} onChange={(e) => setRunnerType(e.target.value)}>
+              <select className={selectCls} value={runnerType} onChange={(e) => setRunnerType(e.target.value)}>
                 <option value="">{t('step4.mold_type_default')}</option>
                 <option value="콜드">{t('step4.runner_cold')}</option>
                 <option value="핫">{t('step4.runner_hot')}</option>
@@ -1844,7 +1845,7 @@ function DiagnoseContent() {
             {/* Overall change */}
             <div>
               <label className={labelCls}>{t('followup.change_label')}</label>
-              <select className={inputCls} value={followUpChange} onChange={(e) => setFollowUpChange(e.target.value)}>
+              <select className={selectCls} value={followUpChange} onChange={(e) => setFollowUpChange(e.target.value)}>
                 <option value="">{t('followup.change_default')}</option>
                 <option value="개선됨 (빈도 줄었지만 아직 발생)">{t('followup.change_improved')}</option>
                 <option value="변화 없음">{t('followup.result_unchanged')}</option>
@@ -1943,7 +1944,7 @@ function DiagnoseContent() {
               type="button"
               onClick={handleDiagnose}
               disabled={isLoading || !effectiveDefectType}
-              className="shrink-0 bg-brand hover:bg-brand-ink disabled:bg-surface-sunken disabled:text-faint text-on-brand px-6 rounded-xl font-bold text-lg transition-colors flex items-center justify-center gap-2 min-h-[var(--touch-cta)]"
+              className="ui-cta shrink-0 px-6 text-body gap-2 disabled:bg-surface-sunken disabled:text-faint"
             >
               {isLoading ? (
                 <>

@@ -34,12 +34,14 @@
   --danger-border: #F7C1C1;
 
   /* ── Typography scale ───────────────────────────────────────────────── */
-  --text-display: 2.75rem;   /* 44px — hero headline */
-  --text-h1:      2rem;      /* 32px */
-  --text-h2:      1.5rem;    /* 24px */
-  --text-h3:      1.375rem;  /* 22px — body(19) 위 단계 유지 */
-  --text-body:    1.1875rem; /* 19px — 현장 가독성(노안 대응) */
-  --text-label:   0.875rem;  /* 14px — labels, tags, captions */
+  --text-display: 2.75rem;   /* 44px — hero (랜딩 전용) */
+  --text-h1:      2rem;      /* 32px — 페이지 타이틀 */
+  --text-h2:      1.5rem;    /* 24px — 결과 헤드라인 */
+  --text-h3:      1.375rem;  /* 22px */
+  --text-subhead: 1.125rem;  /* 18px — 본문 내 소제목(근거·다른원인배제): brand + 상단 hairline */
+  --text-num:     1.1875rem; /* 19px — 강조 수치(tabular-nums) */
+  --text-body:    1rem;      /* 16px — 본문(디자인 v1 절충: 현장 가독성 ↔ 디자인 균형) */
+  --text-label:   0.8125rem; /* 13px — labels, tags, captions 전용 */
 
   --leading-tight: 1.2;
   --leading-body:  1.7;
@@ -54,13 +56,17 @@
 
   /* ── Touch targets ──────────────────────────────────────────────────── */
   --touch-min: 2.75rem;   /* 44px */
-  --touch-cta: 3rem;      /* 48px */
+  --touch-cta: 3rem;      /* 48px — 보조 버튼 */
+  --touch-cta-lg: 3.375rem; /* 54px — 주요 CTA (디자인 v1) */
 
   /* ── Radius ─────────────────────────────────────────────────────────── */
   --radius-sm:   0.375rem;
   --radius-md:   0.75rem;
   --radius-lg:   1.25rem;
   --radius-full: 9999px;
+  --radius-cta:     0.875rem;  /* 14px — primary CTA (디자인 v1) */
+  --radius-card:    1rem;      /* 16px — 섹션 카드 */
+  --radius-card-lg: 1.125rem;  /* 18px — 큰 카드 */
 
   /* ── Motion ─────────────────────────────────────────────────────────── */
   --ease-apple:    cubic-bezier(0.32, 0.72, 0,   1);
@@ -113,3 +119,51 @@ body {
 ::-webkit-scrollbar-track  { background: transparent; }
 ::-webkit-scrollbar-thumb  { background: var(--border-strong); border-radius: 3px; }
 ::-webkit-scrollbar-thumb:hover { background: var(--muted); opacity: 0.4; }
+
+/* ─── Common components (디자인 v1 파운데이션 — Phase 2~5가 재사용. 토큰만, raw hex 0) ──── */
+@layer components {
+  /* 입력 — 함몰 배경, 보더 없음, 12px 라운드, 48 높이, 본문 16, focus 브랜드 아웃라인 */
+  .ui-input {
+    width: 100%;
+    background: var(--surface-sunken);
+    border: none;
+    border-radius: var(--radius-md);
+    min-height: var(--touch-cta);
+    padding: 0 14px;
+    font-size: var(--text-body);
+    color: var(--ink);
+  }
+  .ui-input::placeholder { color: var(--faint); }
+  .ui-input:focus { outline: 2px solid var(--brand); outline-offset: -2px; }
+  /* 셀렉트 — appearance-none + 우측 셰브론(인라인 SVG, muted 톤 아이콘 예외) */
+  .ui-select {
+    appearance: none;
+    padding-right: 36px;
+    background-image: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='16'%20height='16'%20viewBox='0%200%2024%2024'%20fill='none'%20stroke='%2345505B'%20stroke-width='2'%20stroke-linecap='round'%20stroke-linejoin='round'%3E%3Cpath%20d='M6%209l6%206%206-6'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    background-size: 16px;
+  }
+  /* 섹션 라벨 — 13·700·faint (규율2: 라벨 전용) */
+  .ui-label { display: block; font-size: var(--text-label); font-weight: 700; color: var(--faint); letter-spacing: .02em; margin-bottom: 0.375rem; }
+  /* 카드 — 섹션 16 / 큰 카드 18, 보더 + 패딩 16 */
+  .ui-card    { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-card); padding: var(--space-md); }
+  .ui-card-lg { border-radius: var(--radius-card-lg); }
+  /* 주요 CTA — 브랜드, 14 라운드, 54 높이, bold, 눌림 스케일 */
+  .ui-cta {
+    display: inline-flex; align-items: center; justify-content: center;
+    background: var(--brand); color: var(--on-brand);
+    border-radius: var(--radius-cta);
+    min-height: var(--touch-cta-lg);
+    font-weight: 700;
+    transition: background-color .15s, transform .05s;
+  }
+  .ui-cta:hover   { background: var(--brand-ink); }
+  .ui-cta:active  { transform: scale(.99); }
+  .ui-cta-secondary { background: var(--brand-tint); color: var(--brand-ink); }
+  /* 본문 내 소제목(근거/다른 원인 배제) — 18·700·brand + 상단 hairline */
+  .ui-subhead {
+    font-size: var(--text-subhead); font-weight: 700; color: var(--brand);
+    border-top: 1px solid var(--border); padding-top: 18px;
+  }
+}

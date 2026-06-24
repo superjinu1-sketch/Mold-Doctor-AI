@@ -71,9 +71,9 @@
 - 단일 컬럼 기본, 외곽 패딩 16–24px (`var(--space-md)` ~ `var(--space-lg)`)
 - 모든 레이아웃은 375px 기준으로 설계 후 sm:/md: 확장
 
-### 규율 2 — 본문 19px+
-- 본문 최소 `var(--text-body)` (19px). 결과 수치·강조는 `var(--text-h2)` (24px+)
-- `var(--text-label)` (14px)는 라벨·태그·캡션 전용 — 본문·설명에 절대 사용 금지
+### 규율 2 — 본문 16px (디자인 v1 절충)
+- 본문 최소 `var(--text-body)` (16px) — 현장 가독성↔디자인 균형. 강조 수치는 `var(--text-num)` (19px)·결과 헤드라인은 `var(--text-h2)` (24px+). 본문 내 소제목은 `var(--text-subhead)` (18px)
+- `var(--text-label)` (13px)는 라벨·태그·캡션 전용 — 본문·설명에 절대 사용 금지
 
 ### 규율 3 — 터치 타겟 44px+
 - 모든 버튼·링크·아이콘 버튼: `min-h-[var(--touch-min)]` (44px) 이상

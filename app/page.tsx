@@ -2,166 +2,73 @@
 
 import Link from 'next/link';
 import { useLocale } from '@/contexts/LocaleContext';
-
-const defectChips = [
-  { ko: '은선/은줄', en: 'Silver Streak' },
-  { ko: '플래시', en: 'Flash' },
-  { ko: '웰드라인', en: 'Weld Line' },
-  { ko: '싱크마크', en: 'Sink Mark' },
-  { ko: '버닝/가스마크', en: 'Burn Mark' },
-  { ko: '변색', en: 'Discoloration' },
-  { ko: '크랙', en: 'Crack' },
-  { ko: '휨/변형', en: 'Warpage' },
-  { ko: '기포/보이드', en: 'Void/Bubble' },
-  { ko: '제팅', en: 'Jetting' },
-  { ko: '박리', en: 'Delamination' },
-  { ko: 'GF 백화', en: 'Fiber Read-out' },
-  { ko: '흐름자국', en: 'Flow Mark' },
-  { ko: '미성형', en: 'Short Shot' },
-];
+import { useAuth } from '@/contexts/AuthContext';
 
 export default function HomePage() {
-  const { t, locale } = useLocale();
+  const { t } = useLocale();
+  const { user } = useAuth();
+
+  const meta = (user?.user_metadata ?? {}) as Record<string, unknown>;
+  const name = (typeof meta.name === 'string' && meta.name)
+    || (typeof meta.full_name === 'string' && meta.full_name)
+    || user?.email?.split('@')[0]
+    || '';
 
   const steps = [
-    { n: '01', t: t('landing.step1_t'), d: t('landing.step1_d') },
-    { n: '02', t: t('landing.step2_t'), d: t('landing.step2_d') },
-    { n: '03', t: t('landing.step3_t'), d: t('landing.step3_d') },
-  ];
-
-  const stats = [
-    { n: t('landing.stat_1'), l: t('landing.stat_1_label') },
-    { n: t('landing.stat_2'), l: t('landing.stat_2_label') },
-    { n: t('landing.stat_3'), l: t('landing.stat_3_label') },
+    { t: t('landing.step1_t'), d: t('landing.step1_d') },
+    { t: t('landing.step2_t'), d: t('landing.step2_d') },
+    { t: t('landing.step3_t'), d: t('landing.step3_d') },
   ];
 
   return (
-    <div className="bg-canvas">
-
-      {/* Hero */}
-      <section className="pt-20 pb-28 px-4 sm:px-6 relative overflow-hidden">
-        {/* Subtle light-theme tone blob — brand tint, low opacity */}
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-brand-tint rounded-full blur-3xl opacity-60 pointer-events-none" />
-
-        <div className="max-w-4xl mx-auto text-center relative">
-          <div className="inline-flex items-center gap-2 border border-[var(--brand-border)] bg-brand-tint text-brand-ink text-xs font-medium px-3.5 py-1.5 rounded-full mb-8">
-            <span className="w-1.5 h-1.5 bg-brand rounded-full animate-pulse" />
-            {t('landing.hero_badge')}
-          </div>
-
-          <h1 className="text-5xl sm:text-6xl md:text-7xl font-bold tracking-tight leading-[1.08] mb-6 text-ink">
-            {t('landing.hero_h1_1')}
-            <br />
-            <span className="text-brand">{t('landing.hero_h1_2')}</span>
-            <br />
-            {t('landing.hero_h1_3')}
-          </h1>
-
-          <p className="text-muted text-lg sm:text-xl max-w-2xl mx-auto mb-10 leading-relaxed">
-            {t('landing.hero_sub')}
+    <div className="bg-canvas min-h-screen">
+      {/* Hero — 브랜드 블루 풀블리드 */}
+      <section className="bg-brand text-on-brand px-5 pt-12 pb-14">
+        <div className="max-w-md mx-auto">
+          <p className="text-label font-semibold text-on-brand/80 mb-3">
+            {user ? t('landing.hero_eyebrow_user').replace('{name}', String(name)) : t('landing.hero_eyebrow')}
           </p>
+          <h1 className="font-bold leading-[1.12] mb-4" style={{ fontSize: 'clamp(2rem, 8vw, var(--text-display))' }}>
+            {t('landing.hero_h1')}
+          </h1>
+          <p className="text-on-brand/85 text-body leading-relaxed mb-8">{t('landing.hero_sub')}</p>
 
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
-            <Link href="/diagnose"
-              className="bg-brand text-on-brand px-8 py-3.5 rounded-full font-bold text-base hover:bg-brand-ink transition-all shadow-sm">
-              {t('landing.cta_primary')}
-            </Link>
-            <Link href="/guide"
-              className="border border-border-strong text-muted px-8 py-3.5 rounded-full font-medium text-base hover:bg-surface-sunken hover:text-ink transition-all">
-              {t('landing.cta_secondary')}
-            </Link>
+          <div className="flex flex-col gap-3">
+            {user ? (
+              <>
+                <Link href="/diagnose" className="ui-cta w-full bg-surface text-brand hover:bg-surface-sunken text-body">{t('landing.cta_primary_user')}</Link>
+                <Link href="/account" className="ui-cta w-full bg-transparent border-2 border-[var(--on-brand)] text-on-brand hover:bg-brand-ink text-body">{t('landing.cta_account')}</Link>
+              </>
+            ) : (
+              <>
+                <Link href="/diagnose" className="ui-cta w-full bg-surface text-brand hover:bg-surface-sunken text-body">{t('landing.cta_primary_loggedout')}</Link>
+                <Link href="/guide" className="ui-cta w-full bg-transparent border-2 border-[var(--on-brand)] text-on-brand hover:bg-brand-ink text-body">{t('landing.cta_secondary')}</Link>
+              </>
+            )}
           </div>
 
-          {/* 5 Credits Banner */}
-          <div className="mt-5 inline-flex items-center gap-2 bg-brand-tint border border-[var(--brand-border)] text-brand-ink px-5 py-2.5 rounded-full text-sm font-semibold">
-            <span aria-hidden="true">🎁</span>
-            {t('landing.credits_banner')}
-          </div>
-
-          {/* Stats */}
-          <div className="mt-16 flex flex-wrap justify-center gap-x-12 gap-y-4">
-            {stats.map((s) => (
-              <div key={s.l} className="text-center">
-                <div className="text-2xl font-bold text-ink">{s.n}</div>
-                <div className="text-xs text-faint mt-0.5">{s.l}</div>
-              </div>
-            ))}
-          </div>
+          {!user && <p className="text-on-brand/70 text-label mt-4 text-center">{t('landing.hero_trust')}</p>}
         </div>
       </section>
 
-      {/* Defect Coverage */}
-      <section className="pb-28 px-4 sm:px-6">
-        <div className="max-w-5xl mx-auto">
-          <div className="text-center mb-10">
-            <h2 className="text-2xl sm:text-3xl font-bold text-ink mb-3">{t('landing.defects_h2')}</h2>
-            <p className="text-muted text-base">{t('landing.defects_sub')}</p>
-          </div>
-
-          {/* Defect chip cloud — 모바일: 2줄 가로 스크롤 / 데스크탑(sm+): 중앙 wrap */}
-          <div className="relative mb-6">
-            <div className="grid grid-flow-col grid-rows-2 auto-cols-max gap-2 overflow-x-auto pb-2 -mx-4 px-4 snap-x [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:flex sm:flex-wrap sm:justify-center sm:overflow-visible sm:grid-rows-1 sm:mx-0 sm:px-0 sm:pb-0">
-              {defectChips.map((chip) => (
-                <Link
-                  key={chip.en}
-                  href="/diagnose"
-                  className="shrink-0 snap-start whitespace-nowrap px-3.5 py-2 bg-surface border border-border rounded-full text-sm font-medium text-muted hover:border-[var(--brand-border)] hover:text-brand-ink hover:bg-brand-tint transition-colors min-h-[44px] flex items-center"
-                >
-                  {locale === 'en' ? chip.en : chip.ko}
-                </Link>
-              ))}
-              <span className="shrink-0 snap-start whitespace-nowrap px-3.5 py-2 bg-surface-sunken rounded-full text-sm font-medium text-faint min-h-[44px] flex items-center select-none">
-                {locale === 'en' ? '+ many more' : '+ 그 외 다수'}
-              </span>
-            </div>
-            <div aria-hidden="true" className="pointer-events-none absolute inset-y-0 right-0 w-12 bg-gradient-to-l from-[var(--canvas)] to-transparent sm:hidden" />
-          </div>
-
-          {/* Safety net */}
-          <div className="flex items-center justify-center gap-2.5 bg-surface-sunken border border-border rounded-xl px-5 py-3.5 max-w-md mx-auto">
-            <svg className="w-5 h-5 text-brand-ink shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
-            </svg>
-            <span className="text-muted text-base">{t('landing.defects_safety')}</span>
-          </div>
-        </div>
-      </section>
-
-      {/* How it works */}
-      <section className="pb-28 px-4 sm:px-6">
-        <div className="max-w-5xl mx-auto">
-          <div className="bg-surface border border-border rounded-3xl p-8 sm:p-12">
-            <h2 className="text-2xl font-bold text-ink mb-10 text-center">{t('landing.how_h2')}</h2>
-            <div className="grid md:grid-cols-3 gap-10">
-              {steps.map((s) => (
-                <div key={s.n}>
-                  <div className="text-6xl font-black text-border leading-none mb-4 select-none">{s.n}</div>
-                  <div className="text-xs font-semibold text-brand-ink uppercase tracking-widest mb-2">STEP</div>
-                  <h3 className="text-base font-bold text-ink mb-2">{s.t}</h3>
-                  <p className="text-muted text-sm leading-relaxed">{s.d}</p>
+      {/* 하단 흰 영역 — 이렇게 추정해요 + 커버리지 한 줄 */}
+      <section className="px-5 py-12">
+        <div className="max-w-md mx-auto">
+          <h2 className="text-h3 font-bold text-ink mb-6">{t('landing.how_title')}</h2>
+          <ol className="space-y-3">
+            {steps.map((s, i) => (
+              <li key={i} className="ui-card flex gap-3 items-start">
+                <span className="shrink-0 w-7 h-7 rounded-full bg-brand-tint text-brand-ink font-bold text-label flex items-center justify-center tabular-nums">{i + 1}</span>
+                <div className="min-w-0">
+                  <h3 className="font-bold text-ink text-body">{s.t}</h3>
+                  <p className="text-muted text-label mt-0.5 leading-relaxed">{s.d}</p>
                 </div>
-              ))}
-            </div>
-          </div>
+              </li>
+            ))}
+          </ol>
+          <p className="text-center text-muted text-label mt-6">{t('landing.coverage')}</p>
         </div>
       </section>
-
-      {/* CTA */}
-      <section className="pb-28 px-4 sm:px-6">
-        <div className="max-w-2xl mx-auto text-center">
-          <h2 className="text-3xl sm:text-4xl font-bold text-ink mb-4">
-            {t('landing.cta_h2_1')}{' '}
-            <span className="text-brand">{t('landing.cta_h2_2')}</span>
-          </h2>
-          <p className="text-muted text-sm mb-8">{t('landing.cta_sub')}</p>
-          <Link href="/diagnose"
-            className="inline-block bg-brand text-on-brand px-10 py-4 rounded-full font-bold text-base hover:bg-brand-ink transition-all shadow-sm">
-            {t('landing.cta_btn')}
-          </Link>
-        </div>
-      </section>
-
     </div>
   );
 }

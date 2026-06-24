@@ -1,8 +1,10 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLocale } from '@/contexts/LocaleContext';
+import Logo from './Logo';
 
 function GoogleIcon() {
   return (
@@ -18,6 +20,7 @@ function GoogleIcon() {
 export default function AuthModal({ open, onClose }: { open: boolean; onClose: () => void }) {
   const { signInWithEmail, signUpWithEmail, signInWithGoogle } = useAuth();
   const { t } = useLocale();
+  const router = useRouter();
   const [mode, setMode] = useState<'login' | 'signup'>('login');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -68,22 +71,26 @@ export default function AuthModal({ open, onClose }: { open: boolean; onClose: (
       role="presentation"
     >
       <div
-        className="bg-surface rounded-2xl w-full max-w-md p-6 my-8 space-y-5"
+        className="bg-surface rounded-[var(--radius-card-lg)] w-full max-w-md p-6 my-8 space-y-5 relative"
         onClick={(e) => e.stopPropagation()}
         role="dialog"
         aria-modal="true"
         aria-label={mode === 'login' ? t('auth.login') : t('auth.signup')}
       >
-        <div className="flex items-center justify-between">
-          <h2 className="text-h2 font-bold text-ink">{mode === 'login' ? t('auth.login') : t('auth.signup')}</h2>
-          <button
-            type="button"
-            onClick={close}
-            aria-label={t('auth.close')}
-            className="min-w-[var(--touch-min)] min-h-[var(--touch-min)] flex items-center justify-center text-faint hover:text-ink -mr-2"
-          >
-            <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2"><path d="M6 6l12 12M6 18L18 6" strokeLinecap="round" /></svg>
-          </button>
+        <button
+          type="button"
+          onClick={close}
+          aria-label={t('auth.close')}
+          className="absolute top-3 right-3 min-w-[var(--touch-min)] min-h-[var(--touch-min)] flex items-center justify-center text-faint hover:text-ink"
+        >
+          <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2"><path d="M6 6l12 12M6 18L18 6" strokeLinecap="round" /></svg>
+        </button>
+
+        {/* 로고 + 부제 */}
+        <div className="flex flex-col items-center text-center gap-2 pt-2">
+          <Logo size={44} showWord={false} />
+          <h2 className="text-h3 font-bold text-ink">Mold Doctor</h2>
+          <p className="text-label text-muted">{t('auth.subtitle')}</p>
         </div>
 
         <div className="space-y-3">
@@ -96,7 +103,7 @@ export default function AuthModal({ open, onClose }: { open: boolean; onClose: (
               autoComplete="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full rounded-xl border border-border-strong bg-surface-sunken px-4 text-body text-ink min-h-[var(--touch-cta)] focus:border-brand focus:outline-none"
+              className="ui-input"
             />
           </div>
           <div>
@@ -108,7 +115,7 @@ export default function AuthModal({ open, onClose }: { open: boolean; onClose: (
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               onKeyDown={(e) => { if (e.key === 'Enter') submit(); }}
-              className="w-full rounded-xl border border-border-strong bg-surface-sunken px-4 text-body text-ink min-h-[var(--touch-cta)] focus:border-brand focus:outline-none"
+              className="ui-input"
             />
           </div>
         </div>
@@ -116,11 +123,12 @@ export default function AuthModal({ open, onClose }: { open: boolean; onClose: (
         {error && <p className="text-body text-danger">{error}</p>}
         {info && <p className="text-body text-muted bg-brand-tint rounded-xl p-3">{info}</p>}
 
+        {/* 주요 CTA(현 모드 제출) + 모드 토글(회원가입·5크레딧 무료) */}
         <button
           type="button"
           onClick={submit}
           disabled={busy}
-          className="w-full bg-brand hover:bg-brand-ink disabled:opacity-50 text-on-brand font-bold rounded-xl min-h-[var(--touch-cta)] text-body transition-colors"
+          className="ui-cta w-full text-body disabled:opacity-50"
         >
           {busy ? t('auth.signing_in') : (mode === 'login' ? t('auth.login') : t('auth.signup'))}
         </button>
@@ -128,9 +136,17 @@ export default function AuthModal({ open, onClose }: { open: boolean; onClose: (
         <button
           type="button"
           onClick={switchMode}
+          className="ui-cta-secondary ui-cta w-full text-body"
+        >
+          {mode === 'login' ? t('auth.signup_with_credit') : t('auth.toggle_to_login')}
+        </button>
+
+        <button
+          type="button"
+          onClick={() => { close(); router.push('/diagnose'); }}
           className="w-full text-center text-body text-brand hover:text-brand-ink min-h-[var(--touch-min)]"
         >
-          {mode === 'login' ? t('auth.toggle_to_signup') : t('auth.toggle_to_login')}
+          {t('auth.browse_sample')}
         </button>
 
         <div className="flex items-center gap-3">
@@ -139,10 +155,11 @@ export default function AuthModal({ open, onClose }: { open: boolean; onClose: (
           <div className="flex-1 h-px bg-border" />
         </div>
 
+        {/* 구글 로그인 — 유지(삭제 금지) */}
         <button
           type="button"
           onClick={() => signInWithGoogle()}
-          className="w-full flex items-center justify-center gap-2 bg-surface hover:bg-surface-sunken text-ink border border-border-strong rounded-xl min-h-[var(--touch-cta)] text-body font-semibold transition-colors"
+          className="w-full flex items-center justify-center gap-2 bg-surface hover:bg-surface-sunken text-ink border border-border-strong rounded-[var(--radius-cta)] min-h-[var(--touch-cta)] text-body font-semibold transition-colors"
         >
           <GoogleIcon />
           {t('auth.signin')}

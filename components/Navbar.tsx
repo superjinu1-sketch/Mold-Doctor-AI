@@ -5,6 +5,7 @@ import { useState } from 'react';
 import { useLocale } from '@/contexts/LocaleContext';
 import { useAuth } from '@/contexts/AuthContext';
 import AuthModal from './AuthModal';
+import Logo from './Logo';
 
 export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -24,11 +25,8 @@ export default function Navbar() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <div className="flex items-center justify-between h-14">
             {/* Logo */}
-            <Link href="/" className="flex items-center gap-2 font-bold">
-              <div className="w-7 h-7 rounded-lg bg-brand flex items-center justify-center shadow-sm">
-                <span className="text-on-brand text-xs font-black">M</span>
-              </div>
-              <span className="text-sm tracking-tight text-ink">Mold Doctor AI</span>
+            <Link href="/" className="flex items-center" aria-label="Mold Doctor">
+              <Logo size={28} wordClassName="text-sm" />
             </Link>
 
             {/* Desktop Nav */}
