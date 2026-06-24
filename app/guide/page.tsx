@@ -196,12 +196,12 @@ export default function GuidePage() {
     <div className="bg-canvas min-h-screen px-4 sm:px-6 py-10">
       <div className="max-w-4xl mx-auto">
         <div className="mb-10">
-          <div className="inline-flex items-center gap-2 border border-[var(--brand-border)] bg-brand-tint text-brand-ink text-xs font-medium px-3.5 py-1.5 rounded-full mb-5">
+          <div className="inline-flex items-center gap-2 border border-[var(--brand-border)] bg-brand-tint text-brand-ink text-[length:var(--text-label)] font-medium px-3.5 py-1.5 rounded-full mb-5">
             <span className="w-1.5 h-1.5 bg-brand rounded-full" />
             {t('guide.badge')}
           </div>
-          <h1 className="text-3xl font-bold text-ink mb-2">{t('guide.h1')}</h1>
-          <p className="text-muted">{t('guide.sub')}</p>
+          <h1 className="text-[length:var(--text-h1)] font-bold text-ink mb-2">{t('guide.h1')}</h1>
+          <p className="text-muted text-body">{t('guide.sub')}</p>
         </div>
 
         <div className="space-y-2">
@@ -218,7 +218,7 @@ export default function GuidePage() {
             return (
               <div
                 key={defect.id}
-                className={`border rounded-2xl overflow-hidden transition-all ${
+                className={`border rounded-[var(--radius-card-lg)] overflow-hidden transition-all ${
                   openId === defect.id ? colorMap[defect.color] : 'border-border bg-surface hover:border-[var(--brand-border)]'
                 }`}
               >
@@ -232,9 +232,9 @@ export default function GuidePage() {
                       {DEFECT_NUMS[defect.id]}
                     </span>
                     <div>
-                      <span className="font-bold text-ink text-base">{displayName}</span>
+                      <span className="font-bold text-ink text-body">{displayName}</span>
                       {secondaryName && (
-                        <span className="text-faint ml-2 text-sm">({secondaryName})</span>
+                        <span className="text-faint ml-2 text-[length:var(--text-label)]">({secondaryName})</span>
                       )}
                     </div>
                   </div>
@@ -248,16 +248,16 @@ export default function GuidePage() {
 
                 {openId === defect.id && (
                   <div className="px-5 pb-6 space-y-5 border-t border-border pt-4">
-                    <p className="text-muted text-sm leading-relaxed">{description}</p>
+                    <p className="text-muted text-body leading-relaxed">{description}</p>
 
                     <div className="grid sm:grid-cols-2 gap-4">
                       <div>
-                        <h4 className="font-semibold text-muted mb-3 flex items-center gap-2 text-sm">
+                        <h4 className="ui-subhead mb-3 flex items-center gap-2">
                           <span className="text-danger">◆</span> {t('guide.causes_label')}
                         </h4>
                         <ul className="space-y-2">
                           {causes.map((cause, i) => (
-                            <li key={i} className="flex items-start gap-2 text-sm text-muted">
+                            <li key={i} className="flex items-start gap-2 text-body text-muted">
                               <span className="text-danger mt-0.5 shrink-0">•</span>
                               {cause}
                             </li>
@@ -265,12 +265,12 @@ export default function GuidePage() {
                         </ul>
                       </div>
                       <div>
-                        <h4 className="font-semibold text-muted mb-3 flex items-center gap-2 text-sm">
+                        <h4 className="ui-subhead mb-3 flex items-center gap-2">
                           <span className="text-ok">◆</span> {t('guide.solutions_label')}
                         </h4>
                         <ul className="space-y-2">
                           {solutions.map((sol, i) => (
-                            <li key={i} className="flex items-start gap-2 text-sm text-muted">
+                            <li key={i} className="flex items-start gap-2 text-body text-muted">
                               <span className="text-ok mt-0.5 shrink-0">✓</span>
                               {sol}
                             </li>
@@ -281,14 +281,14 @@ export default function GuidePage() {
 
                     {Object.keys(resinNotes).length > 0 && (
                       <div>
-                        <h4 className="font-semibold text-muted mb-3 flex items-center gap-2 text-sm">
+                        <h4 className="ui-subhead mb-3 flex items-center gap-2">
                           <span className="text-brand-ink">◆</span> {t('guide.resin_notes_label')}
                         </h4>
                         <div className="grid sm:grid-cols-2 gap-2">
                           {Object.entries(resinNotes).map(([resin, note]) => (
-                            <div key={resin} className="bg-surface-sunken rounded-xl p-3 border border-border">
-                              <span className="font-bold text-ink text-sm">{resin}</span>
-                              <p className="text-faint text-xs mt-1">{note}</p>
+                            <div key={resin} className="bg-surface-sunken rounded-[var(--radius-card)] p-3 border border-border">
+                              <span className="font-bold text-ink text-body">{resin}</span>
+                              <p className="text-muted text-[length:var(--text-label)] mt-1">{note}</p>
                             </div>
                           ))}
                         </div>
@@ -298,7 +298,7 @@ export default function GuidePage() {
                     <div className="pt-1">
                       <Link
                         href={`/diagnose?defect=${encodeURIComponent(defect.nameKo)}`}
-                        className="inline-flex items-center gap-2 bg-brand hover:bg-brand-ink text-on-brand px-4 py-2 rounded-full text-sm font-bold transition-colors shadow-sm"
+                        className="inline-flex items-center gap-2 bg-brand hover:bg-brand-ink text-on-brand px-5 rounded-full text-body font-bold transition-colors min-h-[var(--touch-min)]"
                       >
                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />

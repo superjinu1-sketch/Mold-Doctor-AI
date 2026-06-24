@@ -56,10 +56,10 @@ export default function AccountPage() {
 
   return (
     <div className="max-w-2xl mx-auto px-4 py-8">
-      <h1 className="text-2xl font-bold text-ink mb-6">{t('account.title')}</h1>
+      <h1 className="text-[length:var(--text-h2)] font-bold text-ink mb-6">{t('account.title')}</h1>
 
       {/* ① 계정 헤더 */}
-      <div className="bg-surface border border-border rounded-2xl p-5 mb-4">
+      <div className="ui-card ui-card-lg p-5 mb-4">
         {!loading && user ? (
           <div className="flex items-center justify-between gap-3">
             <div className="min-w-0">
@@ -90,15 +90,15 @@ export default function AccountPage() {
 
       {/* ② 크레딧 카드 + 거래내역 */}
       {!loading && user && (
-        <div className="bg-surface border border-border rounded-2xl p-5 mb-4">
+        <div className="ui-card ui-card-lg p-5 mb-4">
           <div className="flex items-end justify-between gap-3 mb-4">
             <div>
               <div className="text-label text-faint mb-1">{t('account.credit_balance')}</div>
-              <div className="text-h2 font-black text-ink tabular-nums">{credits ?? '—'}</div>
+              <div className="text-[length:var(--text-h2)] font-black text-ink tabular-nums">{credits ?? '—'}</div>
             </div>
             <a
               href="/pricing"
-              className="shrink-0 min-h-[var(--touch-cta)] flex items-center px-5 rounded-full bg-brand-tint text-brand-ink font-bold text-sm border border-[var(--brand-border)] hover:bg-brand-tint/70 transition-colors"
+              className="shrink-0 min-h-[var(--touch-cta)] flex items-center px-5 rounded-full ui-cta-secondary font-bold text-sm hover:bg-[var(--brand-border)] transition-colors"
             >
               {t('account.recharge')}
             </a>
@@ -129,8 +129,13 @@ export default function AccountPage() {
       )}
 
       {/* ③ 진단 히스토리 */}
-      <h2 className="text-lg font-bold text-ink mb-3 mt-6">{t('account.history')}</h2>
+      <h2 className="text-[length:var(--text-h3)] font-bold text-ink mb-3 mt-6">{t('account.history')}</h2>
       <HistoryList records={records} />
+
+      {/* 하단 sticky — 새로 추정 */}
+      <div className="sticky bottom-0 -mx-4 mt-6 px-4 py-3 bg-surface/95 backdrop-blur border-t border-border">
+        <a href="/diagnose" className="ui-cta w-full text-body">{t('account.new_diagnosis')}</a>
+      </div>
 
       <AuthModal open={authOpen} onClose={() => setAuthOpen(false)} />
     </div>

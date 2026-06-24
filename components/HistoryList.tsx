@@ -117,10 +117,10 @@ export default function HistoryList({ records }: { records: HistoryRecord[] }) {
 
   if (records.length === 0) {
     return (
-      <div className="bg-surface border border-border rounded-2xl p-10 text-center">
-        <p className="text-muted text-base">{t('history.empty')}</p>
+      <div className="bg-surface border border-border rounded-[var(--radius-card-lg)] p-10 text-center">
+        <p className="text-muted text-body">{t('history.empty')}</p>
         <a href="/diagnose"
-          className="mt-5 inline-flex items-center justify-center bg-brand text-on-brand px-6 py-3 rounded-full font-bold text-sm hover:bg-brand-ink transition-colors min-h-[44px]">
+          className="mt-5 ui-cta inline-flex px-6 text-body">
           {locale === 'en' ? 'Start analysis' : '추정 시작하기'}
         </a>
       </div>
@@ -130,7 +130,7 @@ export default function HistoryList({ records }: { records: HistoryRecord[] }) {
   return (
     <div className="space-y-3">
       {records.map((r) => (
-        <div key={r.id} className="bg-surface border border-border rounded-xl overflow-hidden">
+        <div key={r.id} className="ui-card p-0 overflow-hidden">
           <button
             type="button"
             onClick={() => setExpanded(expanded === r.id ? null : r.id)}
@@ -138,7 +138,7 @@ export default function HistoryList({ records }: { records: HistoryRecord[] }) {
           >
             <div className="flex-1 min-w-0">
               <div className="flex flex-wrap items-center gap-1.5 mb-1">
-                <span className="text-base font-bold text-ink truncate">{defectLabel(r)}</span>
+                <span className="text-body font-bold text-ink truncate">{defectLabel(r)}</span>
                 <SeverityBadge severity={r.severity} />
                 <ResolvedBadge resolved={r.resolved} t={t} />
               </div>
@@ -254,14 +254,14 @@ export default function HistoryList({ records }: { records: HistoryRecord[] }) {
                 <button
                   type="button"
                   onClick={() => handleRestore(r)}
-                  className="flex-1 bg-brand text-on-brand py-3 rounded-xl font-bold text-base hover:bg-brand-ink transition-colors min-h-[44px]"
+                  className="ui-cta flex-1 text-body"
                 >
                   {t('history.restore')}
                 </button>
                 <button
                   type="button"
                   onClick={() => setReportRecord(r)}
-                  className="px-4 py-3 rounded-xl border border-border text-muted font-medium hover:bg-surface-sunken transition-colors min-h-[44px] text-sm"
+                  className="inline-flex items-center px-4 rounded-[var(--radius-cta)] border border-border-strong text-muted font-semibold hover:bg-surface-sunken transition-colors min-h-[var(--touch-cta-lg)] text-body"
                 >
                   {t('history.pdf_report')}
                 </button>

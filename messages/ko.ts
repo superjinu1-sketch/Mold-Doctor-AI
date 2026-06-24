@@ -125,6 +125,7 @@ export const ko: Record<string, string> = {
   'account.ledger': '거래내역',
   'account.ledger_empty': '거래내역이 없습니다.',
   'account.history': '추정 기록',
+  'account.new_diagnosis': '새로 추정 시작',
   'ledger.kind.signup_bonus': '가입 보너스',
   'ledger.kind.purchase': '충전',
   'ledger.kind.diagnosis': '추정 사용',

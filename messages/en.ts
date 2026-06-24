@@ -125,6 +125,7 @@ export const en: Record<string, string> = {
   'account.ledger': 'Transactions',
   'account.ledger_empty': 'No transactions yet.',
   'account.history': 'Diagnosis history',
+  'account.new_diagnosis': 'Start new estimate',
   'ledger.kind.signup_bonus': 'Signup bonus',
   'ledger.kind.purchase': 'Purchase',
   'ledger.kind.diagnosis': 'Diagnosis',

@@ -650,12 +650,12 @@ export default function DiagnosisResultPanel({ result, onSavePDF, round = 1, fol
             <div className="text-xs font-bold text-faint uppercase tracking-wider mb-2">{t('conclusion.actions')}</div>
             <div className="space-y-2">
               {topActions.map((rec, i) => (
-                <div key={i} className="bg-surface-sunken rounded-xl p-3 border border-[var(--brand-border)]">
-                  <div className="font-semibold text-muted text-base mb-0.5">{rec.parameter}</div>
+                <div key={i} className="bg-surface-sunken rounded-[var(--radius-card)] p-3 border border-[var(--brand-border)]">
+                  <div className="font-semibold text-muted text-body mb-0.5">{rec.parameter}</div>
                   <div className="flex items-start gap-1.5">
-                    <span className="text-muted text-base min-w-0 break-words">{rec.current || '-'}</span>
+                    <span className="text-muted text-body min-w-0 break-words">{rec.current || '-'}</span>
                     <span className="text-faint shrink-0">→</span>
-                    <span className="text-ink font-bold text-base flex items-start gap-1 min-w-0 break-words"><DirectionArrow direction={rec.direction} />{rec.recommended}</span>
+                    <span className="text-ink font-bold text-body flex items-start gap-1 min-w-0 break-words"><DirectionArrow direction={rec.direction} />{rec.recommended}</span>
                   </div>
                 </div>
               ))}
