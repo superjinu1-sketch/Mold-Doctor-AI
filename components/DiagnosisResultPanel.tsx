@@ -90,7 +90,7 @@ function Collapsible({ title, children, defaultOpen = false, accent = false, pdf
   const forceOpen = useContext(PdfExportContext);
   const isOpen = open || forceOpen;
   return (
-    <div {...(pdfBlock ? { 'data-pdf-block': '' } : {})} className={`bg-surface rounded-2xl border overflow-hidden ${accent ? 'border-[var(--brand-border)]' : 'border-border'}`}>
+    <div {...(pdfBlock ? { 'data-pdf-block': '' } : {})} className={`bg-surface rounded-[var(--radius-card-lg)] border overflow-hidden ${accent ? 'border-[var(--brand-border)]' : 'border-border'}`}>
       <button
         type="button"
         onClick={() => setOpen(o => !o)}
@@ -172,7 +172,7 @@ function CauseCard({ cause, defaultOpen = false }: { cause: CauseItem; defaultOp
           {why && <p className="text-[length:var(--text-body)] leading-relaxed text-muted max-w-[68ch]">{why}</p>}
           {detail.map(({ label, value }) => (
             <div key={label}>
-              <div className="text-[length:var(--text-h3)] font-bold text-brand-ink mb-1.5">{label}</div>
+              <div className="ui-subhead mb-1.5">{label}</div>
               <p className="text-[length:var(--text-body)] leading-relaxed text-muted max-w-[68ch]">{value}</p>
             </div>
           ))}
@@ -205,7 +205,7 @@ function ChatSection({
   const { t } = useLocale();
   const MAX_CHAT_TURNS = 5;
   return (
-    <div className="bg-surface rounded-2xl border border-border overflow-hidden">
+    <div className="bg-surface rounded-[var(--radius-card-lg)] border border-border overflow-hidden">
       <div className="px-4 sm:px-6 pt-5 pb-3 border-b border-border">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
@@ -257,7 +257,7 @@ function ChatSection({
               key={i}
               type="button"
               onClick={() => sendChat(q)}
-              className="text-sm bg-surface-sunken hover:bg-surface-sunken text-muted border border-border px-3 py-2.5 rounded-full transition-colors text-left min-h-[44px] flex items-center"
+              className="text-[length:var(--text-label)] bg-brand-tint hover:bg-[var(--brand-border)] text-brand-ink px-3.5 py-2.5 rounded-full transition-colors text-left min-h-[44px] flex items-center"
             >
               {q.length > 40 ? q.slice(0, 40) + '…' : q}
             </button>
@@ -279,13 +279,13 @@ function ChatSection({
               onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendChat(chatInput); } }}
               placeholder={t('chat.placeholder')}
               disabled={isChatLoading}
-              className="flex-1 text-base bg-surface-sunken border border-border rounded-xl px-4 py-3 text-ink placeholder:text-faint focus:outline-none focus:ring-2 focus:ring-brand focus:border-[var(--brand-border)] disabled:opacity-50 min-h-[var(--touch-min)]"
+              className="ui-input flex-1 disabled:opacity-50"
             />
             <button
               type="button"
               onClick={() => sendChat(chatInput)}
               disabled={isChatLoading || !chatInput.trim()}
-              className="shrink-0 bg-brand hover:bg-brand/90 disabled:bg-surface-sunken disabled:cursor-not-allowed text-on-brand disabled:text-faint px-4 py-3 rounded-xl text-base font-bold transition-colors min-h-[var(--touch-min)]"
+              className="shrink-0 bg-brand hover:bg-brand-ink disabled:bg-surface-sunken disabled:cursor-not-allowed text-on-brand disabled:text-faint px-4 rounded-[var(--radius-cta)] text-body font-bold transition-colors min-h-[48px]"
             >
               {isChatLoading ? '…' : t('chat.send')}
             </button>
@@ -595,7 +595,7 @@ export default function DiagnosisResultPanel({ result, onSavePDF, round = 1, fol
       )}
 
       {/* Summary Card */}
-      <div data-pdf-block className="bg-surface rounded-2xl p-4 sm:p-6 border border-border">
+      <div data-pdf-block className="bg-surface rounded-[var(--radius-card-lg)] p-4 sm:p-6 border border-border">
         <div className="flex flex-wrap items-start justify-between gap-3 mb-4">
           <div>
             <h2 className="text-[length:var(--text-h2)] sm:text-[length:var(--text-h1)] font-bold text-ink leading-tight">
@@ -614,7 +614,7 @@ export default function DiagnosisResultPanel({ result, onSavePDF, round = 1, fol
           <button
             type="button"
             onClick={onSavePDF}
-            className="flex items-center gap-2 bg-surface-sunken hover:bg-surface-sunken text-ink px-3 py-2.5 rounded-lg text-base font-medium transition-colors whitespace-nowrap min-h-[44px]"
+            className="flex items-center gap-2 bg-brand-tint text-brand-ink hover:bg-[var(--brand-border)] px-3.5 rounded-[var(--radius-cta)] text-body font-semibold transition-colors whitespace-nowrap min-h-[44px]"
           >
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
@@ -722,40 +722,26 @@ export default function DiagnosisResultPanel({ result, onSavePDF, round = 1, fol
               </tbody>
             </table>
           </div>
-          {/* Mobile cards */}
-          <div className="sm:hidden space-y-3">
-            {recommendations.map((rec, i) => {
-              const changed = rec.current !== rec.recommended && rec.direction !== 'same';
-              return (
-                <div key={i} className={`rounded-xl p-3 border ${changed ? 'bg-[var(--warn-bg)] border-[var(--warn-border)]' : 'bg-surface border-border'}`}>
-                  <div className="flex items-center justify-between gap-2 mb-2">
-                    <span className="flex items-center gap-2 min-w-0">
-                      <UrgencyChip urgency={rec.urgency} t={t} />
-                      <span className="font-semibold text-muted text-sm truncate">{rec.parameter}</span>
-                    </span>
-                    {changed && <span className="shrink-0 text-xs bg-warn/20 text-warn px-2 py-0.5 rounded-full font-medium">{t('rec.change_needed')}</span>}
-                  </div>
-                  <div className="flex items-center gap-3 mb-2">
-                    <div className="flex-1 text-center bg-surface-sunken rounded-lg p-2 border border-border">
-                      <div className="text-[length:var(--text-label)] text-faint mb-0.5">{t('rec.col_current')}</div>
-                      <div className="text-base text-muted font-medium">{rec.current || '-'}</div>
-                    </div>
-                    <div className="text-faint">→</div>
-                    <div className="flex-1 text-center bg-surface-sunken rounded-lg p-2 border border-[var(--brand-border)]">
-                      <div className="text-[length:var(--text-label)] text-faint mb-0.5">{t('rec.col_recommended')}</div>
-                      <div className="text-base font-bold text-ink flex items-center justify-center gap-1">
-                        <DirectionArrow direction={rec.direction} />
-                        {rec.recommended}
-                      </div>
-                    </div>
-                  </div>
-                  <p className="text-[length:var(--text-label)] text-muted mb-1">{rec.reason}</p>
-                  {rec.expected_result && <p className="text-[length:var(--text-label)] text-muted bg-brand-tint rounded px-2 py-1">{t('rec.expected_prefix')}{rec.expected_result}</p>}
-                  {rec.interaction_note && <p className="text-[length:var(--text-label)] text-muted bg-surface-sunken rounded px-2 py-1 mt-1">{t('rec.check_prefix')}{rec.interaction_note}</p>}
-                  {rec.risk && <p className="text-[length:var(--text-label)] text-warn bg-[var(--warn-bg)] rounded px-2 py-1 mt-1">{t('rec.risk_prefix')}{rec.risk}</p>}
+          {/* Mobile — 한 장 그룹 카드 + 행 구분선(divide-y). urgency 매핑·바인딩 불변, 레이아웃만 행으로.
+               PDF: 상위 rec Collapsible의 data-pdf-block(pdfBlock) 1개 유지 → v3 placeBlock 재귀가 행 단위로 분할(행 중간 잘림 방지). */}
+          <div className="sm:hidden ui-card p-0 divide-y divide-border">
+            {recommendations.map((rec, i) => (
+              <div key={i} className="p-3">
+                <div className="flex items-center gap-2 mb-1.5">
+                  <UrgencyChip urgency={rec.urgency} t={t} />
+                  <span className="font-semibold text-ink text-body min-w-0 break-words">{rec.parameter}</span>
                 </div>
-              );
-            })}
+                <div className="flex items-start gap-1.5 mb-1">
+                  <span className="text-muted text-body min-w-0 break-words">{rec.current || '-'}</span>
+                  <span className="text-faint shrink-0">→</span>
+                  <span className="text-brand font-bold text-body flex items-start gap-1 min-w-0 break-words"><DirectionArrow direction={rec.direction} />{rec.recommended}</span>
+                </div>
+                <p className="text-[length:var(--text-label)] text-muted">{rec.reason}</p>
+                {rec.expected_result && <p className="text-[length:var(--text-label)] text-muted bg-brand-tint rounded px-2 py-1 mt-1">{t('rec.expected_prefix')}{rec.expected_result}</p>}
+                {rec.interaction_note && <p className="text-[length:var(--text-label)] text-muted bg-surface-sunken rounded px-2 py-1 mt-1">{t('rec.check_prefix')}{rec.interaction_note}</p>}
+                {rec.risk && <p className="text-[length:var(--text-label)] text-warn bg-[var(--warn-bg)] rounded px-2 py-1 mt-1">{t('rec.risk_prefix')}{rec.risk}</p>}
+              </div>
+            ))}
           </div>
         </Collapsible>
       )}
@@ -1045,7 +1031,7 @@ export default function DiagnosisResultPanel({ result, onSavePDF, round = 1, fol
                 <button
                   type="button"
                   onClick={() => setShowResolvedForm(true)}
-                  className="flex-1 flex items-center justify-center gap-2 bg-brand-tint hover:bg-brand-tint text-brand-ink border border-[var(--brand-border)] px-4 py-3 rounded-xl text-base font-bold transition-colors min-h-[var(--touch-cta)]"
+                  className="ui-cta flex-1 gap-2 text-body"
                 >
                   <span className="text-lg">✓</span>
                   {t('action.resolved')}
@@ -1053,7 +1039,7 @@ export default function DiagnosisResultPanel({ result, onSavePDF, round = 1, fol
                 <button
                   type="button"
                   onClick={onStartFollowUp}
-                  className="flex-1 flex items-center justify-center gap-2 bg-[var(--warn-bg)] hover:bg-[var(--warn-bg)] text-warn border border-[var(--warn-border)] px-4 py-3 rounded-xl text-base font-bold transition-colors min-h-[var(--touch-cta)]"
+                  className="flex-1 flex items-center justify-center gap-2 bg-[var(--warn-bg)] hover:bg-[var(--warn-border)] text-warn border border-[var(--warn-border)] px-4 rounded-[var(--radius-cta)] text-body font-bold transition-colors min-h-[var(--touch-cta-lg)]"
                 >
                   <span className="text-lg">→</span>
                   {t('action.followup')}
