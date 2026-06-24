@@ -215,6 +215,10 @@ function DiagnoseContent() {
   const [defectType, setDefectType] = useState('');
   const [customDefect, setCustomDefect] = useState('');
   const [defectDescription, setDefectDescription] = useState('');
+  const [aiSuggested, setAiSuggested] = useState(false);   // 불량유형 AI 제안 배지
+  const [isClassifying, setIsClassifying] = useState(false);
+  // 진단 필수 게이트용 — 확정된 불량유형(기타는 직접 입력값)
+  const effectiveDefectType = (defectType === '기타 (직접 입력)' ? customDefect.trim() : defectType);
   const [resinType, setResinType] = useState('');
   const [customResin, setCustomResin] = useState('');
   const [filler, setFiller] = useState('없음');
@@ -596,12 +600,33 @@ function DiagnoseContent() {
     setMoldDrawings(prev => [...prev, ...valid].slice(0, 3));
   }, [processFile]);
 
+  // 사진→불량유형 AI 제안(보조 기능: 크레딧 무차감, 실패는 조용히 무시)
+  const classifyDefect = useCallback(async (img: ImageFile) => {
+    setIsClassifying(true);
+    try {
+      const res = await fetch(apiUrl('/api/classify-defect'), {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', ...(await authHeaders()) },
+        body: JSON.stringify({ image: { data: img.base64, mediaType: img.mediaType } }),
+      });
+      if (!res.ok) return;
+      const data = await res.json();
+      const en = typeof data?.defect_type?.en === 'string' ? data.defect_type.en.trim() : '';
+      if (!en || data?.confidence === 'low') return;
+      const matched = DEFECT_TYPES.find(d => d.includes(en));
+      if (matched) { setDefectType(matched); setAiSuggested(true); }
+    } catch { /* 보조 기능 — 조용히 무시 */ }
+    finally { setIsClassifying(false); }
+  }, []);
+
   const addImages = useCallback(async (files: FileList | File[]) => {
     const fileArray = Array.from(files);
     const processed = await Promise.all(fileArray.map(processFile));
     const valid = processed.filter(Boolean) as ImageFile[];
     setImages(prev => [...prev, ...valid].slice(0, 5));
-  }, [processFile]);
+    // 유형 미선택 상태에서 첫 사진이면 AI 제안 호출(사용자 선택은 존중)
+    if (valid.length > 0 && !defectType) void classifyDefect(valid[0]);
+  }, [processFile, defectType, classifyDefect]);
 
   const handleDrop = useCallback((e: React.DragEvent) => {
     e.preventDefault();
@@ -1080,6 +1105,21 @@ function DiagnoseContent() {
           <div className="mb-4">
             <label className={labelCls}>{t('step1.type_label')}</label>
 
+            {isClassifying && (
+              <div className="flex items-center gap-2 mb-2 text-muted text-sm">
+                <svg className="animate-spin w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
+                </svg>
+                {t('step1.classifying')}
+              </div>
+            )}
+            {aiSuggested && defectType && (
+              <div className="mb-2 text-[length:var(--text-label)] font-medium text-brand-ink bg-brand-tint border border-[var(--brand-border)] rounded-lg px-3 py-1.5">
+                {t('step1.ai_suggested')}
+              </div>
+            )}
+
             {!defectGridOpen ? (
               <div className="flex flex-wrap items-center gap-2">
                 {defectType ? (
@@ -1091,7 +1131,7 @@ function DiagnoseContent() {
                       className="text-brand hover:text-brand-ink text-base font-medium min-h-[44px] px-2">
                       {t('step1.type_change')}
                     </button>
-                    <button type="button" onClick={() => { setDefectType(''); setCustomDefect(''); }}
+                    <button type="button" onClick={() => { setDefectType(''); setCustomDefect(''); setAiSuggested(false); }}
                       className="text-faint hover:text-ink text-base min-h-[44px] px-2" aria-label={t('step1.type_clear')}>
                       ×
                     </button>
@@ -1112,6 +1152,7 @@ function DiagnoseContent() {
                     onClick={() => {
                       const next = defectType === type ? '' : type;
                       setDefectType(next);
+                      setAiSuggested(false);   // 사용자 확정이 AI 제안을 덮어씀
                       // 선택 즉시 접기. '기타'는 직접 입력을 위해 펼친 상태 유지.
                       if (next && next !== '기타 (직접 입력)') setDefectGridOpen(false);
                     }}
@@ -1825,15 +1866,17 @@ function DiagnoseContent() {
       {!result && (
         <div className="fixed bottom-0 inset-x-0 z-40 border-t border-border bg-surface/95 backdrop-blur-md">
           <div className="max-w-5xl mx-auto px-3 sm:px-4 py-3 flex items-center gap-3">
-            <div className="flex-1 min-w-0 text-sm text-faint leading-tight">
-              {user
-                ? <span>{t('nav.credits')} <span className="font-bold text-ink tabular-nums">{credits ?? '—'}</span></span>
-                : <span>{t('sticky.login_hint')}</span>}
+            <div className="flex-1 min-w-0 text-sm leading-tight">
+              {!effectiveDefectType
+                ? <span className="text-warn font-medium">{t('step1.defect_required_gate')}</span>
+                : user
+                  ? <span className="text-faint">{t('nav.credits')} <span className="font-bold text-ink tabular-nums">{credits ?? '—'}</span></span>
+                  : <span className="text-faint">{t('sticky.login_hint')}</span>}
             </div>
             <button
               type="button"
               onClick={handleDiagnose}
-              disabled={isLoading}
+              disabled={isLoading || !effectiveDefectType}
               className="shrink-0 bg-brand hover:bg-brand-ink disabled:bg-surface-sunken disabled:text-faint text-on-brand px-6 rounded-xl font-bold text-lg transition-colors flex items-center justify-center gap-2 min-h-[var(--touch-cta)]"
             >
               {isLoading ? (

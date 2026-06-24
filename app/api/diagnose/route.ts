@@ -173,6 +173,14 @@ function classifyComplexity(input: ComplexityInput): 'simple' | 'complex' {
 }
 
 // Fixed framework text — cached across requests (resin/tier/round independent)
+// STEP1 혼동쌍 외관 감별표 — diagnose(아래 FIXED_FRAMEWORK)와 classify-defect route가 공유(단일 출처).
+// ⚠️ FIXED_FRAMEWORK에 ${VISUAL_DIFFERENTIAL}로 그대로 삽입되어 최종 프롬프트 텍스트는 추출 전과 100% 동일.
+export const VISUAL_DIFFERENTIAL = `- VISUAL DIFFERENTIAL (혼동 쌍 외관 감별 — 사진으로 불량유형을 제안·식별할 때 우선 적용):
+  · flash(플래시/버) vs silver_streak(은선/은줄): flash는 파팅선(PL)·이젝터핀·금형 분리면 '경계'를 따라 밖으로 삐져나온 얇은 막/지느러미(여분 수지가 새어나온 것, 제품 가장자리·경계에 위치). silver_streak는 제품 '표면' 위에 게이트에서 유동 방향으로 방사상으로 퍼진 은색·흰색 줄무늬(수분/가스가 표면에 끌려나온 것). 판별: 경계의 지느러미=flash / 표면의 방사형 은줄=silver_streak. ★ 투명·반투명 수지(PC·PMMA·PS·SAN·AS 등) 제품에서 게이트를 기점으로 부채꼴·방사형으로 퍼지는 은색·뿌연 streak은 거의 항상 silver_streak(수분/가스 splay)다 — flash로 분류하지 마라. (역방향 보호: PL선·이젝터핀 주변의 얇은 막·지느러미는 표면 streak이 아니므로 그대로 flash로 둔다.)
+  · silver_streak vs jetting(제팅): jetting은 게이트에서 시작하는 구불구불한 지렁이·뱀 궤적(사행 곡선). silver_streak는 직선·방사형 은줄. 구불=jetting / 곧은 방사=silver_streak.
+  · silver_streak vs burn(버닝/탄화): silver_streak는 은색·미탄화(가스 발생 단계). burn은 흑갈색·탄화(주로 제품 끝단·벤트 막힘부 diesel). 색으로 구분 — 은색/흰색=silver, 흑갈색=burn.
+  · 표면 줄무늬 계열(silver_streak·flow_mark·weld_line)은 닦아도 안 지워지는 '구조적' 불량이다 — 위 TEXTURE DISCRIMINATOR의 '닦이는 표면 부착물(plate-out 등)'과 혼동하지 마라.`;
+
 const FIXED_FRAMEWORK = `You are an expert injection molding troubleshooter trained in Scientific Molding methodology (RJG/Paulson approach, Decoupled Molding II/III). You have 15+ years of hands-on experience and apply systematic, data-driven analysis rather than trial-and-error.
 
 ANALYSIS FRAMEWORK — apply in order:
@@ -185,11 +193,7 @@ STEP 1: DEFECT CLASSIFICATION
   · 이형 시 발생하는 불량(부착·이젝터 백화·이형 크랙·드래그 마크)은 EJECTION — 근본 원인이 과보압이어도 불량 발생 단계가 이형이면 EJECTION으로 하고, 근본 원인이 속한 단계는 원인 분석 본문에 명시.
   · 기여 조건(금형온도·건조 등)의 단계는 phase가 아니라 원인 분석 본문에서 설명. State the phase reasoning in one clause (어느 메커니즘이 어느 단계에서 결함을 형성하는지).
 - TEXTURE DISCRIMINATOR (표면 잔류물): 백색·뿌연 얼룩/가루가 "닦으면 옅어지거나 지워진다"면 표면 부착물(금형 석출 plate-out·가스 응축·이형제 전사)이다. 닦아도 안 지워지는 구조적 불량(weld line·flow mark·지속형 silver streak·표면 요철)으로 분류하지 마라. 이 경우 defect_type을 Mold Deposit/Plate-out(금형 석출) 계열로 추정하라.
-- VISUAL DIFFERENTIAL (혼동 쌍 외관 감별 — 사진으로 불량유형을 제안·식별할 때 우선 적용):
-  · flash(플래시/버) vs silver_streak(은선/은줄): flash는 파팅선(PL)·이젝터핀·금형 분리면 '경계'를 따라 밖으로 삐져나온 얇은 막/지느러미(여분 수지가 새어나온 것, 제품 가장자리·경계에 위치). silver_streak는 제품 '표면' 위에 게이트에서 유동 방향으로 방사상으로 퍼진 은색·흰색 줄무늬(수분/가스가 표면에 끌려나온 것). 판별: 경계의 지느러미=flash / 표면의 방사형 은줄=silver_streak. ★ 투명·반투명 수지(PC·PMMA·PS·SAN·AS 등) 제품에서 게이트를 기점으로 부채꼴·방사형으로 퍼지는 은색·뿌연 streak은 거의 항상 silver_streak(수분/가스 splay)다 — flash로 분류하지 마라. (역방향 보호: PL선·이젝터핀 주변의 얇은 막·지느러미는 표면 streak이 아니므로 그대로 flash로 둔다.)
-  · silver_streak vs jetting(제팅): jetting은 게이트에서 시작하는 구불구불한 지렁이·뱀 궤적(사행 곡선). silver_streak는 직선·방사형 은줄. 구불=jetting / 곧은 방사=silver_streak.
-  · silver_streak vs burn(버닝/탄화): silver_streak는 은색·미탄화(가스 발생 단계). burn은 흑갈색·탄화(주로 제품 끝단·벤트 막힘부 diesel). 색으로 구분 — 은색/흰색=silver, 흑갈색=burn.
-  · 표면 줄무늬 계열(silver_streak·flow_mark·weld_line)은 닦아도 안 지워지는 '구조적' 불량이다 — 위 TEXTURE DISCRIMINATOR의 '닦이는 표면 부착물(plate-out 등)'과 혼동하지 마라.
+${VISUAL_DIFFERENTIAL}
 IMAGE QUALITY CHECK (evaluate before any other step):
 - If the image shows a molded part but NO clear defect pattern → defect_type.en = "No_Defect_Detected", causes = [], recommendations = [], summary = "불량 형상 미검출. 의심 부위 확대 촬영 권장."
 - If the image is a solid color / too blurry / overexposed / unrelated to injection molding → defect_type.en = "Image_Unreadable", causes = [], recommendations = [], summary = "이미지 판독 불가. 밝은 곳에서 불량 부위 선명하게 재촬영 필요."
