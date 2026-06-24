@@ -1377,5 +1377,133 @@
       "severity": "medium",
       "trap": "①배압·계량위치·석백·노즐온도 등 성형조건 미세조정만 반복하면 함정(이미 전부 무효, 다수 전문가가 '조건으로는 한계' 합의 → 환경·설비·금형 하드웨어 축이 진짜). ②단일 수분/건조 탓으로 단정도 함정(주 원인은 환경 온도드리프트 + 하드웨어). ③배럴온도를 220 근처로 유지·미소조정만 권하면 함정(대형기 PMMA엔 과저, 240~250 필요)."
     }
+  },
+  {
+    "id": "pc-silverstreak-moisture-amorphous",
+    "source": "흡습성 정확성 가드 v1 — 비결정성 오개념 타깃",
+    "title": "PC 투명 하우징 은줄(수분 splay) — '비결정성=흡습 강함' 오개념 가드",
+    "difficulty": "hard",
+    "description": "비결정성 PC 은줄(잔류 수분 가수분해 splay). reasoning이 '비결정질이라 흡습성이 강하다'로 오설명하는지 검사. 올바른 인과 = 카보네이트 극성으로 흡습(흡습량은 PA보다 낮음) + 고온 가수분해 감수성 → 건조 필수.",
+    "input": {
+      "defect_type": "은줄 (Silver Streak)",
+      "resin_type": "PC",
+      "resin_detail": "PC (투명 그레이드)",
+      "machine_settings": {
+        "nozzle_temp": 300,
+        "zone1_temp": 295,
+        "zone2_temp": 290,
+        "zone3_temp": 285,
+        "zone4_temp": 270,
+        "mold_temp_fixed": 90,
+        "mold_temp_moving": 90,
+        "injection_pressure": 110,
+        "holding_pressure": 60,
+        "injection_speed_1": 50,
+        "back_pressure": 8,
+        "screw_rpm": 80,
+        "drying_temp": 100,
+        "drying_time": 2,
+        "dryer_type": "열풍식"
+      },
+      "defect_description": "투명 PC 하우징, 게이트에서 유동 방향으로 방사상 은색 줄무늬. 닦아도 안 지워짐. 건조 열풍식 100℃ 2h. 노즐 300℃, 금형 90℃."
+    },
+    "expected": {
+      "root_cause": "PC 잔류 수분에 의한 가수분해(수분이 열에 분해) splay = 은줄. PC는 카보네이트 극성으로 흡습하나 흡습량 자체는 PA보다 낮음(~0.2%) — 문제는 300℃ 고온에서 소량 잔류 수분도 카보네이트를 가수분해(CO2/수증기 발생·분자량 저하)시켜 splay 유발. 열풍식 100℃ 2h는 노점 관리 불가 → 잔류 수분 잔존. 제습식 120℃ 4h 재건조 필요.",
+      "key_recommendations": [
+        "제습식 건조기로 120℃ 4h 재건조(노점 -30℃ 이하 확인)",
+        "호퍼 투입 직전 수분율 측정(0.02% 이하 목표)",
+        "멜트온도 점검(300℃ — PC 상한, 체류시간 과다 시 가수분해 가중)",
+        "건조 이유는 흡습량이 아니라 고온 가수분해 감수성 때문임을 명확히"
+      ],
+      "expected_phase": "material",
+      "severity": "high",
+      "trap": "★ '비결정질(amorphous)이라 흡습성이 강하다'는 틀린 인과(본 가드 직접 타깃). PC 흡습량은 결정성 PA보다 낮다. 올바른 설명 = 카보네이트 극성으로 흡습(PA보다 낮음) + 고온 가수분해 감수성 → 건조 필수. 결정도 자체를 흡습량 원인으로 들면 오진."
+    }
+  },
+  {
+    "id": "pmma-silverstreak-moisture-amorphous",
+    "source": "흡습성 정확성 가드 v1 — 비결정성 오개념 타깃",
+    "title": "PMMA 은줄(수분 splay) — '비결정성=흡습 강함' 오개념 가드",
+    "difficulty": "hard",
+    "description": "비결정성 PMMA 은줄(잔류 수분 splay). reasoning이 '비결정질이라 흡습성이 강하다'로 오설명하는지 검사. 올바른 인과 = 에스터 극성으로 중간 흡습(PA보다 낮음) + 고온 기화/가수분해 → 건조 필수.",
+    "input": {
+      "defect_type": "은줄 (Silver Streak)",
+      "resin_type": "PMMA",
+      "resin_detail": "PMMA (아크릴, 투명)",
+      "machine_settings": {
+        "nozzle_temp": 245,
+        "zone1_temp": 240,
+        "zone2_temp": 235,
+        "zone3_temp": 230,
+        "zone4_temp": 220,
+        "mold_temp_fixed": 70,
+        "mold_temp_moving": 70,
+        "injection_pressure": 100,
+        "holding_pressure": 55,
+        "injection_speed_1": 50,
+        "back_pressure": 8,
+        "screw_rpm": 70,
+        "drying_temp": 80,
+        "drying_time": 2,
+        "dryer_type": "열풍식"
+      },
+      "defect_description": "투명 PMMA 렌즈커버, 게이트 기점 방사상 은색·뿌연 줄무늬. 닦아도 안 지워짐. 건조 열풍식 80℃ 2h. 노즐 245℃."
+    },
+    "expected": {
+      "root_cause": "PMMA 잔류 수분 splay = 은줄. PMMA는 에스터 극성으로 '중간' 정도 흡습(~0.3%, 결정성 PA ~1.5~2%보다 낮음) — 비결정성이라 흡습이 강한 게 아니다. 245℃ 성형에서 잔류 수분이 기화·가수분해되어 표면 splay. 열풍식 80℃ 2h 부족 → 제습식 80℃ 4h 재건조 필요.",
+      "key_recommendations": [
+        "제습식 건조기로 80℃ 4h 재건조(노점 확인)",
+        "호퍼 투입 직전 수분율 측정",
+        "1차 사출속도 소폭 하향(표면 splay 완화 보조)",
+        "건조 이유는 흡습량이 아니라 잔류 수분의 고온 기화/가수분해 때문임을 명확히"
+      ],
+      "expected_phase": "material",
+      "severity": "high",
+      "trap": "★ '비결정질이라 흡습성이 강하다'는 틀린 인과(본 가드 직접 타깃). PMMA 흡습은 에스터 극성에 의한 '중간' 수준으로 PA보다 낮다. 올바른 설명 = 극성기 기반 중간 흡습 + 고온 기화/가수분해 → 건조 필수. 결정도를 흡습 원인으로 들면 오진."
+    }
+  },
+  {
+    "id": "pa6-metering-glossvar-feedside",
+    "source": "사출 카페 실사례(2018) — 진우 검수. AI material(MB) 과집중·피드측 하드웨어 미스 타깃",
+    "title": "PA6+흑MB 표면 광택 얼룩 + 계량 불량 — 금형온도·피드부(냉각/배압/스크류) 축",
+    "difficulty": "hard",
+    "description": "PA6 비강화 + 흑색 마스터배치 드라이블렌드, 프레스물 인몰드. 두 증상: ① 표면 군데군데 번쩍임(광택 변동) ② 계량 불안정. 함정 = material(MB)·수분·후방존 온도에만 집중. 정답 축 = 광택→금형온도↑ 먼저(+유동성) / 계량→피드부(feed throat) 실린더 냉각·배압·스크류 디자인.",
+    "input": {
+      "defect_type": "은줄 (Silver Streak)",
+      "resin_type": "PA6",
+      "resin_detail": "PA6 비강화(코프라 NP) + 흑색 마스터배치(MB BK) 드라이블렌드",
+      "machine_settings": {
+        "nozzle_temp": 255,
+        "zone1_temp": 240,
+        "zone2_temp": 235,
+        "zone3_temp": 225,
+        "zone4_temp": 215,
+        "hopper_temp": 70,
+        "mold_temp_fixed": null,
+        "mold_temp_moving": null,
+        "injection_pressure": 5,
+        "holding_pressure": 0.2,
+        "back_pressure": 5,
+        "screw_rpm": 0,
+        "metering": 291.4,
+        "cushion": 1.0,
+        "pressure_unit": "bar"
+      },
+      "defect_description": "PA6 비강화 + 흑색 마스터배치 드라이블렌드, 프레스물 인몰드 사출. 아무리 조건을 맞춰도 계량이 안 되고, 나온 제품 표면에 군데군데 번쩍임(광택 얼룩). 후방존 온도를 올려봤더니(히터3 220→230) 계량이 오히려 더 안 됨. 금형온도 미입력."
+    },
+    "expected": {
+      "root_cause": "두 증상 분리. (1) 표면 번쩍임/광택 얼룩: 금형온도 낮음 + 수지 유동성 부족이 1차 — 현장 우선 처방은 금형온도↑. 마스터배치 캐리어(PE/PP) 분산 불균일·미세 가스도 기여하나 실전 1순위는 금형온도. (2) 계량 불안정: PA6 계량불량은 대개 피드측 — feed throat(실린더 피드부) 냉각수 순환 부족 시 펠릿 슬립, 과배압 시 나일론 계량 불가, 스크류 디자인/직경(28~32mm L/D) 영향. 후방존(히터3/4) 온도만 올리는 건 역효과(작업자 실측으로 악화 확인).",
+      "key_recommendations": [
+        "표면 광택: 금형온도 먼저 올림(+실린더/유동성 점검) — 현장 1순위",
+        "계량: feed throat(피드부) 실린더 냉각수 순환·온도 확인(과열 시 펠릿 슬립 → 계량 불가)",
+        "계량: 배압 조정(나일론은 과배압 시 계량 안 됨 — 낮춰 시도)",
+        "계량: 스크류 디자인/직경 점검(PA6 28~32mm 계량 난조 빈발)",
+        "마스터배치 영향 분리(MB 빼고 사출 비교), PA6 계열 캐리어 MB 권장",
+        "화면 screw_rpm 0은 촬영시점 idle일 가능성 — 실제 계량 rpm 설정을 확인(설정 오류로 단정 금지)"
+      ],
+      "expected_phase": "filling",
+      "severity": "high",
+      "trap": "★ material(마스터배치)·수분에만 집중하고 표면 광택에 '금형온도↑'를 안 짚으면 오진(현장 1순위 누락). ★ 계량불량을 후방존(히터3/4) 온도↑로만 처방 = 함정(작업자가 230℃로 올려 더 악화). 정답 = 광택은 금형온도 먼저, 계량은 피드부 냉각·배압·스크류 디자인(하드웨어/피드 축). ★ 화면의 0rpm을 설정 오류로 단정 = idle 스냅샷 오독."
+    }
   }
 ]

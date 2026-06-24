@@ -4,7 +4,7 @@
 // 수정 순서: taxonomy.md → 이 파일 → KB_VERSION bump → eval 회귀.
 import type { ResinSpec } from './resin-kb';
 
-export const KB_VERSION = 'defect-kb-v1.6';
+export const KB_VERSION = 'defect-kb-v1.7';
 
 export type Cause = {
   rank: number;
@@ -322,7 +322,24 @@ export const DEFECT_KB: Record<string, DefectNode> = {
         evidence: '배압 입력값.',
         verification: '배압 5~10bar씩↑ 후 보이드 감소 확인.',
         adjustment: '배압 소폭↑(GF 수지=섬유 파손 주의).' },
+      { rank: 4, cause: '환경 온도 드리프트(낮밤 기온차) → 금형/배럴 온도 불안정', category: 'Machine',
+        baseProbability: 25,
+        trigger: '낮밤 기온차 큰 환경 + 두꺼운부 + 간헐 발생(겨울 문닫으면 정상). 성형조건 조정과 무관.',
+        evidence: '주야·계절 발생 패턴. 금형/배럴 실측온도 안정성.',
+        verification: '기온차 측정 + 사출기 차폐/격리 후 재현 확인.',
+        adjustment: '사출기 차폐·격리(비닐 등)로 낮밤 온도차 차단(근본), 금형·배럴 온도 일정 유지.' },
+      { rank: 5, cause: '설비·금형 하드웨어(스크류/체크링 마모·노즐후퇴 미사용·코어측 벤트/오버플로우 부재)', category: 'Machine',
+        baseProbability: 20,
+        trigger: '성형조건 다 조정해도 무효 + 두꺼운부 보이드 고정위치. 스크류서 기포 혼입.',
+        evidence: '스크류·체크링 마모 이력. 보이드 위치 고정성.',
+        verification: '노즐후퇴(decompression) 적용·스크류 점검. 고정위치면 코어측 벤트/오버플로우 추가 후 확인.',
+        adjustment: '노즐후퇴로 기포 배출, 스크류/체크링 점검, 보이드 고정위치면 코어측 오버플로우·가스밴트 추가.' },
     ],
+    patternHints: {
+      '성형조건(보압·배압·온도·속도) 다 조정해도 무효 + 두꺼운부 + 낮밤 간헐': '공정 원인 아님 → 환경 온도드리프트·설비(스크류/노즐후퇴)·금형(코어측 벤트/오버플로우) 하드웨어 우선. 성형조건 미세조정 반복은 함정.',
+      '대형기·고점도(PMMA 등)인데 배럴온도 수지 권장 하한 근처': '배럴온도 충분히 확보(수지 권장범위 상단). 과저 시 두꺼운부 충전·탈기 불리 → 보이드 가중.',
+    },
+    priorityLogic: '조건무효 시 공정 미세조정에 머물지 말고 환경(온도 드리프트)·설비(스크류·노즐후퇴)·금형(벤트/오버플로우) 하드웨어 축으로 전환. 단 보압부족(rank1)·수분(rank2) 기본 단서가 명확하면 그대로 우선.',
     sharedGates: [],
     source: 'synthesis-2.2,taxonomy-8', confidence: 'high',
   },
@@ -755,14 +772,28 @@ export const DEFECT_KB: Record<string, DefectNode> = {
 
   gate_blush: {
     id: 'gate_blush', nameKo: '게이트 블러시', nameEn: 'Gate Blush', phase: '충전',
-    discriminators: '게이트 직후 흐림·광택 저하. 흐름자국(멀리까지)과 구분.',
+    discriminators: '게이트 직후 흐림·광택 저하. 흐름자국(멀리까지)과 구분. 밸브게이트 사용·게이트 국한·간헐·조건무효면 게이트 하드웨어(밸브핀·핫러너 온도) 의심. 닦이면 표면 석출(mold_deposit) 감별.',
     causes: [
       { rank: 1, cause: '게이트 과소 + 금형온도 낮음', category: 'Mold',
         trigger: '게이트 과소 → 급속 감압. 금형온도 낮음.',
         evidence: '게이트 크기. 금형온도.',
         verification: '게이트 확대 후 재시험.',
         adjustment: '게이트 확대, 금형온도↑, 사출속도↓.' },
+      { rank: 2, cause: '밸브게이트 핀 마모 또는 핀 타이밍/스트로크 불량', category: 'Mold',
+        trigger: '밸브게이트 사용 + 게이트 주변 국한 + 간헐 + 성형조건 무효.',
+        evidence: '밸브게이트 여부. 간헐성·게이트 국한.',
+        verification: '금형 열고 밸브핀 선단 마모·스트로크 실측(설계 대비 ±0.1mm 이상=이상). 핀 교체 후 동일 조건 소멸=확진.',
+        adjustment: '밸브핀 선단 점검·스트로크 조정·필요 시 교체.' },
+      { rank: 3, cause: '핫러너 게이트 온도 과저 또는 노즐 데드스팟 정체', category: 'Mold',
+        trigger: '핫러너 게이트온도가 수지 권장 하한 근처(내열ABS·PC 등) 또는 노즐 데드스팟 정체. 간헐.',
+        evidence: '핫러너 게이트온도 vs 수지 권장범위. 간헐 패턴.',
+        verification: '핫러너 게이트온도 상향·퍼지 후 재현 확인.',
+        adjustment: '핫러너 게이트온도↑(수지 하한 탈출), 퍼지·시트 정체/탄화 점검.' },
     ],
+    patternHints: {
+      '1점 밸브게이트·게이트 국한·간헐·성형조건 무효': '게이트 하드웨어/열 원인(밸브핀 마모·타이밍 또는 핫러너 게이트온도 과저) 우선. 성형조건 재조정은 함정.',
+    },
+    priorityLogic: '조건무효 + 밸브게이트면 게이트 하드웨어(밸브핀·핫러너온도)로 전환. 핫러너 게이트온도(미점검 흔함)를 금형분해(밸브핀)보다 먼저 시도. 닦임 여부로 mold_deposit 감별.',
     sharedGates: ['mold_temp_insufficient'],
     source: 'synthesis,taxonomy-29', confidence: 'med',
   },
