@@ -338,6 +338,9 @@ export const en: Record<string, string> = {
   'err.estimate_error': 'An error occurred during analysis.',
   'err.pdf_error': 'Error saving PDF.',
   'err.extract_fail': 'Extraction failed. Please use a clear photo of the machine screen.',
+  'err.extract_413': 'Photo is too large. Please try again (auto-downscaling applied).',
+  'err.extract_422': 'Could not read values from the photo. Try a sharper screen photo.',
+  'step3.photo_remove': 'Remove photo',
   'msg.resolved': 'Recorded as resolved case.',
   'msg.extracted': ' fields auto-filled — please verify.',
 

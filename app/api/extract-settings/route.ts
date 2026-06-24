@@ -4,7 +4,7 @@ import { tryMock } from '@/lib/mock';
 import { supabaseAdmin } from '@/lib/supabase/server';
 
 const ALLOWED_IMAGE_TYPES = new Set(['image/jpeg', 'image/png', 'image/webp', 'image/gif']);
-const MAX_IMAGE_BYTES = 8 * 1024 * 1024; // 8 MB
+const MAX_IMAGE_BYTES = 4 * 1024 * 1024; // 4 MB (Vercel 함수 페이로드 ~4.5MB보다 작게 — 413 가드)
 const DAILY_LIMIT = 20;
 
 function getApiKey(): string {

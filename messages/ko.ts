@@ -338,6 +338,9 @@ export const ko: Record<string, string> = {
   'err.estimate_error': '추정 중 오류가 발생했습니다.',
   'err.pdf_error': 'PDF 저장 중 오류가 발생했습니다.',
   'err.extract_fail': '추출 실패. 사출기 화면이 잘 보이는 사진을 사용해주세요.',
+  'err.extract_413': '사진 용량이 큽니다. 다시 시도해 주세요(자동 축소 적용 중).',
+  'err.extract_422': '사진에서 값을 읽지 못했습니다. 화면이 선명한 사진으로 다시 시도하세요.',
+  'step3.photo_remove': '사진 삭제',
   'msg.resolved': '해결된 사례로 기록되었습니다.',
   'msg.extracted': '개 항목 자동 입력 완료 — 확인 후 수정하세요.',
 

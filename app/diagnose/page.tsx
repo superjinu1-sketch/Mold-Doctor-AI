@@ -291,6 +291,7 @@ function DiagnoseContent() {
   const [isExtractingSettings, setIsExtractingSettings] = useState(false);
   const [extractMsg, setExtractMsg] = useState('');
   const [extractedFields, setExtractedFields] = useState<Set<string>>(new Set());
+  const [settingsImages, setSettingsImages] = useState<{ id: string; preview: string }[]>([]);  // 셋팅 OCR 멀티 썸네일
   const fileInputRef = useRef<HTMLInputElement>(null);
   const settingsImageRef = useRef<HTMLInputElement>(null);
   const gradeImageRef = useRef<HTMLInputElement>(null);
@@ -347,45 +348,75 @@ function DiagnoseContent() {
     ['멜라민계', 'step2.fr_melamine'],
   ];
 
-  const handleSettingsImage = async (file: File) => {
-    if (!file.type.startsWith('image/')) return;
+  const fileToBase64 = (file: File) => new Promise<string>((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = (e) => resolve((e.target?.result as string).split(',')[1]);
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+
+  // 축소본(base64)을 extract-settings로 보내 settings에 누적 병합. 반환: {filled, status}
+  const extractFromScaled = async (scaled: string): Promise<{ filled: number; status: number }> => {
+    const res = await fetch(apiUrl('/api/extract-settings'), {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', ...(await authHeaders()) },
+      body: JSON.stringify({ image: { data: scaled, mediaType: 'image/jpeg' } }),
+    });
+    if (!res.ok) return { filled: 0, status: res.status };
+    const extracted = await res.json();
+    const filledKeys: string[] = [];
+    setSettings(prev => {
+      const updated = { ...prev };
+      for (const key of Object.keys(extracted)) {
+        if (key === 'pressureUnit') continue; // 유효값 가드 후 아래에서 처리
+        if (key in updated && extracted[key]) {
+          (updated as Record<string, string>)[key] = extracted[key];
+          filledKeys.push(key);
+        }
+      }
+      if (extracted.pressureUnit && ['bar', 'MPa', 'kgf/cm2'].includes(extracted.pressureUnit)) {
+        updated.pressureUnit = extracted.pressureUnit;
+      }
+      return updated;
+    });
+    setExtractedFields(prev => new Set([...prev, ...filledKeys])); // 멀티 누적
+    return { filled: filledKeys.length, status: 200 };
+  };
+
+  // 셋팅 OCR 멀티 업로드(최대 5장): 각 장 즉시 다운스케일(413 방지) + OCR → settings 누적. 부분추출 허용.
+  const addSettingsImages = async (files: FileList | File[]) => {
+    const arr = Array.from(files).filter(f => f.type.startsWith('image/'));
+    if (arr.length === 0) return;
     setIsExtractingSettings(true);
     setExtractMsg('');
-    try {
-      const base64 = await new Promise<string>((resolve) => {
-        const reader = new FileReader();
-        reader.onload = (e) => resolve((e.target?.result as string).split(',')[1]);
-        reader.readAsDataURL(file);
-      });
-      const res = await fetch(apiUrl('/api/extract-settings'), {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', ...(await authHeaders()) },
-        body: JSON.stringify({ image: { data: base64, mediaType: file.type } }),
-      });
-      if (!res.ok) throw new Error(t('err.extract_fail'));
-      const extracted = await res.json();
-      const filledKeys: string[] = [];
-      setSettings(prev => {
-        const updated = { ...prev };
-        for (const key of Object.keys(extracted)) {
-          if (key === 'pressureUnit') continue; // 유효값 가드 후 아래에서 처리
-          if (key in updated && extracted[key]) {
-            (updated as Record<string, string>)[key] = extracted[key];
-            filledKeys.push(key);
-          }
-        }
-        if (extracted.pressureUnit && ['bar', 'MPa', 'kgf/cm2'].includes(extracted.pressureUnit)) {
-          updated.pressureUnit = extracted.pressureUnit;
-        }
-        return updated;
-      });
-      setExtractedFields(new Set(filledKeys));
-      setExtractMsg(`✓ ${filledKeys.length}${t('msg.extracted')}`);
-    } catch {
-      setExtractMsg(t('err.extract_fail'));
-    } finally {
-      setIsExtractingSettings(false);
+    let totalFilled = 0;
+    let lastErrStatus = 0;
+    for (const file of arr) {
+      let full = false;
+      setSettingsImages(prev => { full = prev.length >= 5; return prev; });
+      if (full) break;
+      try {
+        const raw = await fileToBase64(file);
+        // OCR용: 긴 변 1800px / JPEG 0.82 — 숫자 판독 충분 + base64 1MB 이하(Vercel 413 방지)
+        const scaled = await downscaleImageClient(raw, 1800, 0.82, file.type);
+        setSettingsImages(prev => prev.length >= 5 ? prev : [...prev, { id: `s-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`, preview: `data:image/jpeg;base64,${scaled}` }]);
+        const r = await extractFromScaled(scaled);
+        if (r.status === 200) totalFilled += r.filled;
+        else lastErrStatus = r.status;
+      } catch {
+        lastErrStatus = -1;
+      }
     }
+    setIsExtractingSettings(false);
+    if (totalFilled > 0) setExtractMsg(`✓ ${totalFilled}${t('msg.extracted')}`);
+    else if (lastErrStatus === 413) setExtractMsg(t('err.extract_413'));
+    else if (lastErrStatus === 422) setExtractMsg(t('err.extract_422'));
+    else if (lastErrStatus) setExtractMsg(t('err.extract_fail'));
+  };
+
+  const removeSettingsImage = (id: string) => {
+    // 사진만 목록에서 제거 — 이미 채워진 settings 값은 유지(사용자가 직접 수정·삭제)
+    setSettingsImages(prev => prev.filter(s => s.id !== id));
   };
 
   // Pre-select defect type from URL param
@@ -645,9 +676,9 @@ function DiagnoseContent() {
       }
     }
     if (imageFiles.length === 0) return;
-    if (openSection === 3) handleSettingsImage(imageFiles[0]); // 셋팅 OCR (단일) — Step3 열림 시
-    else addImages(imageFiles);                                 // 불량 (기존)
-  }, [addImages, openSection, handleSettingsImage]);
+    if (openSection === 3) addSettingsImages(imageFiles); // 셋팅 OCR (멀티 누적) — Step3 열림 시
+    else addImages(imageFiles);                            // 불량 (기존)
+  }, [addImages, openSection, addSettingsImages]);
 
   useEffect(() => {
     document.addEventListener('paste', handlePaste);
@@ -1332,11 +1363,11 @@ function DiagnoseContent() {
               role="button"
               tabIndex={0}
               aria-disabled={isExtractingSettings}
-              onClick={() => { if (!isExtractingSettings) settingsImageRef.current?.click(); }}
-              onKeyDown={(e) => { if ((e.key === 'Enter' || e.key === ' ') && !isExtractingSettings) { e.preventDefault(); settingsImageRef.current?.click(); } }}
-              onDragOver={(e) => { e.preventDefault(); if (!isExtractingSettings) setIsDraggingSettings(true); }}
+              onClick={() => { if (!isExtractingSettings && settingsImages.length < 5) settingsImageRef.current?.click(); }}
+              onKeyDown={(e) => { if ((e.key === 'Enter' || e.key === ' ') && !isExtractingSettings && settingsImages.length < 5) { e.preventDefault(); settingsImageRef.current?.click(); } }}
+              onDragOver={(e) => { e.preventDefault(); if (!isExtractingSettings && settingsImages.length < 5) setIsDraggingSettings(true); }}
               onDragLeave={() => setIsDraggingSettings(false)}
-              onDrop={(e) => { e.preventDefault(); setIsDraggingSettings(false); if (!isExtractingSettings && e.dataTransfer.files[0]) handleSettingsImage(e.dataTransfer.files[0]); }}
+              onDrop={(e) => { e.preventDefault(); setIsDraggingSettings(false); if (!isExtractingSettings && settingsImages.length < 5 && e.dataTransfer.files.length) addSettingsImages(e.dataTransfer.files); }}
               className={`border-2 border-dashed rounded-xl p-5 sm:p-8 text-center transition-colors min-h-[56px] ${isExtractingSettings ? 'cursor-default opacity-80' : 'cursor-pointer'} ${isDraggingSettings ? 'border-[var(--brand-border)] bg-brand-tint' : 'border-[var(--brand-border)] hover:bg-brand-tint'}`}
             >
               {isExtractingSettings ? (
@@ -1362,9 +1393,26 @@ function DiagnoseContent() {
               ref={settingsImageRef}
               type="file"
               accept="image/*"
+              multiple
               className="hidden"
-              onChange={(e) => e.target.files?.[0] && handleSettingsImage(e.target.files[0])}
+              onChange={(e) => { if (e.target.files?.length) addSettingsImages(e.target.files); e.target.value = ''; }}
             />
+            {/* 셋팅 사진 썸네일(멀티) — × 삭제 / 재촬영=추가 업로드 */}
+            {settingsImages.length > 0 && (
+              <div className="mt-3 flex flex-wrap gap-2">
+                {settingsImages.map((s) => (
+                  <div key={s.id} className="relative">
+                    <img src={s.preview} alt="" className="w-16 h-16 object-cover rounded-lg border border-border" />
+                    <button
+                      type="button"
+                      onClick={() => removeSettingsImage(s.id)}
+                      className="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-ink text-on-brand text-xs font-bold flex items-center justify-center"
+                      aria-label={t('step3.photo_remove')}
+                    >×</button>
+                  </div>
+                ))}
+              </div>
+            )}
             {extractMsg && (
               <div className={`mt-2 text-sm px-4 py-3 rounded-xl flex items-start gap-2 ${extractMsg.startsWith('✓') ? 'bg-brand-tint border border-[var(--brand-border)] text-brand-ink' : 'bg-[var(--danger-bg)] border border-[var(--danger-border)] text-danger'}`}>
                 <span className="shrink-0 mt-0.5">{extractMsg.startsWith('✓') ? '✓' : '!'}</span>

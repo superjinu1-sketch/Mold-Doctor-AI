@@ -5,7 +5,7 @@ import { VISUAL_DIFFERENTIAL } from '@/app/api/diagnose/route';
 
 // 경량 불량유형 분류(사진→제안). 보조 기능: 크레딧·진단 카운트 차감 없음(과금 RPC 호출 안 함).
 const ALLOWED_IMAGE_TYPES = new Set(['image/jpeg', 'image/png', 'image/webp', 'image/gif']);
-const MAX_IMAGE_BYTES = 8 * 1024 * 1024; // 8 MB
+const MAX_IMAGE_BYTES = 4 * 1024 * 1024; // 4 MB (Vercel 함수 페이로드 ~4.5MB보다 작게 — 413 가드)
 
 function getApiKey(): string {
   return process.env.ANTHROPIC_API_KEY || '';
