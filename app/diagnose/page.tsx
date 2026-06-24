@@ -217,6 +217,7 @@ function DiagnoseContent() {
   const [defectDescription, setDefectDescription] = useState('');
   const [aiSuggested, setAiSuggested] = useState(false);   // 불량유형 AI 제안 배지
   const [isClassifying, setIsClassifying] = useState(false);
+  const [classifyError, setClassifyError] = useState(false);   // AI 자동추정 시스템 오류(키 한도/네트워크 등) 표시
   // 진단 필수 게이트용 — 확정된 불량유형(기타는 직접 입력값)
   const effectiveDefectType = (defectType === '기타 (직접 입력)' ? customDefect.trim() : defectType);
   const [resinType, setResinType] = useState('');
@@ -631,23 +632,34 @@ function DiagnoseContent() {
     setMoldDrawings(prev => [...prev, ...valid].slice(0, 3));
   }, [processFile]);
 
-  // 사진→불량유형 AI 제안(보조 기능: 크레딧 무차감, 실패는 조용히 무시)
+  // 사진→불량유형 AI 제안(보조 기능: 크레딧 무차감)
+  // 무검출은 조용히 무시, 단 시스템 오류(키 한도/네트워크)는 사용자에게 표시
   const classifyDefect = useCallback(async (img: ImageFile) => {
     setIsClassifying(true);
+    setClassifyError(false);
     try {
       const res = await fetch(apiUrl('/api/classify-defect'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', ...(await authHeaders()) },
         body: JSON.stringify({ image: { data: img.base64, mediaType: img.mediaType } }),
       });
-      if (!res.ok) return;
+      if (!res.ok) {
+        // 시스템 오류(예: 400 usage limit, 429, 5xx) — 조용히 삼키지 말고 표시
+        console.warn('[classify-defect] non-ok status:', res.status);
+        setClassifyError(true);
+        return;
+      }
       const data = await res.json();
       const en = typeof data?.defect_type?.en === 'string' ? data.defect_type.en.trim() : '';
-      if (!en || data?.confidence === 'low') return;
+      if (!en || data?.confidence === 'low') return;   // 무검출/저신뢰 = 정상 무시(오류 아님)
       const matched = DEFECT_TYPES.find(d => d.includes(en));
       if (matched) { setDefectType(matched); setAiSuggested(true); }
-    } catch { /* 보조 기능 — 조용히 무시 */ }
-    finally { setIsClassifying(false); }
+    } catch (e) {
+      console.warn('[classify-defect] request failed:', e);
+      setClassifyError(true);
+    } finally {
+      setIsClassifying(false);
+    }
   }, []);
 
   const addImages = useCallback(async (files: FileList | File[]) => {
@@ -1150,6 +1162,11 @@ function DiagnoseContent() {
                 {t('step1.ai_suggested')}
               </div>
             )}
+            {classifyError && (
+              <div className="mb-2 text-[length:var(--text-label)] font-medium text-warn bg-[var(--warn-bg)] border border-[var(--warn-border)] rounded-lg px-3 py-1.5">
+                {t('step1.classify_error')}
+              </div>
+            )}
 
             {!defectGridOpen ? (
               <div className="flex flex-wrap items-center gap-2">
@@ -1162,7 +1179,7 @@ function DiagnoseContent() {
                       className="text-brand hover:text-brand-ink text-base font-medium min-h-[44px] px-2">
                       {t('step1.type_change')}
                     </button>
-                    <button type="button" onClick={() => { setDefectType(''); setCustomDefect(''); setAiSuggested(false); }}
+                    <button type="button" onClick={() => { setDefectType(''); setCustomDefect(''); setAiSuggested(false); setClassifyError(false); }}
                       className="text-faint hover:text-ink text-base min-h-[44px] px-2" aria-label={t('step1.type_clear')}>
                       ×
                     </button>
@@ -1184,6 +1201,7 @@ function DiagnoseContent() {
                       const next = defectType === type ? '' : type;
                       setDefectType(next);
                       setAiSuggested(false);   // 사용자 확정이 AI 제안을 덮어씀
+                      setClassifyError(false);
                       // 선택 즉시 접기. '기타'는 직접 입력을 위해 펼친 상태 유지.
                       if (next && next !== '기타 (직접 입력)') setDefectGridOpen(false);
                     }}

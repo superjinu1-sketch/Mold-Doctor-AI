@@ -141,6 +141,7 @@ export const ko: Record<string, string> = {
   'step1.type_custom': '불량 유형 직접 입력',
   'step1.classifying': 'AI가 불량 유형 분석 중…',
   'step1.ai_suggested': '🔍 AI 추정 — 맞으면 그대로, 다르면 아래에서 선택',
+  'step1.classify_error': 'AI 자동 추정을 일시적으로 할 수 없습니다. 불량 유형을 직접 선택해 주세요.',
   'step1.defect_required_gate': '불량 유형을 확정해 주세요 (사진 업로드 시 AI가 제안합니다)',
   'step1.desc_label': '불량 상황 설명 (선택)',
   'step1.desc_placeholder': '예: 5샷에 1번꼴로 발생, 특정 부위에서만, 오후에 심해짐, 조건 바꿔도 안 됨...',

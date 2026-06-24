@@ -141,6 +141,7 @@ export const en: Record<string, string> = {
   'step1.type_custom': 'Enter defect type manually',
   'step1.classifying': 'AI is analyzing the defect type…',
   'step1.ai_suggested': '🔍 AI suggestion — keep if correct, or pick below',
+  'step1.classify_error': 'AI auto-detect is temporarily unavailable. Please select the defect type manually.',
   'step1.defect_required_gate': 'Please confirm the defect type (AI suggests one when you upload a photo)',
   'step1.desc_label': 'Defect Description (optional)',
   'step1.desc_placeholder': 'e.g. 1 in 5 shots, specific location, worsens in afternoon, persists despite condition changes...',
