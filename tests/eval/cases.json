@@ -798,6 +798,7 @@
         "건조·멜트는 정상이므로 수분 대책 불필요"
       ],
       "expected_phase": "cooling",
+      "phase_also_accept": ["filling"],
       "severity": "medium",
       "trap": null
     }
@@ -840,6 +841,7 @@
         "건조 정상이므로 수분 대책 불필요"
       ],
       "expected_phase": "cooling",
+      "phase_also_accept": ["filling"],
       "severity": "medium",
       "trap": "건조 정상인데 '은줄=수분'으로 단정하면 오진. GF수지·흑색·안 닦이는 방사상 백화 = 섬유 readout. 분류 전환 + 금형온도가 핵심."
     }
@@ -881,6 +883,7 @@
         "필요 시 금형 표면 폴리싱"
       ],
       "expected_phase": "cooling",
+      "phase_also_accept": ["filling"],
       "severity": "low",
       "trap": null
     }

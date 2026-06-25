@@ -247,12 +247,12 @@ async function judgeCase(c, aiRaw, client) {
 ## 정답 기준 (cases.json expected)
 - 정답 root_cause: ${exp.root_cause}
 - 정답 key_recommendations: ${exp.key_recommendations.join(', ')}
-- 정답 phase: ${exp.expected_phase}
+- 정답 phase: ${exp.expected_phase}${exp.phase_also_accept?.length ? ` (이 결함은 표면 스킨 형성 단계가 본질적으로 모호 → 다음 phase도 정답으로 인정: ${exp.phase_also_accept.join(', ')})` : ''}
 - 정답 severity: ${exp.severity}
 ${hasTrap ? `- 오진 함정(trap): ${exp.trap}` : ''}
 
 ## 채점 기준 (총 100점, hard trap 회피 시 +10 bonus)
-1. phase 정확 (20점): AI의 defect_phase가 정답 phase와 일치하는가
+1. phase 정확 (20점): AI의 defect_phase가 정답 phase와 일치하면 만점. 위 "정답으로 인정" 목록이 있으면 그 중 하나와 일치해도 만점.
 2. root cause 정확도 (40점): AI가 핵심 근본 원인을 올바르게 지목했는가 (부분 점수 가능)
 3. recommendations 적합성 (30점): AI 조치가 정답 key_recommendations와 방향이 맞는가
 4. severity 정확 (10점): high/medium/low 일치
