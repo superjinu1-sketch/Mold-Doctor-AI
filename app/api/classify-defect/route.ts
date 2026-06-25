@@ -7,6 +7,10 @@ import { VISUAL_DIFFERENTIAL } from '@/app/api/diagnose/route';
 const ALLOWED_IMAGE_TYPES = new Set(['image/jpeg', 'image/png', 'image/webp', 'image/gif']);
 const MAX_IMAGE_BYTES = 4 * 1024 * 1024; // 4 MB (Vercel 함수 페이로드 ~4.5MB보다 작게 — 413 가드)
 
+// 봇/abuse 차단 rate-limit (정상 사용자 천장보다 훨씬 높게 — 조정: 진우). 크레딧 0 엔드포인트라 user당 윈도우 한도가 유일 방어.
+const CLASSIFY_HOURLY_LIMIT = 10;
+const CLASSIFY_DAILY_LIMIT = 30;
+
 function getApiKey(): string {
   return process.env.ANTHROPIC_API_KEY || '';
 }
@@ -24,6 +28,26 @@ export async function POST(request: NextRequest) {
     const { data: userData, error: userErr } = await supabaseAdmin.auth.getUser(token);
     if (userErr || !userData?.user) {
       return NextResponse.json({ error: '로그인이 필요합니다.', code: 'AUTH_REQUIRED' }, { status: 401 });
+    }
+
+    // ── rate-limit (시간당 + 일일 이중) — user당 윈도우 카운터 ──
+    const now = new Date().toISOString();
+    const dayBucket = now.slice(0, 10);   // 2026-06-24
+    const hourBucket = now.slice(0, 13);  // 2026-06-24T13
+    const ep = 'classify-defect';
+    for (const [bucket, limit, label] of [
+      [hourBucket, CLASSIFY_HOURLY_LIMIT, '시간당'],
+      [dayBucket, CLASSIFY_DAILY_LIMIT, '일일'],
+    ] as const) {
+      const { data: rl, error: rlErr } = await supabaseAdmin.rpc('increment_api_count', {
+        p_user_id: userData.user.id, p_bucket: bucket, p_endpoint: ep, p_limit: limit,
+      });
+      if (rlErr) {
+        return NextResponse.json({ error: 'Rate limit 확인 중 오류', code: 'RL_ERROR' }, { status: 500 });
+      }
+      if (!(rl as { ok: boolean })?.ok) {
+        return NextResponse.json({ error: `${label} 사용 한도(${limit}회)를 초과했습니다.`, code: 'RATE_LIMIT' }, { status: 429 });
+      }
     }
 
     // ── 입력 검증 (MIME + 크기) ───────────────────────────
