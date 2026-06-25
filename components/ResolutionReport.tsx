@@ -75,7 +75,7 @@ export function ReportLayout({ record, authorName, companyName }: ReportProps) {
   return (
     <div style={{ width: 794, fontFamily: 'Pretendard Variable, sans-serif', background: '#fff', color: '#14171C', fontSize: 13, lineHeight: 1.5 }}>
       {/* Header */}
-      <div style={{ background: '#1E5FA5', color: '#fff', padding: '20px 32px 16px', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
+      <div data-pdf-block style={{ background: '#1E5FA5', color: '#fff', padding: '20px 32px 16px', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
         <div>
           <div style={{ fontSize: 20, fontWeight: 800, marginBottom: 4 }}>Mold Doctor AI 추정 리포트</div>
           <div style={{ fontSize: 12, opacity: 0.85 }}>사출 불량 트러블슈팅 기록</div>
@@ -90,7 +90,7 @@ export function ReportLayout({ record, authorName, companyName }: ReportProps) {
       <div style={{ padding: '24px 32px', display: 'flex', flexDirection: 'column', gap: 20 }}>
 
         {/* 불량 정보 */}
-        <section>
+        <section data-pdf-block>
           <div style={{ fontWeight: 800, fontSize: 15, borderBottom: '2px solid #1E5FA5', paddingBottom: 4, marginBottom: 12 }}>1. 불량 정보</div>
           <div style={{ display: 'flex', gap: 20 }}>
             <div style={{ flex: 1 }}>
@@ -122,7 +122,7 @@ export function ReportLayout({ record, authorName, companyName }: ReportProps) {
 
         {/* 추정 원인 */}
         {record.causes && record.causes.length > 0 && (
-          <section>
+          <section data-pdf-block>
             <div style={{ fontWeight: 800, fontSize: 15, borderBottom: '2px solid #1E5FA5', paddingBottom: 4, marginBottom: 12 }}>2. 추정 원인</div>
             <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 12 }}>
               <thead>
@@ -148,7 +148,7 @@ export function ReportLayout({ record, authorName, companyName }: ReportProps) {
 
         {/* 셋팅 비교 */}
         {allKeys.length > 0 && (
-          <section>
+          <section data-pdf-block>
             <div style={{ fontWeight: 800, fontSize: 15, borderBottom: '2px solid #1E5FA5', paddingBottom: 4, marginBottom: 12 }}>3. 셋팅값 Before → After</div>
             <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 12 }}>
               <thead>
@@ -178,7 +178,7 @@ export function ReportLayout({ record, authorName, companyName }: ReportProps) {
 
         {/* 조정안 */}
         {record.recommendations && record.recommendations.length > 0 && (
-          <section>
+          <section data-pdf-block>
             <div style={{ fontWeight: 800, fontSize: 15, borderBottom: '2px solid #1E5FA5', paddingBottom: 4, marginBottom: 12 }}>4. 주요 조정안</div>
             <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 12 }}>
               <thead>
@@ -202,7 +202,7 @@ export function ReportLayout({ record, authorName, companyName }: ReportProps) {
         )}
 
         {/* 조치 결과 */}
-        <section>
+        <section data-pdf-block>
           <div style={{ fontWeight: 800, fontSize: 15, borderBottom: '2px solid #1E5FA5', paddingBottom: 4, marginBottom: 12 }}>5. 조치 결과</div>
           <div style={{ display: 'flex', gap: 20 }}>
             <div style={{ flex: 1 }}>
@@ -234,7 +234,7 @@ export function ReportLayout({ record, authorName, companyName }: ReportProps) {
 
         {/* 체크리스트 */}
         {chklist.length > 0 && (
-          <section>
+          <section data-pdf-block>
             <div style={{ fontWeight: 800, fontSize: 15, borderBottom: '2px solid #1E5FA5', paddingBottom: 4, marginBottom: 12 }}>6. 체크리스트</div>
             <ul style={{ paddingLeft: 16, margin: 0 }}>
               {chklist.slice(0, 8).map((item, i) => (
@@ -245,7 +245,7 @@ export function ReportLayout({ record, authorName, companyName }: ReportProps) {
         )}
 
         {/* 면책 */}
-        <div style={{ borderTop: '1px solid #E3E6EA', paddingTop: 12, fontSize: 11, color: '#6B7280', textAlign: 'center' }}>
+        <div data-pdf-block style={{ borderTop: '1px solid #E3E6EA', paddingTop: 12, fontSize: 11, color: '#6B7280', textAlign: 'center' }}>
           본 리포트는 AI 추정 기반 참고자료입니다. 최종 판단은 현장 엔지니어의 검증이 필요합니다.
           <br />Mold Doctor AI · {new Date().getFullYear()}
         </div>
@@ -273,22 +273,62 @@ export function ReportModal({ record, onClose }: ReportModalProps) {
         import('html2canvas-pro'),
         import('jspdf').then(m => ({ jsPDF: m.jsPDF })),
       ]);
-      const canvas = await html2canvas(reportRef.current, { scale: 2, useCORS: true, backgroundColor: '#ffffff' });
-      const imgData = canvas.toDataURL('image/png');
+      const el = reportRef.current;
+      if (!el) return;
+      // 폰트/이미지 렌더 안정화 대기 (diagnose page와 동일)
+      await new Promise<void>(r => requestAnimationFrame(() => requestAnimationFrame(() => r())));
+
       const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
-      const pdfW = pdf.internal.pageSize.getWidth();
-      const pdfH = pdf.internal.pageSize.getHeight();
-      const imgH = (canvas.height * pdfW) / canvas.width;
-      let remaining = imgH;
-      let pos = 0;
-      pdf.addImage(imgData, 'PNG', 0, pos, pdfW, imgH);
-      remaining -= pdfH;
-      while (remaining > 0) {
-        pos = remaining - imgH;
+      const pageW = pdf.internal.pageSize.getWidth();
+      const pageH = pdf.internal.pageSize.getHeight();
+      const M = 6;                      // 여백(mm)
+      const GAP = 4;                    // 블록 간 간격(mm)
+      const imgW = pageW - M * 2;
+      const pageAvail = pageH - M * 2;  // 한 페이지 가용 높이
+      let y = M;
+
+      const placeBlock = async (node: HTMLElement): Promise<void> => {
+        const canvas = await html2canvas(node, { scale: 2, useCORS: true, backgroundColor: '#ffffff' });
+        if (!canvas.width || !canvas.height) return;
+        const imgH = (canvas.height * imgW) / canvas.width;
+
+        // (a) 한 페이지에 드는 블록: 남은 공간 부족하면 새 페이지 → 통째 배치(행 안 잘림)
+        if (imgH <= pageAvail) {
+          if (y + imgH > pageH - M) { pdf.addPage(); y = M; }
+          pdf.addImage(canvas.toDataURL('image/png'), 'PNG', M, y, imgW, imgH);
+          y += imgH + GAP;
+          return;
+        }
+        // (b) 페이지보다 큰 블록: 직계 자식으로 재귀 분할(픽셀 슬라이싱 회피)
+        const kids = Array.from(node.children).filter(
+          (c): c is HTMLElement => c instanceof HTMLElement && c.offsetHeight > 0
+        );
+        if (kids.length > 1) {
+          for (const kid of kids) await placeBlock(kid);
+          return;
+        }
+        // (c) 더 못 쪼개는 단일 거대 블록(희귀): 최후의 픽셀 슬라이싱
+        if (y > M) { pdf.addPage(); y = M; }
+        const data = canvas.toDataURL('image/png');
+        let pos = M;
+        let left = imgH;
+        pdf.addImage(data, 'PNG', M, pos, imgW, imgH);
+        left -= (pageH - M - pos);
+        while (left > 0) {
+          pdf.addPage();
+          pos = M - (imgH - left);
+          pdf.addImage(data, 'PNG', M, pos, imgW, imgH);
+          left -= (pageH - M * 2);
+        }
         pdf.addPage();
-        pdf.addImage(imgData, 'PNG', 0, pos, pdfW, imgH);
-        remaining -= pdfH;
-      }
+        y = M;
+      };
+
+      // 마커 순회(없으면 전체 폴백)
+      const blocks = Array.from(el.querySelectorAll<HTMLElement>('[data-pdf-block]'));
+      const targets: HTMLElement[] = blocks.length ? blocks : [el];
+      for (const block of targets) await placeBlock(block);
+
       const defect = record.defect_type?.en?.replace(/\s/g, '-') ?? 'report';
       pdf.save(`mold-doctor-${defect}-${Date.now()}.pdf`);
     } catch (e) {
