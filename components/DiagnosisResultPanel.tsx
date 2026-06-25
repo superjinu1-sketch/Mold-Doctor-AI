@@ -990,7 +990,7 @@ export default function DiagnosisResultPanel({ result, onSavePDF, round = 1, fol
                         const b64 = (ev.target?.result as string)?.split(',')[1];
                         if (b64) {
                           const small = await downscaleImageClient(b64, 400);
-                          setAfterPhoto(small);
+                          setAfterPhoto(small ?? b64);  // 디코드 실패 시 원본 폴백(해결 사진은 기록·표시용 — 비전 분석 아님)
                         }
                       };
                       reader.readAsDataURL(file);

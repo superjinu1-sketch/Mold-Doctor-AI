@@ -392,6 +392,7 @@ function DiagnoseContent() {
     setExtractMsg('');
     let totalFilled = 0;
     let lastErrStatus = 0;
+    let decodeFailed = false;
     for (const file of arr) {
       let full = false;
       setSettingsImages(prev => { full = prev.length >= 5; return prev; });
@@ -400,6 +401,7 @@ function DiagnoseContent() {
         const raw = await fileToBase64(file);
         // OCR용: 긴 변 1800px / JPEG 0.82 — 숫자 판독 충분 + base64 1MB 이하(Vercel 413 방지)
         const scaled = await downscaleImageClient(raw, 1800, 0.82, file.type);
+        if (scaled == null) { decodeFailed = true; continue; }  // HEIC 등 디코드 실패 → 스킵 + 안내
         setSettingsImages(prev => prev.length >= 5 ? prev : [...prev, { id: `s-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`, preview: `data:image/jpeg;base64,${scaled}` }]);
         const r = await extractFromScaled(scaled);
         if (r.status === 200) totalFilled += r.filled;
@@ -410,6 +412,7 @@ function DiagnoseContent() {
     }
     setIsExtractingSettings(false);
     if (totalFilled > 0) setExtractMsg(`✓ ${totalFilled}${t('msg.extracted')}`);
+    else if (decodeFailed) setExtractMsg(t('img.decode_failed'));
     else if (lastErrStatus === 413) setExtractMsg(t('err.extract_413'));
     else if (lastErrStatus === 422) setExtractMsg(t('err.extract_422'));
     else if (lastErrStatus) setExtractMsg(t('err.extract_fail'));
@@ -613,6 +616,7 @@ function DiagnoseContent() {
         const dataUrl = e.target?.result as string;
         const rawBase64 = dataUrl.split(',')[1];
         const scaled = await downscaleImageClient(rawBase64, 1568, 0.82, file.type);
+        if (scaled == null) { setError(t('img.decode_failed')); resolve(null); return; }  // HEIC 등 디코드 실패 → 오라벨 전송 대신 거부+안내
         resolve({
           id: Math.random().toString(36).slice(2),
           file,
@@ -623,14 +627,47 @@ function DiagnoseContent() {
       };
       reader.readAsDataURL(file);
     });
-  }, []);
+  }, [t]);
+
+  // 금형 도면 PDF 전용 처리 — 다운스케일 금지(이미지 아님). preview:''가 기존 PDF 칩 UI를 트리거.
+  const processDrawingPdf = useCallback(async (file: File): Promise<ImageFile | null> => {
+    if (file.type !== 'application/pdf') return null;
+    const MAX_DRAWING_PDF = 2.5 * 1024 * 1024;   // 2.5MB (base64 ~1.37배 팽창 → 서버 413 페이로드 천장 4.4MB 정합, 도면+사진 동시 여유)
+    if (file.size > MAX_DRAWING_PDF) {
+      setError(locale === 'en'
+        ? 'The drawing PDF is too large (max 2.5MB). Please compress and attach again.'
+        : '도면 PDF가 너무 큽니다 (최대 2.5MB). 파일을 줄여 다시 첨부해주세요.');
+      return null;
+    }
+    return new Promise((resolve) => {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const dataUrl = e.target?.result as string;
+        const rawBase64 = dataUrl?.split(',')[1] ?? '';
+        if (!rawBase64) { resolve(null); return; }
+        resolve({
+          id: Math.random().toString(36).slice(2),
+          file,
+          preview: '',
+          base64: rawBase64,
+          mediaType: 'application/pdf',
+        });
+      };
+      reader.onerror = () => resolve(null);
+      reader.readAsDataURL(file);
+    });
+  }, [locale]);
 
   const addMoldDrawings = useCallback(async (files: FileList | File[]) => {
-    const fileArray = Array.from(files).filter(f => f.type.startsWith('image/') || f.type === 'application/pdf');
-    const processed = await Promise.all(fileArray.map(processFile));
+    const all = Array.from(files);
+    const accepted = all.filter(f => f.type.startsWith('image/') || f.type === 'application/pdf');
+    if (accepted.length < all.length) setError(t('step4.drawing_unsupported'));   // CAD 등 미지원 파일 거부 안내(무음 폐기 금지)
+    const processed = await Promise.all(
+      accepted.map(f => f.type === 'application/pdf' ? processDrawingPdf(f) : processFile(f))
+    );
     const valid = processed.filter(Boolean) as ImageFile[];
     setMoldDrawings(prev => [...prev, ...valid].slice(0, 3));
-  }, [processFile]);
+  }, [processFile, processDrawingPdf, t]);
 
   // 사진→불량유형 AI 제안(보조 기능: 크레딧 무차감)
   // 무검출은 조용히 무시, 단 시스템 오류(키 한도/네트워크)는 사용자에게 표시
@@ -885,6 +922,7 @@ function DiagnoseContent() {
         // 비동기: 첫 번째 불량 사진을 축소해 beforePhoto로 추가 저장
         if (images.length > 0) {
           downscaleImageClient(images[0].base64, 400).then(thumb => {
+            if (!thumb) return;  // 디코드 실패 시 썸네일 스킵(입력이 이미 jpeg라 실사례는 없음, 타입 가드)
             try {
               const r2 = localStorage.getItem('diagnoseHistory');
               const h2 = JSON.parse(r2 || '[]');

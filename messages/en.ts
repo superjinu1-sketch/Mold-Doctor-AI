@@ -314,8 +314,10 @@ export const en: Record<string, string> = {
   'step4.notes': 'Product Notes',
   'step4.notes_placeholder': 'e.g. insert molding, two-shot, bosses, ribs',
   'step4.drawing_label': 'Mold Drawing Upload (optional · max 3)',
-  'step4.drawing_hint': 'Upload mold drawings, 3D captures, gate/runner layout images',
-  'step4.drawing_ai_hint': 'AI analyzes mold structure for root cause estimation · JPG, PNG, PDF',
+  'step4.drawing_hint': 'Upload or photograph the mold drawing / gate·runner layout',
+  'step4.drawing_ai_hint': 'PDF recommended for best accuracy. Photos/screenshots work only if the full drawing is sharp. Export CAD files (DWG/STEP, etc.) to PDF first. · JPG · PNG · PDF',
+  'step4.drawing_unsupported': 'Unsupported file type. Export the drawing to PDF or upload a screenshot. (Supported: JPG, PNG, PDF)',
+  'img.decode_failed': "Couldn't read this image. If it's an iPhone HEIC photo, convert it to JPG/PNG or upload a screenshot.",
   'step4.drawing_alt': 'Drawing',
   'step4.drawing_del': 'Delete drawing',
 

@@ -314,8 +314,10 @@ export const ko: Record<string, string> = {
   'step4.notes': '제품 특이사항',
   'step4.notes_placeholder': '예: 인서트, 이중사출, 보스, 리브 등',
   'step4.drawing_label': '금형 도면 업로드 (선택 · 최대 3장)',
-  'step4.drawing_hint': '금형 도면, 제품 3D 캡처, 게이트/러너 레이아웃 이미지를 올려주세요',
-  'step4.drawing_ai_hint': 'AI가 금형 구조를 분석하여 불량 원인 추정에 반영합니다 · JPG, PNG, PDF',
+  'step4.drawing_hint': '금형 도면·게이트/러너 레이아웃을 올리거나 촬영하세요',
+  'step4.drawing_ai_hint': '정확도를 위해 PDF 권장. 사진·화면 캡처도 가능하나 도면 전체가 선명해야 정확합니다. CAD 파일(DWG·STEP 등)은 PDF로 출력해 올려주세요. · JPG · PNG · PDF',
+  'step4.drawing_unsupported': '지원하지 않는 형식입니다. 도면은 PDF로 출력하거나 화면을 캡처해 올려주세요. (지원: JPG · PNG · PDF)',
+  'img.decode_failed': '이 이미지를 읽지 못했습니다. 아이폰 HEIC 사진이면 JPG·PNG로 변환하거나 화면을 캡처해 올려주세요.',
   'step4.drawing_alt': '도면',
   'step4.drawing_del': '도면 삭제',
 

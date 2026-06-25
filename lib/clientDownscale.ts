@@ -6,7 +6,7 @@ export async function downscaleImageClient(
   maxPx = 400,
   quality = 0.75,
   srcMime = 'image/jpeg',
-): Promise<string> {
+): Promise<string | null> {
   return new Promise((resolve) => {
     const img = new window.Image();
     img.onload = () => {
@@ -22,7 +22,7 @@ export async function downscaleImageClient(
       const dataUrl = canvas.toDataURL('image/jpeg', quality);
       resolve(dataUrl.split(',')[1] ?? base64);
     };
-    img.onerror = () => resolve(base64);
+    img.onerror = () => resolve(null);  // 디코드 실패(HEIC 등) → 오라벨 전송 대신 null(호출부가 거부·안내)
     img.src = `data:${srcMime};base64,${base64}`;
   });
 }
