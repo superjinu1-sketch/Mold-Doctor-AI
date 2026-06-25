@@ -1508,5 +1508,40 @@
       "severity": "high",
       "trap": "★ material(마스터배치)·수분에만 집중하고 표면 광택에 '금형온도↑'를 안 짚으면 오진(현장 1순위 누락). ★ 계량불량을 후방존(히터3/4) 온도↑로만 처방 = 함정(작업자가 230℃로 올려 더 악화). 정답 = 광택은 금형온도 먼저, 계량은 피드부 냉각·배압·스크류 디자인(하드웨어/피드 축). ★ 화면의 0rpm을 설정 오류로 단정 = idle 스냅샷 오독."
     }
+  },
+  {
+    "id": "machine-capacity-limit-pressurelimited",
+    "source": "checkSettings 앵커 v2 커버리지 — 쿠션·피크압·형체력 발화",
+    "title": "ABS 대형 부품 간헐 미성형 — 기계 용량 한계(압력·쿠션·형체력)",
+    "difficulty": "hard",
+    "description": "ABS 부품, 실측 피크 사출압이 기계 최대 근접·쿠션 0(스크류 바닥)·형체력도 최대 근접. 간헐 미성형.",
+    "input": {
+      "defect_type": "미성형 (Short Shot)",
+      "resin_type": "ABS",
+      "resin_detail": "ABS 일반사출",
+      "machine_settings": {
+        "nozzle_temp": 240, "zone1_temp": 240, "zone2_temp": 235, "zone3_temp": 230, "zone4_temp": 220,
+        "mold_temp_fixed": 55, "mold_temp_moving": 55,
+        "injection_pressure": 150, "holding_pressure": 90,
+        "injection_speed_1": 60, "back_pressure": 8, "screw_rpm": 110,
+        "cushion": 0, "metering": 45,
+        "clamp_force": 142, "max_clamp_force": 150,
+        "actual_peak_pressure": 148, "actual_cushion": 0, "max_inj_pressure": 150,
+        "drying_temp": 80, "drying_time": 3, "dryer_type": "제습식"
+      },
+      "defect_description": "ABS 대형 부품, 충전 말단부가 사이클마다 들쭉날쭉 미성형. 실측 피크 사출압 148MPa(기계 최대 150), 쿠션 0mm로 스크류 바닥 도달, 형체력 142ton(기계 150). 건조 정상."
+    },
+    "expected": {
+      "root_cause": "사출 피크압이 기계 최대(150MPa)에 도달(148)해 속도제어 상실·압력의존 충전→충전 부족(간헐 미성형), 쿠션 0mm로 보압 전달·쿠션 통제 불능. 형체력도 최대 근접 = 설비 용량이 부품 대비 부족. 멜트·건조 정상.",
+      "key_recommendations": [
+        "충전저항 감소로 피크압 낮추기(멜트·금형온도 상향, 사출속도 프로파일, 게이트·러너 확대)",
+        "쿠션 확보(계량량 증가/스크류 위치 조정, 3~8mm 목표)",
+        "근본: 더 큰 사출압·형체력 용량 기계로 이관 검토",
+        "건조 정상이므로 수분 대책 불필요"
+      ],
+      "expected_phase": "filling",
+      "severity": "medium",
+      "trap": "건조·온도만 조정으로 보면 반쪽 — 사출압 기계한계·쿠션 0·형체력 한계가 근본(설비 용량 부족). 이를 못 짚으면 오진."
+    }
   }
 ]

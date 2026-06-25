@@ -108,8 +108,8 @@ function buildPayload(c) {
     holdTime:        String(ms.holding_time ?? ''),
     coolTime:        String(ms.cooling_time ?? ''),
     injTime:         '',
-    metering:        '',
-    cushion:         '',
+    metering:        String(ms.metering ?? ''),
+    cushion:         String(ms.cushion ?? ''),
     backPressure:    String(ms.back_pressure ?? ''),
     screwRpm:        String(ms.screw_rpm ?? ''),
     clampForce:      String(ms.clamp_force ?? ''),
@@ -118,7 +118,7 @@ function buildPayload(c) {
   const advSettings = {
     vpTransferPos: '', vpTransferPressure: '',
     preInjectDecompDist: '', preInjectDecompSpeed: '', postMeterDecompDist: '',
-    actualFillTime: '', actualPeakPressure: '', actualCushion: '', actualCycleTime: '', actualPartWeight: '',
+    actualFillTime: '', actualPeakPressure: String(ms.actual_peak_pressure ?? ''), actualCushion: String(ms.actual_cushion ?? ''), actualCycleTime: '', actualPartWeight: '',
     dryTemp:  String(ms.drying_temp ?? ''),
     dryTime:  String(ms.drying_time ?? ''),
     dryerType: ms.dryer_type || '없음',
@@ -127,7 +127,7 @@ function buildPayload(c) {
     regrindRatio: String(c.input.color_info?.regrind_ratio ?? ''),
     colorType: c.input.color_info?.masterbatch_type || '없음',
     mbRatio: String(c.input.color_info?.masterbatch_ratio ?? ''),
-    machineModel: '', screwDiameter: '', maxClampForce: '', maxInjPressure: '',
+    machineModel: '', screwDiameter: '', maxClampForce: String(ms.max_clamp_force ?? ''), maxInjPressure: String(ms.max_inj_pressure ?? ''),
   };
 
   return {
