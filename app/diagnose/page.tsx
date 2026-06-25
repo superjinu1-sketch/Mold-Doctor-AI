@@ -1136,7 +1136,7 @@ function DiagnoseContent() {
                     <button
                       type="button"
                       onClick={() => setImages(prev => prev.filter(i => i.id !== img.id))}
-                      className="absolute -top-2 -right-2 bg-danger text-ink rounded-full w-5 h-5 flex items-center justify-center text-xs"
+                      className="absolute -top-2 -right-2 bg-danger text-ink rounded-full w-5 h-5 flex items-center justify-center text-xs before:content-[''] before:absolute before:top-1/2 before:left-1/2 before:-translate-x-1/2 before:-translate-y-1/2 before:w-[var(--touch-min)] before:h-[var(--touch-min)]"
                       aria-label={t('step1.photo_del')}
                     >×</button>
                   </div>
@@ -1425,7 +1425,7 @@ function DiagnoseContent() {
                     <button
                       type="button"
                       onClick={() => removeSettingsImage(s.id)}
-                      className="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-ink text-on-brand text-xs font-bold flex items-center justify-center"
+                      className="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-ink text-on-brand text-xs font-bold flex items-center justify-center before:content-[''] before:absolute before:top-1/2 before:left-1/2 before:-translate-x-1/2 before:-translate-y-1/2 before:w-[var(--touch-min)] before:h-[var(--touch-min)]"
                       aria-label={t('step3.photo_remove')}
                     >×</button>
                   </div>
@@ -1892,7 +1892,7 @@ function DiagnoseContent() {
                         <button
                           type="button"
                           onClick={(e) => { e.stopPropagation(); setFollowUpImages(prev => prev.filter(i => i.id !== img.id)); }}
-                          className="absolute -top-1 -right-1 w-5 h-5 bg-danger text-ink rounded-full text-xs flex items-center justify-center"
+                          className="absolute -top-1 -right-1 w-5 h-5 bg-danger text-ink rounded-full text-xs flex items-center justify-center before:content-[''] before:absolute before:top-1/2 before:left-1/2 before:-translate-x-1/2 before:-translate-y-1/2 before:w-[var(--touch-min)] before:h-[var(--touch-min)]"
                         >×</button>
                       </div>
                     ))}

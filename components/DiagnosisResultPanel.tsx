@@ -999,7 +999,7 @@ export default function DiagnosisResultPanel({ result, onSavePDF, round = 1, fol
                   {afterPhoto && (
                     <div className="mt-2 relative">
                       <img src={`data:image/jpeg;base64,${afterPhoto}`} alt="" className="w-full max-h-32 object-cover rounded-lg" />
-                      <button type="button" onClick={() => setAfterPhoto(undefined)} className="absolute top-1 right-1 bg-surface text-muted rounded-full w-6 h-6 flex items-center justify-center text-xs border border-border">×</button>
+                      <button type="button" onClick={() => setAfterPhoto(undefined)} className="absolute top-1 right-1 bg-surface text-muted rounded-full w-6 h-6 flex items-center justify-center text-xs border border-border before:content-[''] before:absolute before:top-1/2 before:left-1/2 before:-translate-x-1/2 before:-translate-y-1/2 before:w-[var(--touch-min)] before:h-[var(--touch-min)]">×</button>
                     </div>
                   )}
                 </div>
