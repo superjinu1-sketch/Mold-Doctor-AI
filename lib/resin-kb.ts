@@ -417,6 +417,41 @@ export function checkSettings(
     }
   }
 
+  // ─── 수지무관 관계식 앵커(가이드레일 v2) — 각 입력 존재 시에만, 보수적 임계. 압력은 route에서 MPa 환산됨. ───
+  // 1) 보압/사출압 비율
+  const fillP = toNum(a.actualPeakPressure) ?? toNum(s.injPressure1);
+  const holdP = toNum(s.holdPressure);
+  if (fillP !== null && fillP > 0 && holdP !== null) {
+    const ratio = holdP / fillP;
+    const status: CheckStatus = ratio < 0.30 ? 'low' : ratio > 0.85 ? 'high' : 'ok';
+    out.push({ label: '보압/사출압 비', value: Math.round(ratio * 100), unit: '%', rangeText: '50-75% 통상', status });
+  }
+
+  // 2) 쿠션
+  const cushion = toNum(a.actualCushion) ?? toNum(s.cushion);
+  if (cushion !== null) {
+    const metering = toNum(s.metering);
+    let status: CheckStatus = 'ok';
+    if (cushion <= 0) status = 'low';
+    else if (metering !== null && metering > 0 && cushion > 0.3 * metering) status = 'high';
+    out.push({ label: '쿠션', value: cushion, unit: 'mm', rangeText: '2-8mm 통상·0 위험', status });
+  }
+
+  // 3) 피크 사출압 vs 기계 최대
+  const peakP = toNum(a.actualPeakPressure);
+  const maxInjP = toNum(a.maxInjPressure);
+  if (peakP !== null && maxInjP !== null && maxInjP > 0) {
+    const status: CheckStatus = peakP >= 0.90 * maxInjP ? 'high' : 'ok';
+    out.push({ label: '피크압/기계최대', value: Math.round((peakP / maxInjP) * 100), unit: '%', rangeText: '<90% 권장', status });
+  }
+
+  // 4) 형체력 여유
+  const clamp = toNum(s.clampForce);
+  const maxClamp = toNum(a.maxClampForce);
+  if (clamp !== null && maxClamp !== null && maxClamp > 0 && clamp >= 0.90 * maxClamp) {
+    out.push({ label: '형체력/기계최대', value: Math.round((clamp / maxClamp) * 100), unit: '%', rangeText: '<90% 권장', status: 'high' });
+  }
+
   return out;
 }
 
