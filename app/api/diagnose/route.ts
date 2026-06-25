@@ -404,6 +404,10 @@ export async function POST(request: NextRequest) {
   // 진단 throw 시 환불에 쓸 컨텍스트 (start_session 성공 후 채워짐)
   let refundCtx: { sessionId: string; userId: string } | null = null;
   try {
+    const MAX_PAYLOAD = 4.4 * 1024 * 1024;  // Vercel 함수 페이로드 한도(~4.5MB) 안전선
+    if (Number(request.headers.get('content-length') || 0) > MAX_PAYLOAD) {
+      return NextResponse.json({ error: '요청 용량이 너무 큽니다. 사진을 줄여 다시 시도해주세요.' }, { status: 413 });
+    }
     const body = await request.json();
     const mock = tryMock(body); if (mock) return mock;
 
@@ -411,7 +415,7 @@ export async function POST(request: NextRequest) {
     {
       const ALLOWED_IMG = new Set(['image/jpeg', 'image/png', 'image/webp', 'image/gif']);
       const ALLOWED_ALL = new Set([...ALLOWED_IMG, 'application/pdf']);
-      const MAX_IMG = 8 * 1024 * 1024;   // 8 MB
+      const MAX_IMG = 4 * 1024 * 1024;   // 4 MB (클라 다운스케일·Vercel 페이로드와 정합)
       const MAX_PDF = 20 * 1024 * 1024;  // 20 MB
       const bodyImgs: { mediaType?: string; data?: string }[] = Array.isArray(body.images) ? body.images : [];
       const bodyDrawings: { mediaType?: string; data?: string }[] = Array.isArray(body.moldDrawings) ? body.moldDrawings : [];
@@ -807,10 +811,10 @@ ${defectGuide ? `${defectGuide}\n\n` : ''}${moldMachineGuard ? `${moldMachineGua
 ${isFollowUp && previousDiagnosis ? `
 ## 후속 추정 정보 (${round}차 Follow-up)
 ### 이전 추정 원인
-${previousDiagnosis.causes.map(c => `- ${c.description} (${c.probability}%)`).join('\n')}
+${(previousDiagnosis.causes ?? []).map(c => `- ${c.description} (${c.probability}%)`).join('\n')}
 
 ### 이전 AI 추천사항
-${previousDiagnosis.recommendations.map(r => `- ${r.parameter}: ${r.current} → ${r.recommended}`).join('\n')}
+${(previousDiagnosis.recommendations ?? []).map(r => `- ${r.parameter}: ${r.current} → ${r.recommended}`).join('\n')}
 
 ### 실행한 조치와 결과
 ${(actionsTaken || []).filter(a => a.done).map(a => `- ✓ ${a.recommendation}: ${a.result || '결과 미기재'}`).join('\n') || '없음'}
@@ -924,7 +928,7 @@ CRITICAL: Your entire response must be ONLY the JSON object. No text before or a
       } catch { /* 환불 실패는 무시(로그만) */ }
     }
     return NextResponse.json(
-      { error: error instanceof Error ? error.message : '분석 중 오류가 발생했습니다.' },
+      { error: '분석 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.' },  // 일반화(상세는 위 console.error)
       { status: 500 }
     );
   }

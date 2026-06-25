@@ -7,7 +7,7 @@ import { resolveGradeCore, type CacheValue } from '@/lib/resolve-grade-core';
 // 포대 라벨 사진 OCR → 그레이드명 추출 → 서버 내부에서 resolve 연결 (클라 왕복 1회).
 // extract-settings 패턴 미러. 사출기 OCR과 rate limit 예산 분리. 무료(무차감).
 const ALLOWED_IMAGE_TYPES = new Set(['image/jpeg', 'image/png', 'image/webp', 'image/gif']);
-const MAX_IMAGE_BYTES = 8 * 1024 * 1024; // 8 MB
+const MAX_IMAGE_BYTES = 4 * 1024 * 1024; // 4 MB (클라 다운스케일·Vercel 페이로드와 정합)
 const DAILY_LIMIT = 20;
 
 type Ocr = { manufacturer: string; gradeName: string; resinFamily: string; fillerText: string; flameText: string };
@@ -26,6 +26,10 @@ function sanitizeOcr(raw: unknown): Ocr {
 
 export async function POST(request: NextRequest) {
   try {
+    const MAX_PAYLOAD = 4.4 * 1024 * 1024;  // Vercel 함수 페이로드 한도(~4.5MB) 안전선
+    if (Number(request.headers.get('content-length') || 0) > MAX_PAYLOAD) {
+      return NextResponse.json({ error: '요청 용량이 너무 큽니다. 사진을 줄여 다시 시도해주세요.' }, { status: 413 });
+    }
     const body = await request.json().catch(() => ({}));
     const mock = tryMock(body, 'extract-grade'); if (mock) return mock;
 
@@ -134,8 +138,9 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ ocr, resolved, cached });
   } catch (error) {
+    console.error('[extract-grade] error:', error);
     return NextResponse.json(
-      { error: error instanceof Error ? error.message : '라벨 분석 실패' },
+      { error: '라벨 분석 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.' },  // 일반화
       { status: 500 }
     );
   }

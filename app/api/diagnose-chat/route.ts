@@ -153,7 +153,7 @@ export async function POST(req: NextRequest) {
   } catch (error) {
     console.error('Chat API error:', error);
     return NextResponse.json(
-      { error: error instanceof Error ? error.message : '채팅 응답 중 오류가 발생했습니다.' },
+      { error: '응답 처리 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.' },  // 일반화
       { status: 500 }
     );
   }

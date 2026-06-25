@@ -20,6 +20,7 @@ create or replace function increment_api_count(p_user_id uuid, p_bucket text, p_
 returns jsonb
 language plpgsql
 security definer
+set search_path = public, pg_temp   -- security definer 하드닝(injection 표면 차단). prod에 이미 Run됨(재Run 불필요).
 as $$
 declare
   v_count int;

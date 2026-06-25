@@ -31,8 +31,9 @@ export async function POST(request: NextRequest) {
     }
     return NextResponse.json({ ...outcome.result, cached: outcome.cached });
   } catch (error) {
+    console.error('[resolve-grade] error:', error);
     return NextResponse.json(
-      { error: error instanceof Error ? error.message : '그레이드 해석 실패' },
+      { error: '그레이드 해석 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.' },  // 일반화
       { status: 500 }
     );
   }

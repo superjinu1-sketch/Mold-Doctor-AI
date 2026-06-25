@@ -9,6 +9,7 @@ const FIXTURES = join(process.cwd(), 'tests', 'fixtures', 'responses');
  * body에 __fixture 필드가 있으면 해당 픽스처, 없으면 defaultFixture.
  */
 export function tryMock(body: Record<string, unknown>, defaultFixture = 'normal'): NextResponse | null {
+  if (process.env.NODE_ENV === 'production') return null;  // prod에선 MOCK_AI 무시(실수 방지)
   if (process.env.MOCK_AI !== '1') return null;
   const name = String(body.__fixture ?? defaultFixture);
   const path = join(FIXTURES, `${name}.json`);

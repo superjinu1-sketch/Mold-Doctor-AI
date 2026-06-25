@@ -13,6 +13,10 @@ function getApiKey(): string {
 
 export async function POST(request: NextRequest) {
   try {
+    const MAX_PAYLOAD = 4.4 * 1024 * 1024;  // Vercel 함수 페이로드 한도(~4.5MB) 안전선
+    if (Number(request.headers.get('content-length') || 0) > MAX_PAYLOAD) {
+      return NextResponse.json({ error: '요청 용량이 너무 큽니다. 사진을 줄여 다시 시도해주세요.' }, { status: 413 });
+    }
     const body = await request.json();
     const mock = tryMock(body, 'extract'); if (mock) return mock;
 
@@ -185,8 +189,9 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'AI 응답을 파싱할 수 없습니다. 사출기 화면이 선명한 사진을 사용해주세요.' }, { status: 422 });
     }
   } catch (error) {
+    console.error('[extract-settings] error:', error);
     return NextResponse.json(
-      { error: error instanceof Error ? error.message : '셋팅값 추출 실패' },
+      { error: '셋팅값 추출 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.' },  // 일반화
       { status: 500 }
     );
   }
