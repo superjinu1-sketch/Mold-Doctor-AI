@@ -6,6 +6,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import AuthModal from '@/components/AuthModal';
 import HistoryList from '@/components/HistoryList';
 import { fetchServerHistory, fetchLedger, migrateLocalHistory, type HistoryRecord, type LedgerEntry } from '@/lib/history-sync';
+import { authHeaders } from '@/lib/supabase/authHeader';
 
 function loadLocalHistory(): HistoryRecord[] {
   try {
@@ -34,6 +35,32 @@ export default function AccountPage() {
   const [records, setRecords] = useState<HistoryRecord[]>([]);
   const [ledger, setLedger] = useState<LedgerEntry[]>([]);
   const [authOpen, setAuthOpen] = useState(false);
+  const [deleteOpen, setDeleteOpen] = useState(false);
+  const [deleteText, setDeleteText] = useState('');
+  const [deleting, setDeleting] = useState(false);
+
+  async function handleDeleteAccount() {
+    if (deleteText !== '삭제') return;
+    setDeleting(true);
+    try {
+      const res = await fetch('/api/account/delete', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', ...(await authHeaders()) },
+        body: JSON.stringify({ confirm: 'DELETE' }),
+      });
+      if (!res.ok) throw new Error('delete failed');
+      // 로컬 흔적 제거 후 로그아웃·홈 이동
+      try {
+        localStorage.removeItem('diagnoseHistory');
+        localStorage.removeItem('historyMigratedV1');
+      } catch {}
+      await signOut();
+      window.location.href = '/';
+    } catch {
+      setDeleting(false);
+      alert(t('account.delete_error'));
+    }
+  }
 
   useEffect(() => {
     let cancelled = false;
@@ -124,6 +151,54 @@ export default function AccountPage() {
                 </li>
               ))}
             </ul>
+          )}
+        </div>
+      )}
+
+      {/* 위험 구역 — 계정 삭제 (스토어 필수) */}
+      {!loading && user && (
+        <div className="ui-card ui-card-lg p-5 mb-4 border-[var(--danger-border)]">
+          <div className="text-label font-bold text-danger uppercase tracking-wider mb-1">{t('account.danger_zone')}</div>
+          {!deleteOpen ? (
+            <div className="flex items-center justify-between gap-3">
+              <p className="text-body text-muted">{t('account.delete_desc')}</p>
+              <button
+                type="button"
+                onClick={() => setDeleteOpen(true)}
+                className="shrink-0 min-h-[var(--touch-min)] px-4 rounded-full border border-[var(--danger-border)] text-danger hover:bg-[var(--danger-bg)] text-sm font-bold transition-colors"
+              >
+                {t('account.delete_account')}
+              </button>
+            </div>
+          ) : (
+            <div>
+              <p className="text-body text-ink font-semibold mb-1">{t('account.delete_confirm_title')}</p>
+              <p className="text-body text-muted mb-3">{t('account.delete_confirm_desc')}</p>
+              <input
+                type="text"
+                value={deleteText}
+                onChange={(e) => setDeleteText(e.target.value)}
+                placeholder={t('account.delete_confirm_placeholder')}
+                className="w-full min-h-[var(--touch-min)] px-3 rounded-lg bg-surface-sunken border border-border-strong text-ink text-body mb-3"
+              />
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  disabled={deleteText !== '삭제' || deleting}
+                  onClick={handleDeleteAccount}
+                  className="min-h-[var(--touch-cta)] px-5 rounded-full bg-danger text-on-brand font-bold text-sm disabled:opacity-40 transition-colors"
+                >
+                  {deleting ? t('account.deleting') : t('account.delete_permanent')}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => { setDeleteOpen(false); setDeleteText(''); }}
+                  className="min-h-[var(--touch-min)] px-4 rounded-full border border-border-strong text-muted hover:text-ink text-sm font-medium transition-colors"
+                >
+                  {t('common.cancel')}
+                </button>
+              </div>
+            </div>
           )}
         </div>
       )}

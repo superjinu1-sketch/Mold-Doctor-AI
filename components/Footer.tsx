@@ -11,6 +11,10 @@ export default function Footer() {
           <span className="text-sm text-muted">Mold Doctor AI</span>
         </Link>
         <p className="text-faint text-xs">contact@molddoctor.ai</p>
+        <nav className="flex items-center gap-4">
+          <Link href="/privacy" className="text-faint text-xs hover:text-muted transition-colors">개인정보처리방침</Link>
+          <Link href="/terms" className="text-faint text-xs hover:text-muted transition-colors">이용약관</Link>
+        </nav>
         <p className="text-faint text-xs">© 2026 Mold Doctor AI. All rights reserved.</p>
       </div>
     </footer>
