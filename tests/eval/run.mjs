@@ -47,11 +47,11 @@ const CACHE_DIR = join(ROOT, 'tests/eval/.cache');
 const CACHE_TTL_MS = 7 * 24 * 3600 * 1000; // 7일
 
 /* ── diagnose 응답 캐시 (프롬프트 버전 기준 7일 유효) ─── */
-function cacheKey(caseId) {
-  return createHash('sha256').update(`${caseId}:${PROMPT_VERSION}`).digest('hex').slice(0, 16);
+function cacheKey(c) {
+  return createHash('sha256').update(`${c.id}:${PROMPT_VERSION}:${fixtureHash(c)}`).digest('hex').slice(0, 16);
 }
-function loadDiagnoseCache(caseId) {
-  const path = join(CACHE_DIR, `${cacheKey(caseId)}.json`);
+function loadDiagnoseCache(c) {
+  const path = join(CACHE_DIR, `${cacheKey(c)}.json`);
   if (!existsSync(path)) return null;
   try {
     const d = JSON.parse(readFileSync(path, 'utf-8'));
@@ -59,9 +59,9 @@ function loadDiagnoseCache(caseId) {
     return d.body;
   } catch { return null; }
 }
-function saveDiagnoseCache(caseId, body) {
+function saveDiagnoseCache(c, body) {
   if (!existsSync(CACHE_DIR)) mkdirSync(CACHE_DIR, { recursive: true });
-  writeFileSync(join(CACHE_DIR, `${cacheKey(caseId)}.json`), JSON.stringify({ ts: Date.now(), body }));
+  writeFileSync(join(CACHE_DIR, `${cacheKey(c)}.json`), JSON.stringify({ ts: Date.now(), body }));
 }
 
 /* ── API key — EVAL 전용 (billing 격리) ──────────────────
@@ -85,6 +85,27 @@ function loadKbVersion() {
     const m = f.match(/KB_VERSION\s*=\s*'([^']+)'/);
     return m ? m[1] : 'unknown';
   } catch { return 'unknown'; }
+}
+
+/* ── 이미지 픽스처 로딩 (tests/eval/fixtures/) ─────────── */
+function fixtureMediaType(name) {
+  const ext = name.split('.').pop().toLowerCase();
+  return ext === 'png' ? 'image/png' : ext === 'pdf' ? 'application/pdf'
+       : ext === 'webp' ? 'image/webp' : ext === 'gif' ? 'image/gif' : 'image/jpeg';
+}
+function loadFixtures(names = []) {
+  return names.map(n => {
+    const p = join(__dir, 'fixtures', n);
+    if (!existsSync(p)) throw new Error(`픽스처 없음: tests/eval/fixtures/${n}`);
+    return { data: readFileSync(p).toString('base64'), mediaType: fixtureMediaType(n) };
+  });
+}
+function fixtureHash(c) {
+  const names = [...(c.input.drawing_fixtures || []), ...(c.input.image_fixtures || [])];
+  if (!names.length) return '';
+  const h = createHash('sha256');
+  for (const n of names) { const p = join(__dir, 'fixtures', n); if (existsSync(p)) h.update(readFileSync(p)); }
+  return h.digest('hex').slice(0, 8);
 }
 
 /* ── field mapping: cases.json → /api/diagnose body ─── */
@@ -157,8 +178,8 @@ function buildPayload(c) {
       wallThicknessMax: String(pi.wall_thickness_max ?? ''),
       notes: '',
     },
-    images: [],
-    moldDrawings: [],
+    images:       loadFixtures(c.input.image_fixtures),
+    moldDrawings: loadFixtures(c.input.drawing_fixtures),
   };
 }
 
@@ -235,6 +256,14 @@ async function judgeCase(c, aiRaw, client) {
     .map(r => `${r.parameter}: ${r.current}→${r.recommended}`)
     .join(' / ');
 
+  const isImageCase = !!((c.input.drawing_fixtures && c.input.drawing_fixtures.length) || (c.input.image_fixtures && c.input.image_fixtures.length));
+  const ma = aiResult.mold_analysis || {};
+  const maSummary = [
+    ma.gate_assessment && `게이트: ${ma.gate_assessment}`,
+    ma.cooling_assessment && `냉각: ${ma.cooling_assessment}`,
+    (ma.design_risk_factors && ma.design_risk_factors.length) ? `설계리스크: ${ma.design_risk_factors.join(' | ')}` : ''
+  ].filter(Boolean).join('\n');
+
   const prompt = `당신은 사출 성형 트러블슈팅 전문가이자 채점관이다.
 
 ## AI 응답 요약
@@ -243,12 +272,15 @@ async function judgeCase(c, aiRaw, client) {
 - summary: ${aiResult.summary}
 - 주요 원인(상위 3개): ${causeSummary || '없음'}
 - 주요 조치(상위 5개): ${recSummary || '없음'}
+${isImageCase ? `- 도면/사진 판독(mold_analysis):\n${maSummary || '(모델이 mold_analysis를 비움)'}` : ''}
 
 ## 정답 기준 (cases.json expected)
 - 정답 root_cause: ${exp.root_cause}
 - 정답 key_recommendations: ${exp.key_recommendations.join(', ')}
 - 정답 phase: ${exp.expected_phase}${exp.phase_also_accept?.length ? ` (이 결함은 표면 스킨 형성 단계가 본질적으로 모호 → 다음 phase도 정답으로 인정: ${exp.phase_also_accept.join(', ')})` : ''}
 - 정답 severity: ${exp.severity}
+${isImageCase && exp.mold_read?.length ? `- 도면에서 읽어야 할 핵심(mold_read): ${exp.mold_read.join(' / ')}` : ''}
+${isImageCase && exp.hallucination_forbidden?.length ? `- 발명 금지(도면에 없음): ${exp.hallucination_forbidden.join(' / ')}` : ''}
 ${hasTrap ? `- 오진 함정(trap): ${exp.trap}` : ''}
 
 ## 채점 기준 (총 100점, hard trap 회피 시 +10 bonus)
@@ -257,6 +289,7 @@ ${hasTrap ? `- 오진 함정(trap): ${exp.trap}` : ''}
 3. recommendations 적합성 (30점): AI 조치가 정답 key_recommendations와 방향이 맞는가
 4. severity 정확 (10점): high/medium/low 일치
 ${hasTrap ? '5. trap 회피 보너스 (10점): AI가 오진 함정을 피했는가 (건조 탓으로 돌리지 않음 등)' : ''}
+${isImageCase ? `\n[이미지 케이스 가중] root cause·recommendations 평가 시, 위 mold_read를 모델이 도면에서 정확히 읽어 근거로 썼는지 반영하라. 그리고 발명 금지 항목(hallucination_forbidden)을 모델이 지어냈으면 최종 score에서 15~25점 감점하라.` : ''}
 
 다음 JSON으로만 응답하라 (마크다운 없이):
 {
@@ -336,7 +369,7 @@ async function main() {
     let aiRaw = '';
     let diagError = null;
     let diagHeaders = {};
-    const cached = (MEASURE_COST || NO_CACHE) ? null : loadDiagnoseCache(c.id);
+    const cached = (MEASURE_COST || NO_CACHE) ? null : loadDiagnoseCache(c);
     if (cached) {
       process.stdout.write(' [cached]');
       aiRaw = cached;
@@ -355,7 +388,7 @@ async function main() {
       } else {
         aiRaw = diagRes.body;
         diagHeaders = diagRes.headers || {};
-        if (!MEASURE_COST && !NO_CACHE) saveDiagnoseCache(c.id, aiRaw);
+        if (!MEASURE_COST && !NO_CACHE) saveDiagnoseCache(c, aiRaw);
       }
     } catch (e) {
       diagError = e.message;

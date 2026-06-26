@@ -1543,5 +1543,34 @@
       "severity": "high",
       "trap": "건조·온도만 조정으로 보면 반쪽 — 사출압 기계한계·쿠션 0·형체력 한계가 근본(설비 용량 부족). 이를 못 짚으면 오진."
     }
+  },
+  {
+    "id": "drawing-boss-sink-korean",
+    "source": "이미지 eval 스위트 v1 — 도면 판독 회귀가드(한글+사진열화)",
+    "title": "ABS 커버 싱크 — 한글 열화 금형도면 판독",
+    "difficulty": "hard",
+    "description": "한글 라벨 + 사진 열화 금형도면(평면+단면 A-A). 보스 후육·냉각 공백을 도면에서만 읽어야(구조화 입력 미제공).",
+    "input": {
+      "defect_type": "싱크마크 (Sink Mark)",
+      "resin_type": "ABS",
+      "resin_detail": "ABS 일반사출",
+      "defect_description": "ABS 컨트롤 커버 사출 중 싱크마크 발생. 원인 분석을 위해 첨부한 금형 도면(평면도 + 단면 A-A)을 분석해 주세요.",
+      "machine_settings": {
+        "nozzle_temp": 240, "zone1_temp": 240, "zone2_temp": 235, "zone3_temp": 230, "zone4_temp": 220,
+        "mold_temp_fixed": 55, "mold_temp_moving": 55,
+        "injection_pressure": 120, "holding_pressure": 70, "injection_speed_1": 55,
+        "holding_time": 4, "cooling_time": 18, "metering": 45, "cushion": 5, "back_pressure": 8, "screw_rpm": 110
+      },
+      "drawing_fixtures": ["mold-korean-degraded.jpg"]
+    },
+    "expected": {
+      "root_cause": "보스 국부 후육(12mm vs 기본벽 2.5mm, 약 4.8배) + 보스부 냉각채널 부재 → 게이트씰 전 과수축으로 싱크. 게이트가 좌측이라 보스까지 유동거리 길어 보압 전달 약화.",
+      "key_recommendations": ["보스부 국소 냉각 추가(버블러/베플)", "보스 코어링으로 실효 살두께 축소(두께비↓)", "보압/보압시간 상향으로 게이트씰까지 보압 유지"],
+      "expected_phase": "packing",
+      "severity": "medium",
+      "mold_read": ["보스 후육 12mm vs 기본 2.5 (약 4.8배)", "냉각 좌측 편중·보스부 냉각 공백", "게이트 좌측(보스까지 유동거리 김)"],
+      "hallucination_forbidden": ["다캐비티/러너 밸런스", "핫러너", "게이트 2개 이상", "밸브게이트"],
+      "trap": "보스 후육·냉각 공백을 못 읽고 건조·온도 일반론으로 가면 오진."
+    }
   }
 ]
