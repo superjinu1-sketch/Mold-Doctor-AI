@@ -1841,9 +1841,9 @@ function DiagnoseContent() {
         {showFollowUpForm && result &&
          result.defect_type?.en !== 'Image_Unreadable' &&
          result.defect_type?.en !== 'No_Defect_Detected' && (
-          <div ref={followUpFormRef} className="bg-surface rounded-2xl p-4 sm:p-6 border-2 border-[var(--warn-border)] space-y-5">
+          <div ref={followUpFormRef} className="bg-surface rounded-2xl p-4 sm:p-6 border-2 border-[var(--brand-border)] space-y-5">
             <div className="flex items-center gap-2 mb-1">
-              <span className="bg-warn text-ink text-xs font-bold px-2 py-1 rounded-full">{round}{t('followup.badge')}</span>
+              <span className="bg-brand-tint text-brand-ink text-xs font-bold px-2 py-1 rounded-full">{round}{t('followup.badge')}</span>
               <h3 className="text-lg font-bold text-ink">{t('followup.title')}</h3>
             </div>
 
@@ -1956,7 +1956,7 @@ function DiagnoseContent() {
                 type="button"
                 onClick={handleFollowUpSubmit}
                 disabled={isLoading}
-                className="flex-1 bg-warn hover:brightness-90 disabled:opacity-50 text-ink font-bold py-3 px-6 rounded-xl transition-colors min-h-[var(--touch-cta)] text-base"
+                className="flex-1 bg-brand hover:bg-brand-ink disabled:opacity-50 text-on-brand font-bold py-3 px-6 rounded-xl transition-colors min-h-[var(--touch-cta)] text-base"
               >
                 {isLoading ? t('submit.analyzing') : `${round}${t('submit.followup')}`}
               </button>
