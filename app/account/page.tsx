@@ -39,7 +39,7 @@ export default function AccountPage() {
   const [deleteText, setDeleteText] = useState('');
   const [deleting, setDeleting] = useState(false);
   const [ledgerOpen, setLedgerOpen] = useState(false);
-  const [historyOpen, setHistoryOpen] = useState(false);
+  const [historyOpen, setHistoryOpen] = useState(true);
 
   async function handleDeleteAccount() {
     if (deleteText !== '삭제') return;
