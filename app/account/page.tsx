@@ -38,6 +38,8 @@ export default function AccountPage() {
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [deleteText, setDeleteText] = useState('');
   const [deleting, setDeleting] = useState(false);
+  const [ledgerOpen, setLedgerOpen] = useState(false);
+  const [historyOpen, setHistoryOpen] = useState(false);
 
   async function handleDeleteAccount() {
     if (deleteText !== '삭제') return;
@@ -85,22 +87,69 @@ export default function AccountPage() {
     <div className="max-w-2xl mx-auto px-4 py-8">
       <h1 className="text-[length:var(--text-h2)] font-bold text-ink mb-6">{t('account.title')}</h1>
 
-      {/* ① 계정 헤더 */}
+      {/* ① 계정 헤더 (+ 계정 삭제 통합) */}
       <div className="ui-card ui-card-lg p-5 mb-4">
         {!loading && user ? (
-          <div className="flex items-center justify-between gap-3">
-            <div className="min-w-0">
-              <div className="text-label text-faint mb-0.5">{t('account.signed_in_as')}</div>
-              <div className="text-body text-ink font-semibold truncate">{user.email}</div>
+          <>
+            <div className="flex items-center justify-between gap-3">
+              <div className="min-w-0">
+                <div className="text-label text-faint mb-0.5">{t('account.signed_in_as')}</div>
+                <div className="text-body text-ink font-semibold truncate">{user.email}</div>
+              </div>
+              <button
+                type="button"
+                onClick={() => signOut()}
+                className="shrink-0 min-h-[var(--touch-min)] px-4 rounded-full border border-border-strong text-muted hover:text-ink hover:bg-surface-sunken text-sm font-medium transition-colors"
+              >
+                {t('auth.signout')}
+              </button>
             </div>
-            <button
-              type="button"
-              onClick={() => signOut()}
-              className="shrink-0 min-h-[var(--touch-min)] px-4 rounded-full border border-border-strong text-muted hover:text-ink hover:bg-surface-sunken text-sm font-medium transition-colors"
-            >
-              {t('auth.signout')}
-            </button>
-          </div>
+
+            {/* 계정 삭제 — 저강조, 같은 카드 하단(중앙 빨강 카드 폐지) */}
+            <div className="border-t border-border mt-4 pt-3">
+              {!deleteOpen ? (
+                <div className="flex items-center justify-between gap-3">
+                  <p className="text-label text-faint">{t('account.delete_desc')}</p>
+                  <button
+                    type="button"
+                    onClick={() => setDeleteOpen(true)}
+                    className="shrink-0 min-h-[var(--touch-min)] px-3 text-danger hover:underline text-sm font-medium transition-colors"
+                  >
+                    {t('account.delete_account')}
+                  </button>
+                </div>
+              ) : (
+                <div>
+                  <p className="text-body text-ink font-semibold mb-1">{t('account.delete_confirm_title')}</p>
+                  <p className="text-body text-muted mb-3">{t('account.delete_confirm_desc')}</p>
+                  <input
+                    type="text"
+                    value={deleteText}
+                    onChange={(e) => setDeleteText(e.target.value)}
+                    placeholder={t('account.delete_confirm_placeholder')}
+                    className="w-full min-h-[var(--touch-min)] px-3 rounded-lg bg-surface-sunken border border-border-strong text-ink text-body mb-3"
+                  />
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      disabled={deleteText !== '삭제' || deleting}
+                      onClick={handleDeleteAccount}
+                      className="min-h-[var(--touch-cta)] px-5 rounded-full bg-danger text-on-brand font-bold text-sm disabled:opacity-40 transition-colors"
+                    >
+                      {deleting ? t('account.deleting') : t('account.delete_permanent')}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => { setDeleteOpen(false); setDeleteText(''); }}
+                      className="min-h-[var(--touch-min)] px-4 rounded-full border border-border-strong text-muted hover:text-ink text-sm font-medium transition-colors"
+                    >
+                      {t('common.cancel')}
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+          </>
         ) : (
           <div className="flex items-center justify-between gap-3">
             <p className="text-body text-muted">{t('account.login_prompt')}</p>
@@ -131,81 +180,53 @@ export default function AccountPage() {
             </a>
           </div>
 
-          <div className="text-label font-bold text-faint uppercase tracking-wider mb-2">{t('account.ledger')}</div>
-          {ledger.length === 0 ? (
-            <p className="text-body text-muted">{t('account.ledger_empty')}</p>
-          ) : (
-            <ul className="divide-y divide-border">
-              {ledger.map((e) => (
-                <li key={e.id} className="flex items-center justify-between gap-3 py-2.5">
-                  <div className="min-w-0">
-                    <div className="text-body text-ink">{ledgerKindLabel(e.kind, t)}</div>
-                    <div className="text-label text-faint">{formatLedgerDate(e.created_at, locale)}{e.note ? ` · ${e.note}` : ''}</div>
-                  </div>
-                  <div className="shrink-0 text-right">
-                    <div className={`text-body font-bold tabular-nums ${e.delta >= 0 ? 'text-ok' : 'text-danger'}`}>
-                      {e.delta >= 0 ? '+' : ''}{e.delta}
+          <button
+            type="button"
+            aria-expanded={ledgerOpen}
+            onClick={() => setLedgerOpen(v => !v)}
+            className="w-full flex items-center justify-between gap-2 min-h-[var(--touch-min)] text-left"
+          >
+            <span className="text-label font-bold text-faint uppercase tracking-wider">{t('account.ledger')} ({ledger.length})</span>
+            <span className="text-faint text-sm shrink-0">{ledgerOpen ? '▲' : '▼'}</span>
+          </button>
+          {ledgerOpen && (
+            ledger.length === 0 ? (
+              <p className="text-body text-muted mt-2">{t('account.ledger_empty')}</p>
+            ) : (
+              <ul className="divide-y divide-border mt-1">
+                {ledger.map((e) => (
+                  <li key={e.id} className="flex items-center justify-between gap-3 py-2.5">
+                    <div className="min-w-0">
+                      <div className="text-body text-ink">{ledgerKindLabel(e.kind, t)}</div>
+                      <div className="text-label text-faint">{formatLedgerDate(e.created_at, locale)}{e.note ? ` · ${e.note}` : ''}</div>
                     </div>
-                    {e.balance_after !== null && <div className="text-label text-faint tabular-nums">{e.balance_after}</div>}
-                  </div>
-                </li>
-              ))}
-            </ul>
+                    <div className="shrink-0 text-right">
+                      <div className={`text-body font-bold tabular-nums ${e.delta >= 0 ? 'text-ok' : 'text-danger'}`}>
+                        {e.delta >= 0 ? '+' : ''}{e.delta}
+                      </div>
+                      {e.balance_after !== null && <div className="text-label text-faint tabular-nums">{e.balance_after}</div>}
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            )
           )}
         </div>
       )}
 
-      {/* 위험 구역 — 계정 삭제 (스토어 필수) */}
-      {!loading && user && (
-        <div className="ui-card ui-card-lg p-5 mb-4 border-[var(--danger-border)]">
-          <div className="text-label font-bold text-danger uppercase tracking-wider mb-1">{t('account.danger_zone')}</div>
-          {!deleteOpen ? (
-            <div className="flex items-center justify-between gap-3">
-              <p className="text-body text-muted">{t('account.delete_desc')}</p>
-              <button
-                type="button"
-                onClick={() => setDeleteOpen(true)}
-                className="shrink-0 min-h-[var(--touch-min)] px-4 rounded-full border border-[var(--danger-border)] text-danger hover:bg-[var(--danger-bg)] text-sm font-bold transition-colors"
-              >
-                {t('account.delete_account')}
-              </button>
-            </div>
-          ) : (
-            <div>
-              <p className="text-body text-ink font-semibold mb-1">{t('account.delete_confirm_title')}</p>
-              <p className="text-body text-muted mb-3">{t('account.delete_confirm_desc')}</p>
-              <input
-                type="text"
-                value={deleteText}
-                onChange={(e) => setDeleteText(e.target.value)}
-                placeholder={t('account.delete_confirm_placeholder')}
-                className="w-full min-h-[var(--touch-min)] px-3 rounded-lg bg-surface-sunken border border-border-strong text-ink text-body mb-3"
-              />
-              <div className="flex items-center gap-2">
-                <button
-                  type="button"
-                  disabled={deleteText !== '삭제' || deleting}
-                  onClick={handleDeleteAccount}
-                  className="min-h-[var(--touch-cta)] px-5 rounded-full bg-danger text-on-brand font-bold text-sm disabled:opacity-40 transition-colors"
-                >
-                  {deleting ? t('account.deleting') : t('account.delete_permanent')}
-                </button>
-                <button
-                  type="button"
-                  onClick={() => { setDeleteOpen(false); setDeleteText(''); }}
-                  className="min-h-[var(--touch-min)] px-4 rounded-full border border-border-strong text-muted hover:text-ink text-sm font-medium transition-colors"
-                >
-                  {t('common.cancel')}
-                </button>
-              </div>
-            </div>
-          )}
-        </div>
-      )}
-
-      {/* ③ 진단 히스토리 */}
-      <h2 className="text-[length:var(--text-h3)] font-bold text-ink mb-3 mt-6">{t('account.history')}</h2>
-      <HistoryList records={records} />
+      {/* ③ 진단 히스토리 — 섹션 접기(button-in-heading 아코디언 패턴) */}
+      <h2 className="mt-6 mb-3">
+        <button
+          type="button"
+          aria-expanded={historyOpen}
+          onClick={() => setHistoryOpen(v => !v)}
+          className="w-full flex items-center justify-between gap-2 min-h-[var(--touch-min)] text-left text-[length:var(--text-h3)] font-bold text-ink"
+        >
+          <span>{t('account.history')} ({records.length})</span>
+          <span className="text-faint text-sm font-normal shrink-0">{historyOpen ? '▲' : '▼'}</span>
+        </button>
+      </h2>
+      {historyOpen && <HistoryList records={records} />}
 
       {/* 하단 sticky — 새로 추정 */}
       <div className="sticky bottom-0 -mx-4 mt-6 px-4 py-3 bg-surface/95 backdrop-blur border-t border-border">
