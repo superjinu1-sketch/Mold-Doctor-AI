@@ -10,7 +10,7 @@ export const ko: Record<string, string> = {
   'landing.hero_eyebrow': 'AI 기반 실시간 추정',
   'landing.hero_eyebrow_user': '{name}님, 반가워요',
   'landing.hero_h1': '사출 불량, 원인을 추정합니다.',
-  'landing.hero_trust': '가입 시 5크레딧 무료 · 카드 없이 시작',
+  'landing.hero_trust': '가입 시 5크레딧 무료 · AI 대처 가이드 (참고용)',
   'landing.cta_primary_loggedout': '무료로 추정 시작',
   'landing.cta_primary_user': '새로 추정 시작',
   'landing.cta_account': '마이페이지',
@@ -361,6 +361,7 @@ export const ko: Record<string, string> = {
   'msg.extracted': '개 항목 자동 입력 완료 — 확인 후 수정하세요.',
 
   /* ── DiagnosisResultPanel ─────────────────────── */
+  'result.ai_guide_disclaimer': 'AI 대처 가이드입니다 — 무조건 해결을 보장하지 않으며 실수가 있을 수 있습니다. 최종 판단은 현장 엔지니어가 검증하세요.',
   'result.severity_high': '심각 (상)',
   'result.severity_medium': '주의 (중)',
   'result.severity_low': '경미 (하)',

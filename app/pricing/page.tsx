@@ -4,10 +4,10 @@ import Link from 'next/link';
 import { useLocale } from '@/contexts/LocaleContext';
 
 const creditPacks = [
-  { nameKo: '스타터', nameEn: 'Starter', credits: 5,   priceKo: '₩5,500',  priceEn: '₩5,500',  perKo: '크레딧당 ₩1,100', perEn: '₩1,100 / credit', recommended: false },
-  { nameKo: '베이직', nameEn: 'Basic',   credits: 10,  priceKo: '₩9,900',  priceEn: '₩9,900',  perKo: '크레딧당 ₩990',   perEn: '₩990 / credit',   recommended: true  },
-  { nameKo: '프로',   nameEn: 'Pro',     credits: 30,  priceKo: '₩24,900', priceEn: '₩24,900', perKo: '크레딧당 ₩830',   perEn: '₩830 / credit',   recommended: false },
-  { nameKo: '벌크',   nameEn: 'Bulk',    credits: 100, priceKo: '₩69,000', priceEn: '₩69,000', perKo: '크레딧당 ₩690',   perEn: '₩690 / credit',   recommended: false },
+  { nameKo: '스타터',   nameEn: 'Starter',  credits: 5,   priceKo: '₩12,000',  priceEn: '₩12,000',  perKo: '크레딧당 ₩2,400', perEn: '₩2,400 / credit', recommended: false },
+  { nameKo: '스탠다드', nameEn: 'Standard', credits: 20,  priceKo: '₩40,000',  priceEn: '₩40,000',  perKo: '크레딧당 ₩2,000', perEn: '₩2,000 / credit', recommended: true  },
+  { nameKo: '프로',     nameEn: 'Pro',      credits: 50,  priceKo: '₩90,000',  priceEn: '₩90,000',  perKo: '크레딧당 ₩1,800', perEn: '₩1,800 / credit', recommended: false },
+  { nameKo: '벌크',     nameEn: 'Bulk',     credits: 100, priceKo: '₩160,000', priceEn: '₩160,000', perKo: '크레딧당 ₩1,600', perEn: '₩1,600 / credit', recommended: false },
 ];
 
 const creditPoints = [
@@ -171,6 +171,15 @@ export default function PricingPage() {
             {locale === 'en'
               ? 'Credit purchases are coming soon. For now, try it with your 5 free sign-up credits.'
               : '추가 크레딧 구매는 곧 제공됩니다. 지금은 가입 5크레딧으로 체험하세요.'}
+          </p>
+        </div>
+
+        {/* 포지셔닝 · 면책 */}
+        <div className="bg-surface-sunken border border-border rounded-2xl p-6 mb-16 max-w-3xl mx-auto text-center">
+          <p className="text-muted text-base leading-relaxed">
+            {locale === 'en'
+              ? 'Mold Doctor is not an expert that guarantees a fix. It is an AI sidekick that quickly points you toward how to respond to a defect. As an AI it can make mistakes, and the final judgment belongs to the on-site engineer.'
+              : 'Mold Doctor는 불량을 무조건 해결해주는 전문가가 아니라, 대처 방향을 빠르게 잡아주는 AI 사수입니다. AI라 실수가 있을 수 있고, 최종 판단은 현장 엔지니어의 몫입니다.'}
           </p>
         </div>
 

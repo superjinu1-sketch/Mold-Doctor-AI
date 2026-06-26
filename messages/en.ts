@@ -10,7 +10,7 @@ export const en: Record<string, string> = {
   'landing.hero_eyebrow': 'AI-powered real-time estimate',
   'landing.hero_eyebrow_user': 'Welcome back, {name}',
   'landing.hero_h1': 'Injection defects — we estimate the cause.',
-  'landing.hero_trust': '5 free credits on signup · no card required',
+  'landing.hero_trust': '5 free credits on signup · AI guidance (reference)',
   'landing.cta_primary_loggedout': 'Start free estimate',
   'landing.cta_primary_user': 'Start new estimate',
   'landing.cta_account': 'My Page',
@@ -361,6 +361,7 @@ export const en: Record<string, string> = {
   'msg.extracted': ' fields auto-filled — please verify.',
 
   /* DiagnosisResultPanel */
+  'result.ai_guide_disclaimer': 'This is AI guidance. It does not guarantee a fix and may contain mistakes. Final judgment must be verified by the on-site engineer.',
   'result.severity_high': 'Critical',
   'result.severity_medium': 'Warning',
   'result.severity_low': 'Minor',

@@ -623,6 +623,7 @@ export default function DiagnosisResultPanel({ result, onSavePDF, round = 1, fol
           </button>
         </div>
         <p className="text-muted text-base leading-relaxed bg-surface-sunken rounded-lg p-4 max-w-[68ch]">{summary}</p>
+        <p className="mt-3 text-faint text-[length:var(--text-label)] leading-relaxed max-w-[68ch]">{t('result.ai_guide_disclaimer')}</p>
 
         {/* 분석한 불량 사진 (신선=업로드 / 복원=beforePhoto 1장). 값 없으면 미표시 */}
         {defectPhotos.length > 0 && (
