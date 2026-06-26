@@ -432,9 +432,11 @@ export function checkSettings(
   if (cushion !== null) {
     const metering = toNum(s.metering);
     let status: CheckStatus = 'ok';
-    if (cushion <= 0) status = 'low';
+    // <2mm = 기계 최소 클리어런스(~1.5mm) 근접 → 스크류 바닥·보압 전달 불안정(싱크·치수변동·샷간편차).
+    // 0 이하(완전 바닥)도 이 조건에 포함되어 기존 동작을 흡수.
+    if (cushion < 2) status = 'low';
     else if (metering !== null && metering > 0 && cushion > 0.3 * metering) status = 'high';
-    out.push({ label: '쿠션', value: cushion, unit: 'mm', rangeText: '2-8mm 통상·0 위험', status });
+    out.push({ label: '쿠션', value: cushion, unit: 'mm', rangeText: '2-8mm 통상·<2mm 바닥 위험', status });
   }
 
   // 3) 피크 사출압 vs 기계 최대
