@@ -3,17 +3,8 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useLocale } from '@/contexts/LocaleContext';
-import { useAuth } from '@/contexts/AuthContext';
-import { authHeaders } from '@/lib/supabase/authHeader';
-import { apiUrl } from '@/lib/apiBase';
 import { ReportModal } from '@/components/ResolutionReport';
-import type { HistoryRecord, DiagnosisCause, DiagnosisRec } from '@/lib/history-sync';
-
-interface RetestResult {
-  summary?: string;
-  causes?: DiagnosisCause[];
-  recommendations?: DiagnosisRec[];
-}
+import type { HistoryRecord } from '@/lib/history-sync';
 
 function SeverityBadge({ severity }: { severity?: string }) {
   if (!severity) return null;
@@ -63,49 +54,15 @@ function formatDate(ts: string, locale: string) {
 // 진단 히스토리 리스트 — /history(redirect)·/account 공용. 데이터 소스는 부모가 주입.
 export default function HistoryList({ records }: { records: HistoryRecord[] }) {
   const { t, locale } = useLocale();
-  const { user } = useAuth();
   const router = useRouter();
   const [expanded, setExpanded] = useState<string | null>(null);
   const [reportRecord, setReportRecord] = useState<HistoryRecord | null>(null);
-
-  // dev 화이트리스트 (NEXT_PUBLIC_DEV_EMAILS, 미설정 시 기능 off)
-  const devEmailList = (process.env.NEXT_PUBLIC_DEV_EMAILS || '').split(',').map(e => e.trim().toLowerCase()).filter(Boolean);
-  const isDev = devEmailList.length > 0 && devEmailList.includes((user?.email || '').toLowerCase());
-
-  const [retestResult, setRetestResult] = useState<Record<string, RetestResult>>({});
-  const [retestLoading, setRetestLoading] = useState<Record<string, boolean>>({});
-  const [retestError, setRetestError] = useState<Record<string, string>>({});
-  const [retestExpanded, setRetestExpanded] = useState<Record<string, boolean>>({});
 
   const handleRestore = (record: HistoryRecord) => {
     try {
       sessionStorage.setItem('molddoctor_restore', JSON.stringify(record));
     } catch { /* ignore */ }
     router.push('/diagnose');
-  };
-
-  const handleRetest = async (r: HistoryRecord) => {
-    if (!r.beforeInput) return;
-    setRetestLoading(prev => ({ ...prev, [r.id]: true }));
-    setRetestError(prev => ({ ...prev, [r.id]: '' }));
-    try {
-      const headers = { 'Content-Type': 'application/json', ...(await authHeaders()) };
-      const body = {
-        ...(r.beforeInput as Record<string, unknown>),
-        images: r.beforePhoto ? [{ data: r.beforePhoto, mediaType: 'image/jpeg' }] : [],
-        moldDrawings: [],
-        isRetest: true,
-        isDemo: false,
-      };
-      const res = await fetch(apiUrl('/api/diagnose'), { method: 'POST', headers, body: JSON.stringify(body) });
-      const data: RetestResult = await res.json();
-      if (!res.ok) throw new Error((data as Record<string, unknown>).error as string || '재진단 실패');
-      setRetestResult(prev => ({ ...prev, [r.id]: data }));
-    } catch (e) {
-      setRetestError(prev => ({ ...prev, [r.id]: e instanceof Error ? e.message : '재진단 실패' }));
-    } finally {
-      setRetestLoading(prev => ({ ...prev, [r.id]: false }));
-    }
   };
 
   const defectLabel = (r: HistoryRecord) =>
@@ -266,134 +223,6 @@ export default function HistoryList({ records }: { records: HistoryRecord[] }) {
                   {t('history.pdf_report')}
                 </button>
               </div>
-
-              {isDev && r.beforeInput && (
-                <button
-                  type="button"
-                  onClick={() => handleRetest(r)}
-                  disabled={retestLoading[r.id]}
-                  className="w-full flex items-center justify-center gap-2 bg-surface-sunken border border-border rounded-xl px-4 py-3 text-muted font-medium hover:border-[var(--brand-border)] hover:text-brand-ink transition-colors min-h-[44px] text-sm disabled:opacity-50"
-                >
-                  {retestLoading[r.id] ? (
-                    <>
-                      <svg className="animate-spin w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24">
-                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-                      </svg>
-                      재진단 중...
-                    </>
-                  ) : '🔄 재진단(dev)'}
-                </button>
-              )}
-
-              {retestError[r.id] && (
-                <p className="text-danger text-sm text-center bg-[var(--danger-bg)] rounded-lg px-3 py-2 border border-[var(--danger-border)]">
-                  {retestError[r.id]}
-                </p>
-              )}
-
-              {isDev && retestResult[r.id] && (() => {
-                const rt = retestResult[r.id];
-                const beforeCause = r.causes?.[0];
-                const afterCause = rt.causes?.[0];
-                const causeChanged = beforeCause && afterCause && beforeCause.category !== afterCause.category;
-                return (
-                  <div className="border border-[var(--brand-border)] rounded-xl overflow-hidden">
-                    <div className="bg-brand-tint px-4 py-2.5 flex items-center gap-2">
-                      <span className="text-sm font-bold text-brand-ink">비교 결과</span>
-                      <span className="px-2 py-0.5 bg-surface-sunken text-muted text-xs rounded-full">기존</span>
-                      <span className="text-faint text-xs">vs</span>
-                      <span className="px-2 py-0.5 bg-brand text-on-brand text-xs rounded-full font-bold">재진단</span>
-                    </div>
-                    <div className="p-3 space-y-4">
-                      <div>
-                        <div className="text-xs font-bold text-faint uppercase tracking-wider mb-2">요약</div>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                          <div className="bg-surface-sunken rounded-lg p-3">
-                            <div className="text-xs text-faint mb-1 font-semibold">기존</div>
-                            <p className="text-sm text-muted">{r.summary || '—'}</p>
-                          </div>
-                          <div className="bg-brand-tint rounded-lg p-3">
-                            <div className="text-xs text-brand-ink mb-1 font-semibold">재진단</div>
-                            <p className="text-sm text-muted">{rt.summary || '—'}</p>
-                          </div>
-                        </div>
-                      </div>
-
-                      <div>
-                        <div className="text-xs font-bold text-faint uppercase tracking-wider mb-2">1순위 원인</div>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                          <div className="bg-surface-sunken rounded-lg p-3">
-                            <div className="text-xs text-faint mb-1 font-semibold">기존</div>
-                            {beforeCause ? (
-                              <p className="text-sm text-muted">[{beforeCause.category}] {beforeCause.description} ({beforeCause.probability}%)</p>
-                            ) : <p className="text-sm text-faint">—</p>}
-                          </div>
-                          <div className={`rounded-lg p-3 ${causeChanged ? 'bg-brand-tint border border-[var(--brand-border)]' : 'bg-surface-sunken'}`}>
-                            <div className={`text-xs mb-1 font-semibold ${causeChanged ? 'text-brand-ink' : 'text-faint'}`}>
-                              재진단{causeChanged && ' ← 변화'}
-                            </div>
-                            {afterCause ? (
-                              <p className={`text-sm ${causeChanged ? 'text-brand-ink font-semibold' : 'text-muted'}`}>
-                                [{afterCause.category}] {afterCause.description} ({afterCause.probability}%)
-                              </p>
-                            ) : <p className="text-sm text-faint">—</p>}
-                          </div>
-                        </div>
-                      </div>
-
-                      <div>
-                        <div className="text-[length:var(--text-label)] font-bold text-brand-ink mb-2">조정안 TOP 3</div>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                          <div className="bg-surface-sunken rounded-lg p-3 space-y-1">
-                            <div className="text-xs text-faint mb-1 font-semibold">기존</div>
-                            {(r.recommendations || []).slice(0, 3).map((rec, i) => (
-                              <div key={i} className="text-sm text-muted flex gap-1.5">
-                                <span className="text-faint shrink-0">{i + 1}.</span>
-                                <span>{rec.parameter}: {rec.recommended}</span>
-                              </div>
-                            ))}
-                          </div>
-                          <div className="bg-brand-tint rounded-lg p-3 space-y-1">
-                            <div className="text-xs text-brand-ink mb-1 font-semibold">재진단</div>
-                            {(rt.recommendations || []).slice(0, 3).map((rec, i) => (
-                              <div key={i} className="text-sm text-muted flex gap-1.5">
-                                <span className="text-faint shrink-0">{i + 1}.</span>
-                                <span>{rec.parameter}: {rec.recommended}</span>
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-                      </div>
-
-                      <button
-                        type="button"
-                        onClick={() => setRetestExpanded(prev => ({ ...prev, [r.id]: !prev[r.id] }))}
-                        className="w-full text-center text-sm text-brand-ink min-h-[44px] flex items-center justify-center gap-1 hover:bg-surface-sunken rounded-lg transition-colors"
-                      >
-                        {retestExpanded[r.id] ? '접기 ▲' : '전체 재진단 결과 펼치기 ▼'}
-                      </button>
-
-                      {retestExpanded[r.id] && (
-                        <div className="space-y-2">
-                          {(rt.causes || []).map((c, i) => (
-                            <div key={i} className="flex gap-2 text-sm text-muted py-1 border-b border-border last:border-0">
-                              <span className="text-faint shrink-0 font-semibold">{c.rank}.</span>
-                              <span className="text-faint shrink-0">[{c.category}]</span>
-                              <span className="flex-1">{c.description} <span className="text-faint">({c.probability}%)</span></span>
-                            </div>
-                          ))}
-                          {(rt.recommendations || []).length > 3 && (
-                            <div className="text-xs text-faint mt-2">
-                              {locale === 'en' ? '+ more recommendations in full result' : `+ 조정안 ${rt.recommendations!.length - 3}개 추가`}
-                            </div>
-                          )}
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                );
-              })()}
             </div>
           )}
         </div>
