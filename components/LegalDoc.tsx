@@ -28,10 +28,11 @@ function renderBlocks(md: string) {
   return out;
 }
 
-export default function LegalDoc({ md, updated }: { md: string; updated?: string }) {
+export default function LegalDoc({ md, updated, locale }: { md: string; updated?: string; locale?: string }) {
+  const updatedLabel = locale === 'en' ? 'Last updated' : '최종 업데이트';
   return (
     <div className="max-w-2xl mx-auto px-4 py-8">
-      {updated && <p className="text-faint text-[length:var(--text-label)] mb-4">최종 업데이트: {updated}</p>}
+      {updated && <p className="text-faint text-[length:var(--text-label)] mb-4">{updatedLabel}: {updated}</p>}
       <article>{renderBlocks(md)}</article>
     </div>
   );

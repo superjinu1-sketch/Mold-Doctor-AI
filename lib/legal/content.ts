@@ -107,3 +107,115 @@ export const TERMS_MD = `# 이용약관
 본 약관은 대한민국 법령에 따르며, 분쟁은 회사 본점 소재지 관할 법원을 관할로 합니다.
 
 본 약관은 [시행일: 진우 입력]부터 시행합니다. 사업자 정보: [진우 입력].`;
+
+// ─── 영어판(편의 번역, 준거 원문은 한국어). placeholder는 KO와 동기로 채울 것. ───
+export const PRIVACY_MD_EN = `# Privacy Policy
+
+This is an English translation provided for convenience. The Korean version is the official and governing document.
+
+Mold Doctor AI ("the Company") complies with the Personal Information Protection Act (PIPA) and other applicable laws, and processes users' personal information as follows.
+
+## 1. Personal Information We Collect
+- Email sign-up: email address, password (stored encrypted)
+- Google sign-in: email address, Google account identifier, authentication provider information
+- Entered during service use: defect photos and mold drawings, injection settings, resin/mold/product information, diagnosis results and resolution notes, follow-up questions
+- Automatically generated: member unique ID, credit balance and transaction history, infrastructure server logs (access IP and request information recorded temporarily)
+- The Company does not use advertising or analytics tracking tools.
+
+## 2. Purpose of Collection and Use
+Member identification and login, providing AI diagnosis and storing history, credit and payment management, abuse prevention and usage-limit control, responding to inquiries, and service improvement.
+
+## 3. Retention and Use Period
+- Member information and diagnosis records: until account withdrawal (destroyed without delay upon withdrawal)
+- Original defect photos and drawings: not stored (not retained after diagnosis processing; only thumbnails are kept in diagnosis records)
+- Statutory retention: contract and subscription-withdrawal records 5 years, payment and goods-supply records 5 years, consumer dispute-handling records 3 years, access logs 3 months
+
+## 4. Provision to Third Parties
+The Company does not provide personal information beyond the stated purposes. Exceptions apply only where there is a legal basis or a lawful investigative request.
+
+## 5. Outsourcing of Processing and Overseas Transfer
+Pursuant to Article 28-8(1)3 of the Personal Information Protection Act (outsourcing/storage for performance of a contract), the Company discloses overseas transfers through this policy.
+- Anthropic, PBC (USA): defect/drawing images, settings and other text, and follow-up questions are transmitted for the purpose of AI diagnosis analysis; not retained by the Company after an immediate response
+- Supabase, Inc. (USA, etc.): member authentication information, diagnosis records, credit history, for the purpose of database hosting; until account withdrawal or termination of outsourcing
+- Vercel, Inc. (USA): access IP and request information, for the purpose of application hosting; short-term retention
+Refusal of transfer: you may refuse by withdrawing your account or not using the service; however, core diagnosis functions will be unavailable.
+
+## 6. Rights of the Data Subject
+Users may request access, correction, deletion, and suspension of processing.
+- Access: in-app account page
+- Account/data deletion: performed directly in-app via [Account > Delete Account] (immediate destruction)
+- Other inquiries: contact@molddoctor.ai
+
+## 7. Destruction Procedure and Method
+Upon expiry of the retention period or achievement of the purpose, information is destroyed without delay. Electronic files are permanently deleted by irrecoverable means, and when an account is deleted, all linked data is deleted in cascade.
+
+## 8. Security Measures
+Encryption in transit (HTTPS/TLS), separation and minimization of access privileges, encrypted storage of authentication information.
+
+## 9. Children Under 14
+The service is not directed to children under the age of 14 and does not collect their personal information.
+
+## 10. Personal Information Protection Officer
+- Protection Officer: [TBD: name/title]
+- Contact: contact@molddoctor.ai
+- Report infringement: Personal Information Infringement Report Center (118), Personal Information Dispute Mediation Committee (1833-6972)
+
+## 11. Changes to This Policy
+This policy applies from [Effective date: TBD]. Changes will be announced 7 days before they take effect (30 days for material changes).
+
+Business information: [TBD - business name, representative, business registration number, address]`;
+
+export const TERMS_MD_EN = `# Terms of Service
+
+This is an English translation provided for convenience. The Korean version is the official and governing document.
+
+## 1. Purpose
+These Terms set out the conditions of use of the injection molding defect diagnosis AI service provided by Mold Doctor AI ("the Company"), and the rights and obligations of the Company and users.
+
+## 2. Definitions
+- Service: a service in which AI provides cause analysis, recommended settings, and checklists based on defect photos, settings, and similar inputs
+- Credit: an in-service right of use consumed to use paid features
+
+## 3. Effect and Amendment of Terms
+These Terms take effect upon posting on the service screen. Changes will be announced 7 days before they take effect (30 days for changes unfavorable to users).
+
+## 4. Nature of the Service and Disclaimer
+- Diagnosis results are AI-generated reference guidance and do not guarantee resolution of defects.
+- AI may produce errors or inaccurate results; the final judgment and responsibility for adopting results and making actual equipment adjustments rest with the on-site engineer (the user).
+- The Company is not liable for damages such as production loss or equipment damage arising from applying diagnosis results (except for the Company's intent or gross negligence).
+- The service does not replace on-site diagnosis by an expert.
+
+## 5. Membership and Account
+You sign up with an email or Google account, and you are responsible for managing your own account information. Persons under the age of 14 may not sign up.
+
+## 6. Credits and Payment [TBD: to be revised after payment method and pricing are finalized]
+- Paid features deduct credits (principle: 1 diagnosis = 1 credit). Follow-up questions are free within a set number per session.
+- Free credits may be granted upon sign-up.
+- Payment is processed through the app marketplace or a payment provider designated by the Company.
+- Subscription products have a monthly usage cap and do not provide unlimited use.
+
+## 7. Withdrawal of Subscription and Refunds
+- Under the Act on Consumer Protection in Electronic Commerce, withdrawal is possible within 7 days from the date of payment.
+- Withdrawal may be restricted for already-used credits; unused credits are refundable.
+- Refunds for app marketplace (IAP) payments follow the respective marketplace policy.
+- Specific refund criteria will be specified after [TBD].
+
+## 8. User Obligations
+Account theft, abnormal or automated bulk calls, uploading unlawful content, and unauthorized commercial resale are prohibited.
+
+## 9. Rights to Content
+Rights to content uploaded by users belong to the users; the Company processes it to provide diagnosis, store history, and improve the service (in accordance with the Privacy Policy).
+
+## 10. Suspension and Change of Service
+The Company may change or suspend the service for maintenance, technical reasons, or force majeure, with notice given before or after.
+
+## 11. Termination of Account
+Users may withdraw at any time via [Account > Delete Account] in the app, and data is destroyed upon withdrawal. The Company may restrict use in the event of a violation of these Terms or applicable laws.
+
+## 12. Limitation of Liability
+The Company does not warrant the accuracy or completeness of diagnosis results, and liability for damages is limited to the extent permitted by applicable law.
+
+## 13. Governing Law and Jurisdiction
+These Terms are governed by the laws of the Republic of Korea, and disputes shall be subject to the jurisdiction of the court having jurisdiction over the location of the Company's head office.
+
+These Terms take effect from [Effective date: TBD]. Business information: [TBD].`;
