@@ -7,6 +7,7 @@ import AuthModal from '@/components/AuthModal';
 import HistoryList from '@/components/HistoryList';
 import { fetchServerHistory, fetchLedger, migrateLocalHistory, type HistoryRecord, type LedgerEntry } from '@/lib/history-sync';
 import { authHeaders } from '@/lib/supabase/authHeader';
+import { apiUrl } from '@/lib/apiBase';
 
 function loadLocalHistory(): HistoryRecord[] {
   try {
@@ -45,7 +46,7 @@ export default function AccountPage() {
     if (deleteText !== '삭제') return;
     setDeleting(true);
     try {
-      const res = await fetch('/api/account/delete', {
+      const res = await fetch(apiUrl('/api/account/delete'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', ...(await authHeaders()) },
         body: JSON.stringify({ confirm: 'DELETE' }),

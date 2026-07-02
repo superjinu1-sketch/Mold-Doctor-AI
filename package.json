@@ -6,6 +6,7 @@
     "dev": "next dev",
     "dev:eval": "node scripts/dev-eval.mjs",
     "build": "next build",
+    "build:cap": "node scripts/build-capacitor.mjs",
     "start": "next start",
     "verify": "node .claude/scripts/verify.mjs",
     "eval": "node tests/eval/run.mjs"
