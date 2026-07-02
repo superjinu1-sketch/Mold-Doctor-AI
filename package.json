@@ -7,6 +7,7 @@
     "dev:eval": "node scripts/dev-eval.mjs",
     "build": "next build",
     "build:cap": "node scripts/build-capacitor.mjs",
+    "build:cap:sync": "npm run build:cap && npx cap sync",
     "start": "next start",
     "verify": "node .claude/scripts/verify.mjs",
     "eval": "node tests/eval/run.mjs"
