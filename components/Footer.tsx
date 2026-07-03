@@ -10,7 +10,7 @@ export default function Footer() {
           </div>
           <span className="text-sm text-muted">Mold Doctor AI</span>
         </Link>
-        <p className="text-faint text-xs">contact@molddoctor.ai</p>
+        <p className="text-faint text-xs">jinsimlabs@jinsimlabs.com</p>
         <nav className="flex items-center gap-4">
           <Link href="/privacy" className="text-faint text-xs hover:text-muted transition-colors">개인정보처리방침</Link>
           <Link href="/terms" className="text-faint text-xs hover:text-muted transition-colors">이용약관</Link>

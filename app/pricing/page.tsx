@@ -204,7 +204,7 @@ export default function PricingPage() {
               </ul>
             </div>
             <Link
-              href="mailto:contact@molddoctor.ai"
+              href="mailto:jinsimlabs@jinsimlabs.com"
               className="shrink-0 inline-flex items-center justify-center border border-border-strong text-brand-ink hover:bg-brand-tint px-6 py-3 rounded-xl font-bold text-sm transition-colors min-h-[var(--touch-cta)]"
             >
               {locale === 'en' ? 'Contact' : t('pricing.contact')}
