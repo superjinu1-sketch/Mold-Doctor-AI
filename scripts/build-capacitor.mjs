@@ -14,22 +14,16 @@ const apiDest = join(root, '.cap-excluded', 'api');
 const middlewareSrc = join(root, 'middleware.ts');
 const middlewareDest = join(root, '.cap-excluded', 'middleware.ts');
 
-function moveOut() {
-  mkdirSync(join(root, '.cap-excluded'), { recursive: true });
-  if (existsSync(apiSrc)) renameSync(apiSrc, apiDest);
-  if (existsSync(middlewareSrc)) renameSync(middlewareSrc, middlewareDest);
-}
-
-function restore() {
+function restore(movedApi, movedMw) {
   const errors = [];
-  if (existsSync(apiDest)) {
+  if (movedApi) {
     try {
       renameSync(apiDest, apiSrc);
     } catch (e) {
       errors.push(`app/api 복원 실패: ${e.message}`);
     }
   }
-  if (existsSync(middlewareDest)) {
+  if (movedMw) {
     try {
       renameSync(middlewareDest, middlewareSrc);
     } catch (e) {
@@ -51,11 +45,15 @@ function restore() {
   return true;
 }
 
-console.log('[build:cap] app/api, middleware.ts 를 .cap-excluded/ 로 이동 (빌드 동안만)...');
-moveOut();
-
+let movedApi = false;
+let movedMw = false;
 let buildFailed = false;
 try {
+  console.log('[build:cap] app/api, middleware.ts 를 .cap-excluded/ 로 이동 (빌드 동안만)...');
+  mkdirSync(join(root, '.cap-excluded'), { recursive: true });
+  if (existsSync(apiSrc)) { renameSync(apiSrc, apiDest); movedApi = true; }
+  if (existsSync(middlewareSrc)) { renameSync(middlewareSrc, middlewareDest); movedMw = true; }
+
   const result = spawnSync('npx', ['next', 'build'], {
     cwd: root,
     stdio: 'inherit',
@@ -71,7 +69,7 @@ try {
   buildFailed = true;
 } finally {
   console.log('[build:cap] app/api, middleware.ts 원위치 복원 중...');
-  const restored = restore();
+  const restored = restore(movedApi, movedMw);
   if (restored) console.log('[build:cap] 원위치 복원 완료.');
 }
 
