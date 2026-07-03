@@ -2,8 +2,11 @@
 
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import type { User } from '@supabase/supabase-js';
+import { App } from '@capacitor/app';
+import { Browser } from '@capacitor/browser';
 import { supabase } from '@/lib/supabase/client';
 import { migrateLocalHistory } from '@/lib/history-sync';
+import { isNativeApp, AUTH_DEEPLINK } from '@/lib/platform';
 
 interface AuthCtx {
   user: User | null;
@@ -55,6 +58,31 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return () => subscription.unsubscribe();
   }, []);
 
+  useEffect(() => {
+    if (!isNativeApp()) return; // 웹 경로에서는 이 코드가 실행되지 않음
+
+    const handleDeepLink = (url: string) => {
+      if (!url.startsWith(AUTH_DEEPLINK)) return;
+      const code = new URL(url).searchParams.get('code');
+      if (!code) return;
+      supabase.auth
+        .exchangeCodeForSession(code)
+        .finally(() => {
+          Browser.close().catch(() => {}); // 이미 닫혀있을 수 있음 — 무해 실패 허용
+          window.location.replace('/');
+        });
+    };
+
+    const listenerPromise = App.addListener('appUrlOpen', ({ url }) => handleDeepLink(url));
+    App.getLaunchUrl().then((result) => {
+      if (result?.url) handleDeepLink(result.url);
+    });
+
+    return () => {
+      listenerPromise.then((listener) => listener.remove());
+    };
+  }, []);
+
   const refreshCredits = async () => {
     const { data: { user: u } } = await supabase.auth.getUser();
     if (!u) { setCredits(null); return; }
@@ -78,6 +106,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [user]);
 
   const signInWithGoogle = async () => {
+    if (isNativeApp()) {
+      const { data } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: { redirectTo: AUTH_DEEPLINK, skipBrowserRedirect: true },
+      });
+      if (data?.url) await Browser.open({ url: data.url }); // 시스템 브라우저 — PKCE verifier는 앱 localStorage에 유지됨
+      return;
+    }
     await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {

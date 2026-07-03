@@ -300,6 +300,7 @@ function DiagnoseContent() {
   const resultRef = useRef<HTMLDivElement>(null);
   const followUpFormRef = useRef<HTMLDivElement>(null);
   const errorRef = useRef<HTMLDivElement>(null);
+  const customDefectInputRef = useRef<HTMLInputElement>(null);
 
   // Computed label arrays (use t() — must be inside component)
   const machineParams = [
@@ -507,6 +508,11 @@ function DiagnoseContent() {
   useEffect(() => {
     if (resinType || customResin) setManualResinOpen(true);
   }, [resinType, customResin]);
+
+  // '기타 (직접 입력)' 선택 시 입력 칸으로 자동 포커스
+  useEffect(() => {
+    if (defectType === '기타 (직접 입력)') customDefectInputRef.current?.focus();
+  }, [defectType]);
 
   // 그레이드명 → resolve-grade 자동 입력. 응답 enum을 폼 setter에 그대로 set(환각0: null이면 미채움).
   const handleAutoFillGrade = async () => {
@@ -939,7 +945,8 @@ function DiagnoseContent() {
 
       setTimeout(() => resultRef.current?.scrollIntoView({ behavior: 'smooth' }), 100);
     } catch (err) {
-      setError(err instanceof Error ? err.message : t('err.estimate_error'));
+      const isNetworkErr = err instanceof TypeError || (err instanceof Error && /fetch/i.test(err.message));
+      setError(isNetworkErr ? t('err.network') : (err instanceof Error ? err.message : t('err.estimate_error')));
     } finally {
       setIsLoading(false);
     }
@@ -1257,13 +1264,19 @@ function DiagnoseContent() {
             )}
 
             {defectType === '기타 (직접 입력)' && (
-              <input
-                type="text"
-                className={`${inputCls} mt-2`}
-                placeholder={t('step1.type_custom')}
-                value={customDefect}
-                onChange={(e) => setCustomDefect(e.target.value)}
-              />
+              <>
+                <input
+                  ref={customDefectInputRef}
+                  type="text"
+                  className={`${inputCls} mt-2 ${customDefect.trim() === '' ? 'border border-[var(--warn-border)]' : ''}`}
+                  placeholder={t('step1.type_custom')}
+                  value={customDefect}
+                  onChange={(e) => setCustomDefect(e.target.value)}
+                />
+                {customDefect.trim() === '' && (
+                  <p className="mt-1 text-[length:var(--text-label)] text-warn">{t('step1.type_custom_required')}</p>
+                )}
+              </>
             )}
           </div>
 
@@ -1975,7 +1988,7 @@ function DiagnoseContent() {
               {!effectiveDefectType
                 ? <span className="text-warn font-medium">{t('step1.defect_required_gate')}</span>
                 : user
-                  ? <span className="text-faint">{t('nav.credits')} <span className="font-bold text-ink tabular-nums">{credits ?? '—'}</span></span>
+                  ? <span className="text-faint">{t('nav.credits')} <span className="font-bold text-ink tabular-nums">{credits ?? 5}</span></span>
                   : <span className="text-faint">{t('sticky.login_hint')}</span>}
             </div>
             <button

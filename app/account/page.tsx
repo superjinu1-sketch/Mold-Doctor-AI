@@ -7,6 +7,7 @@ import AuthModal from '@/components/AuthModal';
 import HistoryList from '@/components/HistoryList';
 import { fetchServerHistory, fetchLedger, migrateLocalHistory, type HistoryRecord, type LedgerEntry } from '@/lib/history-sync';
 import { authHeaders } from '@/lib/supabase/authHeader';
+import { apiUrl } from '@/lib/apiBase';
 
 function loadLocalHistory(): HistoryRecord[] {
   try {
@@ -45,7 +46,7 @@ export default function AccountPage() {
     if (deleteText !== '삭제') return;
     setDeleting(true);
     try {
-      const res = await fetch('/api/account/delete', {
+      const res = await fetch(apiUrl('/api/account/delete'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', ...(await authHeaders()) },
         body: JSON.stringify({ confirm: 'DELETE' }),
@@ -170,7 +171,10 @@ export default function AccountPage() {
           <div className="flex items-end justify-between gap-3 mb-4">
             <div>
               <div className="text-label text-faint mb-1">{t('account.credit_balance')}</div>
-              <div className="text-[length:var(--text-h2)] font-black text-ink tabular-nums">{credits ?? '—'}</div>
+              <div className="text-[length:var(--text-h2)] font-black text-ink tabular-nums">{credits ?? 5}</div>
+              {credits === null && (
+                <div className="text-label text-faint mt-0.5">{t('account.credit_new_hint')}</div>
+              )}
             </div>
             <a
               href="/pricing"

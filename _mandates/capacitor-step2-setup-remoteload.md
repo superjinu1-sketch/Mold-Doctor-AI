@@ -1,3 +1,9 @@
+# ⛔ 폐기 (2026-07-02) — 이 mandate의 원격 로드(server.url) 방향은 폐기됨
+
+> **사유**: Apple App Store 심사 가이드라인 4.2(최소 기능)/4.2.2(웹 클리핑 — 웹사이트 래핑 앱 리젝) 고위험. 원격 로드 = 앱이 웹사이트를 그대로 띄우는 구조로 심사에서 웹클리핑 판정 가능성 높음 (클고문 감사 2026-07-02, JINSIM.LABS 결정).
+> **새 방향**: 로컬 번들(webDir=정적 빌드 산출물) + API만 Vercel 원격 호출 → `_mandates/capacitor-localbundle-v1.md` 참조.
+> 이 문서로 이미 적용된 것(Capacitor 설치, android/ 플랫폼, appId/appName)은 유지. `server.url`·`capacitor-www`만 새 mandate가 대체한다.
+
 # Capacitor Step 2 — 설치 + 원격로드(server.url) 셋업 + Android 플랫폼 추가
 
 ## 목표

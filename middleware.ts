@@ -14,6 +14,7 @@ function corsHeaders(origin: string | null): Record<string, string> {
       'Access-Control-Allow-Origin': origin,
       'Access-Control-Allow-Methods': 'POST, OPTIONS',
       'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+      'Access-Control-Expose-Headers': 'X-Credit-Balance',
       'Access-Control-Max-Age': '86400',
       'Vary': 'Origin',
     };

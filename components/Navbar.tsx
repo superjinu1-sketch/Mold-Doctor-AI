@@ -7,6 +7,34 @@ import { useAuth } from '@/contexts/AuthContext';
 import AuthModal from './AuthModal';
 import Logo from './Logo';
 
+// 앱 WebView에서 구글 프로필 이미지가 referrer 정책 위반으로 거부되는 경우를 대비한 폴백 아바타
+function AvatarImage({ avatarUrl, email, imgClassName, fallbackClassName, textClassName }: {
+  avatarUrl?: string;
+  email: string;
+  imgClassName: string;
+  fallbackClassName: string;
+  textClassName: string;
+}) {
+  const [imgError, setImgError] = useState(false);
+  if (avatarUrl && !imgError) {
+    return (
+      /* eslint-disable-next-line @next/next/no-img-element */
+      <img
+        src={avatarUrl}
+        alt=""
+        referrerPolicy="no-referrer"
+        onError={() => setImgError(true)}
+        className={imgClassName}
+      />
+    );
+  }
+  return (
+    <div className={fallbackClassName}>
+      <span className={textClassName}>{email[0]?.toUpperCase()}</span>
+    </div>
+  );
+}
+
 export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
@@ -49,14 +77,14 @@ export default function Navbar() {
               </button>
 
               {/* Credit badge */}
-              {!loading && user && credits !== null && (
+              {!loading && user && (
                 <Link
                   href="/pricing"
                   className="min-h-[44px] flex items-center gap-1 px-3 rounded-full bg-brand-tint text-brand-ink text-xs font-bold border border-[var(--brand-border)] hover:bg-brand-tint/70 transition-colors"
-                  aria-label={`${t('nav.credits')} ${credits}`}
+                  aria-label={`${t('nav.credits')} ${credits ?? 5}`}
                 >
                   <span>{t('nav.credits')}</span>
-                  <span className="tabular-nums">{credits}</span>
+                  <span className="tabular-nums">{credits ?? 5}</span>
                 </Link>
               )}
 
@@ -78,14 +106,13 @@ export default function Navbar() {
                     onClick={() => setUserMenuOpen(!userMenuOpen)}
                     className="min-h-[44px] flex items-center gap-2 border border-border hover:border-border-strong rounded-full px-3 transition-colors"
                   >
-                    {avatarUrl ? (
-                      /* eslint-disable-next-line @next/next/no-img-element */
-                      <img src={avatarUrl} alt="" className="w-6 h-6 rounded-full shrink-0" />
-                    ) : (
-                      <div className="w-6 h-6 rounded-full bg-brand-tint flex items-center justify-center shrink-0">
-                        <span className="text-brand-ink text-xs font-bold">{email[0]?.toUpperCase()}</span>
-                      </div>
-                    )}
+                    <AvatarImage
+                      avatarUrl={avatarUrl}
+                      email={email}
+                      imgClassName="w-6 h-6 rounded-full shrink-0"
+                      fallbackClassName="w-6 h-6 rounded-full bg-brand-tint flex items-center justify-center shrink-0"
+                      textClassName="text-brand-ink text-xs font-bold"
+                    />
                     <span className="text-muted text-xs">{shortEmail}</span>
                     <svg className="w-3 h-3 text-faint" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
@@ -145,9 +172,9 @@ export default function Navbar() {
                 </button>
               )}
 
-              {!loading && user && credits !== null && (
+              {!loading && user && (
                 <Link href="/pricing" className="min-h-[44px] flex items-center px-2.5 rounded-full bg-brand-tint text-brand-ink text-xs font-bold tabular-nums shrink-0">
-                  {credits}
+                  {credits ?? 5}
                 </Link>
               )}
 
@@ -158,14 +185,13 @@ export default function Navbar() {
                   className="min-w-[44px] min-h-[44px] flex items-center justify-center"
                   aria-label="계정 메뉴"
                 >
-                  {avatarUrl ? (
-                    /* eslint-disable-next-line @next/next/no-img-element */
-                    <img src={avatarUrl} alt="" className="w-8 h-8 rounded-full border-2 border-border" />
-                  ) : (
-                    <div className="w-8 h-8 rounded-full bg-brand-tint border-2 border-[var(--brand-border)] flex items-center justify-center">
-                      <span className="text-brand-ink text-sm font-bold">{email[0]?.toUpperCase()}</span>
-                    </div>
-                  )}
+                  <AvatarImage
+                    avatarUrl={avatarUrl}
+                    email={email}
+                    imgClassName="w-8 h-8 rounded-full border-2 border-border"
+                    fallbackClassName="w-8 h-8 rounded-full bg-brand-tint border-2 border-[var(--brand-border)] flex items-center justify-center"
+                    textClassName="text-brand-ink text-sm font-bold"
+                  />
                 </button>
               )}
 
@@ -214,19 +240,16 @@ export default function Navbar() {
               {!loading && user && (
                 <div className="mt-2 border border-border rounded-xl p-3 space-y-2">
                   <div className="flex items-center gap-2">
-                    {avatarUrl ? (
-                      /* eslint-disable-next-line @next/next/no-img-element */
-                      <img src={avatarUrl} alt="" className="w-8 h-8 rounded-full shrink-0" />
-                    ) : (
-                      <div className="w-8 h-8 rounded-full bg-brand-tint flex items-center justify-center shrink-0">
-                        <span className="text-brand-ink text-sm font-bold">{email[0]?.toUpperCase()}</span>
-                      </div>
-                    )}
+                    <AvatarImage
+                      avatarUrl={avatarUrl}
+                      email={email}
+                      imgClassName="w-8 h-8 rounded-full shrink-0"
+                      fallbackClassName="w-8 h-8 rounded-full bg-brand-tint flex items-center justify-center shrink-0"
+                      textClassName="text-brand-ink text-sm font-bold"
+                    />
                     <span className="text-faint text-xs truncate flex-1">{email}</span>
                   </div>
-                  {credits !== null && (
-                    <div className="text-sm text-muted px-2">{t('nav.credits')}: {credits}</div>
-                  )}
+                  <div className="text-sm text-muted px-2">{t('nav.credits')}: {credits ?? 5}</div>
                   <Link
                     href="/account"
                     onClick={() => setMenuOpen(false)}

@@ -6,6 +6,8 @@
     "dev": "next dev",
     "dev:eval": "node scripts/dev-eval.mjs",
     "build": "next build",
+    "build:cap": "node scripts/build-capacitor.mjs",
+    "build:cap:sync": "npm run build:cap && npx cap sync",
     "start": "next start",
     "verify": "node .claude/scripts/verify.mjs",
     "eval": "node tests/eval/run.mjs"
@@ -13,6 +15,8 @@
   "dependencies": {
     "@anthropic-ai/sdk": "^0.82.0",
     "@capacitor/android": "^8.4.0",
+    "@capacitor/app": "^8.1.0",
+    "@capacitor/browser": "^8.0.3",
     "@capacitor/core": "^8.4.0",
     "@supabase/supabase-js": "^2.107.0",
     "html2canvas-pro": "^2.0.4",
