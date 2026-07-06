@@ -447,6 +447,39 @@ function DiagnoseContent() {
         const record = JSON.parse(restore);
         setResult(record);
         setSessionId(record.session_id ?? null);
+        const bi = record.beforeInput;
+        if (bi) {
+          if (bi.defectType) {
+            if (DEFECT_TYPES.includes(bi.defectType)) setDefectType(bi.defectType);
+            else { setDefectType('기타 (직접 입력)'); setCustomDefect(bi.defectType); }
+          }
+          if (bi.defectDescription) setDefectDescription(bi.defectDescription);
+          const ri = bi.resinInfo || {};
+          if (ri.resinType) {
+            const isPresetResin = RESIN_OPTIONS.some(g => g.options.includes(ri.resinType));
+            if (isPresetResin) setResinType(ri.resinType);
+            else { setResinType('기타 (직접 입력)'); setCustomResin(ri.resinType); }
+          }
+          if (ri.filler) setFiller(ri.filler);
+          if (ri.fillerContent) setFillerContent(ri.fillerContent);
+          if (ri.flameRetardant) setFlameRetardant(ri.flameRetardant);
+          if (ri.flameRetardantThickness) setFlameRetardantThickness(ri.flameRetardantThickness);
+          if (ri.flameRetardantType) setFlameRetardantType(ri.flameRetardantType);
+          if (ri.resinDetail) setResinDetail(ri.resinDetail);
+          if (ri.resinGrade) setResinGrade(ri.resinGrade);
+          if (bi.settings) setSettings(prev => ({ ...prev, ...bi.settings }));
+          if (bi.advSettings) setAdvSettings(prev => ({ ...prev, ...bi.advSettings }));
+          const mi = bi.moldInfo || {};
+          if (mi.moldType) setMoldType(mi.moldType);
+          if (mi.gateType) setGateType(mi.gateType);
+          if (mi.cavities) setCavities(mi.cavities);
+          if (mi.runnerType) setRunnerType(mi.runnerType);
+          const pi = bi.productInfo || {};
+          if (pi.weight) setWeight(pi.weight);
+          if (pi.wallThicknessMin) setWallThicknessMin(pi.wallThicknessMin);
+          if (pi.wallThicknessMax) setWallThicknessMax(pi.wallThicknessMax);
+          if (pi.notes) setProductNotes(pi.notes);
+        }
         setTimeout(() => resultRef.current?.scrollIntoView({ behavior: 'smooth' }), 150);
       }
     } catch { /* ignore */ }
