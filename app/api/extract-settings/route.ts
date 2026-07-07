@@ -2,6 +2,7 @@ import Anthropic from '@anthropic-ai/sdk';
 import { NextRequest, NextResponse } from 'next/server';
 import { tryMock } from '@/lib/mock';
 import { supabaseAdmin } from '@/lib/supabase/server';
+import { reportError } from '@/lib/observability/server';
 
 const ALLOWED_IMAGE_TYPES = new Set(['image/jpeg', 'image/png', 'image/webp', 'image/gif']);
 const MAX_IMAGE_BYTES = 4 * 1024 * 1024; // 4 MB (Vercel 함수 페이로드 ~4.5MB보다 작게 — 413 가드)
@@ -189,7 +190,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'AI 응답을 파싱할 수 없습니다. 사출기 화면이 선명한 사진을 사용해주세요.' }, { status: 422 });
     }
   } catch (error) {
-    console.error('[extract-settings] error:', error);
+    reportError('extract-settings', error);
     return NextResponse.json(
       { error: '셋팅값 추출 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.' },  // 일반화
       { status: 500 }

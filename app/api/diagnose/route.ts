@@ -6,6 +6,7 @@ import { getResinSpec, checkSettings, formatKbCompare } from '@/lib/resin-kb';
 import { formatDefectGuide } from '@/lib/defect-kb';
 import { supabaseAdmin } from '@/lib/supabase/server';
 import { getSampleDemo } from '@/lib/sample-demo';
+import { reportError } from '@/lib/observability/server';
 
 // JSON 문자열 값 안의 실제 줄바꿈을 공백으로 치환 (문자 단위 파싱)
 function sanitizeJsonNewlines(text: string): string {
@@ -918,7 +919,7 @@ CRITICAL: Your entire response must be ONLY the JSON object. No text before or a
       },
     });
   } catch (error) {
-    console.error('Diagnose API error:', error);
+    reportError('diagnose', error);
     if (refundCtx) {
       try {
         await supabaseAdmin.rpc('refund_session', {

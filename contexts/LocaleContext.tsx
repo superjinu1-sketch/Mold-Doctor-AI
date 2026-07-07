@@ -2,6 +2,7 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { ko } from '@/messages/ko';
 import { en } from '@/messages/en';
+import { initClientObservability } from '@/lib/observability/client';
 
 export type Locale = 'ko' | 'en';
 
@@ -28,6 +29,7 @@ export function LocaleProvider({ children }: { children: ReactNode }) {
       const stored = localStorage.getItem(LS_KEY) as Locale | null;
       if (stored === 'en' || stored === 'ko') setLocaleState(stored);
     } catch { /* SSR / privacy mode */ }
+    initClientObservability();
   }, []);
 
   const setLocale = (l: Locale) => {

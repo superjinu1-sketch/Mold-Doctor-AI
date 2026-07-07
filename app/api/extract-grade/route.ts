@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { tryMock } from '@/lib/mock';
 import { supabaseAdmin } from '@/lib/supabase/server';
 import { resolveGradeCore, type CacheValue } from '@/lib/resolve-grade-core';
+import { reportError } from '@/lib/observability/server';
 
 // 포대 라벨 사진 OCR → 그레이드명 추출 → 서버 내부에서 resolve 연결 (클라 왕복 1회).
 // extract-settings 패턴 미러. 사출기 OCR과 rate limit 예산 분리. 무료(무차감).
@@ -138,7 +139,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ ocr, resolved, cached });
   } catch (error) {
-    console.error('[extract-grade] error:', error);
+    reportError('extract-grade', error);
     return NextResponse.json(
       { error: '라벨 분석 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.' },  // 일반화
       { status: 500 }

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabase/server';
+import { reportError } from '@/lib/observability/server';
 
 // 인앱 계정 삭제: auth.users 삭제 → 연결 테이블 ON DELETE CASCADE 연쇄 삭제
 export async function POST(request: NextRequest) {
@@ -28,7 +29,7 @@ export async function POST(request: NextRequest) {
     }
     return NextResponse.json({ ok: true });
   } catch (error) {
-    console.error('[account/delete] error:', error);
+    reportError('account/delete', error);
     return NextResponse.json({ error: '계정 삭제 중 오류가 발생했습니다.', code: 'SERVER_ERROR' }, { status: 500 });
   }
 }

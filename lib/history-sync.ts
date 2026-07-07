@@ -1,6 +1,7 @@
 // 진단 히스토리 서버 동기화 (v1). 브라우저 anon client + RLS (AuthContext.user_credits 조회와 동일 패턴).
 // 로그인 사용자만 서버 사용. 비로그인/오프라인/실패 시 호출부가 localStorage 폴백 유지.
 import { supabase } from '@/lib/supabase/client';
+import { reportClientError } from '@/lib/observability/client';
 
 export interface DiagnosisCause { rank: number; category: string; description: string; probability?: number; }
 export interface DiagnosisRec { parameter: string; current: string; recommended: string; }
@@ -99,7 +100,7 @@ function rowToRecord(row: Row): HistoryRecord {
 export async function saveDiagnosisRecord(rec: HistoryRecord, userId: string): Promise<void> {
   try {
     await supabase.from('diagnosis_records').upsert(recordToRow(rec, userId), { onConflict: 'user_id,client_id' });
-  } catch { /* 폴백: localStorage 유지 */ }
+  } catch (e) { reportClientError('history-sync.saveDiagnosisRecord', e); /* 폴백: localStorage 유지 */ }
 }
 
 /** 해결상태/메모/after 갱신. */
@@ -116,7 +117,7 @@ export async function updateResolution(
     if (patch.afterSettings !== undefined) row.after_settings = patch.afterSettings;
     if (patch.afterPhoto !== undefined) row.after_photo = patch.afterPhoto;
     await supabase.from('diagnosis_records').update(row).eq('user_id', userId).eq('client_id', clientId);
-  } catch { /* 폴백 무시 */ }
+  } catch (e) { reportClientError('history-sync.updateResolution', e); /* 폴백 무시 */ }
 }
 
 /** 사진 등 비동기로 채워진 필드 보강용 (upsert 재호출). */
@@ -127,7 +128,7 @@ export async function patchRecordFields(clientId: string, userId: string, fields
     if (fields.afterPhoto !== undefined) row.after_photo = fields.afterPhoto;
     if (Object.keys(row).length === 0) return;
     await supabase.from('diagnosis_records').update(row).eq('user_id', userId).eq('client_id', clientId);
-  } catch { /* 무시 */ }
+  } catch (e) { reportClientError('history-sync.patchRecordFields', e); /* 무시 */ }
 }
 
 /** 서버 히스토리 로드 (최신순). 실패 시 null → 호출부가 localStorage 폴백. */
@@ -141,7 +142,8 @@ export async function fetchServerHistory(userId: string): Promise<HistoryRecord[
       .limit(200);
     if (error || !data) return null;
     return data.map(rowToRecord);
-  } catch {
+  } catch (e) {
+    reportClientError('history-sync.fetchServerHistory', e);
     return null;
   }
 }
@@ -157,7 +159,8 @@ export async function fetchLedger(userId: string, limit = 30): Promise<LedgerEnt
       .limit(limit);
     if (error || !data) return [];
     return data as LedgerEntry[];
-  } catch {
+  } catch (e) {
+    reportClientError('history-sync.fetchLedger', e);
     return [];
   }
 }
@@ -175,5 +178,5 @@ export async function migrateLocalHistory(userId: string): Promise<void> {
       if (error) return; // 실패 시 플래그 미설정 → 다음 로그인 때 재시도
     }
     localStorage.setItem(MIGRATION_FLAG, '1');
-  } catch { /* 무시: 다음 기회에 재시도 */ }
+  } catch (e) { reportClientError('history-sync.migrateLocalHistory', e); /* 무시: 다음 기회에 재시도 */ }
 }

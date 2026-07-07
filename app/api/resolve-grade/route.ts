@@ -3,6 +3,7 @@ import { tryMock } from '@/lib/mock';
 import { supabaseAdmin } from '@/lib/supabase/server';
 import { normalizeGrade } from '@/lib/grade-parser';
 import { resolveGradeCore } from '@/lib/resolve-grade-core';
+import { reportError } from '@/lib/observability/server';
 
 // thin wrapper: 인증·입력검증만. 파이프라인은 resolveGradeCore (extract-grade와 공유).
 // 외부 계약(200 {...result, cached} / 401 / 400 EMPTY_INPUT / 429 RATE_LIMIT / 500)은 작업2와 동일.
@@ -31,7 +32,7 @@ export async function POST(request: NextRequest) {
     }
     return NextResponse.json({ ...outcome.result, cached: outcome.cached });
   } catch (error) {
-    console.error('[resolve-grade] error:', error);
+    reportError('resolve-grade', error);
     return NextResponse.json(
       { error: '그레이드 해석 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.' },  // 일반화
       { status: 500 }

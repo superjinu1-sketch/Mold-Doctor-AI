@@ -18,6 +18,8 @@
     "@capacitor/app": "^8.1.0",
     "@capacitor/browser": "^8.0.3",
     "@capacitor/core": "^8.4.0",
+    "@sentry/node": "^10.63.0",
+    "@sentry/react": "^10.63.0",
     "@supabase/supabase-js": "^2.107.0",
     "html2canvas-pro": "^2.0.4",
     "jspdf": "^4.2.1",

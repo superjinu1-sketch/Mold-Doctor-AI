@@ -2,6 +2,7 @@ import Anthropic from '@anthropic-ai/sdk';
 import { NextRequest, NextResponse } from 'next/server';
 import { tryMock } from '@/lib/mock';
 import { supabaseAdmin } from '@/lib/supabase/server';
+import { reportError } from '@/lib/observability/server';
 function getApiKey(): string {
   return process.env.ANTHROPIC_API_KEY || '';
 }
@@ -151,7 +152,7 @@ export async function POST(req: NextRequest) {
       },
     });
   } catch (error) {
-    console.error('Chat API error:', error);
+    reportError('diagnose-chat', error);
     return NextResponse.json(
       { error: '응답 처리 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.' },  // 일반화
       { status: 500 }
