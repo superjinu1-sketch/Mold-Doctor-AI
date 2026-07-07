@@ -172,6 +172,19 @@ export default function PricingPage() {
               ? 'Credit purchases are coming soon. For now, try it with your 5 free sign-up credits.'
               : '추가 크레딧 구매는 곧 제공됩니다. 지금은 가입 5크레딧으로 체험하세요.'}
           </p>
+          <div className="mt-6 bg-surface border border-border rounded-2xl p-6 text-center max-w-2xl mx-auto">
+            <p className="text-muted text-base leading-relaxed mb-4">
+              {locale === 'en'
+                ? 'Beta notice: credit purchases open after the official launch. Until then, if you run out and need more, email us with what you’re working on — we top up beta testers for free.'
+                : '베타 안내: 크레딧 구매는 정식 출시 후 열립니다. 그 전까지 크레딧을 다 쓰셨고 더 필요하시면, 어떤 작업 중인지 적어 이메일 주세요. 베타 참여자께는 무료로 충전해 드립니다.'}
+            </p>
+            <a
+              href="mailto:jinsimlabs@jinsimlabs.com?subject=Mold%20Doctor%20베타%20크레딧%20충전%20요청"
+              className="inline-flex items-center justify-center bg-brand text-on-brand px-6 py-3 rounded-full font-bold text-sm hover:bg-brand-ink transition-colors min-h-[var(--touch-cta)]"
+            >
+              {locale === 'en' ? 'Request free credits' : '무료 크레딧 요청'}
+            </a>
+          </div>
         </div>
 
         {/* 포지셔닝 · 면책 */}

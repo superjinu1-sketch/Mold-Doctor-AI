@@ -53,8 +53,11 @@ export default function Navbar() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <div className="flex items-center justify-between h-14">
             {/* Logo */}
-            <Link href="/" className="flex items-center" aria-label="Mold Doctor">
+            <Link href="/" className="flex items-center gap-2" aria-label="Mold Doctor">
               <Logo size={28} wordClassName="text-sm" />
+              <span className="text-[length:var(--text-label)] font-bold uppercase tracking-wider text-brand-ink bg-brand-tint border border-[var(--brand-border)] rounded px-1.5 py-0.5 leading-none">
+                {t('nav.beta')}
+              </span>
             </Link>
 
             {/* Desktop Nav */}

@@ -107,7 +107,7 @@ export const ko: Record<string, string> = {
   'auth.already_registered': '이미 가입된 이메일입니다. 로그인해주세요.',
   'auth.weak_password': '비밀번호는 최소 6자 이상이어야 합니다.',
   'auth.fail': '처리 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.',
-  'credit.insufficient': '크레딧이 부족합니다. 충전 페이지로 이동합니다.',
+  'credit.insufficient': '크레딧을 모두 사용했어요. 베타 기간엔 이메일로 무료 충전해 드립니다. 안내 페이지로 이동합니다.',
 
   /* ── Navbar ─────────────────────────────────── */
   'nav.estimate': '추정하기',
@@ -117,6 +117,7 @@ export const ko: Record<string, string> = {
   'nav.credits': '크레딧',
   'nav.account': '마이페이지',
   'nav.locale_toggle': 'EN',
+  'nav.beta': 'BETA',
   'account.title': '마이페이지',
   'account.signed_in_as': '로그인 계정',
   'account.login_prompt': '로그인하면 크레딧과 추정 기록을 어느 기기에서나 볼 수 있어요.',

@@ -107,7 +107,7 @@ export const en: Record<string, string> = {
   'auth.already_registered': 'This email is already registered. Please log in.',
   'auth.weak_password': 'Password must be at least 6 characters.',
   'auth.fail': 'Something went wrong. Please try again later.',
-  'credit.insufficient': 'Not enough credits. Redirecting to the pricing page.',
+  'credit.insufficient': 'You’ve used all your credits. During beta we top up for free by email. Redirecting to the info page.',
 
   /* ── Navbar ─────────────────────────────────── */
   'nav.estimate': 'Analyze',
@@ -117,6 +117,7 @@ export const en: Record<string, string> = {
   'nav.credits': 'Credits',
   'nav.account': 'My Page',
   'nav.locale_toggle': 'KO',
+  'nav.beta': 'BETA',
   'account.title': 'My Page',
   'account.signed_in_as': 'Signed in as',
   'account.login_prompt': 'Log in to access your credits and diagnosis history on any device.',
