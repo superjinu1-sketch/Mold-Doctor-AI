@@ -7,6 +7,7 @@ import { Browser } from '@capacitor/browser';
 import { supabase } from '@/lib/supabase/client';
 import { migrateLocalHistory } from '@/lib/history-sync';
 import { isNativeApp, AUTH_DEEPLINK } from '@/lib/platform';
+import { configurePurchases, logOutPurchases } from '@/lib/purchases';
 
 interface AuthCtx {
   user: User | null;
@@ -99,8 +100,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       refreshCredits();
       // 첫 로그인 1회: localStorage 진단 히스토리 → 서버 이관 (flag/idempotent, 실패 무시)
       void migrateLocalHistory(user.id);
+      void configurePurchases(user.id); // 네이티브+키 없으면 no-op
     } else {
       setCredits(null);
+      void logOutPurchases();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]);

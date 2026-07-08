@@ -1,14 +1,32 @@
 'use client';
 
+import { useState } from 'react';
 import Link from 'next/link';
 import { useLocale } from '@/contexts/LocaleContext';
+import { useAuth } from '@/contexts/AuthContext';
+import AuthModal from '@/components/AuthModal';
+import { isNativeApp } from '@/lib/platform';
+import { purchaseCredits, isPurchaseCancelled } from '@/lib/purchases';
+import { reportClientError } from '@/lib/observability/client';
+import { supabase } from '@/lib/supabase/client';
 
 const creditPacks = [
-  { nameKo: '스타터',   nameEn: 'Starter',  credits: 5,   priceKo: '₩12,000',  priceEn: '₩12,000',  perKo: '크레딧당 ₩2,400', perEn: '₩2,400 / credit', recommended: false },
-  { nameKo: '스탠다드', nameEn: 'Standard', credits: 20,  priceKo: '₩40,000',  priceEn: '₩40,000',  perKo: '크레딧당 ₩2,000', perEn: '₩2,000 / credit', recommended: true  },
-  { nameKo: '프로',     nameEn: 'Pro',      credits: 50,  priceKo: '₩90,000',  priceEn: '₩90,000',  perKo: '크레딧당 ₩1,800', perEn: '₩1,800 / credit', recommended: false },
-  { nameKo: '벌크',     nameEn: 'Bulk',     credits: 100, priceKo: '₩160,000', priceEn: '₩160,000', perKo: '크레딧당 ₩1,600', perEn: '₩1,600 / credit', recommended: false },
+  { productId: 'credits_starter_5',   nameKo: '스타터',   nameEn: 'Starter',  credits: 5,   priceKo: '₩12,000',  priceEn: '₩12,000',  perKo: '크레딧당 ₩2,400', perEn: '₩2,400 / credit', recommended: false },
+  { productId: 'credits_standard_20', nameKo: '스탠다드', nameEn: 'Standard', credits: 20,  priceKo: '₩40,000',  priceEn: '₩40,000',  perKo: '크레딧당 ₩2,000', perEn: '₩2,000 / credit', recommended: true  },
+  { productId: 'credits_pro_50',      nameKo: '프로',     nameEn: 'Pro',      credits: 50,  priceKo: '₩90,000',  priceEn: '₩90,000',  perKo: '크레딧당 ₩1,800', perEn: '₩1,800 / credit', recommended: false },
+  { productId: 'credits_bulk_100',    nameKo: '벌크',     nameEn: 'Bulk',     credits: 100, priceKo: '₩160,000', priceEn: '₩160,000', perKo: '크레딧당 ₩1,600', perEn: '₩1,600 / credit', recommended: false },
 ];
+
+// 구매 성공 후 웹훅 적립 지연 흡수 — 3초 간격 최대 5회 재조회, 잔액 변화 감지 시 종료.
+async function pollForCreditIncrease(userId: string, previousBalance: number | null): Promise<boolean> {
+  for (let i = 0; i < 5; i++) {
+    await new Promise((r) => setTimeout(r, 3000));
+    const { data } = await supabase.from('user_credits').select('credit_balance').eq('user_id', userId).maybeSingle();
+    const bal = data?.credit_balance ?? null;
+    if (bal !== null && bal !== previousBalance) return true;
+  }
+  return false;
+}
 
 const creditPoints = [
   {
@@ -66,6 +84,50 @@ const faqs = [
 
 export default function PricingPage() {
   const { t, locale } = useLocale();
+  const { user, credits, refreshCredits } = useAuth();
+  const [authOpen, setAuthOpen] = useState(false);
+  const [purchasingId, setPurchasingId] = useState<string | null>(null);
+  const [creditingId, setCreditingId] = useState<string | null>(null);
+  const [purchaseMsg, setPurchaseMsg] = useState<{ tone: 'ok' | 'warn'; text: string } | null>(null);
+  const native = isNativeApp();
+
+  async function handlePurchase(productId: string, packCredits: number) {
+    if (!user) { setAuthOpen(true); return; }
+    setPurchaseMsg(null);
+    setPurchasingId(productId);
+    try {
+      await purchaseCredits(productId);
+      setPurchasingId(null);
+      setCreditingId(productId);
+      const increased = await pollForCreditIncrease(user.id, credits);
+      setCreditingId(null);
+      if (increased) {
+        await refreshCredits();
+        setPurchaseMsg({
+          tone: 'ok',
+          text: locale === 'en' ? `${packCredits} credits added!` : `${packCredits}크레딧이 적립됐어요!`,
+        });
+      } else {
+        setPurchaseMsg({
+          tone: 'warn',
+          text: locale === 'en'
+            ? 'Purchase complete — credits may take a moment to appear. Check your balance shortly.'
+            : '구매가 완료됐어요 — 적립까지 잠시 시간이 걸릴 수 있어요. 잠시 후 잔액을 확인해주세요.',
+        });
+      }
+    } catch (e) {
+      setPurchasingId(null);
+      setCreditingId(null);
+      if (isPurchaseCancelled(e)) return; // 사용자 취소는 조용히 무시
+      setPurchaseMsg({
+        tone: 'warn',
+        text: locale === 'en'
+          ? 'Something went wrong with the purchase. Please try again.'
+          : '구매 처리 중 문제가 발생했어요. 잠시 후 다시 시도해주세요.',
+      });
+      reportClientError('iap.purchase', e);
+    }
+  }
 
   return (
     <div className="bg-canvas min-h-screen px-4 sm:px-6 py-16">
@@ -126,7 +188,7 @@ export default function PricingPage() {
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {creditPacks.map((pack) => (
               <div
-                key={pack.nameKo}
+                key={pack.productId}
                 className={`relative rounded-2xl border overflow-hidden ${
                   pack.recommended
                     ? 'border-brand bg-brand-tint shadow-sm'
@@ -156,35 +218,70 @@ export default function PricingPage() {
                   </div>
                 </div>
                 <div className="px-5 pb-5">
-                  <button
-                    type="button"
-                    disabled
-                    className="w-full py-3 rounded-xl font-bold text-sm border border-border text-faint bg-surface-sunken disabled:opacity-60 cursor-not-allowed min-h-[var(--touch-min)]"
-                  >
-                    {locale === 'en' ? 'Coming soon' : '구매 준비 중'}
-                  </button>
+                  {native ? (
+                    <button
+                      type="button"
+                      disabled={purchasingId === pack.productId || creditingId === pack.productId}
+                      onClick={() => handlePurchase(pack.productId, pack.credits)}
+                      className={`w-full py-3 rounded-xl font-bold text-sm transition-colors min-h-[var(--touch-min)] disabled:opacity-60 disabled:cursor-not-allowed ${
+                        pack.recommended
+                          ? 'bg-brand text-on-brand hover:bg-brand-ink'
+                          : 'border border-border-strong text-brand-ink hover:bg-brand-tint'
+                      }`}
+                    >
+                      {purchasingId === pack.productId
+                        ? (locale === 'en' ? 'Processing…' : '처리 중…')
+                        : creditingId === pack.productId
+                          ? (locale === 'en' ? 'Crediting…' : '적립 처리 중…')
+                          : (locale === 'en' ? 'Buy' : '구매하기')}
+                    </button>
+                  ) : (
+                    <button
+                      type="button"
+                      disabled
+                      className="w-full py-3 rounded-xl font-bold text-sm border border-border text-faint bg-surface-sunken disabled:opacity-60 cursor-not-allowed min-h-[var(--touch-min)]"
+                    >
+                      {locale === 'en' ? 'Coming soon' : '구매 준비 중'}
+                    </button>
+                  )}
                 </div>
               </div>
             ))}
           </div>
-          <p className="text-center text-faint text-sm mt-4">
-            {locale === 'en'
-              ? 'Credit purchases are coming soon. For now, try it with your 5 free sign-up credits.'
-              : '추가 크레딧 구매는 곧 제공됩니다. 지금은 가입 5크레딧으로 체험하세요.'}
-          </p>
-          <div className="mt-6 bg-surface border border-border rounded-2xl p-6 text-center max-w-2xl mx-auto">
-            <p className="text-muted text-base leading-relaxed mb-4">
-              {locale === 'en'
-                ? 'Beta notice: credit purchases open after the official launch. Until then, if you run out and need more, email us with what you’re working on — we top up beta testers for free.'
-                : '베타 안내: 크레딧 구매는 정식 출시 후 열립니다. 그 전까지 크레딧을 다 쓰셨고 더 필요하시면, 어떤 작업 중인지 적어 이메일 주세요. 베타 참여자께는 무료로 충전해 드립니다.'}
-            </p>
-            <a
-              href="mailto:jinsimlabs@jinsimlabs.com?subject=Mold%20Doctor%20베타%20크레딧%20충전%20요청"
-              className="inline-flex items-center justify-center bg-brand text-on-brand px-6 py-3 rounded-full font-bold text-sm hover:bg-brand-ink transition-colors min-h-[var(--touch-cta)]"
-            >
-              {locale === 'en' ? 'Request free credits' : '무료 크레딧 요청'}
-            </a>
-          </div>
+          {native ? (
+            purchaseMsg && (
+              <div
+                className={`mt-6 rounded-2xl border p-4 text-center max-w-2xl mx-auto text-sm font-medium ${
+                  purchaseMsg.tone === 'ok'
+                    ? 'bg-[var(--ok-bg)] border-[var(--ok-border)] text-ok'
+                    : 'bg-[var(--warn-bg)] border-[var(--warn-border)] text-warn'
+                }`}
+              >
+                {purchaseMsg.text}
+              </div>
+            )
+          ) : (
+            <>
+              <p className="text-center text-faint text-sm mt-4">
+                {locale === 'en'
+                  ? 'Credit purchases are coming soon. For now, try it with your 5 free sign-up credits.'
+                  : '추가 크레딧 구매는 곧 제공됩니다. 지금은 가입 5크레딧으로 체험하세요.'}
+              </p>
+              <div className="mt-6 bg-surface border border-border rounded-2xl p-6 text-center max-w-2xl mx-auto">
+                <p className="text-muted text-base leading-relaxed mb-4">
+                  {locale === 'en'
+                    ? 'Beta notice: credit purchases open after the official launch. Until then, if you run out and need more, email us with what you’re working on — we top up beta testers for free.'
+                    : '베타 안내: 크레딧 구매는 정식 출시 후 열립니다. 그 전까지 크레딧을 다 쓰셨고 더 필요하시면, 어떤 작업 중인지 적어 이메일 주세요. 베타 참여자께는 무료로 충전해 드립니다.'}
+                </p>
+                <a
+                  href="mailto:jinsimlabs@jinsimlabs.com?subject=Mold%20Doctor%20베타%20크레딧%20충전%20요청"
+                  className="inline-flex items-center justify-center bg-brand text-on-brand px-6 py-3 rounded-full font-bold text-sm hover:bg-brand-ink transition-colors min-h-[var(--touch-cta)]"
+                >
+                  {locale === 'en' ? 'Request free credits' : '무료 크레딧 요청'}
+                </a>
+              </div>
+            </>
+          )}
         </div>
 
         {/* 포지셔닝 · 면책 */}
@@ -255,6 +352,7 @@ export default function PricingPage() {
         </div>
 
       </div>
+      <AuthModal open={authOpen} onClose={() => setAuthOpen(false)} />
     </div>
   );
 }
