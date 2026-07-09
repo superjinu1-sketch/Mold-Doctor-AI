@@ -4,6 +4,7 @@ import { useState, useRef, useCallback, useEffect, Suspense, type ReactNode } fr
 import { useSearchParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import DiagnosisResultPanel from '@/components/DiagnosisResultPanel';
+import DiagnoseProgress from '@/components/DiagnoseProgress';
 import AuthModal from '@/components/AuthModal';
 import { useLocale } from '@/contexts/LocaleContext';
 import { useAuth } from '@/contexts/AuthContext';
@@ -256,6 +257,7 @@ function DiagnoseContent() {
   const [productNotes, setProductNotes] = useState('');
 
   const [isLoading, setIsLoading] = useState(false);
+  const [progressVisible, setProgressVisible] = useState(false); // isLoading 파생 표시 전용 — 상태 머신 무접촉
   const [result, setResult] = useState<DiagnosisResult | null>(null);
   const [sessionId, setSessionId] = useState<string | null>(null);
   const [demoSnapshot, setDemoSnapshot] = useState<string | null>(null);
@@ -300,6 +302,7 @@ function DiagnoseContent() {
   const resultRef = useRef<HTMLDivElement>(null);
   const followUpFormRef = useRef<HTMLDivElement>(null);
   const errorRef = useRef<HTMLDivElement>(null);
+  const progressCardRef = useRef<HTMLDivElement>(null);
   const customDefectInputRef = useRef<HTMLInputElement>(null);
 
   // Computed label arrays (use t() — must be inside component)
@@ -546,6 +549,15 @@ function DiagnoseContent() {
   useEffect(() => {
     if (defectType === '기타 (직접 입력)') customDefectInputRef.current?.focus();
   }, [defectType]);
+
+  // 진단 진행 카드 표시 — isLoading을 관찰만 함(상태 머신 자체는 무접촉). 카드가 결과 도착 시
+  // 100%까지 채운 뒤 스스로 닫히도록(onExitComplete) isLoading이 꺼진 뒤에도 잠깐 더 유지.
+  useEffect(() => {
+    if (isLoading) {
+      setProgressVisible(true);
+      setTimeout(() => progressCardRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' }), 50);
+    }
+  }, [isLoading]);
 
   // 그레이드명 → resolve-grade 자동 입력. 응답 enum을 폼 setter에 그대로 set(환각0: null이면 미채움).
   const handleAutoFillGrade = async () => {
@@ -1860,6 +1872,18 @@ function DiagnoseContent() {
         {error && (
           <div ref={errorRef} className="bg-[var(--danger-bg)] border border-[var(--danger-border)] text-danger rounded-xl p-4 text-base">
             {error}
+          </div>
+        )}
+
+        {/* 진단 진행 카드 */}
+        {progressVisible && (
+          <div ref={progressCardRef}>
+            <DiagnoseProgress
+              isLoading={isLoading}
+              hasResult={!!result}
+              hasPhoto={images.length > 0}
+              onExitComplete={() => setProgressVisible(false)}
+            />
           </div>
         )}
 
