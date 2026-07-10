@@ -49,7 +49,7 @@ export const en: Record<string, string> = {
 
   /* ── Pricing page ────────────────────────────── */
   'pricing.badge': 'Simple, Transparent Pricing',
-  'pricing.h1': 'AI Analysis Tool Built for the Production Floor',
+  'pricing.h1': 'Buy Credits',
   'pricing.sub': 'Pay only for what you need. 5 free credits on sign-up.',
   'pricing.recommended_badge': '⭐ Recommended',
   'pricing.faq_h2': 'Frequently Asked Questions',
@@ -112,9 +112,10 @@ export const en: Record<string, string> = {
   /* ── Navbar ─────────────────────────────────── */
   'nav.estimate': 'Analyze',
   'nav.guide': 'Defect Guide',
-  'nav.pricing': 'Pricing',
+  'nav.pricing': 'Credits',
   'nav.free': 'Free Trial',
   'nav.credits': 'Credits',
+  'nav.topup': 'Top up',
   'nav.account': 'My Page',
   'nav.locale_toggle': 'KO',
   'nav.beta': 'BETA',

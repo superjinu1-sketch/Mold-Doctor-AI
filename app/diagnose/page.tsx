@@ -2041,7 +2041,13 @@ function DiagnoseContent() {
               {!effectiveDefectType
                 ? <span className="text-warn font-medium">{t('step1.defect_required_gate')}</span>
                 : user
-                  ? <span className="text-faint">{t('nav.credits')} <span className="font-bold text-ink tabular-nums">{credits ?? 5}</span></span>
+                  ? (
+                    <span className="text-faint flex items-center gap-1 flex-wrap">
+                      {t('nav.credits')} <span className="font-bold text-ink tabular-nums">{credits ?? 5}</span>
+                      <span className="text-faint">·</span>
+                      <Link href="/pricing" className="text-brand-ink font-bold">{t('nav.topup')}</Link>
+                    </span>
+                  )
                   : <span className="text-faint">{t('sticky.login_hint')}</span>}
             </div>
             <button

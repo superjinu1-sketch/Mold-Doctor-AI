@@ -148,45 +148,8 @@ export default function PricingPage() {
           <p className="text-muted text-base">{t('pricing.sub')}</p>
         </div>
 
-        {/* 가입 무료 강조 카드 */}
-        <div className="bg-brand-tint border border-[var(--brand-border)] rounded-2xl p-8 sm:p-10 text-center mb-12">
-          <h2 className="text-2xl font-bold text-brand-ink mb-3">
-            {locale === 'en' ? '5 free credits on sign-up' : '가입 즉시 5크레딧 무료'}
-          </h2>
-          <p className="text-muted text-base mb-6">
-            {locale === 'en'
-              ? 'All features, no quality tiers. Start right away.'
-              : '전 기능 그대로. 품질 차등 없이 바로 써보세요.'}
-          </p>
-          <Link
-            href="/diagnose"
-            className="inline-flex items-center justify-center bg-brand text-on-brand px-8 py-3.5 rounded-full font-bold text-base hover:bg-brand-ink transition-colors min-h-[var(--touch-cta)]"
-          >
-            {locale === 'en' ? 'Get started free' : '무료로 시작'}
-          </Link>
-        </div>
-
-        {/* 크레딧 설명 */}
+        {/* 크레딧 팩 그리드 — 페이지 최상단(구매 동선 노출 개선) */}
         <div className="mb-12">
-          <h2 className="text-lg font-bold text-ink text-center mb-6">
-            {locale === 'en' ? 'How credits work' : '크레딧이 뭐예요?'}
-          </h2>
-          <div className="grid sm:grid-cols-3 gap-4">
-            {creditPoints.map((pt, i) => (
-              <div key={i} className="bg-surface border border-border rounded-xl p-5 flex items-start gap-3">
-                <span className="shrink-0 w-7 h-7 rounded-full bg-brand-tint text-brand-ink text-sm font-bold flex items-center justify-center">
-                  {i + 1}
-                </span>
-                <p className="text-muted text-base leading-snug">
-                  {locale === 'en' ? pt.en : pt.ko}
-                </p>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* 크레딧 팩 그리드 */}
-        <div className="mb-4">
           <h2 className="text-lg font-bold text-ink text-center mb-6">
             {locale === 'en' ? 'Credit packs' : '크레딧 팩'}
           </h2>
@@ -287,6 +250,43 @@ export default function PricingPage() {
               </div>
             </>
           )}
+        </div>
+
+        {/* 가입 무료 강조 카드 */}
+        <div className="bg-brand-tint border border-[var(--brand-border)] rounded-2xl p-8 sm:p-10 text-center mb-12">
+          <h2 className="text-2xl font-bold text-brand-ink mb-3">
+            {locale === 'en' ? '5 free credits on sign-up' : '가입 즉시 5크레딧 무료'}
+          </h2>
+          <p className="text-muted text-base mb-6">
+            {locale === 'en'
+              ? 'All features, no quality tiers. Start right away.'
+              : '전 기능 그대로. 품질 차등 없이 바로 써보세요.'}
+          </p>
+          <Link
+            href="/diagnose"
+            className="inline-flex items-center justify-center bg-brand text-on-brand px-8 py-3.5 rounded-full font-bold text-base hover:bg-brand-ink transition-colors min-h-[var(--touch-cta)]"
+          >
+            {locale === 'en' ? 'Get started free' : '무료로 시작'}
+          </Link>
+        </div>
+
+        {/* 크레딧 설명 */}
+        <div className="mb-12">
+          <h2 className="text-lg font-bold text-ink text-center mb-6">
+            {locale === 'en' ? 'How credits work' : '크레딧이 뭐예요?'}
+          </h2>
+          <div className="grid sm:grid-cols-3 gap-4">
+            {creditPoints.map((pt, i) => (
+              <div key={i} className="bg-surface border border-border rounded-xl p-5 flex items-start gap-3">
+                <span className="shrink-0 w-7 h-7 rounded-full bg-brand-tint text-brand-ink text-sm font-bold flex items-center justify-center">
+                  {i + 1}
+                </span>
+                <p className="text-muted text-base leading-snug">
+                  {locale === 'en' ? pt.en : pt.ko}
+                </p>
+              </div>
+            ))}
+          </div>
         </div>
 
         {/* 포지셔닝 · 면책 */}

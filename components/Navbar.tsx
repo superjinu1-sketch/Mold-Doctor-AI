@@ -79,15 +79,17 @@ export default function Navbar() {
                 {t('nav.locale_toggle')}
               </button>
 
-              {/* Credit badge */}
+              {/* Credit badge — 잔액 + 충전 어포던스(탭 가능함이 보이게) */}
               {!loading && user && (
                 <Link
                   href="/pricing"
-                  className="min-h-[44px] flex items-center gap-1 px-3 rounded-full bg-brand-tint text-brand-ink text-xs font-bold border border-[var(--brand-border)] hover:bg-brand-tint/70 transition-colors"
-                  aria-label={`${t('nav.credits')} ${credits ?? 5}`}
+                  className="min-h-[44px] flex items-center gap-1.5 px-3 rounded-full bg-brand-tint text-xs font-bold border border-[var(--brand-border)] hover:bg-brand-tint/70 transition-colors"
+                  aria-label={`${t('nav.credits')} ${credits ?? 5} · ${t('nav.topup')}`}
                 >
-                  <span>{t('nav.credits')}</span>
-                  <span className="tabular-nums">{credits ?? 5}</span>
+                  <span className="text-brand-ink">{t('nav.credits')}</span>
+                  <span className="text-brand-ink tabular-nums">{credits ?? 5}</span>
+                  <span className="text-brand-ink/40">·</span>
+                  <span className="text-brand-ink font-extrabold">{t('nav.topup')}</span>
                 </Link>
               )}
 
@@ -176,8 +178,14 @@ export default function Navbar() {
               )}
 
               {!loading && user && (
-                <Link href="/pricing" className="min-h-[44px] flex items-center px-2.5 rounded-full bg-brand-tint text-brand-ink text-xs font-bold tabular-nums shrink-0">
-                  {credits ?? 5}
+                <Link
+                  href="/pricing"
+                  className="min-h-[44px] flex items-center gap-1 px-2.5 rounded-full bg-brand-tint text-xs font-bold shrink-0"
+                  aria-label={`${t('nav.credits')} ${credits ?? 5} · ${t('nav.topup')}`}
+                >
+                  <span className="text-brand-ink tabular-nums">{credits ?? 5}</span>
+                  <span className="text-brand-ink/40">·</span>
+                  <span className="text-brand-ink font-extrabold">{t('nav.topup')}</span>
                 </Link>
               )}
 

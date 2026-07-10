@@ -49,7 +49,7 @@ export const ko: Record<string, string> = {
 
   /* ── Pricing page ────────────────────────────── */
   'pricing.badge': '간단하고 투명한 가격',
-  'pricing.h1': '현장에서 바로 쓰는 AI 추정 도구',
+  'pricing.h1': '크레딧 충전',
   'pricing.sub': '필요한 만큼만. 가입하면 5크레딧 무료.',
   'pricing.recommended_badge': '⭐ 추천 플랜',
   'pricing.faq_h2': '자주 묻는 질문',
@@ -112,9 +112,10 @@ export const ko: Record<string, string> = {
   /* ── Navbar ─────────────────────────────────── */
   'nav.estimate': '추정하기',
   'nav.guide': '불량 가이드',
-  'nav.pricing': '가격',
+  'nav.pricing': '충전',
   'nav.free': '무료 추정',
   'nav.credits': '크레딧',
+  'nav.topup': '충전',
   'nav.account': '마이페이지',
   'nav.locale_toggle': 'EN',
   'nav.beta': 'BETA',
