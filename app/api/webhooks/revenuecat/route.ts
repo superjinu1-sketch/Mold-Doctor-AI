@@ -5,6 +5,7 @@ import { reportError } from '@/lib/observability/server';
 
 // SKU → 크레딧 매핑 (서버 단일 관리 — 웹훅 payload가 보낸 금액·수량은 신뢰하지 않음)
 const PRODUCT_CREDITS: Record<string, number> = {
+  credits_single_1: 1,
   credits_starter_5: 5,
   credits_standard_20: 20,
   credits_pro_50: 50,

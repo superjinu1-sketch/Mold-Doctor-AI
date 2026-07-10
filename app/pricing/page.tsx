@@ -12,6 +12,7 @@ import { reportClientError } from '@/lib/observability/client';
 import { supabase } from '@/lib/supabase/client';
 
 const creditPacks = [
+  { productId: 'credits_single_1',    nameKo: '싱글',     nameEn: 'Single',   credits: 1,   priceKo: '₩3,000',   priceEn: '₩3,000',   perKo: '크레딧당 ₩3,000', perEn: '₩3,000 / credit', recommended: false },
   { productId: 'credits_starter_5',   nameKo: '스타터',   nameEn: 'Starter',  credits: 5,   priceKo: '₩12,000',  priceEn: '₩12,000',  perKo: '크레딧당 ₩2,400', perEn: '₩2,400 / credit', recommended: false },
   { productId: 'credits_standard_20', nameKo: '스탠다드', nameEn: 'Standard', credits: 20,  priceKo: '₩40,000',  priceEn: '₩40,000',  perKo: '크레딧당 ₩2,000', perEn: '₩2,000 / credit', recommended: true  },
   { productId: 'credits_pro_50',      nameKo: '프로',     nameEn: 'Pro',      credits: 50,  priceKo: '₩90,000',  priceEn: '₩90,000',  perKo: '크레딧당 ₩1,800', perEn: '₩1,800 / credit', recommended: false },
