@@ -206,6 +206,8 @@ export const en: Record<string, string> = {
   'grade.photo_busy': 'Analyzing photo...',
   'grade.err_photo': "Couldn't read a grade name from the photo. Retake it clearly or enter manually.",
   'grade.err_image': 'Unsupported or too-large image (max 8MB). Please use another photo.',
+  'photoInput.camera': 'Take a photo',
+  'photoInput.album': 'Choose from library',
 
   /* Resin option group names */
   'resin.group.polyamide': 'Polyamide (Nylon)',

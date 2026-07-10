@@ -206,6 +206,8 @@ export const ko: Record<string, string> = {
   'grade.photo_busy': '사진 분석 중...',
   'grade.err_photo': '사진에서 그레이드명을 읽지 못했습니다. 라벨이 선명하게 나오게 다시 찍거나 직접 입력해주세요.',
   'grade.err_image': '이미지 형식이 맞지 않거나 너무 큽니다(최대 8MB). 다른 사진을 사용해주세요.',
+  'photoInput.camera': '카메라로 촬영',
+  'photoInput.album': '앨범에서 선택',
 
   /* Resin option group names */
   'resin.group.polyamide': '폴리아미드 (나일론)',

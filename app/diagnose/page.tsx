@@ -5,6 +5,7 @@ import { useSearchParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import DiagnosisResultPanel from '@/components/DiagnosisResultPanel';
 import DiagnoseProgress from '@/components/DiagnoseProgress';
+import PhotoInputTrigger, { type PhotoInputTriggerHandle } from '@/components/PhotoInputTrigger';
 import AuthModal from '@/components/AuthModal';
 import { useLocale } from '@/contexts/LocaleContext';
 import { useAuth } from '@/contexts/AuthContext';
@@ -295,10 +296,10 @@ function DiagnoseContent() {
   const [extractMsg, setExtractMsg] = useState('');
   const [extractedFields, setExtractedFields] = useState<Set<string>>(new Set());
   const [settingsImages, setSettingsImages] = useState<{ id: string; preview: string }[]>([]);  // 셋팅 OCR 멀티 썸네일
-  const fileInputRef = useRef<HTMLInputElement>(null);
-  const settingsImageRef = useRef<HTMLInputElement>(null);
-  const gradeImageRef = useRef<HTMLInputElement>(null);
-  const moldDrawingInputRef = useRef<HTMLInputElement>(null);
+  const fileInputRef = useRef<PhotoInputTriggerHandle>(null);
+  const settingsImageRef = useRef<PhotoInputTriggerHandle>(null);
+  const gradeImageRef = useRef<PhotoInputTriggerHandle>(null);
+  const moldDrawingInputRef = useRef<PhotoInputTriggerHandle>(null);
   const resultRef = useRef<HTMLDivElement>(null);
   const followUpFormRef = useRef<HTMLDivElement>(null);
   const errorRef = useRef<HTMLDivElement>(null);
@@ -655,7 +656,6 @@ function DiagnoseContent() {
       setGradeStatus({ tone: 'warn', text: t('grade.err_fail') });
     } finally {
       setGradeImgBusy(false);
-      if (gradeImageRef.current) gradeImageRef.current.value = ''; // 같은 파일 재선택 허용
     }
   };
 
@@ -1201,20 +1201,18 @@ function DiagnoseContent() {
               onDragOver={(e) => { e.preventDefault(); setIsDragging(true); }}
               onDragLeave={() => setIsDragging(false)}
               onDrop={handleDrop}
-              onClick={() => fileInputRef.current?.click()}
+              onClick={() => fileInputRef.current?.open()}
             >
               <svg className="w-10 h-10 mx-auto mb-3 text-faint" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
               </svg>
               <p className="text-faint font-medium">{t('step1.photo_drop')}</p>
               <p className="text-faint text-sm mt-1">{t('step1.photo_hint')}</p>
-              <input
+              <PhotoInputTrigger
                 ref={fileInputRef}
-                type="file"
                 accept="image/*"
                 multiple
-                className="hidden"
-                onChange={(e) => e.target.files && addImages(e.target.files)}
+                onFiles={(files) => addImages(files)}
               />
             </div>
             {images.length > 0 && (
@@ -1345,18 +1343,16 @@ function DiagnoseContent() {
           {/* 📷 포대 라벨 사진 자동 입력 */}
           <button
             type="button"
-            onClick={() => gradeImageRef.current?.click()}
+            onClick={() => gradeImageRef.current?.open()}
             disabled={gradeImgBusy}
             className="w-full mb-3 flex items-center justify-center gap-2 min-h-[var(--touch-cta)] rounded-xl border border-border-strong bg-surface-sunken text-ink font-semibold text-body hover:bg-surface disabled:opacity-50 transition-colors"
           >
             {gradeImgBusy ? t('grade.photo_busy') : `📷 ${t('grade.label_button')}`}
           </button>
-          <input
+          <PhotoInputTrigger
             ref={gradeImageRef}
-            type="file"
             accept="image/*"
-            className="hidden"
-            onChange={(e) => e.target.files?.[0] && handleLabelImage(e.target.files[0])}
+            onFiles={(files) => files[0] && handleLabelImage(files[0])}
           />
 
           {/* 그레이드명 우선 입력 + 자동 입력(추정) */}
@@ -1478,8 +1474,8 @@ function DiagnoseContent() {
               role="button"
               tabIndex={0}
               aria-disabled={isExtractingSettings}
-              onClick={() => { if (!isExtractingSettings && settingsImages.length < 5) settingsImageRef.current?.click(); }}
-              onKeyDown={(e) => { if ((e.key === 'Enter' || e.key === ' ') && !isExtractingSettings && settingsImages.length < 5) { e.preventDefault(); settingsImageRef.current?.click(); } }}
+              onClick={() => { if (!isExtractingSettings && settingsImages.length < 5) settingsImageRef.current?.open(); }}
+              onKeyDown={(e) => { if ((e.key === 'Enter' || e.key === ' ') && !isExtractingSettings && settingsImages.length < 5) { e.preventDefault(); settingsImageRef.current?.open(); } }}
               onDragOver={(e) => { e.preventDefault(); if (!isExtractingSettings && settingsImages.length < 5) setIsDraggingSettings(true); }}
               onDragLeave={() => setIsDraggingSettings(false)}
               onDrop={(e) => { e.preventDefault(); setIsDraggingSettings(false); if (!isExtractingSettings && settingsImages.length < 5 && e.dataTransfer.files.length) addSettingsImages(e.dataTransfer.files); }}
@@ -1504,13 +1500,11 @@ function DiagnoseContent() {
                 </>
               )}
             </div>
-            <input
+            <PhotoInputTrigger
               ref={settingsImageRef}
-              type="file"
               accept="image/*"
               multiple
-              className="hidden"
-              onChange={(e) => { if (e.target.files?.length) addSettingsImages(e.target.files); e.target.value = ''; }}
+              onFiles={(files) => { if (files.length) addSettingsImages(files); }}
             />
             {/* 셋팅 사진 썸네일(멀티) — × 삭제 / 재촬영=추가 업로드 */}
             {settingsImages.length > 0 && (
@@ -1828,20 +1822,18 @@ function DiagnoseContent() {
                 onDragOver={(e) => { e.preventDefault(); setIsDraggingDrawing(true); }}
                 onDragLeave={() => setIsDraggingDrawing(false)}
                 onDrop={(e) => { e.preventDefault(); setIsDraggingDrawing(false); addMoldDrawings(e.dataTransfer.files); }}
-                onClick={() => moldDrawingInputRef.current?.click()}
+                onClick={() => moldDrawingInputRef.current?.open()}
               >
                 <svg className="w-8 h-8 mx-auto mb-2 text-faint" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                 </svg>
                 <p className="text-muted text-sm font-medium">{t('step4.drawing_hint')}</p>
                 <p className="text-faint text-[length:var(--text-label)] mt-1">{t('step4.drawing_ai_hint')}</p>
-                <input
+                <PhotoInputTrigger
                   ref={moldDrawingInputRef}
-                  type="file"
                   accept="image/*,application/pdf"
                   multiple
-                  className="hidden"
-                  onChange={(e) => e.target.files && addMoldDrawings(e.target.files)}
+                  onFiles={(files) => addMoldDrawings(files)}
                 />
               </div>
               {moldDrawings.length > 0 && (
