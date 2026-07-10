@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useLocale } from '@/contexts/LocaleContext';
 import { useAuth } from '@/contexts/AuthContext';
@@ -90,7 +90,9 @@ export default function PricingPage() {
   const [purchasingId, setPurchasingId] = useState<string | null>(null);
   const [creditingId, setCreditingId] = useState<string | null>(null);
   const [purchaseMsg, setPurchaseMsg] = useState<{ tone: 'ok' | 'warn'; text: string } | null>(null);
-  const native = isNativeApp();
+  // 정적 export 프리렌더 시점엔 네이티브 브릿지가 없어 native=false가 고착될 수 있음 — 마운트 후 재평가로 흡수(웹은 항상 false 유지).
+  const [native, setNative] = useState(false);
+  useEffect(() => { setNative(isNativeApp()); }, []);
 
   async function handlePurchase(productId: string, packCredits: number) {
     if (!user) { setAuthOpen(true); return; }
