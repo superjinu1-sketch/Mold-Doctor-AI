@@ -13,7 +13,7 @@ android {
         applicationId "com.jinsimlabs.molddoctor"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 2
+        versionCode 3
         // 제출(내부테스트 포함)마다 versionCode +1 단조증가, versionName은 사용자 노출 버전(semver).
         // 콘솔은 versionCode 재사용을 거부하므로 재제출 시 반드시 증가시킬 것.
         versionName "1.1.0"
