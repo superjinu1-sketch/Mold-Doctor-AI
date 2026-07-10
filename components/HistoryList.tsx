@@ -87,7 +87,11 @@ export default function HistoryList({ records }: { records: HistoryRecord[] }) {
   return (
     <div className="space-y-3">
       {records.map((r) => (
-        <div key={r.id} className="ui-card p-0 overflow-hidden">
+        <div
+          key={r.id}
+          className="ui-card p-0 overflow-hidden"
+          style={{ contentVisibility: 'auto', containIntrinsicSize: expanded === r.id ? '0 600px' : '0 88px' }}
+        >
           <button
             type="button"
             onClick={() => setExpanded(expanded === r.id ? null : r.id)}

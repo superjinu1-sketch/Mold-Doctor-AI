@@ -49,7 +49,7 @@ export default function Navbar() {
 
   return (
     <>
-      <nav className="fixed top-0 w-full z-50 border-b border-border bg-canvas/80 backdrop-blur-xl">
+      <nav className="fixed top-0 w-full z-50 border-b border-border bg-canvas">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <div className="flex items-center justify-between h-14">
             {/* Logo */}

@@ -80,8 +80,8 @@ export default function DiagnoseProgress({ isLoading, hasResult, hasPhoto, onExi
       {!reducedMotion && (
         <div className="h-2 rounded-full bg-[var(--surface-sunken)] overflow-hidden">
           <div
-            className="h-full rounded-full bg-[var(--brand)] transition-[width] duration-200 ease-linear"
-            style={{ width: `${progress}%` }}
+            className="h-full w-full rounded-full bg-[var(--brand)] transition-transform duration-200 ease-linear"
+            style={{ transform: `scaleX(${progress / 100})`, transformOrigin: 'left' }}
           />
         </div>
       )}

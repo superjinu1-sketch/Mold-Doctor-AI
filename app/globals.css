@@ -102,6 +102,8 @@
 }
 
 /* ─── Base ───────────────────────────────────────────────────────────────── */
+html { -webkit-tap-highlight-color: transparent; }
+
 body {
   background:  var(--canvas);
   color:       var(--ink);
@@ -112,6 +114,35 @@ body {
   word-break: keep-all;        /* 한글을 어절 단위로 — 단어 중간 깨짐 방지 */
   overflow-wrap: anywhere;     /* 긴 영문/수치는 넘칠 때만 분리(오버플로 방지) */
   text-wrap: pretty;           /* 마지막 줄 외톨이 단어 완화 (상속됨) */
+  overscroll-behavior-y: none; /* pull-to-refresh 미사용 — 스크롤 경계 바운스 억제 */
+}
+
+/* ─── Native Feel: 즉각 터치 피드백 (마크업 무접촉 전역 안전망) ───────────── */
+a, button, [role="button"], input, select {
+  touch-action: manipulation; /* 더블탭 확대 등 제스처 지연 제거 */
+}
+/* button·role=button 외에 cursor-pointer 클릭 div(사진 드롭존 등, role 미부여)도 동일 적용 */
+button:not(:disabled):not(.ui-cta),
+[role="button"]:not([aria-disabled="true"]):not(.ui-cta),
+.cursor-pointer:not(.ui-cta) {
+  transition: transform 100ms var(--ease-out), filter 100ms var(--ease-out);
+}
+button:not(:disabled):not(.ui-cta):active,
+[role="button"]:not([aria-disabled="true"]):not(.ui-cta):active,
+.cursor-pointer:not(.ui-cta):active {
+  transform: scale(0.97);
+  filter: brightness(0.96); /* 배경색이 제각각인 일반 버튼에도 색상 무관하게 눌림 암전 적용 */
+}
+/* 기존 hover:bg-surface-sunken 표시 지점(리스트 행·카드 탭 영역)에 :active 동일 배경 — 터치 기기는 hover 미발생 */
+.hover\:bg-surface-sunken:active {
+  background-color: var(--surface-sunken);
+}
+@media (prefers-reduced-motion: reduce) {
+  button:not(:disabled):not(.ui-cta):active,
+  [role="button"]:not([aria-disabled="true"]):not(.ui-cta):active,
+  .cursor-pointer:not(.ui-cta):active {
+    transform: none; /* 색 변화(filter)만 유지 */
+  }
 }
 
 /* ─── Scrollbar ──────────────────────────────────────────────────────────── */
@@ -156,10 +187,13 @@ body {
     border-radius: var(--radius-cta);
     min-height: var(--touch-cta-lg);
     font-weight: 700;
-    transition: background-color .15s, transform .05s;
+    transition: background-color 100ms, transform 100ms;
   }
   .ui-cta:hover   { background: var(--brand-ink); }
-  .ui-cta:active  { transform: scale(.99); }
+  .ui-cta:active  { transform: scale(.97); background: var(--brand-ink); }
+  @media (prefers-reduced-motion: reduce) {
+    .ui-cta:active { transform: none; }
+  }
   .ui-cta-secondary { background: var(--brand-tint); color: var(--brand-ink); }
   /* 본문 내 소제목(근거/다른 원인 배제) — 18·700·brand + 상단 hairline */
   .ui-subhead {

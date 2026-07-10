@@ -6,6 +6,7 @@ import Link from 'next/link';
 import DiagnosisResultPanel from '@/components/DiagnosisResultPanel';
 import DiagnoseProgress from '@/components/DiagnoseProgress';
 import PhotoInputTrigger, { type PhotoInputTriggerHandle } from '@/components/PhotoInputTrigger';
+import { hapticImpactLight, hapticSuccess } from '@/lib/haptics';
 import AuthModal from '@/components/AuthModal';
 import { useLocale } from '@/contexts/LocaleContext';
 import { useAuth } from '@/contexts/AuthContext';
@@ -755,6 +756,7 @@ function DiagnoseContent() {
     const processed = await Promise.all(fileArray.map(processFile));
     const valid = processed.filter(Boolean) as ImageFile[];
     setImages(prev => [...prev, ...valid].slice(0, 5));
+    if (valid.length > 0) void hapticImpactLight();
     // 유형 미선택 상태에서 첫 사진이면 AI 제안 호출(사용자 선택은 존중)
     if (valid.length > 0 && !defectType) void classifyDefect(valid[0]);
   }, [processFile, defectType, classifyDefect]);
@@ -868,6 +870,7 @@ function DiagnoseContent() {
     setIsLoading(true);
     setError('');
     setResult(null);
+    void hapticImpactLight();
 
     try {
       const isFollowUp = round > 1 && previousDiagnosis !== null;
@@ -923,6 +926,7 @@ function DiagnoseContent() {
       data.round = diagnosisRound;
       if (newSessionId) data.session_id = newSessionId;
       setResult(data);
+      void hapticSuccess();
       setShowFollowUpForm(false);
       // 진단 성공 → 폼 방어선 스냅샷 클리어 (다음 방문 시 stale 복원 방지)
       try { sessionStorage.removeItem(FORM_SS_KEY); } catch { /* ignore */ }
@@ -2031,7 +2035,7 @@ function DiagnoseContent() {
 
       {/* 하단 sticky 진단하기 바 (입력 단계에만) */}
       {!result && (
-        <div className="fixed bottom-0 inset-x-0 z-40 border-t border-border bg-surface/95 backdrop-blur-md">
+        <div className="fixed bottom-0 inset-x-0 z-40 border-t border-border bg-surface">
           <div className="max-w-5xl mx-auto px-3 sm:px-4 py-3 flex items-center gap-3">
             <div className="flex-1 min-w-0 text-sm leading-tight">
               {!effectiveDefectType

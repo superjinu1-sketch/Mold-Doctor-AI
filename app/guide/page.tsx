@@ -221,6 +221,7 @@ export default function GuidePage() {
                 className={`border rounded-[var(--radius-card-lg)] overflow-hidden transition-all ${
                   openId === defect.id ? colorMap[defect.color] : 'border-border bg-surface hover:border-[var(--brand-border)]'
                 }`}
+                style={{ contentVisibility: 'auto', containIntrinsicSize: openId === defect.id ? '0 700px' : '0 84px' }}
               >
                 <button
                   type="button"

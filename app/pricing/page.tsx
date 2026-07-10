@@ -7,6 +7,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import AuthModal from '@/components/AuthModal';
 import { isNativeApp } from '@/lib/platform';
 import { purchaseCredits, isPurchaseCancelled } from '@/lib/purchases';
+import { hapticSuccess } from '@/lib/haptics';
 import { reportClientError } from '@/lib/observability/client';
 import { supabase } from '@/lib/supabase/client';
 
@@ -97,6 +98,7 @@ export default function PricingPage() {
     setPurchasingId(productId);
     try {
       await purchaseCredits(productId);
+      void hapticSuccess();
       setPurchasingId(null);
       setCreditingId(productId);
       const increased = await pollForCreditIncrease(user.id, credits);
