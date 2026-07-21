@@ -22,6 +22,10 @@
   --brand-border: #B5D4F4;
   --on-brand:     #FFFFFF;
 
+  /* Apple 로그인 버튼 — Apple HIG 지정색(예외, 브랜드 준수용). 라이트 페이지 기준 검정 버튼. */
+  --apple-btn: #000000;
+  --apple-btn-pressed: #1A1A1A;
+
   /* Semantic severity */
   --ok:          #047857;
   --ok-bg:       #E1F5EE;

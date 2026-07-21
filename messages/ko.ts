@@ -86,6 +86,7 @@ export const ko: Record<string, string> = {
 
   /* ── Auth ───────────────────────────────────── */
   'auth.signin': 'Google로 로그인',
+  'auth.signin_apple': 'Apple로 로그인',
   'auth.signout': '로그아웃',
   'auth.signing_in': '로그인 중...',
   'auth.callback_loading': '로그인 처리 중...',

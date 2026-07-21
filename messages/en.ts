@@ -86,6 +86,7 @@ export const en: Record<string, string> = {
 
   /* ── Auth ───────────────────────────────────── */
   'auth.signin': 'Sign in with Google',
+  'auth.signin_apple': 'Sign in with Apple',
   'auth.signout': 'Sign out',
   'auth.signing_in': 'Signing in...',
   'auth.callback_loading': 'Completing sign-in...',

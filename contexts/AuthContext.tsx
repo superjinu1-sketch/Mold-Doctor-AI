@@ -14,6 +14,7 @@ interface AuthCtx {
   user: User | null;
   loading: boolean;
   signInWithGoogle: () => Promise<void>;
+  signInWithApple: () => Promise<void>;
   signInWithEmail: (email: string, password: string) => Promise<{ error: string | null }>;
   signUpWithEmail: (email: string, password: string) => Promise<{ error: string | null; needsConfirm: boolean }>;
   signOut: () => Promise<void>;
@@ -26,6 +27,7 @@ const AuthContext = createContext<AuthCtx>({
   user: null,
   loading: true,
   signInWithGoogle: async () => {},
+  signInWithApple: async () => {},
   signInWithEmail: async () => ({ error: null }),
   signUpWithEmail: async () => ({ error: null, needsConfirm: false }),
   signOut: async () => {},
@@ -165,6 +167,24 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     });
   };
 
+  // App Store 4.8 — 제3자 로그인(구글) 제공 시 Apple 로그인 동등 제공 의무. signInWithGoogle과 동일 구조.
+  const signInWithApple = async () => {
+    if (isNativeApp()) {
+      const { data } = await supabase.auth.signInWithOAuth({
+        provider: 'apple',
+        options: { redirectTo: AUTH_DEEPLINK, skipBrowserRedirect: true },
+      });
+      if (data?.url) await Browser.open({ url: data.url });
+      return;
+    }
+    await supabase.auth.signInWithOAuth({
+      provider: 'apple',
+      options: {
+        redirectTo: `${window.location.origin}/auth/callback`,
+      },
+    });
+  };
+
   // 이메일/비번 — 기존 구글 OAuth와 병행 추가. onAuthStateChange가 user/credits 자동 갱신.
   const signInWithEmail = async (email: string, password: string) => {
     const { error } = await supabase.auth.signInWithPassword({ email, password });
@@ -181,7 +201,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, signInWithGoogle, signInWithEmail, signUpWithEmail, signOut, credits, setCredits, refreshCredits }}>
+    <AuthContext.Provider value={{ user, loading, signInWithGoogle, signInWithApple, signInWithEmail, signUpWithEmail, signOut, credits, setCredits, refreshCredits }}>
       {children}
     </AuthContext.Provider>
   );
