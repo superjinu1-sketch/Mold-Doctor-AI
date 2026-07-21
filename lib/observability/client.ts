@@ -22,3 +22,10 @@ export function reportClientError(scope: string, error: unknown) {
   if (!dsn) return;
   Sentry.captureException(error, { tags: { scope } });
 }
+
+// initClientObservability를 먼저 호출한 provider가 무엇이든(마운트 순서 무관) 안전하게 동작 — idempotent.
+export function logBreadcrumb(message: string, data?: Record<string, unknown>) {
+  if (!dsn) return;
+  initClientObservability();
+  Sentry.addBreadcrumb({ message, level: 'info', data });
+}

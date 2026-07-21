@@ -8,6 +8,7 @@ import { supabase } from '@/lib/supabase/client';
 import { migrateLocalHistory } from '@/lib/history-sync';
 import { isNativeApp, AUTH_DEEPLINK } from '@/lib/platform';
 import { configurePurchases, logOutPurchases } from '@/lib/purchases';
+import { logBreadcrumb } from '@/lib/observability/client';
 
 interface AuthCtx {
   user: User | null;
@@ -59,6 +60,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return () => subscription.unsubscribe();
   }, []);
 
+  // capacitor:// 커스텀 오리진(iOS)에서 쿠키/스토리지가 조용히 실패하는 사례 대비 —
+  // 설정값이 아니라 런타임 실측 오리진을 근거로 남긴다(플랫폼 무관, 비교 기준선 확보).
+  useEffect(() => {
+    logBreadcrumb('runtime-origin', { origin: window.location.origin, isNative: isNativeApp() });
+  }, []);
+
   useEffect(() => {
     if (!isNativeApp()) return; // 웹 경로에서는 이 코드가 실행되지 않음
 
@@ -94,6 +101,39 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       .maybeSingle();
     setCredits(data?.credit_balance ?? null);
   };
+
+  // AuthResumeSync — iOS는 장기 백그라운드 후 앱을 몰래 재시작하고 "복귀"로 위장할 수 있어
+  // 인증/크레딧 상태가 저장소와 어긋날 수 있다. 네이티브는 App 'resume', 웹은 visibilitychange로
+  // 세션·크레딧을 재확인한다. onAuthStateChange와 별개 경로 — 세션 재확인 자체는 저비용이라
+  // 짧은 쿨다운으로만 중복 폭주를 막고(가드), user 갱신은 기존과 동일한 id 동일성 체크로 불필요한
+  // 다운스트림 effect 재실행을 막는다.
+  useEffect(() => {
+    let lastResync = 0;
+    const resync = async () => {
+      const now = Date.now();
+      if (now - lastResync < 2000) return;
+      lastResync = now;
+
+      const { data: { session } } = await supabase.auth.getSession();
+      const nextUser = session?.user ?? null;
+      setUser(prev => (prev?.id === nextUser?.id ? prev : nextUser));
+      if (nextUser) void refreshCredits();
+    };
+
+    if (isNativeApp()) {
+      const listenerPromise = App.addListener('resume', resync);
+      return () => {
+        listenerPromise.then((listener) => listener.remove());
+      };
+    }
+
+    const handleVisibility = () => {
+      if (document.visibilityState === 'visible') void resync();
+    };
+    document.addEventListener('visibilitychange', handleVisibility);
+    return () => document.removeEventListener('visibilitychange', handleVisibility);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     if (user) {
