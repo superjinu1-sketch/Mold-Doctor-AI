@@ -233,7 +233,7 @@ export default function AccountPage() {
       {historyOpen && <HistoryList records={records} />}
 
       {/* 하단 sticky — 새로 추정 */}
-      <div className="sticky bottom-0 -mx-4 mt-6 px-4 py-3 bg-surface border-t border-border">
+      <div className="sticky bottom-0 -mx-4 mt-6 px-4 py-3 bg-surface border-t border-border pb-[calc(0.75rem+env(safe-area-inset-bottom,0px))]">
         <a href="/diagnose" className="ui-cta w-full text-body">{t('account.new_diagnosis')}</a>
       </div>
 

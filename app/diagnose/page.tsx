@@ -2035,7 +2035,7 @@ function DiagnoseContent() {
 
       {/* 하단 sticky 진단하기 바 (입력 단계에만) */}
       {!result && (
-        <div className="fixed bottom-0 inset-x-0 z-40 border-t border-border bg-surface">
+        <div className="fixed bottom-0 inset-x-0 z-40 border-t border-border bg-surface pb-[env(safe-area-inset-bottom,0px)]">
           <div className="max-w-5xl mx-auto px-3 sm:px-4 py-3 flex items-center gap-3">
             <div className="flex-1 min-w-0 text-sm leading-tight">
               {!effectiveDefectType

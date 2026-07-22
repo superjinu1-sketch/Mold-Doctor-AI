@@ -72,7 +72,7 @@ const PhotoInputTrigger = forwardRef<PhotoInputTriggerHandle, PhotoInputTriggerP
 
         {choiceOpen && createPortal(
           <div
-            className="fixed inset-0 bg-ink/40 z-[60] flex items-end sm:items-center justify-center p-4"
+            className="fixed inset-0 bg-ink/40 z-[60] flex items-end sm:items-center justify-center p-4 pb-[calc(1rem+env(safe-area-inset-bottom,0px))]"
             onClick={closePopup}
             onPointerDown={(e) => e.stopPropagation()}
           >

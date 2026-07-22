@@ -49,7 +49,7 @@ export default function Navbar() {
 
   return (
     <>
-      <nav className="fixed top-0 w-full z-50 border-b border-border bg-canvas">
+      <nav className="fixed top-0 w-full z-50 border-b border-border bg-canvas pt-[env(safe-area-inset-top,0px)]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <div className="flex items-center justify-between h-14">
             {/* Logo */}
@@ -282,8 +282,8 @@ export default function Navbar() {
         </div>
       </nav>
 
-      {/* Spacer */}
-      <div className="h-14" />
+      {/* Spacer — 네비바 실제 높이(콘텐츠 h-14 + safe-area)만큼 문서 흐름에 공간 확보 */}
+      <div className="h-[calc(3.5rem+env(safe-area-inset-top,0px))]" />
 
       <AuthModal open={authModalOpen} onClose={() => setAuthModalOpen(false)} />
     </>

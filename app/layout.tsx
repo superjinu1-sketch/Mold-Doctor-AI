@@ -1,4 +1,4 @@
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 import './globals.css';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
@@ -21,6 +21,13 @@ export const metadata: Metadata = {
     title: 'Mold Doctor AI',
     description: '사출 불량 AI 추정 — 원인 분석 + 셋팅 권장값 즉시 제공',
   },
+};
+
+// viewport-fit=cover 없이는 env(safe-area-inset-*)가 iOS에서 값을 갖지 않는다(원인 실측: 기존엔 미설정).
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  viewportFit: 'cover',
 };
 
 export default function RootLayout({
