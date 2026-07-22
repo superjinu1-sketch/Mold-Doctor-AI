@@ -10,6 +10,13 @@ import { isNativeApp, AUTH_DEEPLINK } from '@/lib/platform';
 import { configurePurchases, logOutPurchases } from '@/lib/purchases';
 import { logBreadcrumb } from '@/lib/observability/client';
 
+// iOS App.getLaunchUrl()은 location.replace('/') 리로드 후에도 최초 콜드 런치 URL을 그대로
+// 반환한다(실측 확인, ios-auth-deeplink-loop-v1) — 앱 프로세스는 살아있고 WKWebView만 재탐색되기
+// 때문. 가드 없이는 동일 URL이 매 리로드마다 재처리되어 exchange 실패(.finally)→replace→리로드가
+// 무한 반복(플리커). sessionStorage는 리로드 간 유지되고 앱 콜드 스타트 시 초기화되므로 "같은 세션
+// 내 동일 URL 1회"를 정확히 표현한다.
+const DEEPLINK_PROCESSED_KEY = 'authDeepLinkProcessedUrl';
+
 interface AuthCtx {
   user: User | null;
   loading: boolean;
@@ -73,8 +80,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     const handleDeepLink = (url: string) => {
       if (!url.startsWith(AUTH_DEEPLINK)) return;
+      // 1회 처리 가드 — appUrlOpen·getLaunchUrl 공용. 동일 URL 재처리를 막아 리로드 루프를 원천 차단.
+      if (sessionStorage.getItem(DEEPLINK_PROCESSED_KEY) === url) return;
       const code = new URL(url).searchParams.get('code');
       if (!code) return;
+      sessionStorage.setItem(DEEPLINK_PROCESSED_KEY, url);
       supabase.auth
         .exchangeCodeForSession(code)
         .finally(() => {
