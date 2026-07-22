@@ -27,8 +27,16 @@ export function LocaleProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     try {
       const stored = localStorage.getItem(LS_KEY) as Locale | null;
-      if (stored === 'en' || stored === 'ko') setLocaleState(stored);
-    } catch { /* SSR / privacy mode */ }
+      if (stored === 'en' || stored === 'ko') {
+        setLocaleState(stored); // 저장값 존재 — 사용자 선택 존중(기기 언어 감지 건너뜀)
+      } else {
+        // 저장값 없음(첫 실행) — 기기 언어 감지. 결과는 저장하지 않음(다음 실행 때 재감지되어 OS 언어 변경 추종).
+        const deviceLang = (navigator.languages?.[0] || navigator.language || '').toLowerCase();
+        setLocaleState(deviceLang.startsWith('ko') ? 'ko' : 'en');
+      }
+    } catch {
+      setLocaleState('ko'); // 감지 실패(SSR/privacy mode 등) 시 폴백
+    }
     initClientObservability();
   }, []);
 
