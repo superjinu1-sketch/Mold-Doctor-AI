@@ -5,7 +5,7 @@ import { useLocale } from '@/contexts/LocaleContext';
 import { useAuth } from '@/contexts/AuthContext';
 
 export default function HomePage() {
-  const { t } = useLocale();
+  const { t, locale } = useLocale();
   const { user } = useAuth();
 
   const meta = (user?.user_metadata ?? {}) as Record<string, unknown>;
@@ -68,6 +68,21 @@ export default function HomePage() {
             ))}
           </ol>
           <p className="text-center text-muted text-label mt-6">{t('landing.coverage')}</p>
+
+          {/* 무료 도구 — 조건 대장 + 수지 라이브러리 나란히 */}
+          <h2 className="text-h3 font-bold text-ink mt-10 mb-4">{t('landing.free_tools_title')}</h2>
+          <div className="grid grid-cols-2 gap-3">
+            <Link href="/ledger" className="ui-card p-4 flex flex-col items-start gap-1 hover:border-[var(--brand-border)] transition-colors">
+              <span className="text-2xl" aria-hidden>📋</span>
+              <span className="font-bold text-ink text-body">{t('landing.tool_ledger_title')}</span>
+              <span className="text-muted text-label leading-snug">{t('landing.tool_ledger_desc')}</span>
+            </Link>
+            <Link href={locale === 'en' ? '/en/resins' : '/resins'} className="ui-card p-4 flex flex-col items-start gap-1 hover:border-[var(--brand-border)] transition-colors">
+              <span className="text-2xl" aria-hidden>🧪</span>
+              <span className="font-bold text-ink text-body">{t('landing.tool_resins_title')}</span>
+              <span className="text-muted text-label leading-snug">{t('landing.tool_resins_desc')}</span>
+            </Link>
+          </div>
         </div>
       </section>
     </div>

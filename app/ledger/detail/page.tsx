@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { useLocale } from '@/contexts/LocaleContext';
 import { useAuth } from '@/contexts/AuthContext';
 import AuthModal from '@/components/AuthModal';
@@ -13,6 +14,8 @@ import { apiUrl } from '@/lib/apiBase';
 import { reportClientError } from '@/lib/observability/client';
 import { exportSectionsToPdf } from '@/lib/pdfExport';
 import { RESIN_OPTIONS, RESIN_OPTION_EN_LABEL, RESIN_CUSTOM_VALUE } from '@/lib/resinOptions';
+import { RESIN_KB } from '@/lib/resin-kb';
+import { slugifyResinKey } from '@/lib/resinSlug';
 import {
   TEMP_FIELDS, MOLD_TEMP_FIELDS, MACHINE_PARAM_FIELDS, ADV_FIELD_GROUPS,
   BASIC_SETTING_KEYS, ADV_SETTING_KEYS, emptySettings,
@@ -447,6 +450,16 @@ function LedgerMachineDetailContent() {
             </select>
             {resinType === RESIN_CUSTOM_VALUE && (
               <input type="text" className={`${inputCls} mt-2`} placeholder={t('step2.resin_custom')} value={customResin} onChange={e => setCustomResin(e.target.value)} />
+            )}
+            {resinType && RESIN_KB[resinType] && (
+              <Link
+                href={`${locale === 'en' ? '/en/resins' : '/resins'}/${slugifyResinKey(resinType)}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1 mt-2 text-brand hover:text-brand-ink text-[length:var(--text-label)] font-medium min-h-[44px]"
+              >
+                {t('ledger.resin_page_link')} ↗
+              </Link>
             )}
           </div>
         </div>

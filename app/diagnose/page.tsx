@@ -438,6 +438,16 @@ function DiagnoseContent() {
     }
   }, [searchParams]);
 
+  // Pre-select resin from URL param (수지 라이브러리 CTA → /diagnose 프리필)
+  useEffect(() => {
+    const resinParam = searchParams.get('resin');
+    if (resinParam) {
+      const isPreset = RESIN_OPTIONS.some(g => g.options.includes(resinParam));
+      if (isPreset) setResinType(resinParam);
+      else { setResinType('기타 (직접 입력)'); setCustomResin(resinParam); }
+    }
+  }, [searchParams]);
+
   // 히스토리 카운트 로드 + sessionStorage 복원 (history 페이지에서 "다시 보기" 클릭 시)
   useEffect(() => {
     try {
