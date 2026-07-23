@@ -2,7 +2,7 @@
 // components/ResolutionReport.tsx generate()의 알고리즘을 그대로 추출(동작 변경 없음).
 // 기존 두 호출부는 무접촉(회귀 리스크 0) — 신규 기능(condition-ledger)에서만 이 모듈을 사용.
 //
-// 섹션(section) = PDF에서 항상 새 페이지로 시작하는 단위(조건 대장 PDF에서는 "설비 1대").
+// 섹션(section) = PDF에서 항상 새 페이지로 시작하는 단위(작업표준 저장소 PDF에서는 "설비 1대").
 // 섹션 내부는 [data-pdf-block] 요소들을 순서대로 배치하며, 한 페이지에 다 안 들어가면 기존과
 // 동일한 재귀 분할·최후 픽셀 슬라이싱 폴백을 사용한다.
 export async function exportSectionsToPdf(sections: HTMLElement[][], filename: string): Promise<void> {

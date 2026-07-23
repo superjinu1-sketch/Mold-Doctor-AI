@@ -5,7 +5,7 @@ export default function Footer() {
     <footer className="border-t border-border bg-canvas py-10 mt-auto">
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
         <nav className="flex flex-wrap items-center justify-center gap-x-4 gap-y-2 mb-6 text-center">
-          <Link href="/ledger" className="text-faint text-xs hover:text-muted transition-colors">조건 대장</Link>
+          <Link href="/ledger" className="text-faint text-xs hover:text-muted transition-colors">작업표준 저장소</Link>
           <Link href="/tryout" className="text-faint text-xs hover:text-muted transition-colors">시사출 체크리스트</Link>
           <Link href="/resins" className="text-faint text-xs hover:text-muted transition-colors">수지 라이브러리</Link>
           <Link href="/guide" className="text-faint text-xs hover:text-muted transition-colors">불량 가이드</Link>

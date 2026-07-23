@@ -84,7 +84,7 @@ export default function HomePage() {
           </ol>
           <p className="text-center text-muted text-label mt-6">{t('landing.coverage')}</p>
 
-          {/* 무료 도구 — 조건 대장 + 시사출 체크리스트 + 수지 라이브러리 */}
+          {/* 무료 도구 — 작업표준 저장소 + 시사출 체크리스트 + 수지 라이브러리 */}
           <h2 className="text-h3 font-bold text-ink mt-10 mb-4">{t('landing.free_tools_title')}</h2>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
             <Link href="/ledger" className="ui-card p-4 flex flex-col items-start gap-1 hover:border-[var(--brand-border)] transition-colors">

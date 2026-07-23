@@ -118,7 +118,7 @@ export async function updateTryoutRecord(id: string, patch: TryoutPatch): Promis
 }
 
 /**
- * [조건 대장 표준으로 저장] 훅 — machine_id가 연동된 경우에만 유효. 시사출의
+ * [작업표준으로 저장] 훅 — machine_id가 연동된 경우에만 유효. 시사출의
  * 확정 조건(final_settings)·수지·금형/아이템명을 condition_standards 신규
  * 개정으로 복사한다(lib/ledger.ts createStandard 재사용 — 캡·롤백 로직 공유).
  */

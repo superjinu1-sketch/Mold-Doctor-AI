@@ -1,4 +1,4 @@
-// 조건 대장(condition-ledger) 데이터 레이어. 브라우저 anon client + RLS(lib/history-sync.ts와 동일 원칙) —
+// 작업표준 저장소(condition-ledger) 데이터 레이어. 브라우저 anon client + RLS(lib/history-sync.ts와 동일 원칙) —
 // 서버 프록시 없이 클라이언트가 machines/condition_standards를 직접 CRUD한다. 용량 캡은 DB 트리거가
 // 강제(0011_condition_ledger.sql)하므로 여기서는 그 에러 코드를 사용자 메시지로 매핑만 한다.
 import { supabase } from '@/lib/supabase/client';

@@ -530,7 +530,7 @@ function DiagnoseContent() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // 조건 대장(/ledger)에서 "[이 조건으로 AI 추정]" 클릭 시 프리필. molddoctor_restore와 달리
+  // 작업표준 저장소(/ledger)에서 "[이 조건으로 AI 추정]" 클릭 시 프리필. molddoctor_restore와 달리
   // result/sessionId는 건드리지 않는다 — 완료된 결과 화면이 아니라 신규 추정 입력 폼을 그대로
   // 채워서 사용자가 검토 후 직접 제출하게 한다.
   useEffect(() => {

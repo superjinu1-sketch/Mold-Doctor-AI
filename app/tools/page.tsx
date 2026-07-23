@@ -2,14 +2,14 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 
 export const metadata: Metadata = {
-  title: '무료 도구 — 조건 대장·시사출 체크리스트·수지 라이브러리·불량 가이드 | Mold Doctor',
-  description: '사출 현장을 위한 무료 도구 모음. 설비별 조건 표준 저장, 시사출 샷 로그, 52종 수지 요약, 불량 유형별 가이드까지 전부 무료, 크레딧 소모 없음.',
+  title: '무료 도구 — 작업표준 저장소·시사출 체크리스트·수지 라이브러리·불량 가이드 | Mold Doctor',
+  description: '사출 현장을 위한 무료 도구 모음. 설비별 작업표준 저장, 시사출 샷 로그, 52종 수지 요약, 불량 유형별 가이드까지 전부 무료, 크레딧 소모 없음.',
   alternates: {
     canonical: 'https://mold-doctor-ai.vercel.app/tools',
   },
   openGraph: {
     title: '무료 도구 모음 | Mold Doctor',
-    description: '조건 대장·시사출 체크리스트·수지 라이브러리·불량 가이드 — 전부 무료.',
+    description: '작업표준 저장소·시사출 체크리스트·수지 라이브러리·불량 가이드 — 전부 무료.',
     type: 'website',
     locale: 'ko_KR',
   },
@@ -18,8 +18,8 @@ export const metadata: Metadata = {
 const TOOLS = [
   {
     icon: '📋',
-    title: '조건 대장',
-    desc: '설비별 조건 표준 저장·현장 부착 PDF',
+    title: '작업표준 저장소',
+    desc: '설비별 작업표준 저장·현장 부착 PDF',
     href: '/ledger',
   },
   {

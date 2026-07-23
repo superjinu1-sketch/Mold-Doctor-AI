@@ -1,4 +1,4 @@
-// 수지 선택 옵션 — app/diagnose/page.tsx의 동일 상수를 조건 대장(/ledger)에서도 쓰기 위해 공유 모듈로 분리.
+// 수지 선택 옵션 — app/diagnose/page.tsx의 동일 상수를 작업표준 저장소(/ledger)에서도 쓰기 위해 공유 모듈로 분리.
 // diagnose 페이지 자체는 무접촉(회귀 리스크 0) — 값(한국어)은 API 호환을 위해 그대로 유지.
 export const RESIN_OPTIONS = [
   { group: '폴리아미드 (나일론)', groupKey: 'resin.group.polyamide', options: ['PA6', 'PA66', 'PA46', 'PA410', 'PA4T', 'PA6T', 'PA9T', 'PA12T', 'PA12', 'PA610', 'PA612', 'PA1010', 'PA6/66', 'MXD6'] },

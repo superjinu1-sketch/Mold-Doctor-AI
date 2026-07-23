@@ -1,4 +1,4 @@
-// 조건 대장(/ledger) 매뉴얼 입력 폼용 필드 구성 — app/diagnose/page.tsx의 settings/advSettings와
+// 작업표준 저장소(/ledger) 매뉴얼 입력 폼용 필드 구성 — app/diagnose/page.tsx의 settings/advSettings와
 // 동일 키·동일 t() 라벨을 재사용(신규 문구 없음, UI 카피 일관성). diagnose 페이지 자체는 무접촉.
 export interface SettingField {
   key: string;
