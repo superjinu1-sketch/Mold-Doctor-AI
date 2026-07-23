@@ -23,6 +23,7 @@ export const metadata: Metadata = {
   },
   verification: {
     google: 'S-q5VyIQgHg2rVbOx2YfMhJdMFV3Ti578xivFZDTZFU',
+    other: { 'naver-site-verification': '70ac4bf16560e7a44c05dd3a4805801e5f810ba8' },
   },
 };
 
