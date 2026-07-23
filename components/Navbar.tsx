@@ -64,6 +64,7 @@ export default function Navbar() {
             <div className="hidden md:flex items-center gap-7 text-sm text-faint">
               <Link href="/diagnose" className="hover:text-ink transition-colors">{t('nav.estimate')}</Link>
               <Link href="/ledger" className="hover:text-ink transition-colors">{t('nav.ledger')}</Link>
+              <Link href="/tryout" className="hover:text-ink transition-colors">{t('nav.tryout')}</Link>
               <Link href="/guide" className="hover:text-ink transition-colors">{t('nav.guide')}</Link>
               <Link href={locale === 'en' ? '/en/resins' : '/resins'} className="hover:text-ink transition-colors">{t('nav.resins')}</Link>
               <Link href="/pricing" className="hover:text-ink transition-colors">{t('nav.pricing')}</Link>
@@ -230,6 +231,7 @@ export default function Navbar() {
               {[
                 { href: '/diagnose', label: t('nav.estimate') },
                 { href: '/ledger', label: t('nav.ledger') },
+                { href: '/tryout', label: t('nav.tryout') },
                 { href: '/guide', label: t('nav.guide') },
                 { href: locale === 'en' ? '/en/resins' : '/resins', label: t('nav.resins') },
                 { href: '/pricing', label: t('nav.pricing') },

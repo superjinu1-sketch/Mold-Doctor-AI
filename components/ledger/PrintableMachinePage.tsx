@@ -4,18 +4,10 @@
 // 흑백 프린터 가독 우선: 심각도색 없음, 토큰(ink/muted/border-strong/surface)만 사용 — raw hex 없음.
 // 라벨은 기존 step3.*/adv.* t() 키를 그대로 재사용(신규 문구 중복 없음, diagnose 폼과 카피 일치).
 import { useEffect, useState } from 'react';
-import QRCode from 'qrcode';
 import { useLocale } from '@/contexts/LocaleContext';
 import type { Machine, ConditionStandard } from '@/lib/ledger';
 import { TEMP_FIELDS, MOLD_TEMP_FIELDS, MACHINE_PARAM_FIELDS, ADV_FIELD_GROUPS } from '@/lib/machineSettingsFields';
-
-const BRAND_URL = 'https://mold-doctor-ai.vercel.app';
-let qrDataUrlCache: string | null = null;
-async function getBrandQrDataUrl(): Promise<string> {
-  if (qrDataUrlCache) return qrDataUrlCache;
-  qrDataUrlCache = await QRCode.toDataURL(BRAND_URL, { width: 96, margin: 0, color: { dark: '#14171C', light: '#FFFFFF' } });
-  return qrDataUrlCache;
-}
+import { getBrandQrDataUrl } from '@/lib/pdfBranding';
 
 function fmtDate(iso: string, locale: string): string {
   try {
