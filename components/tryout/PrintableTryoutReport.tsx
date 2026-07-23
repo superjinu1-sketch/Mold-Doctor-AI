@@ -5,7 +5,7 @@
 import { useEffect, useState } from 'react';
 import { useLocale } from '@/contexts/LocaleContext';
 import type { TryoutRecord } from '@/lib/tryout';
-import { CHECKLIST_GROUPS } from '@/lib/tryoutChecklist';
+import { CHECKLIST_GROUPS, type Shot } from '@/lib/tryoutChecklist';
 import { getGuideDefectById } from '@/lib/defectGuide';
 import { TEMP_FIELDS, MOLD_TEMP_FIELDS, MACHINE_PARAM_FIELDS } from '@/lib/machineSettingsFields';
 import { getBrandQrDataUrl } from '@/lib/pdfBranding';
@@ -24,11 +24,12 @@ function fmtDate(iso: string, locale: string): string {
 }
 
 export default function PrintableTryoutReport({
-  record, machineName, authorName,
+  record, machineName, authorName, shots,
 }: {
   record: TryoutRecord;
   machineName: string;
   authorName: string;
+  shots: Shot[];
 }) {
   const { t, locale } = useLocale();
   const [qrUrl, setQrUrl] = useState<string | null>(null);
@@ -37,7 +38,6 @@ export default function PrintableTryoutReport({
   const L = (ko: string, en: string) => (locale === 'en' ? en : ko);
   const s = record.final_settings || {};
   const hasSettings = Object.values(s).some(v => v);
-  const m = record.measures || {};
 
   return (
     <div style={{ width: '190mm', minHeight: '277mm', background: SURFACE, color: INK, padding: '4mm', boxSizing: 'border-box', fontFamily: 'inherit' }}>
@@ -84,28 +84,32 @@ export default function PrintableTryoutReport({
         </div>
       ))}
 
-      {/* 측정 기록 */}
-      {(m.shotWeight || m.dims || m.cycleTime) && (
+      {/* 샷별 기록 — 행이 많으면 기존 멀티페이지 파이프라인(placeBlock 재귀 분할)이 자연 분할 */}
+      {shots.length > 0 && (
         <div style={{ marginBottom: '5mm' }}>
           <div style={{ fontSize: '4.6mm', fontWeight: 800, marginBottom: '1.5mm', borderBottom: `1px solid ${BORDER}`, paddingBottom: '1mm' }}>
-            D. {L('측정·기록', 'Measurements')}
+            D. {L('샷별 기록', 'Shot Log')}
           </div>
-          <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '4.6mm' }}>
-            <tbody>
+          <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '3.8mm' }}>
+            <thead>
               <tr>
-                <td style={{ border: `1px solid ${BORDER}`, padding: '2mm', textAlign: 'center' }}>
-                  <div style={{ fontSize: '3.4mm', color: MUTED, marginBottom: '1mm' }}>{L('샷 중량', 'Shot Weight')}</div>
-                  <div style={{ fontWeight: 800 }}>{m.shotWeight || '—'}</div>
-                </td>
-                <td style={{ border: `1px solid ${BORDER}`, padding: '2mm', textAlign: 'center' }}>
-                  <div style={{ fontSize: '3.4mm', color: MUTED, marginBottom: '1mm' }}>{L('사이클 타임', 'Cycle Time')}</div>
-                  <div style={{ fontWeight: 800 }}>{m.cycleTime || '—'}</div>
-                </td>
-                <td style={{ border: `1px solid ${BORDER}`, padding: '2mm', textAlign: 'center' }}>
-                  <div style={{ fontSize: '3.4mm', color: MUTED, marginBottom: '1mm' }}>{L('주요 치수', 'Key Dimensions')}</div>
-                  <div style={{ fontWeight: 800 }}>{m.dims || '—'}</div>
-                </td>
+                <th style={{ border: `1px solid ${BORDER}`, padding: '1.5mm', background: 'var(--surface-sunken)', width: '10mm' }}>{L('샷#', 'Shot#')}</th>
+                <th style={{ border: `1px solid ${BORDER}`, padding: '1.5mm', background: 'var(--surface-sunken)' }}>{L('중량(g)', 'Weight(g)')}</th>
+                <th style={{ border: `1px solid ${BORDER}`, padding: '1.5mm', background: 'var(--surface-sunken)' }}>{L('사이클(s)', 'Cycle(s)')}</th>
+                <th style={{ border: `1px solid ${BORDER}`, padding: '1.5mm', background: 'var(--surface-sunken)' }}>{L('주요 치수', 'Dimensions')}</th>
+                <th style={{ border: `1px solid ${BORDER}`, padding: '1.5mm', background: 'var(--surface-sunken)' }}>{L('조정 내용', 'Adjustment')}</th>
               </tr>
+            </thead>
+            <tbody>
+              {shots.map(shot => (
+                <tr key={shot.no}>
+                  <td style={{ border: `1px solid ${BORDER}`, padding: '1.5mm', textAlign: 'center', fontWeight: 800 }}>{shot.no}</td>
+                  <td style={{ border: `1px solid ${BORDER}`, padding: '1.5mm', textAlign: 'center' }}>{shot.shotWeight || '—'}</td>
+                  <td style={{ border: `1px solid ${BORDER}`, padding: '1.5mm', textAlign: 'center' }}>{shot.cycleTime || '—'}</td>
+                  <td style={{ border: `1px solid ${BORDER}`, padding: '1.5mm', textAlign: 'center' }}>{shot.dims || '—'}</td>
+                  <td style={{ border: `1px solid ${BORDER}`, padding: '1.5mm' }}>{shot.adjustMemo || '—'}</td>
+                </tr>
+              ))}
             </tbody>
           </table>
         </div>

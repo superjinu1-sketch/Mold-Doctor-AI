@@ -15,7 +15,9 @@ export interface TryoutRecord {
   resin: string | null;
   status: 'in_progress' | 'done';
   checklist: ChecklistData;
-  measures: Measures | null;
+  // DB에 저장된 원형(raw) — 신형 {shots:[...]}·구형 평면 측정값 둘 다 가능.
+  // 항상 lib/tryoutChecklist.ts의 normalizeMeasures()를 거쳐 사용할 것.
+  measures: Record<string, unknown> | null;
   final_settings: Record<string, string> | null;
   summary: string | null;
   created_at: string;

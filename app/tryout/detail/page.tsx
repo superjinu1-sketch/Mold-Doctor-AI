@@ -13,7 +13,10 @@ import { RESIN_OPTIONS, RESIN_OPTION_EN_LABEL, RESIN_CUSTOM_VALUE } from '@/lib/
 import { RESIN_KB } from '@/lib/resin-kb';
 import { slugifyResinKey } from '@/lib/resinSlug';
 import { TEMP_FIELDS, MOLD_TEMP_FIELDS, MACHINE_PARAM_FIELDS, emptySettings } from '@/lib/machineSettingsFields';
-import { CHECKLIST_GROUPS, emptyChecklist, type ChecklistData, type ChecklistState, type Measures } from '@/lib/tryoutChecklist';
+import {
+  CHECKLIST_GROUPS, emptyChecklist, normalizeMeasures, MAX_SHOTS,
+  type ChecklistData, type ChecklistState, type Shot,
+} from '@/lib/tryoutChecklist';
 import { defects as GUIDE_DEFECTS } from '@/lib/defectGuide';
 import { listMachinesWithCurrent, type MachineWithCurrent } from '@/lib/ledger';
 import {
@@ -45,7 +48,7 @@ function TryoutDetailContent() {
   const [freeformMachineName, setFreeformMachineName] = useState('');
 
   const [checklist, setChecklist] = useState<ChecklistData>(emptyChecklist());
-  const [measures, setMeasures] = useState<Measures>({});
+  const [shots, setShots] = useState<Shot[]>([]);
   const [finalSettings, setFinalSettings] = useState<Record<string, string>>(emptySettings());
   const [showFinalSettings, setShowFinalSettings] = useState(false);
   const [summary, setSummary] = useState('');
@@ -75,7 +78,9 @@ function TryoutDetailContent() {
       if (rec.machine_id) { setMachineMode('linked'); setSelectedMachineId(rec.machine_id); }
       else { setMachineMode('freeform'); setFreeformMachineName(rec.machine_name || ''); }
       setChecklist({ ...emptyChecklist(), ...(rec.checklist || {}) });
-      setMeasures(rec.measures || {});
+      // 구형 평면 measures({shotWeight,cycleTime,dims})는 shot #1로 자동 변환. 완전 신규 기록은 빈 배열 → 샷 #1 기본 표시.
+      const normalized = normalizeMeasures(rec.measures, rec.updated_at);
+      setShots(normalized.shots.length > 0 ? normalized.shots : [{ no: 1, at: new Date().toISOString() }]);
       if (rec.final_settings) { setFinalSettings(prev => ({ ...prev, ...rec.final_settings })); setShowFinalSettings(true); }
       setSummary(rec.summary || '');
       setStatus(rec.status);
@@ -118,6 +123,16 @@ function TryoutDetailContent() {
     });
   };
 
+  const addShot = () => {
+    setShots(prev => (prev.length >= MAX_SHOTS ? prev : [...prev, { no: prev.length + 1, at: new Date().toISOString() }]));
+  };
+  const removeShot = (no: number) => {
+    setShots(prev => prev.filter(s => s.no !== no).map((s, i) => ({ ...s, no: i + 1 }))); // 삭제 후 순번 재정렬
+  };
+  const updateShot = (no: number, patch: Partial<Shot>) => {
+    setShots(prev => prev.map(s => (s.no === no ? { ...s, ...patch } : s)));
+  };
+
   const buildPatch = (overrideStatus?: 'in_progress' | 'done') => {
     const resin = resinType === RESIN_CUSTOM_VALUE ? customResin : resinType;
     return {
@@ -125,7 +140,7 @@ function TryoutDetailContent() {
       item_name: itemName,
       resin,
       checklist,
-      measures,
+      measures: { shots },
       final_settings: showFinalSettings ? finalSettings : undefined,
       summary,
       status: overrideStatus ?? status,
@@ -359,23 +374,54 @@ function TryoutDetailContent() {
         ))}
       </div>
 
-      {/* 측정·기록 */}
+      {/* 측정·기록 — 샷별 로그 */}
       <div className="ui-card ui-card-lg p-5 mb-6">
         <h2 className="text-body font-bold text-ink mb-4">D. {t('tryout.measures_title')}</h2>
-        <div className="grid grid-cols-2 gap-3 mb-3">
-          <div>
-            <label className={labelCls}>{t('tryout.shot_weight')}</label>
-            <input type="text" inputMode="decimal" className={inputCls} placeholder="g" value={measures.shotWeight || ''} onChange={e => setMeasures(prev => ({ ...prev, shotWeight: e.target.value }))} />
-          </div>
-          <div>
-            <label className={labelCls}>{t('tryout.cycle_time')}</label>
-            <input type="text" inputMode="decimal" className={inputCls} placeholder="sec" value={measures.cycleTime || ''} onChange={e => setMeasures(prev => ({ ...prev, cycleTime: e.target.value }))} />
-          </div>
+        <div className="space-y-3">
+          {shots.map(shot => (
+            <div key={shot.no} className="border border-border rounded-[var(--radius-card)] p-3">
+              <div className="flex items-center justify-between mb-2">
+                <span className="font-bold text-ink text-body">{t('tryout.shot_label')} #{shot.no}</span>
+                <button
+                  type="button"
+                  onClick={() => removeShot(shot.no)}
+                  className="text-danger hover:underline text-[length:var(--text-label)] font-medium min-h-[var(--touch-min)] px-2"
+                >
+                  {t('common.delete')}
+                </button>
+              </div>
+              <div className="grid grid-cols-2 gap-2 mb-2">
+                <div>
+                  <label className="text-[length:var(--text-label)] text-faint block mb-1">{t('tryout.shot_weight')}</label>
+                  <input type="text" inputMode="decimal" className={inputCls} placeholder="g" value={shot.shotWeight || ''} onChange={e => updateShot(shot.no, { shotWeight: e.target.value })} />
+                </div>
+                <div>
+                  <label className="text-[length:var(--text-label)] text-faint block mb-1">{t('tryout.cycle_time')}</label>
+                  <input type="text" inputMode="decimal" className={inputCls} placeholder="sec" value={shot.cycleTime || ''} onChange={e => updateShot(shot.no, { cycleTime: e.target.value })} />
+                </div>
+              </div>
+              <div className="mb-2">
+                <label className="text-[length:var(--text-label)] text-faint block mb-1">{t('tryout.dims')}</label>
+                <input type="text" className={inputCls} value={shot.dims || ''} onChange={e => updateShot(shot.no, { dims: e.target.value })} placeholder={t('tryout.dims_placeholder')} />
+              </div>
+              <div>
+                <label className="text-[length:var(--text-label)] text-faint block mb-1">{t('tryout.adjust_memo')}</label>
+                <input type="text" className={inputCls} value={shot.adjustMemo || ''} onChange={e => updateShot(shot.no, { adjustMemo: e.target.value })} placeholder={t('tryout.adjust_memo_placeholder')} />
+              </div>
+            </div>
+          ))}
         </div>
-        <div>
-          <label className={labelCls}>{t('tryout.dims')}</label>
-          <input type="text" className={inputCls} value={measures.dims || ''} onChange={e => setMeasures(prev => ({ ...prev, dims: e.target.value }))} placeholder={t('tryout.dims_placeholder')} />
-        </div>
+        <button
+          type="button"
+          onClick={addShot}
+          disabled={shots.length >= MAX_SHOTS}
+          className="w-full min-h-[var(--touch-cta)] mt-3 rounded-[var(--radius-cta)] border-2 border-dashed border-border-strong text-brand-ink hover:bg-brand-tint font-bold text-body transition-colors disabled:opacity-50"
+        >
+          + {t('tryout.add_shot')}
+        </button>
+        {shots.length >= MAX_SHOTS && (
+          <p className="text-[length:var(--text-label)] text-faint text-center mt-2">{t('tryout.shot_cap_reached')}</p>
+        )}
       </div>
 
       {/* 최종 확정 조건 */}
@@ -480,6 +526,7 @@ function TryoutDetailContent() {
               record={{ ...record, ...buildPatch(), final_settings: showFinalSettings ? finalSettings : record.final_settings }}
               machineName={machineMode === 'linked' ? (machines.find(m => m.id === selectedMachineId)?.name || '') : freeformMachineName}
               authorName={user?.email || ''}
+              shots={shots}
             />
           </div>
         </div>

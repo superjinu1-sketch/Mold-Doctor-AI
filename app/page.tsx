@@ -38,7 +38,21 @@ export default function HomePage() {
               <>
                 <Link href="/diagnose" className="ui-cta w-full bg-surface text-brand hover:bg-surface-sunken text-body">{t('landing.cta_primary_user')}</Link>
                 <Link href="/account" className="ui-cta w-full bg-transparent border-2 border-[var(--on-brand)] text-on-brand hover:bg-brand-ink text-body">{t('landing.cta_account')}</Link>
-                <Link href="/ledger" className="text-on-brand/80 hover:text-on-brand text-label text-center underline underline-offset-2 min-h-[44px] flex items-center justify-center">{t('landing.ledger_link')}</Link>
+                {/* 무료 도구 퀵액세스 — 마이페이지와 동급 아웃라인, 주 CTA보다 튀지 않게 */}
+                <div className="grid grid-cols-2 gap-2">
+                  <Link
+                    href="/ledger"
+                    className="min-h-[var(--touch-cta)] flex items-center justify-center gap-1.5 border-2 border-[var(--on-brand)] text-on-brand hover:bg-brand-ink rounded-full text-sm font-bold px-2 text-center transition-colors"
+                  >
+                    <span aria-hidden>📋</span> {t('landing.tool_ledger_title')}
+                  </Link>
+                  <Link
+                    href="/tryout"
+                    className="min-h-[var(--touch-cta)] flex items-center justify-center gap-1.5 border-2 border-[var(--on-brand)] text-on-brand hover:bg-brand-ink rounded-full text-sm font-bold px-2 text-center transition-colors"
+                  >
+                    <span aria-hidden>✅</span> {t('landing.tool_tryout_title')}
+                  </Link>
+                </div>
               </>
             ) : (
               <>
@@ -69,13 +83,18 @@ export default function HomePage() {
           </ol>
           <p className="text-center text-muted text-label mt-6">{t('landing.coverage')}</p>
 
-          {/* 무료 도구 — 조건 대장 + 수지 라이브러리 나란히 */}
+          {/* 무료 도구 — 조건 대장 + 시사출 체크리스트 + 수지 라이브러리 */}
           <h2 className="text-h3 font-bold text-ink mt-10 mb-4">{t('landing.free_tools_title')}</h2>
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
             <Link href="/ledger" className="ui-card p-4 flex flex-col items-start gap-1 hover:border-[var(--brand-border)] transition-colors">
               <span className="text-2xl" aria-hidden>📋</span>
               <span className="font-bold text-ink text-body">{t('landing.tool_ledger_title')}</span>
               <span className="text-muted text-label leading-snug">{t('landing.tool_ledger_desc')}</span>
+            </Link>
+            <Link href="/tryout" className="ui-card p-4 flex flex-col items-start gap-1 hover:border-[var(--brand-border)] transition-colors">
+              <span className="text-2xl" aria-hidden>✅</span>
+              <span className="font-bold text-ink text-body">{t('landing.tool_tryout_title')}</span>
+              <span className="text-muted text-label leading-snug">{t('landing.tool_tryout_desc')}</span>
             </Link>
             <Link href={locale === 'en' ? '/en/resins' : '/resins'} className="ui-card p-4 flex flex-col items-start gap-1 hover:border-[var(--brand-border)] transition-colors">
               <span className="text-2xl" aria-hidden>🧪</span>

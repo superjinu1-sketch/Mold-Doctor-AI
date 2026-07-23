@@ -59,10 +59,43 @@ export interface ChecklistEntry {
 
 export type ChecklistData = Record<string, ChecklistEntry>;
 
+// D(15~17) 샷별 기록. 조건을 바꿔가며 여러 샷을 내는 실무 흐름을 담기 위해
+// 단일 측정값이 아니라 샷 로그(배열)로 저장한다 — DB 컬럼(measures jsonb)은 그대로,
+// 내부 형태만 { shots: Shot[] }로 변경(마이그레이션 불필요, 구형 평면 데이터는 normalizeMeasures가 변환).
+export interface Shot {
+  no: number;
+  shotWeight?: string;
+  cycleTime?: string;
+  dims?: string;
+  adjustMemo?: string; // 신규 — 이 샷 전에 무엇을 조정했는지
+  at: string;           // ISO 시각
+}
+
 export interface Measures {
-  shotWeight?: string; // #15
-  dims?: string;        // #16
-  cycleTime?: string;   // #17
+  shots: Shot[];
+}
+
+export const MAX_SHOTS = 50;
+
+// 구형 평면 측정값(레코드 확장 전 저장분): {shotWeight, cycleTime, dims} — shots 배열이 없고
+// 위 키 중 하나라도 있으면 구형으로 간주해 shot #1로 변환. 완전히 비어있으면 빈 배열.
+export function normalizeMeasures(raw: unknown, fallbackAt: string): Measures {
+  if (!raw || typeof raw !== 'object') return { shots: [] };
+  const obj = raw as Record<string, unknown>;
+  if (Array.isArray(obj.shots)) {
+    return { shots: obj.shots as Shot[] };
+  }
+  const hasLegacyFields = obj.shotWeight != null || obj.cycleTime != null || obj.dims != null;
+  if (!hasLegacyFields) return { shots: [] };
+  return {
+    shots: [{
+      no: 1,
+      shotWeight: typeof obj.shotWeight === 'string' ? obj.shotWeight : undefined,
+      cycleTime: typeof obj.cycleTime === 'string' ? obj.cycleTime : undefined,
+      dims: typeof obj.dims === 'string' ? obj.dims : undefined,
+      at: fallbackAt,
+    }],
+  };
 }
 
 export function emptyChecklist(): ChecklistData {
