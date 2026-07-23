@@ -22,6 +22,19 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: '삭제 확인이 필요합니다.', code: 'CONFIRM_REQUIRED' }, { status: 400 });
     }
 
+    // 조건 대장 Storage 사진 정리 — DB는 FK cascade로 정리되지만 Storage 객체는 별도 삭제 필수
+    // (사진 잔존 = 법무 리스크). 베스트에포트: 실패해도 계정 삭제 자체는 막지 않고 로그만 남긴다
+    // (실패해도 유저 삭제 후엔 RLS로 아무도 접근 불가 — 노출 위험은 없고 저장공간만 남음).
+    try {
+      const { data: files, error: listErr } = await supabaseAdmin.storage.from('condition-photos').list(userId);
+      if (!listErr && files && files.length > 0) {
+        const paths = files.map(f => `${userId}/${f.name}`);
+        await supabaseAdmin.storage.from('condition-photos').remove(paths);
+      }
+    } catch (storageErr) {
+      reportError('account/delete.storageCleanup', storageErr);
+    }
+
     const { error: delErr } = await supabaseAdmin.auth.admin.deleteUser(userId);
     if (delErr) {
       console.error('[account/delete] deleteUser fail:', delErr);

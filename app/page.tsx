@@ -38,6 +38,7 @@ export default function HomePage() {
               <>
                 <Link href="/diagnose" className="ui-cta w-full bg-surface text-brand hover:bg-surface-sunken text-body">{t('landing.cta_primary_user')}</Link>
                 <Link href="/account" className="ui-cta w-full bg-transparent border-2 border-[var(--on-brand)] text-on-brand hover:bg-brand-ink text-body">{t('landing.cta_account')}</Link>
+                <Link href="/ledger" className="text-on-brand/80 hover:text-on-brand text-label text-center underline underline-offset-2 min-h-[44px] flex items-center justify-center">{t('landing.ledger_link')}</Link>
               </>
             ) : (
               <>

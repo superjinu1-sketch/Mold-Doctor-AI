@@ -63,6 +63,7 @@ export default function Navbar() {
             {/* Desktop Nav */}
             <div className="hidden md:flex items-center gap-7 text-sm text-faint">
               <Link href="/diagnose" className="hover:text-ink transition-colors">{t('nav.estimate')}</Link>
+              <Link href="/ledger" className="hover:text-ink transition-colors">{t('nav.ledger')}</Link>
               <Link href="/guide" className="hover:text-ink transition-colors">{t('nav.guide')}</Link>
               <Link href="/pricing" className="hover:text-ink transition-colors">{t('nav.pricing')}</Link>
             </div>
@@ -227,6 +228,7 @@ export default function Navbar() {
             <div className="md:hidden pb-4 flex flex-col gap-1 border-t border-border pt-3">
               {[
                 { href: '/diagnose', label: t('nav.estimate') },
+                { href: '/ledger', label: t('nav.ledger') },
                 { href: '/guide', label: t('nav.guide') },
                 { href: '/pricing', label: t('nav.pricing') },
               ].map(({ href, label }) => (

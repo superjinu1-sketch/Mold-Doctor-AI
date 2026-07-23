@@ -520,6 +520,40 @@ function DiagnoseContent() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // 조건 대장(/ledger)에서 "[이 조건으로 AI 추정]" 클릭 시 프리필. molddoctor_restore와 달리
+  // result/sessionId는 건드리지 않는다 — 완료된 결과 화면이 아니라 신규 추정 입력 폼을 그대로
+  // 채워서 사용자가 검토 후 직접 제출하게 한다.
+  useEffect(() => {
+    try {
+      const raw = sessionStorage.getItem('molddoctor_ledger_prefill');
+      if (!raw) return;
+      sessionStorage.removeItem('molddoctor_ledger_prefill');
+      const data = JSON.parse(raw);
+      if (data.resinType) {
+        const isPresetResin = RESIN_OPTIONS.some(g => g.options.includes(data.resinType));
+        if (isPresetResin) setResinType(data.resinType);
+        else { setResinType('기타 (직접 입력)'); setCustomResin(data.customResin || data.resinType); }
+      }
+      if (data.settings) setSettings(prev => ({ ...prev, ...data.settings }));
+      if (data.advSettings) setAdvSettings(prev => ({ ...prev, ...data.advSettings }));
+      if (data.photo?.base64) {
+        const byteChars = atob(data.photo.base64);
+        const byteNumbers = new Array(byteChars.length);
+        for (let i = 0; i < byteChars.length; i++) byteNumbers[i] = byteChars.charCodeAt(i);
+        const blob = new Blob([new Uint8Array(byteNumbers)], { type: data.photo.mediaType || 'image/jpeg' });
+        const file = new File([blob], 'ledger-condition.jpg', { type: data.photo.mediaType || 'image/jpeg' });
+        const id = `ledger-${Date.now()}`;
+        setImages(prev => [...prev, {
+          id, file,
+          preview: `data:${data.photo.mediaType || 'image/jpeg'};base64,${data.photo.base64}`,
+          base64: data.photo.base64,
+          mediaType: data.photo.mediaType || 'image/jpeg',
+        }].slice(0, 5));
+      }
+    } catch { /* ignore */ }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   // 폼 상태를 sessionStorage에 디바운스 저장 (내용이 있을 때만) — 소실 방어선
   useEffect(() => {
     const hasContent = !!(defectType || customDefect || defectDescription || resinType);
