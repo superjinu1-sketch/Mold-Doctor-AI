@@ -63,10 +63,7 @@ export default function Navbar() {
             {/* Desktop Nav */}
             <div className="hidden md:flex items-center gap-7 text-sm text-faint">
               <Link href="/diagnose" className="hover:text-ink transition-colors">{t('nav.estimate')}</Link>
-              <Link href="/ledger" className="hover:text-ink transition-colors">{t('nav.ledger')}</Link>
-              <Link href="/tryout" className="hover:text-ink transition-colors">{t('nav.tryout')}</Link>
-              <Link href="/guide" className="hover:text-ink transition-colors">{t('nav.guide')}</Link>
-              <Link href={locale === 'en' ? '/en/resins' : '/resins'} className="hover:text-ink transition-colors">{t('nav.resins')}</Link>
+              <Link href="/tools" className="hover:text-ink transition-colors">{t('nav.tools')}</Link>
               <Link href="/pricing" className="hover:text-ink transition-colors">{t('nav.pricing')}</Link>
             </div>
 
@@ -230,10 +227,7 @@ export default function Navbar() {
             <div className="md:hidden pb-4 flex flex-col gap-1 border-t border-border pt-3">
               {[
                 { href: '/diagnose', label: t('nav.estimate') },
-                { href: '/ledger', label: t('nav.ledger') },
-                { href: '/tryout', label: t('nav.tryout') },
-                { href: '/guide', label: t('nav.guide') },
-                { href: locale === 'en' ? '/en/resins' : '/resins', label: t('nav.resins') },
+                { href: '/tools', label: t('nav.tools') },
                 { href: '/pricing', label: t('nav.pricing') },
               ].map(({ href, label }) => (
                 <Link key={href} href={href}

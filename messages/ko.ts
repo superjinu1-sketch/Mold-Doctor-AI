@@ -23,6 +23,7 @@ export const ko: Record<string, string> = {
   'landing.tool_tryout_desc': '표준 템플릿으로 점검하고 리포트로 출력',
   'landing.tool_resins_title': '수지 라이브러리',
   'landing.tool_resins_desc': '건조·사출온도·수축률 현장 요약',
+  'landing.tools_all_link': '무료 도구 전체 보기 →',
   'landing.stat_1': '30종+',
   'landing.stat_1_label': '불량 유형',
   'landing.stat_2': '50종+',
@@ -120,10 +121,7 @@ export const ko: Record<string, string> = {
 
   /* ── Navbar ─────────────────────────────────── */
   'nav.estimate': '추정하기',
-  'nav.ledger': '조건 대장',
-  'nav.tryout': '시사출',
-  'nav.guide': '불량 가이드',
-  'nav.resins': '수지 라이브러리',
+  'nav.tools': '무료 도구',
   'nav.pricing': '충전',
   'nav.free': '무료 추정',
   'nav.credits': '크레딧',

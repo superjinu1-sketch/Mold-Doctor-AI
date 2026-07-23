@@ -23,6 +23,7 @@ export const en: Record<string, string> = {
   'landing.tool_tryout_desc': 'Standard template inspection, printable report',
   'landing.tool_resins_title': 'Resin Library',
   'landing.tool_resins_desc': 'Drying, melt temp, shrinkage — field reference',
+  'landing.tools_all_link': 'View all free tools →',
   'landing.stat_1': '30+',
   'landing.stat_1_label': 'Defect Types',
   'landing.stat_2': '50+',
@@ -120,10 +121,7 @@ export const en: Record<string, string> = {
 
   /* ── Navbar ─────────────────────────────────── */
   'nav.estimate': 'Analyze',
-  'nav.ledger': 'Condition Ledger',
-  'nav.tryout': 'Tryout',
-  'nav.guide': 'Defect Guide',
-  'nav.resins': 'Resin Library',
+  'nav.tools': 'Free Tools',
   'nav.pricing': 'Credits',
   'nav.free': 'Free Trial',
   'nav.credits': 'Credits',

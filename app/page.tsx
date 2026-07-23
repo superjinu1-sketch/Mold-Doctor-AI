@@ -53,6 +53,7 @@ export default function HomePage() {
                     <span aria-hidden>✅</span> {t('landing.tool_tryout_title')}
                   </Link>
                 </div>
+                <Link href="/tools" className="text-on-brand/80 hover:text-on-brand text-label text-center underline underline-offset-2 min-h-[44px] flex items-center justify-center">{t('landing.tools_all_link')}</Link>
               </>
             ) : (
               <>
@@ -102,6 +103,7 @@ export default function HomePage() {
               <span className="text-muted text-label leading-snug">{t('landing.tool_resins_desc')}</span>
             </Link>
           </div>
+          <Link href="/tools" className="text-brand hover:text-brand-ink text-label font-medium mt-4 min-h-[44px] flex items-center justify-center">{t('landing.tools_all_link')}</Link>
         </div>
       </section>
     </div>
