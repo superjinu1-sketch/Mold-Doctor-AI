@@ -12,11 +12,11 @@ import { reportClientError } from '@/lib/observability/client';
 import { supabase } from '@/lib/supabase/client';
 
 const creditPacks = [
-  { productId: 'credits_single_1',    nameKo: '싱글',     nameEn: 'Single',   credits: 1,   priceKo: '₩3,000',   priceEn: '₩3,000',   perKo: '크레딧당 ₩3,000', perEn: '₩3,000 / credit', recommended: false },
-  { productId: 'credits_starter_5',   nameKo: '스타터',   nameEn: 'Starter',  credits: 5,   priceKo: '₩12,000',  priceEn: '₩12,000',  perKo: '크레딧당 ₩2,400', perEn: '₩2,400 / credit', recommended: false },
-  { productId: 'credits_standard_20', nameKo: '스탠다드', nameEn: 'Standard', credits: 20,  priceKo: '₩40,000',  priceEn: '₩40,000',  perKo: '크레딧당 ₩2,000', perEn: '₩2,000 / credit', recommended: true  },
-  { productId: 'credits_pro_50',      nameKo: '프로',     nameEn: 'Pro',      credits: 50,  priceKo: '₩90,000',  priceEn: '₩90,000',  perKo: '크레딧당 ₩1,800', perEn: '₩1,800 / credit', recommended: false },
-  { productId: 'credits_bulk_100',    nameKo: '벌크',     nameEn: 'Bulk',     credits: 100, priceKo: '₩160,000', priceEn: '₩160,000', perKo: '크레딧당 ₩1,600', perEn: '₩1,600 / credit', recommended: false },
+  { productId: 'credits_single_1',    nameKo: '싱글',     nameEn: 'Single',   credits: 1,   priceKo: '₩1,000',  priceEn: '₩1,000',  perKo: '크레딧당 ₩1,000', perEn: '₩1,000 / credit', recommended: false },
+  { productId: 'credits_starter_5',   nameKo: '스타터',   nameEn: 'Starter',  credits: 5,   priceKo: '₩4,500',  priceEn: '₩4,500',  perKo: '크레딧당 ₩900',   perEn: '₩900 / credit',   recommended: false },
+  { productId: 'credits_standard_20', nameKo: '스탠다드', nameEn: 'Standard', credits: 20,  priceKo: '₩16,000', priceEn: '₩16,000', perKo: '크레딧당 ₩800',   perEn: '₩800 / credit',   recommended: true  },
+  { productId: 'credits_pro_50',      nameKo: '프로',     nameEn: 'Pro',      credits: 50,  priceKo: '₩35,000', priceEn: '₩35,000', perKo: '크레딧당 ₩700',   perEn: '₩700 / credit',   recommended: false },
+  { productId: 'credits_bulk_100',    nameKo: '벌크',     nameEn: 'Bulk',     credits: 100, priceKo: '₩70,000', priceEn: '₩70,000', perKo: '크레딧당 ₩700',   perEn: '₩700 / credit',   recommended: false },
 ];
 
 // 구매 성공 후 웹훅 적립 지연 흡수 — 3초 간격 최대 5회 재조회, 잔액 변화 감지 시 종료.
@@ -32,8 +32,8 @@ async function pollForCreditIncrease(userId: string, previousBalance: number | n
 
 const creditPoints = [
   {
-    ko: '1크레딧 = 분석 1건 + 그 건 추가 질문 5회',
-    en: '1 credit = 1 analysis + 5 follow-up questions',
+    ko: '1크레딧 = 분석 1건 + 추가 질문 2회 무료(이후 5회 묶음당 1크레딧)',
+    en: '1 credit = 1 analysis + 2 free follow-ups (then 1 credit per 5-question bundle)',
   },
   {
     ko: '셋팅 바꿔 다시 분석하면 새 크레딧 1개',
@@ -49,8 +49,8 @@ const faqs = [
   {
     qKo: '크레딧은 어떻게 쓰나요?',
     qEn: 'How do credits work?',
-    aKo: '크레딧 1개로 추정 1건을 받고, 그 결과에 대한 추가 질문을 5번까지 무료로 할 수 있어요. 셋팅을 바꿔 다시 분석하면 새 크레딧 1개가 쓰이고, 저장된 결과를 다시 보는 건 무료입니다.',
-    aEn: '1 credit gives you 1 analysis result plus up to 5 free follow-up questions on that result. Re-running with new settings uses 1 new credit. Viewing saved results is always free.',
+    aKo: '크레딧 1개로 추정 1건을 받고, 그 결과에 대한 추가 질문을 2번까지 무료로 할 수 있어요. 이후에는 질문 5개 묶음마다 1크레딧이 차감됩니다. 셋팅을 바꿔 다시 분석하면 새 크레딧 1개가 쓰이고, 저장된 결과를 다시 보는 건 무료입니다.',
+    aEn: '1 credit gives you 1 analysis result plus 2 free follow-up questions on that result. After that, 1 credit is charged per 5-question bundle. Re-running with new settings uses 1 new credit. Viewing saved results is always free.',
   },
   {
     qKo: '가입하면 뭘 받나요?',
@@ -146,6 +146,9 @@ export default function PricingPage() {
           </div>
           <h1 className="text-4xl font-bold text-ink mb-4">{t('pricing.h1')}</h1>
           <p className="text-muted text-base">{t('pricing.sub')}</p>
+          <p className="text-muted text-base mt-1">
+            {locale === 'en' ? 'Expert-grade AI analysis, from ₩700 per credit' : '전문 지식이 얹힌 AI 추정, 크레딧당 ₩700부터'}
+          </p>
         </div>
 
         {/* 크레딧 팩 그리드 — 페이지 최상단(구매 동선 노출 개선) */}
@@ -216,6 +219,11 @@ export default function PricingPage() {
               </div>
             ))}
           </div>
+          <p className="text-center text-[length:var(--text-label)] text-faint mt-4">
+            {locale === 'en'
+              ? '2 free follow-ups per diagnosis, then 1 credit per 5-question bundle'
+              : '모든 추정에 추가 질문 2회 무료, 이후 5회 묶음 = 1크레딧'}
+          </p>
           {native ? (
             purchaseMsg && (
               <div

@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useRef, useEffect, createContext, useContext, type ReactNode } from 'react';
+import Link from 'next/link';
 import { useLocale } from '@/contexts/LocaleContext';
 import { authHeaders } from '@/lib/supabase/authHeader';
 import { downscaleImageClient } from '@/lib/clientDownscale';
@@ -183,27 +184,31 @@ function CauseCard({ cause, defaultOpen = false }: { cause: CauseItem; defaultOp
 }
 
 interface ChatMessage {
-  role: 'user' | 'assistant';
+  role: 'user' | 'assistant' | 'system';
   content: string;
 }
 
 function ChatSection({
   chatMessages, chatInput, setChatInput, isChatLoading, chatError,
-  chatDisabled, userTurns, suggestedQuestions, sendChat, chatBottomRef,
+  freeRemaining, blockRemaining, followupBlock, suggestedQuestions, sendChat, chatBottomRef,
 }: {
   chatMessages: ChatMessage[];
   chatInput: string;
   setChatInput: (v: string) => void;
   isChatLoading: boolean;
   chatError: string;
-  chatDisabled: boolean;
-  userTurns: number;
+  freeRemaining: number;
+  blockRemaining: number;
+  followupBlock: 'insufficient' | 'hardcap' | null;
   suggestedQuestions: string[];
   sendChat: (q: string) => void;
   chatBottomRef: React.RefObject<HTMLDivElement | null>;
 }) {
   const { t } = useLocale();
-  const MAX_CHAT_TURNS = 5;
+  const hardBlocked = followupBlock === 'hardcap';
+  const badgeText = freeRemaining > 0
+    ? t('chat.free_remaining').replace('%d', String(freeRemaining))
+    : t('chat.block_remaining').replace('%d', String(blockRemaining));
   return (
     <div className="bg-surface rounded-[var(--radius-card-lg)] border border-border overflow-hidden">
       <div className="px-4 sm:px-6 pt-5 pb-3 border-b border-border">
@@ -212,25 +217,29 @@ function ChatSection({
             <span className="text-lg">💬</span>
             <span className="font-bold text-ink text-sm sm:text-base">{t('chat.title')}</span>
           </div>
-          <span className="text-xs text-faint">{userTurns}/{MAX_CHAT_TURNS}{t('chat.limit')}</span>
+          <span className="text-[length:var(--text-label)] text-faint">{badgeText}</span>
         </div>
       </div>
 
       {chatMessages.length > 0 && (
         <div className="px-4 sm:px-6 py-4 space-y-3 max-h-80 overflow-y-auto bg-surface-sunken">
           {chatMessages.map((msg, i) => (
-            <div key={i} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-              <div className={`max-w-[85%] rounded-2xl px-4 py-2.5 text-sm leading-relaxed ${
-                msg.role === 'user'
-                  ? 'bg-surface-sunken text-ink rounded-tr-sm'
-                  : 'bg-surface text-muted border border-border rounded-tl-sm'
-              }`}>
-                {msg.role === 'assistant' && (
-                  <div className="text-xs font-bold text-brand-ink mb-1">{t('chat.ai_label')}</div>
-                )}
-                <p className="whitespace-pre-wrap">{msg.content}</p>
+            msg.role === 'system' ? (
+              <div key={i} className="text-center text-[length:var(--text-label)] text-faint px-2 py-1">{msg.content}</div>
+            ) : (
+              <div key={i} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+                <div className={`max-w-[85%] rounded-2xl px-4 py-2.5 text-sm leading-relaxed ${
+                  msg.role === 'user'
+                    ? 'bg-surface-sunken text-ink rounded-tr-sm'
+                    : 'bg-surface text-muted border border-border rounded-tl-sm'
+                }`}>
+                  {msg.role === 'assistant' && (
+                    <div className="text-xs font-bold text-brand-ink mb-1">{t('chat.ai_label')}</div>
+                  )}
+                  <p className="whitespace-pre-wrap">{msg.content}</p>
+                </div>
               </div>
-            </div>
+            )
           ))}
           {isChatLoading && (
             <div className="flex justify-start">
@@ -250,7 +259,7 @@ function ChatSection({
         </div>
       )}
 
-      {!chatDisabled && chatMessages.length === 0 && suggestedQuestions.length > 0 && (
+      {!hardBlocked && chatMessages.length === 0 && suggestedQuestions.length > 0 && (
         <div className="px-4 sm:px-6 py-3 border-b border-border flex flex-wrap gap-2">
           {suggestedQuestions.slice(0, 3).map((q, i) => (
             <button
@@ -266,9 +275,20 @@ function ChatSection({
       )}
 
       <div className="px-4 sm:px-6 py-4">
-        {chatDisabled ? (
-          <div className="text-center text-xs text-faint py-2">
-            {t('chat.limit_msg').replace('%d', String(MAX_CHAT_TURNS))}
+        {followupBlock === 'insufficient' && (
+          <div className="mb-3 rounded-xl border border-[var(--warn-border)] bg-[var(--warn-bg)] px-4 py-3 flex flex-col sm:flex-row sm:items-center gap-3">
+            <p className="flex-1 text-warn text-[length:var(--text-body)] leading-snug">{t('chat.insufficient_followup')}</p>
+            <Link
+              href="/pricing"
+              className="shrink-0 inline-flex items-center justify-center min-h-[var(--touch-min)] px-4 rounded-full bg-brand text-on-brand font-bold text-sm hover:bg-brand-ink transition-colors"
+            >
+              {t('chat.go_pricing')}
+            </Link>
+          </div>
+        )}
+        {hardBlocked ? (
+          <div className="text-center text-[length:var(--text-body)] text-faint py-2">
+            {t('chat.followup_hardcap')}
           </div>
         ) : (
           <div className="flex gap-2">
@@ -324,6 +344,12 @@ export default function DiagnosisResultPanel({ result, onSavePDF, round = 1, fol
   const [chatInput, setChatInput] = useState('');
   const [isChatLoading, setIsChatLoading] = useState(false);
   const [chatError, setChatError] = useState('');
+  // 팔로업 종량화(2회 무료 → 이후 5회 묶음당 1크레딧). 서버(add_follow_up) 응답의 free_remaining/block_remaining을
+  // 신뢰 원천으로 삼는다 — 첫 메시지 전은 새 세션 가정으로 2/0 낙관 초기화(복원 세션은 첫 응답에서 즉시 보정).
+  const [freeRemaining, setFreeRemaining] = useState(2);
+  const [blockRemaining, setBlockRemaining] = useState(0);
+  const [followupBlock, setFollowupBlock] = useState<'insufficient' | 'hardcap' | null>(null);
+  const bundleNoticeShownRef = useRef(false); // "이후 5회 묶음당 1크레딧" 안내 — 세션당 1회만
   const [isDebug, setIsDebug] = useState(false);
   const [showResolvedForm, setShowResolvedForm] = useState(false);
   const [resolvedStatus, setResolvedStatus] = useState('solved');
@@ -362,18 +388,15 @@ export default function DiagnosisResultPanel({ result, onSavePDF, round = 1, fol
     });
   };
 
-  const MAX_CHAT_TURNS = 5;
-  const userTurns = chatMessages.filter(m => m.role === 'user').length;
-  const chatDisabled = userTurns >= MAX_CHAT_TURNS;
-
   const sendChat = async (question: string) => {
     const q = question.trim();
-    if (!q || isChatLoading || chatDisabled) return;
+    if (!q || isChatLoading || followupBlock === 'hardcap') return;
 
     const userMsg: ChatMessage = { role: 'user', content: q };
     setChatMessages(prev => [...prev, userMsg]);
     setChatInput('');
     setChatError('');
+    setFollowupBlock(null);
     setIsChatLoading(true);
 
     try {
@@ -383,7 +406,7 @@ export default function DiagnosisResultPanel({ result, onSavePDF, round = 1, fol
         body: JSON.stringify({
           question: q,
           diagnosisResult: result,
-          chatHistory: chatMessages,
+          chatHistory: chatMessages.filter(m => m.role !== 'system'),
           resinType,
           machineSettings,
           locale,
@@ -397,13 +420,23 @@ export default function DiagnosisResultPanel({ result, onSavePDF, round = 1, fol
         return;
       }
       if (res.status === 402) {
-        setChatError(t('chat.followup_limit'));
+        const data = await res.json().catch(() => ({} as { code?: string }));
+        setFollowupBlock(data.code === 'FOLLOWUP_HARDCAP' ? 'hardcap' : 'insufficient');
         setIsChatLoading(false);
         return;
       }
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || t('chat.error'));
-      setChatMessages(prev => [...prev, { role: 'assistant', content: data.answer }]);
+
+      const newMsgs: ChatMessage[] = [{ role: 'assistant', content: data.answer }];
+      if (typeof data.free_remaining === 'number') setFreeRemaining(data.free_remaining);
+      if (typeof data.block_remaining === 'number') setBlockRemaining(data.block_remaining);
+      // 무료 2회 소진 시점(3번째 질문에서 첫 차감) 1회 인라인 안내
+      if (data.follow_up_count === 2 && !bundleNoticeShownRef.current) {
+        bundleNoticeShownRef.current = true;
+        newMsgs.push({ role: 'system', content: t('chat.bundle_notice') });
+      }
+      setChatMessages(prev => [...prev, ...newMsgs]);
     } catch (err) {
       setChatError(err instanceof Error ? err.message : '...');
     } finally {
@@ -1072,8 +1105,9 @@ export default function DiagnosisResultPanel({ result, onSavePDF, round = 1, fol
           setChatInput={setChatInput}
           isChatLoading={isChatLoading}
           chatError={chatError}
-          chatDisabled={chatDisabled}
-          userTurns={userTurns}
+          freeRemaining={freeRemaining}
+          blockRemaining={blockRemaining}
+          followupBlock={followupBlock}
           suggestedQuestions={suggestedQuestions}
           sendChat={sendChat}
           chatBottomRef={chatBottomRef}

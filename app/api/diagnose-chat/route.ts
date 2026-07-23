@@ -7,7 +7,7 @@ function getApiKey(): string {
   return process.env.ANTHROPIC_API_KEY || '';
 }
 
-// 컨텍스트 길이 상한 — 토큰 예산 상한 + 프롬프트 인젝션 표면 축소 (rate-limit은 add_follow_up 세션당 5회가 이미 방어).
+// 컨텍스트 길이 상한 — 토큰 예산 상한 + 프롬프트 인젝션 표면 축소 (rate-limit은 add_follow_up 하드캡 32회가 이미 방어).
 const MAX_QUESTION = 2000;
 const MAX_DIAGNOSIS = 8000;
 const MAX_HISTORY_TURNS = 6;   // user+assistant 쌍 6턴
@@ -70,15 +70,25 @@ export async function POST(req: NextRequest) {
     if (fuErr) {
       return NextResponse.json({ error: '팔로업 처리 중 오류가 발생했습니다.', code: 'FOLLOWUP_ERROR' }, { status: 500 });
     }
-    const fu = fuRaw as { ok: boolean; code?: string; follow_up_count?: number };
+    const fu = fuRaw as {
+      ok: boolean; code?: string; credit_balance?: number;
+      follow_up_count?: number; free_remaining?: number; block_remaining?: number;
+    };
     if (!fu?.ok) {
-      if (fu?.code === 'FOLLOWUP_LIMIT') {
-        return NextResponse.json({ error: '이 추정의 추가 질문 5회를 모두 사용했습니다. 새 추정을 시작해 주세요.', code: 'FOLLOWUP_LIMIT' }, { status: 402 });
+      // 팔로업 종량화(2회 무료 → 이후 5회 묶음당 1크레딧): add_follow_up(0010)이 두 402 코드로 구분 반환.
+      if (fu?.code === 'INSUFFICIENT_FOLLOWUP') {
+        return NextResponse.json(
+          { error: '무료 추가 질문 2회를 모두 사용했습니다. 이후에는 5회 묶음당 1크레딧이 차감됩니다. 크레딧을 충전해 주세요.', code: 'INSUFFICIENT_FOLLOWUP', credit_balance: fu.credit_balance },
+          { status: 402 }
+        );
+      }
+      if (fu?.code === 'FOLLOWUP_HARDCAP') {
+        return NextResponse.json({ error: '이 추정의 추가 질문 한도에 도달했습니다. 새 추정을 시작해 주세요.', code: 'FOLLOWUP_HARDCAP' }, { status: 402 });
       }
       return NextResponse.json({ error: '세션을 찾을 수 없습니다.', code: 'NOT_FOUND' }, { status: 403 });
     }
 
-    // rate-limit 미적용(의도): 세션 생성은 진단(크레딧) 필요 + add_follow_up 세션당 5회 제한이 봇 무한반복을 이미 차단. 대신 컨텍스트 길이 상한으로 토큰 abuse 방어.
+    // rate-limit 미적용(의도): 세션 생성은 진단(크레딧) 필요 + add_follow_up 하드캡 32회가 봇 무한반복을 이미 차단. 대신 컨텍스트 길이 상한으로 토큰 abuse 방어.
     const apiKey = getApiKey();
     if (!apiKey) {
       return NextResponse.json({ error: '서버 환경변수 ANTHROPIC_API_KEY 미설정' }, { status: 500 });
@@ -142,7 +152,13 @@ export async function POST(req: NextRequest) {
 
     const answer = response.content[0].type === 'text' ? response.content[0].text : '';
     const cu = response.usage as unknown as Record<string, number>;
-    return NextResponse.json({ answer }, {
+    return NextResponse.json({
+      answer,
+      follow_up_count: fu.follow_up_count,
+      free_remaining: fu.free_remaining,
+      block_remaining: fu.block_remaining,
+      credit_balance: fu.credit_balance,
+    }, {
       headers: {
         'X-Usage-In': String(cu.input_tokens ?? 0),
         'X-Usage-Out': String(cu.output_tokens ?? 0),
