@@ -117,7 +117,7 @@ export const en: Record<string, string> = {
   'auth.already_registered': 'This email is already registered. Please log in.',
   'auth.weak_password': 'Password must be at least 6 characters.',
   'auth.fail': 'Something went wrong. Please try again later.',
-  'credit.insufficient': 'You’ve used all your credits. During beta we top up for free by email. Redirecting to the info page.',
+  'credit.insufficient': 'You’ve used all your credits. Redirecting to the top-up page.',
 
   /* ── Navbar ─────────────────────────────────── */
   'nav.estimate': 'Analyze',
@@ -128,7 +128,6 @@ export const en: Record<string, string> = {
   'nav.topup': 'Top up',
   'nav.account': 'My Page',
   'nav.locale_toggle': 'KO',
-  'nav.beta': 'BETA',
   'account.title': 'My Page',
   'account.signed_in_as': 'Signed in as',
   'account.login_prompt': 'Log in to access your credits and diagnosis history on any device.',
@@ -639,7 +638,7 @@ export const en: Record<string, string> = {
   'tryout.no_machines': 'No machines registered.',
   'tryout.machine_none_placeholder': 'Select machine',
   'tryout.machine_freeform_placeholder': 'e.g. Rental machine A',
-  'tryout.checklist_notice': 'Standard template (beta) — mark items that don’t apply on-site as "N/A." Feedback welcome.',
+  'tryout.checklist_notice': 'Standard template — mark items that don’t apply on-site as "N/A." Feedback welcome.',
   'tryout.drying_reference': 'Resin Library reference',
   'tryout.state_ok': 'OK',
   'tryout.state_ng': 'NG',

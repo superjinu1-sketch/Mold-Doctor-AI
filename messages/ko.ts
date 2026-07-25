@@ -117,7 +117,7 @@ export const ko: Record<string, string> = {
   'auth.already_registered': '이미 가입된 이메일입니다. 로그인해주세요.',
   'auth.weak_password': '비밀번호는 최소 6자 이상이어야 합니다.',
   'auth.fail': '처리 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.',
-  'credit.insufficient': '크레딧을 모두 사용했어요. 베타 기간엔 이메일로 무료 충전해 드립니다. 안내 페이지로 이동합니다.',
+  'credit.insufficient': '크레딧을 모두 사용했어요. 충전 페이지로 이동합니다.',
 
   /* ── Navbar ─────────────────────────────────── */
   'nav.estimate': '추정하기',
@@ -128,7 +128,6 @@ export const ko: Record<string, string> = {
   'nav.topup': '충전',
   'nav.account': '마이페이지',
   'nav.locale_toggle': 'EN',
-  'nav.beta': 'BETA',
   'account.title': '마이페이지',
   'account.signed_in_as': '로그인 계정',
   'account.login_prompt': '로그인하면 크레딧과 추정 기록을 어느 기기에서나 볼 수 있어요.',
@@ -650,7 +649,7 @@ export const ko: Record<string, string> = {
   'tryout.no_machines': '등록된 설비가 없어요.',
   'tryout.machine_none_placeholder': '설비 선택',
   'tryout.machine_freeform_placeholder': '예: 임대 설비 A',
-  'tryout.checklist_notice': '표준 템플릿(베타) — 현장에 맞지 않는 항목은 "해당없음" 처리해주세요. 개선 의견을 환영합니다.',
+  'tryout.checklist_notice': '표준 템플릿 — 현장에 맞지 않는 항목은 "해당없음" 처리해주세요. 개선 의견을 환영합니다.',
   'tryout.drying_reference': '수지 라이브러리 기준',
   'tryout.state_ok': '양호',
   'tryout.state_ng': '불량',
