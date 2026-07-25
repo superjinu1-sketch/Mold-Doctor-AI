@@ -28,6 +28,10 @@ export const metadata: Metadata = {
 };
 
 // viewport-fit=cover 없이는 env(safe-area-inset-*)가 iOS에서 값을 갖지 않는다(원인 실측: 기존엔 미설정).
+// Android 15+ edge-to-edge: Capacitor 코어 SystemBars 플러그인이 이 viewport-fit=cover를 감지해
+// 구형 WebView에서는 env() 대신 --safe-area-inset-*(document.documentElement 커스텀 프로퍼티)로 인셋을
+// 주입한다. 그래서 앱 전역 env(safe-area-inset-*, var(--safe-area-inset-*, 0px)) 폴백 체인을 사용 —
+// iOS/신형 WebView는 env()가 바로 채워지고, 구형 Android WebView는 두 번째 var() 폴백으로 흡수, 웹은 0px.
 export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1,

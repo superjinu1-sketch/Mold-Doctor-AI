@@ -672,4 +672,7 @@ export const en: Record<string, string> = {
   'tryout.pdf_generating': 'Generating PDF…',
   'tryout.pdf_error': 'Something went wrong generating the PDF. Please try again shortly.',
   'tryout.ai_estimate_cta': 'Got a defect? Upload a photo and settings — we’ll estimate the cause',
+  'tryout.deleting': 'Deleting…',
+  'tryout.confirm_delete': 'Tap again to delete',
+  'tryout.delete_record': 'Delete tryout record',
 };

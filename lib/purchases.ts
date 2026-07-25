@@ -33,6 +33,20 @@ export function isPurchaseCancelled(error: unknown): boolean {
   return (error as Partial<PurchasesError> | undefined)?.code === PURCHASES_ERROR_CODE.PURCHASE_CANCELLED_ERROR;
 }
 
+// 네이티브에서 실 StoreKit/Play 가격 조회(표시가격≠청구가격 오해 방지). 웹/키없음/실패 시 빈 맵(no-op) → 호출측은 기존 하드코딩 라벨로 fallback.
+export async function getStorePrices(productIds: string[]): Promise<Record<string, string>> {
+  if (!isNativeApp() || !resolveApiKey()) return {};
+  try {
+    const { products } = await Purchases.getProducts({
+      productIdentifiers: productIds,
+      type: PRODUCT_CATEGORY.NON_SUBSCRIPTION,
+    });
+    const map: Record<string, string> = {};
+    for (const p of products) if (p?.identifier && p?.priceString) map[p.identifier] = p.priceString;
+    return map;
+  } catch { return {}; }
+}
+
 // SKU 조회 후 구매. 크레딧 수·가격은 서버(웹훅)가 상수로 재확인 — 여기 반환값은 신뢰하지 않음.
 export async function purchaseCredits(productId: string) {
   const { products } = await Purchases.getProducts({

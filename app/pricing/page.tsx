@@ -6,7 +6,7 @@ import { useLocale } from '@/contexts/LocaleContext';
 import { useAuth } from '@/contexts/AuthContext';
 import AuthModal from '@/components/AuthModal';
 import { isNativeApp } from '@/lib/platform';
-import { purchaseCredits, isPurchaseCancelled } from '@/lib/purchases';
+import { purchaseCredits, isPurchaseCancelled, getStorePrices } from '@/lib/purchases';
 import { hapticSuccess } from '@/lib/haptics';
 import { reportClientError } from '@/lib/observability/client';
 import { supabase } from '@/lib/supabase/client';
@@ -95,6 +95,13 @@ export default function PricingPage() {
   const [native, setNative] = useState(false);
   useEffect(() => { setNative(isNativeApp()); }, []);
 
+  // 네이티브 확정 후 실 StoreKit/Play 가격 1회 조회 — 표시가격≠청구가격 오해 방지(iOS 심사 리스크). 실패/빈 결과면 기존 하드코딩 라벨 유지.
+  const [storePrices, setStorePrices] = useState<Record<string, string>>({});
+  useEffect(() => {
+    if (!native) return;
+    getStorePrices(creditPacks.map((p) => p.productId)).then(setStorePrices);
+  }, [native]);
+
   async function handlePurchase(productId: string, packCredits: number) {
     if (!user) { setAuthOpen(true); return; }
     setPurchaseMsg(null);
@@ -182,7 +189,7 @@ export default function PricingPage() {
                     </span>
                   </div>
                   <div className="text-xl font-bold text-ink mt-1">
-                    {locale === 'en' ? pack.priceEn : pack.priceKo}
+                    {native && storePrices[pack.productId] ? storePrices[pack.productId] : (locale === 'en' ? pack.priceEn : pack.priceKo)}
                   </div>
                   <div className="text-xs text-faint mt-1">
                     {locale === 'en' ? pack.perEn : pack.perKo}

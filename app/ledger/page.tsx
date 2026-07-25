@@ -261,7 +261,7 @@ export default function LedgerPage() {
       )}
 
       {selectMode && selected.size > 0 && (
-        <div className="fixed bottom-0 inset-x-0 z-40 border-t border-border bg-surface pb-[env(safe-area-inset-bottom,0px)]">
+        <div className="fixed bottom-0 inset-x-0 z-40 border-t border-border bg-surface pb-[env(safe-area-inset-bottom,var(--safe-area-inset-bottom,0px))]">
           <div className="max-w-3xl mx-auto px-4 py-3">
             <button
               type="button"

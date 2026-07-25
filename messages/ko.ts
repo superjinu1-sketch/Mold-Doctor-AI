@@ -683,4 +683,7 @@ export const ko: Record<string, string> = {
   'tryout.pdf_generating': 'PDF 생성 중…',
   'tryout.pdf_error': 'PDF 생성 중 오류가 발생했어요. 잠시 후 다시 시도해주세요.',
   'tryout.ai_estimate_cta': '불량이 보이면 — 사진과 셋팅값으로 원인을 추정해 드립니다',
+  'tryout.deleting': '삭제 중…',
+  'tryout.confirm_delete': '한 번 더 눌러서 삭제',
+  'tryout.delete_record': '시사출 기록 삭제',
 };

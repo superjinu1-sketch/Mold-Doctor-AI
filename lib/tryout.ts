@@ -117,6 +117,18 @@ export async function updateTryoutRecord(id: string, patch: TryoutPatch): Promis
   }
 }
 
+/** 시사출 기록 삭제 — lib/ledger.ts deleteMachine과 동일 구조(Storage 사진 없어 정리 단계 불요). */
+export async function deleteTryout(id: string): Promise<boolean> {
+  try {
+    const { error } = await supabase.from('tryout_records').delete().eq('id', id);
+    if (error) { reportClientError('tryout.delete', error); return false; }
+    return true;
+  } catch (e) {
+    reportClientError('tryout.delete', e);
+    return false;
+  }
+}
+
 /**
  * [작업표준으로 저장] 훅 — machine_id가 연동된 경우에만 유효. 시사출의
  * 확정 조건(final_settings)·수지·금형/아이템명을 condition_standards 신규

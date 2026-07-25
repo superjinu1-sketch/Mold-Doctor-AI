@@ -20,7 +20,7 @@ import {
 import { defects as GUIDE_DEFECTS } from '@/lib/defectGuide';
 import { listMachinesWithCurrent, type MachineWithCurrent } from '@/lib/ledger';
 import {
-  getTryoutRecord, updateTryoutRecord, saveTryoutAsLedgerStandard, type TryoutRecord,
+  getTryoutRecord, updateTryoutRecord, deleteTryout, saveTryoutAsLedgerStandard, type TryoutRecord,
 } from '@/lib/tryout';
 
 const inputCls = 'ui-input';
@@ -62,6 +62,9 @@ function TryoutDetailContent() {
   const [pdfBusy, setPdfBusy] = useState(false);
   const [printing, setPrinting] = useState(false);
   const printRef = useRef<HTMLDivElement>(null);
+
+  const [deleting, setDeleting] = useState(false);
+  const [confirmDelete, setConfirmDelete] = useState(false);
 
   const load = useCallback(async () => {
     if (!id || !user) return;
@@ -168,6 +171,14 @@ function TryoutDetailContent() {
     const res = await saveTryoutAsLedgerStandard(patched, user.id);
     setSavingLedger(false);
     setLedgerMsg(res.ok ? t('tryout.save_ledger_ok') : t('tryout.save_ledger_error'));
+  };
+
+  const handleDeleteTryout = async () => {
+    if (!record || deleting) return;
+    setDeleting(true);
+    const ok = await deleteTryout(record.id);
+    setDeleting(false);
+    if (ok) router.push('/tryout');
   };
 
   const handleAiEstimate = () => {
@@ -513,6 +524,15 @@ function TryoutDetailContent() {
 
         <button type="button" onClick={handleAiEstimate} className="ui-cta w-full text-body">
           {t('tryout.ai_estimate_cta')}
+        </button>
+
+        <button
+          type="button"
+          onClick={() => confirmDelete ? void handleDeleteTryout() : setConfirmDelete(true)}
+          disabled={deleting}
+          className="w-full min-h-[var(--touch-min)] px-3 rounded-full text-danger hover:bg-[var(--danger-bg)] text-sm font-medium transition-colors disabled:opacity-50"
+        >
+          {deleting ? t('tryout.deleting') : confirmDelete ? t('tryout.confirm_delete') : t('tryout.delete_record')}
         </button>
       </div>
 
