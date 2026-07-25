@@ -1,15 +1,20 @@
 'use client';
 
+import { Capacitor } from '@capacitor/core';
 import { Purchases, PRODUCT_CATEGORY, PURCHASES_ERROR_CODE } from '@revenuecat/purchases-capacitor';
 import type { PurchasesError } from '@revenuecat/purchases-capacitor';
 import { isNativeApp } from './platform';
 
-const apiKey = process.env.NEXT_PUBLIC_RC_ANDROID_KEY;
+function resolveApiKey(): string | undefined {
+  if (Capacitor.getPlatform() === 'ios') return process.env.NEXT_PUBLIC_RC_IOS_KEY;
+  return process.env.NEXT_PUBLIC_RC_ANDROID_KEY;
+}
 
 let configuredUserId: string | null = null;
 
 // 로그인 확정 후 1회 호출(유저 변경 시 재-configure). 웹이거나 키 없으면 no-op.
 export async function configurePurchases(userId: string) {
+  const apiKey = resolveApiKey();
   if (!isNativeApp() || !apiKey) return;
   if (configuredUserId === userId) return;
   await Purchases.configure({ apiKey, appUserID: userId });
@@ -17,7 +22,7 @@ export async function configurePurchases(userId: string) {
 }
 
 export async function logOutPurchases() {
-  if (!isNativeApp() || !apiKey || !configuredUserId) return;
+  if (!isNativeApp() || !resolveApiKey() || !configuredUserId) return;
   configuredUserId = null;
   try {
     await Purchases.logOut();
