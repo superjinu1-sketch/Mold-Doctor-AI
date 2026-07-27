@@ -159,7 +159,7 @@ export default function ResinDetailView({
                     </div>
                     {guideId ? (
                       <Link
-                        href={`/guide?d=${guideId}`}
+                        href={`${locale === 'en' ? '/en/guide' : '/guide'}/${guideId}`}
                         className="shrink-0 min-h-[44px] px-3.5 flex items-center rounded-full bg-brand-tint hover:bg-[var(--brand-border)] text-brand-ink text-[length:var(--text-label)] font-bold transition-colors"
                       >
                         {L('가이드 보기', 'View Guide')}
