@@ -4,10 +4,13 @@ import { supabaseAdmin } from '@/lib/supabase/server';
 import { normalizeGrade } from '@/lib/grade-parser';
 import { resolveGradeCore } from '@/lib/resolve-grade-core';
 import { reportError } from '@/lib/observability/server';
+import { checkMinVersion } from '@/lib/appVersionGate';
 
 // thin wrapper: 인증·입력검증만. 파이프라인은 resolveGradeCore (extract-grade와 공유).
 // 외부 계약(200 {...result, cached} / 401 / 400 EMPTY_INPUT / 429 RATE_LIMIT / 500)은 작업2와 동일.
 export async function POST(request: NextRequest) {
+  const gate = await checkMinVersion(request);
+  if (gate) return gate;
   try {
     const body = await request.json().catch(() => ({}));
     const mock = tryMock(body, 'resolve'); if (mock) return mock;

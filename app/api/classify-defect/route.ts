@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabase/server';
 import { VISUAL_DIFFERENTIAL } from '@/app/api/diagnose/route';
 import { reportError } from '@/lib/observability/server';
+import { checkMinVersion } from '@/lib/appVersionGate';
 
 // 경량 불량유형 분류(사진→제안). 보조 기능: 크레딧·진단 카운트 차감 없음(과금 RPC 호출 안 함).
 const ALLOWED_IMAGE_TYPES = new Set(['image/jpeg', 'image/png', 'image/webp', 'image/gif']);
@@ -17,6 +18,8 @@ function getApiKey(): string {
 }
 
 export async function POST(request: NextRequest) {
+  const gate = await checkMinVersion(request);
+  if (gate) return gate;
   try {
     const MAX_PAYLOAD = 4.4 * 1024 * 1024;  // Vercel 함수 페이로드 한도(~4.5MB) 안전선
     if (Number(request.headers.get('content-length') || 0) > MAX_PAYLOAD) {

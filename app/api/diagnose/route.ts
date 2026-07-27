@@ -7,6 +7,7 @@ import { formatDefectGuide } from '@/lib/defect-kb';
 import { supabaseAdmin } from '@/lib/supabase/server';
 import { getSampleDemo } from '@/lib/sample-demo';
 import { reportError } from '@/lib/observability/server';
+import { checkMinVersion } from '@/lib/appVersionGate';
 
 // JSON 문자열 값 안의 실제 줄바꿈을 공백으로 치환 (문자 단위 파싱)
 function sanitizeJsonNewlines(text: string): string {
@@ -402,6 +403,8 @@ function buildSystemBlocks(resinType: string, tier: 'simple' | 'complex' = 'simp
 }
 
 export async function POST(request: NextRequest) {
+  const gate = await checkMinVersion(request);
+  if (gate) return gate;
   // 진단 throw 시 환불에 쓸 컨텍스트 (start_session 성공 후 채워짐)
   let refundCtx: { sessionId: string; userId: string } | null = null;
   try {

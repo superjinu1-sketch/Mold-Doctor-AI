@@ -4,6 +4,7 @@ import { tryMock } from '@/lib/mock';
 import { supabaseAdmin } from '@/lib/supabase/server';
 import { resolveGradeCore, type CacheValue } from '@/lib/resolve-grade-core';
 import { reportError } from '@/lib/observability/server';
+import { checkMinVersion } from '@/lib/appVersionGate';
 
 // 포대 라벨 사진 OCR → 그레이드명 추출 → 서버 내부에서 resolve 연결 (클라 왕복 1회).
 // extract-settings 패턴 미러. 사출기 OCR과 rate limit 예산 분리. 무료(무차감).
@@ -26,6 +27,8 @@ function sanitizeOcr(raw: unknown): Ocr {
 }
 
 export async function POST(request: NextRequest) {
+  const gate = await checkMinVersion(request);
+  if (gate) return gate;
   try {
     const MAX_PAYLOAD = 4.4 * 1024 * 1024;  // Vercel 함수 페이로드 한도(~4.5MB) 안전선
     if (Number(request.headers.get('content-length') || 0) > MAX_PAYLOAD) {

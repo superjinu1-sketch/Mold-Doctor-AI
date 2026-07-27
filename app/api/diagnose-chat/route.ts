@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { tryMock } from '@/lib/mock';
 import { supabaseAdmin } from '@/lib/supabase/server';
 import { reportError } from '@/lib/observability/server';
+import { checkMinVersion } from '@/lib/appVersionGate';
 function getApiKey(): string {
   return process.env.ANTHROPIC_API_KEY || '';
 }
@@ -39,6 +40,8 @@ function pickSettings(obj: unknown): Record<string, string | number> {
 }
 
 export async function POST(req: NextRequest) {
+  const gate = await checkMinVersion(req);
+  if (gate) return gate;
   try {
     const body = await req.json();
     const mock = tryMock(body, 'chat'); if (mock) return mock;

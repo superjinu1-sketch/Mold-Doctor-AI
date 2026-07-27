@@ -1,9 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabase/server';
 import { reportError } from '@/lib/observability/server';
+import { checkMinVersion } from '@/lib/appVersionGate';
 
 // 인앱 계정 삭제: auth.users 삭제 → 연결 테이블 ON DELETE CASCADE 연쇄 삭제
 export async function POST(request: NextRequest) {
+  const gate = await checkMinVersion(request);
+  if (gate) return gate;
   try {
     const authHeader = request.headers.get('authorization') || '';
     const token = authHeader.startsWith('Bearer ') ? authHeader.slice(7) : '';

@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from 'next';
 import './globals.css';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
+import UpdateGate from '@/components/UpdateGate';
 import { LocaleProvider } from '@/contexts/LocaleContext';
 import { AuthProvider } from '@/contexts/AuthContext';
 
@@ -66,6 +67,7 @@ export default function RootLayout({
               {children}
             </main>
             <Footer />
+            <UpdateGate />
           </AuthProvider>
         </LocaleProvider>
       </body>

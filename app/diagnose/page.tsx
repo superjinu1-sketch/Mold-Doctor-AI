@@ -12,7 +12,7 @@ import { useLocale } from '@/contexts/LocaleContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { authHeaders } from '@/lib/supabase/authHeader';
 import { downscaleImageClient, safeLocalStorageSet } from '@/lib/clientDownscale';
-import { apiUrl } from '@/lib/apiBase';
+import { apiFetch } from '@/lib/apiBase';
 import { saveDiagnosisRecord, updateResolution, patchRecordFields, type HistoryRecord } from '@/lib/history-sync';
 
 // --- Types ---
@@ -364,7 +364,7 @@ function DiagnoseContent() {
 
   // 축소본(base64)을 extract-settings로 보내 settings에 누적 병합. 반환: {filled, status}
   const extractFromScaled = async (scaled: string): Promise<{ filled: number; status: number }> => {
-    const res = await fetch(apiUrl('/api/extract-settings'), {
+    const res = await apiFetch('/api/extract-settings', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', ...(await authHeaders()) },
       body: JSON.stringify({ image: { data: scaled, mediaType: 'image/jpeg' } }),
@@ -612,7 +612,7 @@ function DiagnoseContent() {
     setGradeBusy(true);
     setGradeStatus(null);
     try {
-      const res = await fetch(apiUrl('/api/resolve-grade'), {
+      const res = await apiFetch('/api/resolve-grade', {
         method: 'POST',
         headers: { ...(await authHeaders()), 'Content-Type': 'application/json' },
         body: JSON.stringify({ grade }),
@@ -676,7 +676,7 @@ function DiagnoseContent() {
         reader.onload = (e) => resolve((e.target?.result as string).split(',')[1]);
         reader.readAsDataURL(file);
       });
-      const res = await fetch(apiUrl('/api/extract-grade'), {
+      const res = await apiFetch('/api/extract-grade', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', ...(await authHeaders()) },
         body: JSON.stringify({ image: { data: base64, mediaType: file.type } }),
@@ -771,7 +771,7 @@ function DiagnoseContent() {
     setIsClassifying(true);
     setClassifyError(false);
     try {
-      const res = await fetch(apiUrl('/api/classify-defect'), {
+      const res = await apiFetch('/api/classify-defect', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', ...(await authHeaders()) },
         body: JSON.stringify({ image: { data: img.base64, mediaType: img.mediaType } }),
@@ -942,7 +942,7 @@ function DiagnoseContent() {
         }),
       };
 
-      const res = await fetch(apiUrl('/api/diagnose'), {
+      const res = await apiFetch('/api/diagnose', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', ...(isDemo ? {} : await authHeaders()) },
         body: JSON.stringify({ ...payload, isDemo }),

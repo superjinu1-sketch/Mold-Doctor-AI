@@ -10,7 +10,7 @@ import PhotoInputTrigger, { type PhotoInputTriggerHandle } from '@/components/Ph
 import PrintableMachinePage from '@/components/ledger/PrintableMachinePage';
 import { downscaleImageClient } from '@/lib/clientDownscale';
 import { authHeaders } from '@/lib/supabase/authHeader';
-import { apiUrl } from '@/lib/apiBase';
+import { apiFetch } from '@/lib/apiBase';
 import { reportClientError } from '@/lib/observability/client';
 import { exportSectionsToPdf } from '@/lib/pdfExport';
 import { RESIN_OPTIONS, RESIN_OPTION_EN_LABEL, RESIN_CUSTOM_VALUE } from '@/lib/resinOptions';
@@ -150,7 +150,7 @@ function LedgerMachineDetailContent() {
     setOcrLoading(true);
     setOcrError('');
     try {
-      const res = await fetch(apiUrl('/api/extract-settings'), {
+      const res = await apiFetch('/api/extract-settings', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', ...(await authHeaders()) },
         body: JSON.stringify({ image: { mediaType: 'image/jpeg', data: photoBase64 } }),

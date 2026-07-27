@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { useLocale } from '@/contexts/LocaleContext';
 import { authHeaders } from '@/lib/supabase/authHeader';
 import { downscaleImageClient } from '@/lib/clientDownscale';
-import { apiUrl } from '@/lib/apiBase';
+import { apiFetch } from '@/lib/apiBase';
 
 interface DiagnosisResult {
   defect_type: { ko: string; en: string };
@@ -400,7 +400,7 @@ export default function DiagnosisResultPanel({ result, onSavePDF, round = 1, fol
     setIsChatLoading(true);
 
     try {
-      const res = await fetch(apiUrl('/api/diagnose-chat'), {
+      const res = await apiFetch('/api/diagnose-chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', ...(await authHeaders()) },
         body: JSON.stringify({
