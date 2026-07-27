@@ -23,7 +23,10 @@ export const metadata: Metadata = {
     description: '사출 불량 AI 추정 — 원인 분석 + 셋팅 권장값 즉시 제공',
   },
   verification: {
-    google: 'S-q5VyIQgHg2rVbOx2YfMhJdMFV3Ti578xivFZDTZFU',
+    google: [
+      'S-q5VyIQgHg2rVbOx2YfMhJdMFV3Ti578xivFZDTZFU',
+      'FpipNtxXjP6JlF6KNp_LDdD63c6Me8NF-CgUKziAUqs',
+    ],
     other: { 'naver-site-verification': '70ac4bf16560e7a44c05dd3a4805801e5f810ba8' },
   },
 };
