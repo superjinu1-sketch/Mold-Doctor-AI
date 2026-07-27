@@ -31,6 +31,8 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
       },
     },
     openGraph: { title, description, type: 'article', locale: 'en_US', url },
+    // 루트 레이아웃의 twitter 메타는 한국어 고정값(실측 확인된 잔존) — 영문 페이지에서는 페이지별 영문 title/description으로 덮어쓴다.
+    twitter: { card: 'summary', title, description },
   };
 }
 

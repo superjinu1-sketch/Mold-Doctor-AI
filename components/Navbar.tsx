@@ -2,8 +2,10 @@
 
 import Link from 'next/link';
 import { useState } from 'react';
+import { usePathname } from 'next/navigation';
 import { useLocale } from '@/contexts/LocaleContext';
 import { useAuth } from '@/contexts/AuthContext';
+import { en as enMessages } from '@/messages/en';
 import AuthModal from './AuthModal';
 import Logo from './Logo';
 
@@ -41,6 +43,10 @@ export default function Navbar() {
   const [authModalOpen, setAuthModalOpen] = useState(false);
   const { locale, setLocale, t } = useLocale();
   const { user, loading, signOut, credits } = useAuth();
+  const pathname = usePathname();
+  // 영문 라우트(/en/*)는 locale 토글 상태와 무관하게 항상 영문 내비 라벨 — 실측 확인된 한국어 잔존 수정.
+  const isEnRoute = pathname?.startsWith('/en') ?? false;
+  const nt = (key: string) => (isEnRoute ? (enMessages[key] ?? key) : t(key));
 
   const toggleLocale = () => setLocale(locale === 'ko' ? 'en' : 'ko');
   const email = user?.email ?? '';
@@ -59,9 +65,9 @@ export default function Navbar() {
 
             {/* Desktop Nav */}
             <div className="hidden md:flex items-center gap-7 text-sm text-faint">
-              <Link href="/diagnose" className="hover:text-ink transition-colors">{t('nav.estimate')}</Link>
-              <Link href="/tools" className="hover:text-ink transition-colors">{t('nav.tools')}</Link>
-              <Link href="/pricing" className="hover:text-ink transition-colors">{t('nav.pricing')}</Link>
+              <Link href="/diagnose" className="hover:text-ink transition-colors">{nt('nav.estimate')}</Link>
+              <Link href="/tools" className="hover:text-ink transition-colors">{nt('nav.tools')}</Link>
+              <Link href="/pricing" className="hover:text-ink transition-colors">{nt('nav.pricing')}</Link>
             </div>
 
             {/* Desktop right */}
@@ -71,7 +77,7 @@ export default function Navbar() {
                 type="button"
                 onClick={toggleLocale}
                 className="min-w-[44px] min-h-[44px] flex items-center justify-center text-xs font-bold text-faint hover:text-ink border border-border hover:border-border-strong rounded-lg px-2 transition-colors"
-                aria-label="언어 전환 / Switch language"
+                aria-label={isEnRoute ? 'Switch language' : '언어 전환 / Switch language'}
               >
                 {t('nav.locale_toggle')}
               </button>
@@ -158,7 +164,7 @@ export default function Navbar() {
                 type="button"
                 onClick={toggleLocale}
                 className="min-w-[44px] min-h-[44px] flex items-center justify-center text-xs font-bold text-faint hover:text-ink border border-border rounded-lg px-2 transition-colors"
-                aria-label="언어 전환 / Switch language"
+                aria-label={isEnRoute ? 'Switch language' : '언어 전환 / Switch language'}
               >
                 {t('nav.locale_toggle')}
               </button>
@@ -191,7 +197,7 @@ export default function Navbar() {
                   type="button"
                   onClick={() => setMenuOpen(!menuOpen)}
                   className="min-w-[44px] min-h-[44px] flex items-center justify-center"
-                  aria-label="계정 메뉴"
+                  aria-label={isEnRoute ? 'Account menu' : '계정 메뉴'}
                 >
                   <AvatarImage
                     avatarUrl={avatarUrl}
@@ -207,7 +213,7 @@ export default function Navbar() {
                 type="button"
                 className="min-w-[44px] min-h-[44px] flex items-center justify-center rounded-lg hover:bg-surface-sunken text-muted"
                 onClick={() => setMenuOpen(!menuOpen)}
-                aria-label="메뉴 열기"
+                aria-label={isEnRoute ? 'Open menu' : '메뉴 열기'}
               >
                 <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2">
                   {menuOpen
@@ -223,9 +229,9 @@ export default function Navbar() {
           {menuOpen && (
             <div className="md:hidden pb-4 flex flex-col gap-1 border-t border-border pt-3">
               {[
-                { href: '/diagnose', label: t('nav.estimate') },
-                { href: '/tools', label: t('nav.tools') },
-                { href: '/pricing', label: t('nav.pricing') },
+                { href: '/diagnose', label: nt('nav.estimate') },
+                { href: '/tools', label: nt('nav.tools') },
+                { href: '/pricing', label: nt('nav.pricing') },
               ].map(({ href, label }) => (
                 <Link key={href} href={href}
                   className="text-faint hover:text-ink hover:bg-surface-sunken px-3 py-3 rounded-lg text-sm font-medium transition-colors min-h-[44px] flex items-center"

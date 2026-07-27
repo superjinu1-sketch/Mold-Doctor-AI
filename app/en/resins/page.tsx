@@ -19,6 +19,12 @@ export const metadata: Metadata = {
     type: 'website',
     locale: 'en_US',
   },
+  // 루트 레이아웃의 twitter 메타는 한국어 고정값 — 영문 페이지에서는 페이지별 영문 title/description으로 덮어쓴다.
+  twitter: {
+    card: 'summary',
+    title: 'Injection Molding Resin Library — Drying, Melt Temp, Shrinkage | Mold Doctor',
+    description: 'Field-reference summaries for 43+ injection molding resins — PA66, PC, POM, PPS and more — covering drying conditions, melt temperature, mold temperature, shrinkage, and common defects.',
+  },
 };
 
 export default function ResinsListPageEn() {
