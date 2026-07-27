@@ -1,9 +1,12 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useLocale } from '@/contexts/LocaleContext';
+import { useAuth } from '@/contexts/AuthContext';
 import { ReportModal } from '@/components/ResolutionReport';
+import SaveAsWorkStandardModal from '@/components/SaveAsWorkStandardModal';
+import { canSaveAsWorkStandard, getLedgerSavedAt, markLedgerSaved } from '@/lib/diagnoseToLedger';
 import type { HistoryRecord } from '@/lib/history-sync';
 
 function SeverityBadge({ severity }: { severity?: string }) {
@@ -55,8 +58,20 @@ function formatDate(ts: string, locale: string) {
 export default function HistoryList({ records }: { records: HistoryRecord[] }) {
   const { t, locale } = useLocale();
   const router = useRouter();
+  const { user } = useAuth();
   const [expanded, setExpanded] = useState<string | null>(null);
   const [reportRecord, setReportRecord] = useState<HistoryRecord | null>(null);
+  const [ledgerModalRecord, setLedgerModalRecord] = useState<HistoryRecord | null>(null);
+  const [savedMap, setSavedMap] = useState<Record<string, string>>({});
+
+  useEffect(() => {
+    const map: Record<string, string> = {};
+    for (const r of records) {
+      const saved = getLedgerSavedAt(r.id);
+      if (saved) map[r.id] = saved;
+    }
+    setSavedMap(map);
+  }, [records]);
 
   const handleRestore = (record: HistoryRecord) => {
     try {
@@ -70,6 +85,23 @@ export default function HistoryList({ records }: { records: HistoryRecord[] }) {
 
   if (reportRecord) {
     return <ReportModal record={reportRecord} onClose={() => setReportRecord(null)} />;
+  }
+
+  if (ledgerModalRecord && user) {
+    return (
+      <SaveAsWorkStandardModal
+        record={ledgerModalRecord}
+        userId={user.id}
+        onClose={() => setLedgerModalRecord(null)}
+        onSaved={() => {
+          const id = ledgerModalRecord.id;
+          const iso = new Date().toISOString();
+          markLedgerSaved(id, iso);
+          setSavedMap(prev => ({ ...prev, [id]: iso }));
+          setLedgerModalRecord(null);
+        }}
+      />
+    );
   }
 
   if (records.length === 0) {
@@ -123,6 +155,23 @@ export default function HistoryList({ records }: { records: HistoryRecord[] }) {
                     {r.resolvedMemo && <span className="ml-2">{r.resolvedMemo}</span>}
                   </div>
                 </div>
+              )}
+
+              {user && canSaveAsWorkStandard(r) && (
+                savedMap[r.id] ? (
+                  <div className="flex items-center justify-between gap-2 bg-surface-sunken rounded-xl px-3 py-2.5 min-h-[var(--touch-min)]">
+                    <span className="text-sm font-semibold text-ok">✓ {t('history.save_ledger_saved_badge')}</span>
+                    <a href="/ledger" className="text-sm font-semibold text-brand-ink shrink-0">{t('history.save_ledger_go_ledger')}</a>
+                  </div>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => setLedgerModalRecord(r)}
+                    className="w-full min-h-[var(--touch-min)] rounded-xl border border-border-strong text-muted hover:text-ink hover:bg-surface-sunken font-semibold text-body transition-colors"
+                  >
+                    {t('history.save_ledger_cta')}
+                  </button>
+                )
               )}
 
               {(r.beforePhoto || r.afterPhoto) && (

@@ -1,6 +1,9 @@
 'use client';
 
 import { useRef, useState } from 'react';
+import { useAuth } from '@/contexts/AuthContext';
+import SaveAsWorkStandardModal from '@/components/SaveAsWorkStandardModal';
+import { canSaveAsWorkStandard, getLedgerSavedAt, markLedgerSaved } from '@/lib/diagnoseToLedger';
 
 // v0: localStorage 기반. 로그인 후 Supabase 동기화는 v1.
 
@@ -260,10 +263,15 @@ interface ReportModalProps {
 }
 
 export function ReportModal({ record, onClose }: ReportModalProps) {
+  const { user } = useAuth();
   const [authorName, setAuthorName] = useState('');
   const [companyName, setCompanyName] = useState('');
   const [generating, setGenerating] = useState(false);
+  const [showLedgerModal, setShowLedgerModal] = useState(false);
+  const recordId = record.id ? String(record.id) : '';
+  const [ledgerSaved, setLedgerSaved] = useState(() => recordId ? !!getLedgerSavedAt(recordId) : false);
   const reportRef = useRef<HTMLDivElement>(null);
+  const canSaveStandard = !!user && !!recordId && canSaveAsWorkStandard(record);
 
   const generate = async () => {
     if (!reportRef.current) return;
@@ -363,6 +371,23 @@ export function ReportModal({ record, onClose }: ReportModalProps) {
           </button>
         </div>
 
+        {canSaveStandard && (
+          ledgerSaved ? (
+            <div className="flex items-center justify-between gap-2 bg-surface-sunken rounded-xl px-3 py-2.5 min-h-[44px]">
+              <span className="text-sm font-semibold text-ok">✓ 작업표준에 저장됨</span>
+              <a href="/ledger" className="text-sm font-semibold text-brand-ink shrink-0">작업표준 저장소로 이동</a>
+            </div>
+          ) : (
+            <button
+              type="button"
+              onClick={() => setShowLedgerModal(true)}
+              className="w-full min-h-[44px] rounded-xl border border-border-strong text-muted hover:text-ink hover:bg-surface-sunken font-semibold transition-colors"
+            >
+              작업표준으로 저장
+            </button>
+          )
+        )}
+
         {/* 숨겨진 리포트 레이아웃 (캡처 대상) */}
         <div style={{ position: 'absolute', top: -9999, left: 0, pointerEvents: 'none' }}>
           <div ref={reportRef}>
@@ -370,6 +395,19 @@ export function ReportModal({ record, onClose }: ReportModalProps) {
           </div>
         </div>
       </div>
+
+      {showLedgerModal && user && (
+        <SaveAsWorkStandardModal
+          record={record}
+          userId={user.id}
+          onClose={() => setShowLedgerModal(false)}
+          onSaved={() => {
+            if (recordId) markLedgerSaved(recordId, new Date().toISOString());
+            setLedgerSaved(true);
+            setShowLedgerModal(false);
+          }}
+        />
+      )}
     </div>
   );
 }

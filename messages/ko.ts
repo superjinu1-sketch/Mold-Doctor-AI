@@ -542,6 +542,15 @@ export const ko: Record<string, string> = {
   'history.after_label': '조치 후',
   'history.causes_label': '추정 원인',
   'history.adj_label': '주요 조정안',
+  'history.save_ledger_cta': '작업표준으로 저장',
+  'history.save_ledger_ok': '작업표준 저장소에 새 표준으로 저장했어요.',
+  'history.save_ledger_error': '저장에 실패했어요. 잠시 후 다시 시도해주세요.',
+  'history.save_ledger_saved_badge': '작업표준에 저장됨',
+  'history.save_ledger_go_ledger': '작업표준 저장소로 이동',
+  'history.save_ledger_modal_title': '어느 설비의 표준으로 저장할까요?',
+  'history.save_ledger_no_machine': '작업표준은 설비별로 관리됩니다. 먼저 설비를 등록해 주세요.',
+  'history.save_ledger_no_machine_cta': '설비 등록하러 가기',
+  'history.save_ledger_add_machine': '+ 새 설비 등록',
 
   /* Defect types (display) */
   'defect.short_shot': '미성형 (Short Shot)',
