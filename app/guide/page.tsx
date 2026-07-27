@@ -3,6 +3,7 @@ import { Suspense } from 'react';
 import Link from 'next/link';
 import { defects, DEFECT_NUMS, headerColorMap } from '@/lib/defectGuide';
 import GuideDeepLinkRedirect from '@/components/guide/GuideDeepLinkRedirect';
+import { SITE_URL } from '@/lib/siteUrl';
 
 // Capacitor 정적 export(output:'export') 호환 — app/sitemap.ts 선례와 동일 원칙 적용.
 export const dynamic = 'force-static';
@@ -11,11 +12,11 @@ export const metadata: Metadata = {
   title: '사출 불량 가이드 — 12종 원인과 해결 방법 | Mold Doctor',
   description: '미성형·플래시·싱크마크·웰드라인 등 사출성형 불량 12종의 원인과 해결 방법을 정리했습니다.',
   alternates: {
-    canonical: 'https://mold-doctor-ai.vercel.app/guide',
+    canonical: `${SITE_URL}/guide`,
     languages: {
-      ko: 'https://mold-doctor-ai.vercel.app/guide',
-      en: 'https://mold-doctor-ai.vercel.app/en/guide',
-      'x-default': 'https://mold-doctor-ai.vercel.app/en/guide',
+      ko: `${SITE_URL}/guide`,
+      en: `${SITE_URL}/en/guide`,
+      'x-default': `${SITE_URL}/en/guide`,
     },
   },
   openGraph: {

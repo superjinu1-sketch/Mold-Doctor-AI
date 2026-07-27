@@ -5,6 +5,7 @@ import { getAllResinSlugs, getResinKeyBySlug } from '@/lib/resinSlug';
 import { getResinDisplayName, buildTitle, buildDescription, buildJsonLd } from '@/lib/resinDisplay';
 import { getRelatedResinKeys } from '@/lib/resinPageData';
 import ResinDetailView from '@/components/resins/ResinDetailView';
+import { SITE_URL } from '@/lib/siteUrl';
 
 export function generateStaticParams() {
   return getAllResinSlugs().map(slug => ({ slug }));
@@ -18,14 +19,14 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const displayName = getResinDisplayName(key, 'en');
   const title = buildTitle(displayName, 'en');
   const description = buildDescription(spec, displayName, 'en');
-  const url = `https://mold-doctor-ai.vercel.app/en/resins/${slug}`;
+  const url = `${SITE_URL}/en/resins/${slug}`;
   return {
     title,
     description,
     alternates: {
       canonical: url,
       languages: {
-        ko: `https://mold-doctor-ai.vercel.app/resins/${slug}`,
+        ko: `${SITE_URL}/resins/${slug}`,
         en: url,
         'x-default': url,
       },
@@ -42,7 +43,7 @@ export default async function ResinDetailPageEn({ params }: { params: Promise<{ 
   if (!key) notFound();
   const spec = RESIN_KB[key];
   const displayName = getResinDisplayName(key, 'en');
-  const url = `https://mold-doctor-ai.vercel.app/en/resins/${slug}`;
+  const url = `${SITE_URL}/en/resins/${slug}`;
   const jsonLd = buildJsonLd(spec, displayName, 'en', url);
   const related = getRelatedResinKeys(key);
 

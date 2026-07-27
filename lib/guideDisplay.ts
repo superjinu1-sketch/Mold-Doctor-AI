@@ -3,6 +3,7 @@
 import { type GuideDefect, DEFECT_KEY_TO_GUIDE_ID } from '@/lib/defectGuide';
 import { RESIN_KB, type DefectKey } from '@/lib/resin-kb';
 import { slugifyResinKey } from '@/lib/resinSlug';
+import { SITE_URL } from '@/lib/siteUrl';
 
 export type Locale = 'ko' | 'en';
 
@@ -65,6 +66,6 @@ export function buildGuideJsonLd(defect: GuideDefect, locale: Locale, url: strin
     inLanguage: locale,
     url,
     about: { '@type': 'Thing', name: locale === 'en' ? defect.nameEn : defect.nameKo },
-    publisher: { '@type': 'Organization', name: 'Mold Doctor AI', url: 'https://mold-doctor-ai.vercel.app' },
+    publisher: { '@type': 'Organization', name: 'Mold Doctor AI', url: SITE_URL },
   };
 }

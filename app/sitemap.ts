@@ -1,11 +1,10 @@
 import type { MetadataRoute } from 'next';
 import { getAllResinSlugs } from '@/lib/resinSlug';
 import { defects } from '@/lib/defectGuide';
+import { SITE_URL } from '@/lib/siteUrl';
 
 // Capacitor 정적 export(output:'export') 호환 — 명시하지 않으면 빌드 실패.
 export const dynamic = 'force-static';
-
-const SITE_URL = 'https://mold-doctor-ai.vercel.app';
 
 // 인증 필요 페이지(/diagnose, /account, /history, /ledger, /auth/callback)는 의도적으로 제외.
 export default function sitemap(): MetadataRoute.Sitemap {

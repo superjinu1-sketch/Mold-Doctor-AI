@@ -3,6 +3,7 @@ import { Suspense } from 'react';
 import Link from 'next/link';
 import { defects, DEFECT_NUMS, headerColorMap } from '@/lib/defectGuide';
 import GuideDeepLinkRedirect from '@/components/guide/GuideDeepLinkRedirect';
+import { SITE_URL } from '@/lib/siteUrl';
 
 // Capacitor 정적 export(output:'export') 호환 — app/sitemap.ts 선례와 동일 원칙 적용.
 export const dynamic = 'force-static';
@@ -14,11 +15,11 @@ export const metadata: Metadata = {
   title: TITLE,
   description: DESCRIPTION,
   alternates: {
-    canonical: 'https://mold-doctor-ai.vercel.app/en/guide',
+    canonical: `${SITE_URL}/en/guide`,
     languages: {
-      ko: 'https://mold-doctor-ai.vercel.app/guide',
-      en: 'https://mold-doctor-ai.vercel.app/en/guide',
-      'x-default': 'https://mold-doctor-ai.vercel.app/en/guide',
+      ko: `${SITE_URL}/guide`,
+      en: `${SITE_URL}/en/guide`,
+      'x-default': `${SITE_URL}/en/guide`,
     },
   },
   openGraph: {

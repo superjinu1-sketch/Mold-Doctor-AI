@@ -1,16 +1,17 @@
 import type { Metadata } from 'next';
 import ResinListView from '@/components/resins/ResinListView';
 import { getAllResinListItems } from '@/lib/resinPageData';
+import { SITE_URL } from '@/lib/siteUrl';
 
 export const metadata: Metadata = {
   title: 'Injection Molding Resin Library — Drying, Melt Temp, Shrinkage | Mold Doctor',
   description: 'Field-reference summaries for 43+ injection molding resins — PA66, PC, POM, PPS and more — covering drying conditions, melt temperature, mold temperature, shrinkage, and common defects.',
   alternates: {
-    canonical: 'https://mold-doctor-ai.vercel.app/en/resins',
+    canonical: `${SITE_URL}/en/resins`,
     languages: {
-      ko: 'https://mold-doctor-ai.vercel.app/resins',
-      en: 'https://mold-doctor-ai.vercel.app/en/resins',
-      'x-default': 'https://mold-doctor-ai.vercel.app/en/resins',
+      ko: `${SITE_URL}/resins`,
+      en: `${SITE_URL}/en/resins`,
+      'x-default': `${SITE_URL}/en/resins`,
     },
   },
   openGraph: {

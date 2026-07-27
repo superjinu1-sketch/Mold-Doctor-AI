@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation';
 import { defects, getGuideDefectById } from '@/lib/defectGuide';
 import { buildGuideTitle, buildGuideDescription, buildGuideJsonLd, getRelatedResinsForGuide } from '@/lib/guideDisplay';
 import GuideDetailView from '@/components/guide/GuideDetailView';
+import { SITE_URL } from '@/lib/siteUrl';
 
 // Capacitor 정적 export(output:'export') 호환 — app/sitemap.ts 선례와 동일 원칙 적용.
 export const dynamic = 'force-static';
@@ -17,7 +18,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   if (!defect) return {};
   const title = buildGuideTitle(defect, 'ko');
   const description = buildGuideDescription(defect, 'ko');
-  const url = `https://mold-doctor-ai.vercel.app/guide/${slug}`;
+  const url = `${SITE_URL}/guide/${slug}`;
   return {
     title,
     description,
@@ -25,8 +26,8 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
       canonical: url,
       languages: {
         ko: url,
-        en: `https://mold-doctor-ai.vercel.app/en/guide/${slug}`,
-        'x-default': `https://mold-doctor-ai.vercel.app/en/guide/${slug}`,
+        en: `${SITE_URL}/en/guide/${slug}`,
+        'x-default': `${SITE_URL}/en/guide/${slug}`,
       },
     },
     openGraph: { title, description, type: 'article', locale: 'ko_KR', url },
@@ -37,7 +38,7 @@ export default async function GuideDetailPage({ params }: { params: Promise<{ sl
   const { slug } = await params;
   const defect = getGuideDefectById(slug);
   if (!defect) notFound();
-  const url = `https://mold-doctor-ai.vercel.app/guide/${slug}`;
+  const url = `${SITE_URL}/guide/${slug}`;
   const jsonLd = buildGuideJsonLd(defect, 'ko', url);
   const related = getRelatedResinsForGuide(slug);
 

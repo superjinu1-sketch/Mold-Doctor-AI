@@ -7,7 +7,7 @@ import { useEffect, useState } from 'react';
 import { useLocale } from '@/contexts/LocaleContext';
 import type { Machine, ConditionStandard } from '@/lib/ledger';
 import { TEMP_FIELDS, MOLD_TEMP_FIELDS, MACHINE_PARAM_FIELDS, ADV_FIELD_GROUPS } from '@/lib/machineSettingsFields';
-import { getBrandQrDataUrl } from '@/lib/pdfBranding';
+import { getBrandQrDataUrl, BRAND_HOST } from '@/lib/pdfBranding';
 
 function fmtDate(iso: string, locale: string): string {
   try {
@@ -157,7 +157,7 @@ export default function PrintableMachinePage({
           <div style={{ textAlign: 'right', display: 'flex', alignItems: 'center', gap: '2mm' }}>
             <div>
               <div style={{ fontWeight: 700 }}>Mold Doctor{L('로 작성', ' generated')}</div>
-              <div>mold-doctor-ai.vercel.app</div>
+              <div>{BRAND_HOST}</div>
             </div>
             {qrUrl && <img src={qrUrl} alt="" width={64} height={64} style={{ width: '17mm', height: '17mm' }} />}
           </div>

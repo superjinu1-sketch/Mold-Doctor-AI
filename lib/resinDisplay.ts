@@ -2,6 +2,7 @@
 // 단일 소스로 삼아 수치 기반 문자열을 만든다 — 페이지별 문구가 자동으로 고유해짐(중복 0 보장).
 import type { ResinSpec, Tier, Hygro } from '@/lib/resin-kb';
 import { RESIN_OPTION_EN_LABEL } from '@/lib/resinOptions';
+import { SITE_URL } from '@/lib/siteUrl';
 
 export type Locale = 'ko' | 'en';
 
@@ -73,6 +74,6 @@ export function buildJsonLd(spec: ResinSpec, displayName: string, locale: Locale
     inLanguage: locale,
     url,
     about: { '@type': 'Thing', name: displayName },
-    publisher: { '@type': 'Organization', name: 'Mold Doctor AI', url: 'https://mold-doctor-ai.vercel.app' },
+    publisher: { '@type': 'Organization', name: 'Mold Doctor AI', url: SITE_URL },
   };
 }

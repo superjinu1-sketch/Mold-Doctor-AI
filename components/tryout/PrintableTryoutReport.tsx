@@ -8,7 +8,7 @@ import type { TryoutRecord } from '@/lib/tryout';
 import { CHECKLIST_GROUPS, type Shot } from '@/lib/tryoutChecklist';
 import { getGuideDefectById } from '@/lib/defectGuide';
 import { TEMP_FIELDS, MOLD_TEMP_FIELDS, MACHINE_PARAM_FIELDS } from '@/lib/machineSettingsFields';
-import { getBrandQrDataUrl } from '@/lib/pdfBranding';
+import { getBrandQrDataUrl, BRAND_HOST } from '@/lib/pdfBranding';
 
 const INK = 'var(--ink)';
 const MUTED = 'var(--muted)';
@@ -164,7 +164,7 @@ export default function PrintableTryoutReport({
           <div style={{ textAlign: 'right', display: 'flex', alignItems: 'center', gap: '2mm' }}>
             <div>
               <div style={{ fontWeight: 700 }}>Mold Doctor{L('로 작성', ' generated')}</div>
-              <div>mold-doctor-ai.vercel.app</div>
+              <div>{BRAND_HOST}</div>
             </div>
             {qrUrl && <img src={qrUrl} alt="" width={64} height={64} style={{ width: '17mm', height: '17mm' }} />}
           </div>

@@ -1,16 +1,17 @@
 import type { Metadata } from 'next';
 import ResinListView from '@/components/resins/ResinListView';
 import { getAllResinListItems } from '@/lib/resinPageData';
+import { SITE_URL } from '@/lib/siteUrl';
 
 export const metadata: Metadata = {
   title: '사출성형 수지 라이브러리 — 건조·사출온도·수축률 요약 | Mold Doctor',
   description: 'PA66·PC·POM·PPS 등 사출성형 수지 43여 종의 건조 조건, 사출(용융) 온도, 금형 온도, 수축률, 흔한 불량을 한눈에 정리했습니다.',
   alternates: {
-    canonical: 'https://mold-doctor-ai.vercel.app/resins',
+    canonical: `${SITE_URL}/resins`,
     languages: {
-      ko: 'https://mold-doctor-ai.vercel.app/resins',
-      en: 'https://mold-doctor-ai.vercel.app/en/resins',
-      'x-default': 'https://mold-doctor-ai.vercel.app/en/resins',
+      ko: `${SITE_URL}/resins`,
+      en: `${SITE_URL}/en/resins`,
+      'x-default': `${SITE_URL}/en/resins`,
     },
   },
   openGraph: {
