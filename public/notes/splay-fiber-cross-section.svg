@@ -1,0 +1,42 @@
+<svg viewBox="0 0 720 250" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="cs-t cs-d">
+  <title id="cs-t">Fiber position at the part surface, cold mold versus adequate mold temperature</title>
+  <desc id="cs-d">With a cold mold the melt freezes on contact and glass fibers remain close to the surface. At adequate mold temperature a thin resin layer forms first and the fibers stay behind it.</desc>
+  <text x="20" y="22" font-size="13" font-weight="700" fill="var(--ink)">Mold too cold</text>
+  <text x="20" y="40" font-size="11" fill="var(--faint)">melt freezes on contact</text>
+  <rect x="20" y="55" width="300" height="16" fill="var(--faint)" opacity=".28"/>
+  <text x="24" y="67" font-size="9" fill="var(--faint)">MOLD WALL</text>
+  <rect x="20" y="71" width="300" height="110" fill="var(--faint)" opacity=".07"/>
+  <g stroke="var(--danger)" stroke-width="2.5" stroke-linecap="round">
+    <line x1="40" y1="78" x2="72" y2="82"/><line x1="92" y1="80" x2="126" y2="76"/>
+    <line x1="146" y1="77" x2="180" y2="83"/><line x1="198" y1="82" x2="232" y2="77"/>
+    <line x1="250" y1="78" x2="284" y2="82"/><line x1="55" y1="92" x2="88" y2="88"/>
+    <line x1="160" y1="90" x2="196" y2="94"/><line x1="240" y1="93" x2="272" y2="88"/>
+  </g>
+  <g stroke="var(--faint)" stroke-width="2.5" stroke-linecap="round" opacity=".45">
+    <line x1="50" y1="125" x2="86" y2="130"/><line x1="120" y1="140" x2="158" y2="134"/>
+    <line x1="200" y1="128" x2="238" y2="133"/><line x1="90" y1="160" x2="128" y2="155"/>
+    <line x1="210" y1="158" x2="248" y2="163"/>
+  </g>
+  <line x1="170" y1="78" x2="170" y2="55" stroke="var(--danger)" stroke-width="1.5" stroke-dasharray="3 3"/>
+  <text x="176" y="52" font-size="11" font-weight="600" fill="var(--danger)">no resin layer</text>
+  <text x="20" y="205" font-size="12" font-weight="600" fill="var(--danger)">→ glass visible at surface</text>
+  <text x="20" y="223" font-size="11" fill="var(--faint)">white, rough, stands out on black parts</text>
+  <text x="400" y="22" font-size="13" font-weight="700" fill="var(--ink)">Mold temperature adequate</text>
+  <text x="400" y="40" font-size="11" fill="var(--faint)">resin wraps the fibers first</text>
+  <rect x="400" y="55" width="300" height="16" fill="var(--faint)" opacity=".28"/>
+  <text x="404" y="67" font-size="9" fill="var(--faint)">MOLD WALL</text>
+  <rect x="400" y="71" width="300" height="110" fill="var(--faint)" opacity=".07"/>
+  <rect x="400" y="71" width="300" height="22" fill="var(--ok)" opacity=".18"/>
+  <line x1="400" y1="93" x2="700" y2="93" stroke="var(--ok)" stroke-width="1.5" stroke-dasharray="4 3"/>
+  <text x="550" y="52" font-size="11" font-weight="600" fill="var(--ok)">resin-rich layer</text>
+  <line x1="550" y1="58" x2="550" y2="71" stroke="var(--ok)" stroke-width="1.5" stroke-dasharray="3 3"/>
+  <g stroke="var(--faint)" stroke-width="2.5" stroke-linecap="round" opacity=".55">
+    <line x1="425" y1="108" x2="460" y2="112"/><line x1="480" y1="115" x2="516" y2="110"/>
+    <line x1="540" y1="106" x2="576" y2="112"/><line x1="600" y1="113" x2="636" y2="108"/>
+    <line x1="655" y1="107" x2="688" y2="112"/><line x1="440" y1="140" x2="476" y2="134"/>
+    <line x1="520" y1="132" x2="558" y2="138"/><line x1="610" y1="141" x2="648" y2="135"/>
+    <line x1="470" y1="163" x2="508" y2="158"/><line x1="580" y1="160" x2="618" y2="165"/>
+  </g>
+  <text x="400" y="205" font-size="12" font-weight="600" fill="var(--ok)">→ surface reads as resin</text>
+  <text x="400" y="223" font-size="11" fill="var(--faint)">fibers stay behind the skin</text>
+</svg>
