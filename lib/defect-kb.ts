@@ -4,7 +4,7 @@
 // 수정 순서: taxonomy.md → 이 파일 → KB_VERSION bump → eval 회귀.
 import type { ResinSpec } from './resin-kb';
 
-export const KB_VERSION = 'defect-kb-v1.7';
+export const KB_VERSION = 'defect-kb-v1.8';
 
 export type Cause = {
   rank: number;
@@ -30,6 +30,8 @@ export type DefectNode = {
   priorityLogic?: string;
   source?: string;
   confidence?: 'high' | 'med' | 'low';
+  sourceRefs?: string[];   // 개별 문헌 인용 + 검증 상태(예: "NOT verified (paywall)") — 정직한 출처 추적용
+  verifiedAt?: string;     // sourceRefs 최근 검증일(ISO)
 };
 
 export type SharedGate = {
@@ -171,11 +173,11 @@ export const DEFECT_KB: Record<string, DefectNode> = {
     typicalSeverity: 'medium (외관). GF 수지 강도 직결·기능부품 시 high',
     discriminators: '홀·보스·코어핀 주변, 멀티게이트 합류부 가는 선. 합류각<135°=weld(강도저하 큼) / >135°=meld. GF수지=강도 모재 50~80%↓. 닦아도 안 지워지는 구조적 선. 닦으면 옅어지는 백색 잔류물이면 웰드 아님 → mold_deposit(석출) 검토.',
     causes: [
-      { rank: 1, cause: '멜트온도 부족 (강도 기여 71%)', category: 'Method',
+      { rank: 1, cause: '멜트온도 부족 (비강화 수지에서 강도 지배 인자)', category: 'Method',
         baseProbability: 45,
-        trigger: '멜트온도 resin-kb meltC.min 근방 또는 미달',
+        trigger: '멜트온도 resin-kb meltC.min 근방 또는 미달. 비강화 수지(PP·PE 등)면 본 순위 그대로 적용, GF 강화 수지면 2순위(보압)·3순위(게이트)를 상향 검토.',
         evidence: '노즐·배럴 온도 입력값. resin-kb meltC 범위 대비.',
-        verification: '멜트온도 +10℃ 후 V홈 깊이 감소 확인(7→3μm 사례).',
+        verification: '멜트온도 +10℃ 후 V홈 깊이 감소 확인(7→3μm 사례) — 외관 지표이며 강도 검증은 아님.',
         adjustment: '멜트온도↑(최우선), 금형온도↑.' },
       { rank: 2, cause: '홀드압·사출속도 부족', category: 'Machine',
         baseProbability: 20,
@@ -197,8 +199,15 @@ export const DEFECT_KB: Record<string, DefectNode> = {
       '파단|부러짐|강도 부족|기능 불량': 'GF 수지면 섬유 배향 단절 = 조건 조정만으로는 모재 수준 회복 불가 영역(보압↑으로 일부 개선은 가능). 게이트 위치 이동·웰드 위치 이동(금형)이 근본 대책. 조건 권고 시 한계를 명시할 것',
     },
     sharedGates: ['mold_temp_insufficient'],
-    priorityLogic: '멜트온도 최우선(Taguchi 71% 기여). 구조적 웰드=조건만으론 한계, 게이트 위치 이동이 근본. 강도·파단 요구 시나리오(기능부품·GF 수지)에서는 Mold(게이트 위치) 원인을 우선 검토 — 멜트온도↑·금형온도↑는 V홈 외관은 개선해도 강도 기여는 미미하다. 보압↑은 웰드라인 강도를 실제로 개선하나, 어느 조건으로도 모재 수준 회복은 안 된다. 외관 양품 ≠ 강도 OK.',
+    priorityLogic: '구조적 웰드(홀·코어핀 등)=조건만으론 한계, 게이트 위치 이동이 근본. 강도·파단 요구 시나리오(기능부품·GF 수지)에서는 Mold(게이트 위치) 원인을 우선 검토 — 비강화 수지(PP·PE 등)는 멜트온도가 웰드 강도의 주요 인자(분자 확산·힐링 지배)다. GF 강화 수지는 멜트온도·금형온도의 강도 기여가 미미하고(연신·외관엔 유효) 보압↑이 강도를 실제로 개선한다. 어느 경우든 조건만으로 모재 수준 회복은 안 된다. 외관 양품 ≠ 강도 OK.',
     source: 'synthesis-1.4,taxonomy-4', confidence: 'high',
+    sourceRefs: [
+      'Polymers (MDPI) 15(20):4102 (2023) — PA6+30%GF: packing pressure dominates weld UTS; melt temp affects elongation, not UTS. Full text verified 2026-07-28',
+      'Wu & Liang (cited in 15:4102 intro) — PP/HDPE: melt temp dominates weld strength. Original full text NOT verified (paywall)',
+      'Jadhav & Gaval et al., J. Thermoplastic Composite Materials (2023) — packing pressure effect on stagnation weld-line strength',
+      'Mokarizadehhaghighishirazi et al., Polymer Composites (2024) — fiber orientation at weld plane',
+    ],
+    verifiedAt: '2026-07-28',
   },
 
   // ─── 5. Air Trap / Burn Mark (에어트랩·버닝) ───────────────
@@ -911,7 +920,7 @@ export function formatDefectGuide(
   }
 
   if (node.id === 'weld_line') {
-    lines.push('★ 강도·파단 요구 시나리오(기능부품·GF/필러 수지)면 금형(게이트 위치 이동·웰드 위치 이동) 대책을 권고 1순위로 명시하라. 멜트온도↑·금형온도↑는 V홈 외관은 개선해도 강도 기여는 미미하다. 보압↑은 웰드라인 강도를 실제로 개선하나, 어느 조건으로도 모재 수준 회복은 안 된다 — 외관 양품 ≠ 강도 OK.');
+    lines.push('★ 강도·파단 요구 시나리오(기능부품·GF/필러 수지)면 금형(게이트 위치 이동·웰드 위치 이동) 대책을 권고 1순위로 명시하라. 비강화 수지(PP·PE 등)는 멜트온도가 웰드 강도의 주요 인자(분자 확산·힐링 지배)다. GF 강화 수지는 멜트온도·금형온도의 강도 기여가 미미하고(연신·외관엔 유효) 보압↑이 강도를 실제로 개선한다. 어느 경우든 조건만으로 모재 수준 회복은 안 된다 — 외관 양품 ≠ 강도 OK.');
   }
 
   if (node.patternHints) {
