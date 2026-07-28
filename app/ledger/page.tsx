@@ -9,6 +9,7 @@ import PrintableMachinePage from '@/components/ledger/PrintableMachinePage';
 import { listMachinesWithCurrent, createMachine, type MachineWithCurrent } from '@/lib/ledger';
 import { exportSectionsToPdf } from '@/lib/pdfExport';
 import { reportClientError } from '@/lib/observability/client';
+import { IconMachine } from '@/components/icons';
 
 function fmtUpdated(iso: string, locale: string): string {
   try {
@@ -244,7 +245,9 @@ export default function LedgerPage() {
                   className="shrink-0 w-14 h-14 rounded-lg object-cover border border-border"
                 />
               ) : (
-                <div className="shrink-0 w-14 h-14 rounded-lg bg-surface-sunken border border-border flex items-center justify-center text-faint text-xl">⚙️</div>
+                <div className="shrink-0 w-14 h-14 rounded-lg bg-surface-sunken border border-border flex items-center justify-center text-faint">
+                  <IconMachine size={24} />
+                </div>
               )}
               <div className="min-w-0 flex-1">
                 <div className="font-semibold text-ink text-body truncate">{m.name}</div>

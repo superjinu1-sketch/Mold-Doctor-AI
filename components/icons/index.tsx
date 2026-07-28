@@ -1,0 +1,119 @@
+// 단색 인라인 SVG 아이콘. currentColor 상속 — 색은 부모 텍스트 색 유틸로 지정한다.
+// 아이콘 라이브러리(lucide-react 등) 미사용 — 번들 크기(Capacitor 로컬 번들) 보호.
+export type IconProps = { className?: string; size?: number };
+
+const base = (size: number) => ({
+  width: size, height: size, viewBox: '0 0 24 24',
+  fill: 'none', stroke: 'currentColor',
+  strokeWidth: 1.75, strokeLinecap: 'round' as const, strokeLinejoin: 'round' as const,
+  'aria-hidden': true, focusable: 'false' as const,
+});
+
+// 작업표준 저장소 — 클립보드 + 가로줄 2개
+export function IconClipboard({ className, size = 20 }: IconProps) {
+  return (
+    <svg {...base(size)} className={className}>
+      <path d="M8 4H6a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2h-2" />
+      <rect x="8" y="2" width="8" height="4" rx="1" />
+      <line x1="8" y1="11" x2="16" y2="11" />
+      <line x1="8" y1="15" x2="16" y2="15" />
+    </svg>
+  );
+}
+
+// 시사출 체크리스트 — 사각형 + 체크
+export function IconCheckSquare({ className, size = 20 }: IconProps) {
+  return (
+    <svg {...base(size)} className={className}>
+      <rect x="3" y="3" width="18" height="18" rx="2" />
+      <polyline points="7 12 10.5 15.5 17 8.5" />
+    </svg>
+  );
+}
+
+// 수지 라이브러리 — 삼각 플라스크
+export function IconFlask({ className, size = 20 }: IconProps) {
+  return (
+    <svg {...base(size)} className={className}>
+      <path d="M9 2v6.5L4.5 18a2 2 0 0 0 1.8 3h11.4a2 2 0 0 0 1.8-3L15 8.5V2" />
+      <line x1="8" y1="2" x2="16" y2="2" />
+      <line x1="7" y1="15" x2="17" y2="15" />
+    </svg>
+  );
+}
+
+// 불량 가이드 — 펼친 책
+export function IconBook({ className, size = 20 }: IconProps) {
+  return (
+    <svg {...base(size)} className={className}>
+      <path d="M4 5.5C4 4.67 4.67 4 5.5 4H11v16H5.5A1.5 1.5 0 0 1 4 18.5v-13z" />
+      <path d="M20 5.5c0-.83-.67-1.5-1.5-1.5H13v16h5.5a1.5 1.5 0 0 0 1.5-1.5v-13z" />
+    </svg>
+  );
+}
+
+// 사진 입력·촬영 — 카메라 바디 + 렌즈 원
+export function IconCamera({ className, size = 20 }: IconProps) {
+  return (
+    <svg {...base(size)} className={className}>
+      <path d="M3 9a2 2 0 0 1 2-2h.93a2 2 0 0 0 1.664-.89l.812-1.22A2 2 0 0 1 10.07 4h3.86a2 2 0 0 1 1.664.89l.812 1.22A2 2 0 0 0 18.07 7H19a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V9z" />
+      <circle cx="12" cy="13" r="3.5" />
+    </svg>
+  );
+}
+
+// 앨범 선택 — 사각형 + 산 + 원
+export function IconImage({ className, size = 20 }: IconProps) {
+  return (
+    <svg {...base(size)} className={className}>
+      <rect x="3" y="4" width="18" height="16" rx="2" />
+      <circle cx="8.5" cy="9.5" r="1.5" />
+      <path d="M3 16.5l5-5a1.5 1.5 0 0 1 2.1 0L15 16.5" />
+      <path d="M13.5 15l2-2a1.5 1.5 0 0 1 2.1 0L21 16.5" />
+    </svg>
+  );
+}
+
+// 팔로업 질문 — 말풍선
+export function IconMessage({ className, size = 20 }: IconProps) {
+  return (
+    <svg {...base(size)} className={className}>
+      <path d="M4 5a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H9l-4 4v-4H6a2 2 0 0 1-2-2V5z" />
+    </svg>
+  );
+}
+
+// 진행 중 팁 — 전구
+export function IconBulb({ className, size = 20 }: IconProps) {
+  return (
+    <svg {...base(size)} className={className}>
+      <path d="M12 3a6 6 0 0 0-3.6 10.8c.5.4.85 1 .95 1.7h5.3c.1-.7.45-1.3.95-1.7A6 6 0 0 0 12 3z" />
+      <path d="M9 18h6" />
+      <path d="M10 21h4" />
+    </svg>
+  );
+}
+
+// 설비(대장 목록) — 사각 본체 + 노즐
+export function IconMachine({ className, size = 20 }: IconProps) {
+  return (
+    <svg {...base(size)} className={className}>
+      <rect x="3" y="7" width="13" height="12" rx="1.5" />
+      <path d="M16 11h3.5a1.5 1.5 0 0 1 1.5 1.5v3a1.5 1.5 0 0 1-1.5 1.5H16" />
+      <line x1="7" y1="7" x2="7" y2="4" />
+      <line x1="12" y1="7" x2="12" y2="4" />
+    </svg>
+  );
+}
+
+// 기록 없음 빈 상태 — 문서 + 접힌 모서리
+export function IconNote({ className, size = 20 }: IconProps) {
+  return (
+    <svg {...base(size)} className={className}>
+      <path d="M7 3h7l5 5v11a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z" />
+      <path d="M14 3v5h5" />
+      <line x1="8.5" y1="12" x2="15.5" y2="12" />
+      <line x1="8.5" y1="16" x2="13" y2="16" />
+    </svg>
+  );
+}

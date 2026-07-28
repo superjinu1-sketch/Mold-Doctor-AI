@@ -36,7 +36,7 @@ const SETTINGS_LABELS: Record<string, string> = {
 };
 
 function ResolvedLabel({ s }: { s?: boolean | string }) {
-  if (s === true || s === 'solved') return <span style={{ color: '#047857', fontWeight: 700 }}>✅ 완전 해결</span>;
+  if (s === true || s === 'solved') return <span style={{ color: '#047857', fontWeight: 700 }}>✓ 완전 해결</span>;
   if (s === 'partial') return <span style={{ color: '#854F0B', fontWeight: 700 }}>△ 부분 개선</span>;
   if (s === 'unsolved') return <span style={{ color: '#B42318', fontWeight: 700 }}>✗ 미해결</span>;
   return null;

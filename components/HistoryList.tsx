@@ -7,6 +7,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { ReportModal } from '@/components/ResolutionReport';
 import SaveAsWorkStandardModal from '@/components/SaveAsWorkStandardModal';
 import { canSaveAsWorkStandard, getLedgerSavedAt, markLedgerSaved } from '@/lib/diagnoseToLedger';
+import { IconCheckSquare } from '@/components/icons';
 import type { HistoryRecord } from '@/lib/history-sync';
 
 function SeverityBadge({ severity }: { severity?: string }) {
@@ -149,7 +150,9 @@ export default function HistoryList({ records }: { records: HistoryRecord[] }) {
             <div className="border-t border-border px-4 pb-4 pt-3 space-y-4">
               {(r.resolved === true || typeof r.resolved === 'string') && (
                 <div className="bg-[var(--ok-bg)] border border-[var(--ok-border)] rounded-xl p-3">
-                  <div className="text-sm font-bold text-ok mb-1">✅ {t('history.resolved_detail')}</div>
+                  <div className="text-sm font-bold text-ok mb-1 flex items-center gap-1.5">
+                    <IconCheckSquare size={16} /> {t('history.resolved_detail')}
+                  </div>
                   <div className="text-sm text-muted">
                     <ResolvedBadge resolved={r.resolved} t={t} />
                     {r.resolvedMemo && <span className="ml-2">{r.resolvedMemo}</span>}

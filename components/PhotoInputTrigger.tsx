@@ -3,6 +3,7 @@
 import { forwardRef, useId, useImperativeHandle, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useLocale } from '@/contexts/LocaleContext';
+import { IconCamera, IconImage } from '@/components/icons';
 
 export interface PhotoInputTriggerHandle {
   open: () => void;
@@ -85,14 +86,14 @@ const PhotoInputTrigger = forwardRef<PhotoInputTriggerHandle, PhotoInputTriggerP
                 onClick={(e) => e.stopPropagation()}
                 className="w-full min-h-[var(--touch-min)] flex items-center justify-center gap-2 rounded-xl border border-border-strong bg-surface-sunken text-ink font-semibold text-body hover:bg-brand-tint transition-colors"
               >
-                📷 {t('photoInput.camera')}
+                <IconCamera size={18} /> {t('photoInput.camera')}
               </label>
               <label
                 htmlFor={albumInputId}
                 onClick={(e) => e.stopPropagation()}
                 className="w-full min-h-[var(--touch-min)] flex items-center justify-center gap-2 rounded-xl border border-border-strong bg-surface-sunken text-ink font-semibold text-body hover:bg-brand-tint transition-colors"
               >
-                🖼️ {t('photoInput.album')}
+                <IconImage size={18} /> {t('photoInput.album')}
               </label>
               <button
                 type="button"

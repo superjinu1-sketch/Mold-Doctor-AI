@@ -63,7 +63,7 @@ export const en: Record<string, string> = {
   'pricing.badge': 'Simple, Transparent Pricing',
   'pricing.h1': 'Buy Credits',
   'pricing.sub': 'Pay only for what you need. 5 free credits on sign-up.',
-  'pricing.recommended_badge': '⭐ Recommended',
+  'pricing.recommended_badge': 'Recommended',
   'pricing.faq_h2': 'Frequently Asked Questions',
   'pricing.cta_h2': 'Start for Free Right Now',
   'pricing.cta_sub': 'No credit card required · 5 free credits instantly on sign-up',
@@ -182,7 +182,7 @@ export const en: Record<string, string> = {
   'step1.type_custom': 'Enter defect type manually',
   'step1.type_custom_required': 'Enter a defect type to start the analysis',
   'step1.classifying': 'AI is analyzing the defect type…',
-  'step1.ai_suggested': '🔍 AI suggestion — keep if correct, or pick below',
+  'step1.ai_suggested': 'AI suggestion — keep if correct, or pick below',
   'step1.classify_error': 'AI auto-detect is temporarily unavailable. Please select the defect type manually.',
   'step1.defect_required_gate': 'Please confirm the defect type (AI suggests one when you upload a photo)',
   'step1.desc_label': 'Defect Description (optional)',
@@ -237,7 +237,7 @@ export const en: Record<string, string> = {
 
   /* STEP 2b: Machine Settings */
   'step3.title': 'Machine Settings',
-  'step3.camera_btn': '📷 Scan Machine Screen to Auto-Fill',
+  'step3.camera_btn': 'Scan Machine Screen to Auto-Fill',
   'step3.camera_btn_count': '— 19 fields',
   'step3.camera_hint': 'Click · drag · Ctrl+V · camera — auto-fills 19 fields',
   'step3.camera_loading': 'Reading settings...',

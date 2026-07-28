@@ -14,6 +14,7 @@ import { authHeaders } from '@/lib/supabase/authHeader';
 import { downscaleImageClient, safeLocalStorageSet } from '@/lib/clientDownscale';
 import { apiFetch } from '@/lib/apiBase';
 import { saveDiagnosisRecord, updateResolution, patchRecordFields, type HistoryRecord } from '@/lib/history-sync';
+import { IconClipboard, IconCamera } from '@/components/icons';
 
 // --- Types ---
 interface ImageFile {
@@ -665,7 +666,7 @@ function DiagnoseContent() {
       : { tone: 'brand', text: t('grade.filled') });
   };
 
-  // 📷 포대 라벨 사진 OCR → 그레이드명 인식 + 자동채움 (extract-grade)
+  // 포대 라벨 사진 OCR → 그레이드명 인식 + 자동채움 (extract-grade)
   const handleLabelImage = async (file: File) => {
     if (!file.type.startsWith('image/') || gradeImgBusy) return;
     setGradeImgBusy(true);
@@ -1201,8 +1202,8 @@ function DiagnoseContent() {
       {/* 지난 기록 진입점 — 1건 이상 있을 때만 노출 */}
       {historyCount > 0 && (
         <div className="mb-4 flex items-center justify-between bg-brand-tint border border-[var(--brand-border)] rounded-xl px-4 py-3">
-          <span className="text-brand-ink text-sm font-semibold">
-            📋 {t('history.recent_n')} {historyCount}{locale === 'en' ? '' : '건'}
+          <span className="text-brand-ink text-sm font-semibold flex items-center gap-1.5">
+            <IconClipboard size={16} className="shrink-0" /> {t('history.recent_n')} {historyCount}{locale === 'en' ? '' : '건'}
           </span>
           <Link href="/history"
             className="text-brand-ink text-sm font-bold hover:underline min-h-[44px] flex items-center">
@@ -1388,14 +1389,14 @@ function DiagnoseContent() {
         <FormSection step={2} title={t('step2.title')} open={openSection === 2}
           complete={!!(resinType || customResin)}
           onToggle={() => setOpenSection(s => (s === 2 ? null : 2))}>
-          {/* 📷 포대 라벨 사진 자동 입력 */}
+          {/* 포대 라벨 사진 자동 입력 */}
           <button
             type="button"
             onClick={() => gradeImageRef.current?.open()}
             disabled={gradeImgBusy}
             className="w-full mb-3 flex items-center justify-center gap-2 min-h-[var(--touch-cta)] rounded-xl border border-border-strong bg-surface-sunken text-ink font-semibold text-body hover:bg-surface disabled:opacity-50 transition-colors"
           >
-            {gradeImgBusy ? t('grade.photo_busy') : `📷 ${t('grade.label_button')}`}
+            {gradeImgBusy ? t('grade.photo_busy') : <><IconCamera size={18} /> {t('grade.label_button')}</>}
           </button>
           <PhotoInputTrigger
             ref={gradeImageRef}

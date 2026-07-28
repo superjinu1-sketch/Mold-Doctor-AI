@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { useLocale } from '@/contexts/LocaleContext';
 import { useAuth } from '@/contexts/AuthContext';
+import { IconClipboard, IconCheckSquare, IconFlask } from '@/components/icons';
 
 export default function HomePage() {
   const { t, locale } = useLocale();
@@ -44,13 +45,13 @@ export default function HomePage() {
                     href="/ledger"
                     className="min-h-[var(--touch-cta)] flex items-center justify-center gap-1.5 border-2 border-[var(--on-brand)] text-on-brand hover:bg-brand-ink rounded-full text-sm font-bold px-2 text-center transition-colors"
                   >
-                    <span aria-hidden>📋</span> {t('landing.tool_ledger_title')}
+                    <IconClipboard className="shrink-0" /> {t('landing.tool_ledger_title')}
                   </Link>
                   <Link
                     href="/tryout"
                     className="min-h-[var(--touch-cta)] flex items-center justify-center gap-1.5 border-2 border-[var(--on-brand)] text-on-brand hover:bg-brand-ink rounded-full text-sm font-bold px-2 text-center transition-colors"
                   >
-                    <span aria-hidden>✅</span> {t('landing.tool_tryout_title')}
+                    <IconCheckSquare className="shrink-0" /> {t('landing.tool_tryout_title')}
                   </Link>
                 </div>
                 <Link href="/tools" className="text-on-brand/80 hover:text-on-brand text-label text-center underline underline-offset-2 min-h-[44px] flex items-center justify-center">{t('landing.tools_all_link')}</Link>
@@ -87,19 +88,19 @@ export default function HomePage() {
           {/* 무료 도구 — 작업표준 저장소 + 시사출 체크리스트 + 수지 라이브러리 */}
           <h2 className="text-h3 font-bold text-ink mt-10 mb-4">{t('landing.free_tools_title')}</h2>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-            <Link href="/ledger" className="ui-card p-4 flex flex-col items-start gap-1 hover:border-[var(--brand-border)] transition-colors">
-              <span className="text-2xl" aria-hidden>📋</span>
-              <span className="font-bold text-ink text-body">{t('landing.tool_ledger_title')}</span>
+            <Link href="/ledger" className="ui-card p-4 h-full flex flex-col items-start gap-1 hover:border-[var(--brand-border)] transition-colors">
+              <IconClipboard size={24} className="text-brand" />
+              <span className="font-bold text-ink text-body break-keep">{t('landing.tool_ledger_title')}</span>
               <span className="text-muted text-label leading-snug">{t('landing.tool_ledger_desc')}</span>
             </Link>
-            <Link href="/tryout" className="ui-card p-4 flex flex-col items-start gap-1 hover:border-[var(--brand-border)] transition-colors">
-              <span className="text-2xl" aria-hidden>✅</span>
-              <span className="font-bold text-ink text-body">{t('landing.tool_tryout_title')}</span>
+            <Link href="/tryout" className="ui-card p-4 h-full flex flex-col items-start gap-1 hover:border-[var(--brand-border)] transition-colors">
+              <IconCheckSquare size={24} className="text-brand" />
+              <span className="font-bold text-ink text-body break-keep">{t('landing.tool_tryout_title')}</span>
               <span className="text-muted text-label leading-snug">{t('landing.tool_tryout_desc')}</span>
             </Link>
-            <Link href={locale === 'en' ? '/en/resins' : '/resins'} className="ui-card p-4 flex flex-col items-start gap-1 hover:border-[var(--brand-border)] transition-colors">
-              <span className="text-2xl" aria-hidden>🧪</span>
-              <span className="font-bold text-ink text-body">{t('landing.tool_resins_title')}</span>
+            <Link href={locale === 'en' ? '/en/resins' : '/resins'} className="ui-card p-4 h-full flex flex-col items-start gap-1 hover:border-[var(--brand-border)] transition-colors">
+              <IconFlask size={24} className="text-brand" />
+              <span className="font-bold text-ink text-body break-keep">{t('landing.tool_resins_title')}</span>
               <span className="text-muted text-label leading-snug">{t('landing.tool_resins_desc')}</span>
             </Link>
           </div>

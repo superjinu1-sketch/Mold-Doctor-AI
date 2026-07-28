@@ -63,7 +63,7 @@ export const ko: Record<string, string> = {
   'pricing.badge': '간단하고 투명한 가격',
   'pricing.h1': '크레딧 충전',
   'pricing.sub': '필요한 만큼만. 가입하면 5크레딧 무료.',
-  'pricing.recommended_badge': '⭐ 추천 플랜',
+  'pricing.recommended_badge': '추천 플랜',
   'pricing.faq_h2': '자주 묻는 질문',
   'pricing.cta_h2': '지금 바로 무료로 시작하세요',
   'pricing.cta_sub': '신용카드 불필요 · 가입 즉시 5크레딧 무료',
@@ -182,7 +182,7 @@ export const ko: Record<string, string> = {
   'step1.type_custom': '불량 유형 직접 입력',
   'step1.type_custom_required': '유형을 입력해야 분석을 시작할 수 있어요',
   'step1.classifying': 'AI가 불량 유형 분석 중…',
-  'step1.ai_suggested': '🔍 AI 추정 — 맞으면 그대로, 다르면 아래에서 선택',
+  'step1.ai_suggested': 'AI 추정 — 맞으면 그대로, 다르면 아래에서 선택',
   'step1.classify_error': 'AI 자동 추정을 일시적으로 할 수 없습니다. 불량 유형을 직접 선택해 주세요.',
   'step1.defect_required_gate': '불량 유형을 확정해 주세요 (사진 업로드 시 AI가 제안합니다)',
   'step1.desc_label': '불량 상황 설명 (선택)',
@@ -237,7 +237,7 @@ export const ko: Record<string, string> = {
 
   /* STEP 2b: Machine Settings */
   'step3.title': '사출기 셋팅값',
-  'step3.camera_btn': '📷 사출기 화면 찍어 자동 입력',
+  'step3.camera_btn': '사출기 화면 찍어 자동 입력',
   'step3.camera_btn_count': '— 19개 항목',
   'step3.camera_hint': '클릭·드래그·Ctrl+V·카메라 · 19개 항목 자동 채움',
   'step3.camera_loading': '셋팅값 읽는 중...',

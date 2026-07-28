@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { useLocale } from '@/contexts/LocaleContext';
+import { IconBulb } from '@/components/icons';
 
 // T_avg 실측: 2026-07-08 프로덕션 코드경로(EVAL 키 격리 dev 서버, /api/diagnose 직접 호출) 3건 평균 58,562ms
 // (case-001 56,416ms · case-006 54,648ms · case-007 64,622ms). τ = T_avg/2.
@@ -113,9 +114,9 @@ export default function DiagnoseProgress({ isLoading, hasResult, hasPhoto, onExi
       </ul>
 
       <p
-        className={`text-muted text-base leading-relaxed border-t border-border pt-4 ${reducedMotion ? '' : 'transition-opacity duration-200'} ${tipVisible ? 'opacity-100' : 'opacity-0'}`}
+        className={`text-muted text-base leading-relaxed border-t border-border pt-4 flex items-start gap-2 ${reducedMotion ? '' : 'transition-opacity duration-200'} ${tipVisible ? 'opacity-100' : 'opacity-0'}`}
       >
-        💡 {t(`progress.tip${tipIndex}`)}
+        <IconBulb size={16} className="shrink-0 mt-0.5" /> {t(`progress.tip${tipIndex}`)}
       </p>
     </div>
   );

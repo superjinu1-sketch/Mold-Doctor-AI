@@ -6,6 +6,7 @@ import { useLocale } from '@/contexts/LocaleContext';
 import { authHeaders } from '@/lib/supabase/authHeader';
 import { downscaleImageClient } from '@/lib/clientDownscale';
 import { apiFetch } from '@/lib/apiBase';
+import { IconMessage, IconCamera, IconCheckSquare, IconNote } from '@/components/icons';
 
 interface DiagnosisResult {
   defect_type: { ko: string; en: string };
@@ -214,7 +215,7 @@ function ChatSection({
       <div className="px-4 sm:px-6 pt-5 pb-3 border-b border-border">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <span className="text-lg">💬</span>
+            <IconMessage size={18} />
             <span className="font-bold text-ink text-sm sm:text-base">{t('chat.title')}</span>
           </div>
           <span className="text-[length:var(--text-label)] text-faint">{badgeText}</span>
@@ -463,7 +464,7 @@ export default function DiagnosisResultPanel({ result, onSavePDF, round = 1, fol
   if (defectTypeEn === 'Image_Unreadable') {
     return (
       <div className="bg-surface-solid border border-[var(--warn-border)] rounded-2xl p-6 sm:p-8 text-center space-y-4">
-        <div className="text-5xl">📷</div>
+        <IconCamera size={40} className="mx-auto text-faint" />
         <h2 className="text-lg font-bold text-warn">{t('fallback.unreadable_title')}</h2>
         <p className="text-muted text-base leading-relaxed">
           {t('fallback.unreadable_body')}<br />
@@ -482,7 +483,7 @@ export default function DiagnosisResultPanel({ result, onSavePDF, round = 1, fol
   if (defectTypeEn === 'No_Defect_Detected') {
     return (
       <div className="bg-surface-solid border border-[var(--brand-border)] rounded-2xl p-6 sm:p-8 text-center space-y-4">
-        <div className="text-5xl">✅</div>
+        <IconCheckSquare size={40} className="mx-auto text-ok" />
         <h2 className="text-lg font-bold text-brand-ink">{t('fallback.nodefect_title')}</h2>
         <p className="text-muted text-base leading-relaxed">
           {t('fallback.nodefect_body')}
@@ -500,7 +501,7 @@ export default function DiagnosisResultPanel({ result, onSavePDF, round = 1, fol
   if (defectTypeEn === 'Insufficient_Input') {
     return (
       <div className="bg-surface-solid border border-border rounded-2xl p-6 sm:p-8 text-center space-y-4">
-        <div className="text-5xl">📝</div>
+        <IconNote size={40} className="mx-auto text-faint" />
         <h2 className="text-lg font-bold text-ink">
           {locale === 'en' ? 'More Information Needed' : '추가 정보가 필요합니다'}
         </h2>
@@ -1006,7 +1007,7 @@ export default function DiagnosisResultPanel({ result, onSavePDF, round = 1, fol
                     onClick={() => afterPhotoRef.current?.click()}
                     className="w-full flex items-center gap-2 bg-surface-sunken border border-border rounded-xl px-3 py-3 text-muted text-sm font-medium hover:border-[var(--brand-border)] transition-colors min-h-[44px]"
                   >
-                    <span>📷</span>
+                    <IconCamera size={16} />
                     <span>{afterPhoto ? t('history.after_photo') + ' ✓' : t('history.after_photo_label')}</span>
                   </button>
                   <p className="text-faint text-xs mt-1 px-1">{t('history.after_photo_help')}</p>
