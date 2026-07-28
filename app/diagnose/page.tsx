@@ -15,6 +15,7 @@ import { downscaleImageClient, safeLocalStorageSet } from '@/lib/clientDownscale
 import { apiFetch } from '@/lib/apiBase';
 import { saveDiagnosisRecord, updateResolution, patchRecordFields, type HistoryRecord } from '@/lib/history-sync';
 import { IconClipboard, IconCamera } from '@/components/icons';
+import { SAMPLE_CASES } from '@/lib/sampleCase';
 
 // --- Types ---
 interface ImageFile {
@@ -167,21 +168,6 @@ const RESIN_OPTIONS = [
   { group: '기타', groupKey: 'resin.group.other', options: ['기타 (직접 입력)'] },
 ];
 
-const SAMPLE_CASES = [
-  {
-    label: 'PA66 GF33%', defectTypeKey: 'defect.silver_streak',
-    defectType: '은줄 (Silver Streak)',
-    defectDescription: '제품 표면에 은색 줄무늬 발생. 5샷에 1번꼴, 게이트 부근에서 시작됨.',
-    resinType: 'PA66', filler: 'GF(유리섬유)', fillerContent: '33', flameRetardant: '없음', flameRetardantThickness: '미입력', flameRetardantType: '해당없음', resinDetail: 'PA66 GF33%', resinGrade: '',
-    nozzleTemp: '285', zone1Temp: '280', zone2Temp: '275', zone3Temp: '265', zone4Temp: '255',
-    moldTempFixed: '80', moldTempMoving: '80', injPressure1: '120', holdPressure: '80',
-    injSpeed1: '60', injSpeed2: '40', holdTime: '8', coolTime: '15', injTime: '3',
-    metering: '85', cushion: '5', backPressure: '5', screwRpm: '80', clampForce: '', pressureUnit: 'MPa',
-    moldType: '2판', gateType: '사이드', cavities: '4', runnerType: '콜드', weight: '45', wallThicknessMin: '1.5', wallThicknessMax: '3.0',
-  },
-];
-
-
 // 폼 상태 sessionStorage 방어선 — 리마운트/새로고침/토큰 리프레시로 인한 입력 소실 방지
 const FORM_SS_KEY = 'molddoctor_form_v1';
 
@@ -207,6 +193,12 @@ function FormSection({ step, title, open, complete, optional = false, onToggle, 
     </section>
   );
 }
+
+// 샘플 데모 판정용 이미지 식별자 — 샘플 자체는 사진을 제공하지 않으므로(loadSample 참조)
+// "이미지 없음"이 기준값이다. 파일명+크기+lastModified 조합으로 원본 바이너리 해싱 없이
+// "샘플 로드 후 사진만 교체" 우회를 currentSnapshot 비교에서 잡아낸다(v13-backlog-bundle-v1 D항).
+const imageIdentity = (imgs: ImageFile[]) =>
+  imgs.map(img => `${img.file.name}|${img.file.size}|${img.file.lastModified}`).join(',');
 
 // --- Main Diagnose Content ---
 function DiagnoseContent() {
@@ -875,6 +867,8 @@ function DiagnoseContent() {
       nozzleTemp: d.nozzleTemp, zone1Temp: d.zone1Temp, zone2Temp: d.zone2Temp,
       moldTempFixed: d.moldTempFixed, injPressure1: d.injPressure1, holdPressure: d.holdPressure,
       injSpeed1: d.injSpeed1, holdTime: d.holdTime, coolTime: d.coolTime,
+      // 샘플 로드 시점의 이미지 상태를 기준값으로 고정(샘플은 사진 미제공 → 통상 빈 문자열).
+      images: imageIdentity(images),
     }));
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
@@ -904,6 +898,8 @@ function DiagnoseContent() {
       nozzleTemp: settings.nozzleTemp, zone1Temp: settings.zone1Temp, zone2Temp: settings.zone2Temp,
       moldTempFixed: settings.moldTempFixed, injPressure1: settings.injPressure1, holdPressure: settings.holdPressure,
       injSpeed1: settings.injSpeed1, holdTime: settings.holdTime, coolTime: settings.coolTime,
+      // 샘플 로드 후 사진만 교체하는 우회 차단 — 이미지가 달라지면 스냅샷도 달라져 isDemo가 false로 떨어진다.
+      images: imageIdentity(images),
     });
     const isDemo = demoSnapshot !== null && currentSnapshot === demoSnapshot;
 

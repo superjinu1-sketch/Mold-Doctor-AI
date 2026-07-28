@@ -24,6 +24,21 @@ export const en: Record<string, string> = {
   'landing.tool_resins_title': 'Resin Library',
   'landing.tool_resins_desc': 'Drying, melt temp, shrinkage — field reference',
   'landing.tools_all_link': 'View all free tools →',
+
+  /* ── Free tools hub (/tools) ───────────────────────────── */
+  'tools.h1': 'Free Tools for the Shop Floor',
+  'tools.subtitle': 'All free, no credits used',
+  'tools.ledger_title': 'Work Standard Storage',
+  'tools.ledger_desc': 'Save work standards per machine, print for the floor',
+  'tools.tryout_title': 'Trial-Run Checklist',
+  'tools.tryout_desc': 'Standard template, shot log, PDF report',
+  'tools.resins_title': 'Resin Library',
+  'tools.resins_desc': '52 resins — drying, temperature, shrinkage reference',
+  'tools.guide_title': 'Defect Guide',
+  'tools.guide_desc': 'Causes and fixes by defect type',
+  'tools.cta_title': 'Curious about the cause? — AI estimate',
+  'tools.cta_button': 'Start free estimate',
+
   'footer.guide': 'Defect Guide',
   'footer.privacy': 'Privacy Policy',
   'footer.terms': 'Terms of Service',

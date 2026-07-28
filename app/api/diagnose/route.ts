@@ -6,6 +6,7 @@ import { getResinSpec, checkSettings, formatKbCompare } from '@/lib/resin-kb';
 import { formatDefectGuide } from '@/lib/defect-kb';
 import { supabaseAdmin } from '@/lib/supabase/server';
 import { getSampleDemo } from '@/lib/sample-demo';
+import { matchesSampleCase } from '@/lib/sampleCase';
 import { reportError } from '@/lib/observability/server';
 import { checkMinVersion } from '@/lib/appVersionGate';
 
@@ -452,7 +453,9 @@ export async function POST(request: NextRequest) {
     }
 
     // ── 샘플 무료 체험 데모: 인증·크레딧·Anthropic 호출 없이 고정 결과 반환 ──
-    if (body?.isDemo === true) {
+    // 클라이언트가 보낸 isDemo:true를 그대로 신뢰하지 않는다 — 알려진 샘플 입력(설정값·사진 없음)과
+    // 정확히 일치할 때만 무료 통과. 불일치(예: 샘플 로드 후 사진만 교체)는 아래 정규 인증·크레딧 경로로 흘려보낸다.
+    if (body?.isDemo === true && matchesSampleCase(body)) {
       return NextResponse.json(getSampleDemo(body.locale), {
         headers: { 'X-Diagnosis-Tier': 'simple', 'X-Diagnosis-Round': '1', 'X-Demo': '1' },
         // X-Session-Id 없음(데모는 세션 미생성) → 클라가 팔로업 비활성 처리

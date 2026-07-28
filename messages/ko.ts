@@ -24,6 +24,21 @@ export const ko: Record<string, string> = {
   'landing.tool_resins_title': '수지 라이브러리',
   'landing.tool_resins_desc': '건조·사출온도·수축률 현장 요약',
   'landing.tools_all_link': '무료 도구 전체 보기 →',
+
+  /* ── 무료 도구 허브(/tools) ───────────────────────────── */
+  'tools.h1': '현장을 위한 무료 도구',
+  'tools.subtitle': '전부 무료, 크레딧 소모 없음',
+  'tools.ledger_title': '작업표준 저장소',
+  'tools.ledger_desc': '설비별 작업표준 저장·현장 부착 PDF',
+  'tools.tryout_title': '시사출 체크리스트',
+  'tools.tryout_desc': '표준 템플릿·샷 로그·리포트 PDF',
+  'tools.resins_title': '수지 라이브러리',
+  'tools.resins_desc': '52종 건조·온도·수축률 현장 요약',
+  'tools.guide_title': '불량 가이드',
+  'tools.guide_desc': '불량 유형별 원인·대처',
+  'tools.cta_title': '불량 원인이 궁금하면 — AI 추정',
+  'tools.cta_button': '무료로 추정 시작',
+
   'footer.guide': '불량 가이드',
   'footer.privacy': '개인정보처리방침',
   'footer.terms': '이용약관',

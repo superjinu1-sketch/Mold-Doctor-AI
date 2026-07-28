@@ -9,7 +9,8 @@ import { en } from '@/messages/en';
 // 기존 locale 토글 상태와 무관하게 URL 경로가 표시 언어를 결정 — 크롤러가 보는 SSR HTML도 항상 정확.
 export default function Footer() {
   const pathname = usePathname();
-  const m = pathname?.startsWith('/en') ? en : ko;
+  const isEn = pathname?.startsWith('/en') ?? false;
+  const m = isEn ? en : ko;
 
   return (
     <footer className="border-t border-border bg-canvas py-10 mt-auto">
@@ -17,8 +18,8 @@ export default function Footer() {
         <nav className="flex flex-wrap items-center justify-center gap-x-4 gap-y-2 mb-6 text-center">
           <Link href="/ledger" className="text-faint text-xs hover:text-muted transition-colors">{m['landing.tool_ledger_title']}</Link>
           <Link href="/tryout" className="text-faint text-xs hover:text-muted transition-colors">{m['landing.tool_tryout_title']}</Link>
-          <Link href="/resins" className="text-faint text-xs hover:text-muted transition-colors">{m['landing.tool_resins_title']}</Link>
-          <Link href="/guide" className="text-faint text-xs hover:text-muted transition-colors">{m['footer.guide']}</Link>
+          <Link href={isEn ? '/en/resins' : '/resins'} className="text-faint text-xs hover:text-muted transition-colors">{m['landing.tool_resins_title']}</Link>
+          <Link href={isEn ? '/en/guide' : '/guide'} className="text-faint text-xs hover:text-muted transition-colors">{m['footer.guide']}</Link>
         </nav>
         <div className="flex flex-col md:flex-row items-center justify-between gap-4">
           <Link href="/" className="flex items-center gap-2 font-bold">
