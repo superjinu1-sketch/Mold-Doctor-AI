@@ -862,13 +862,18 @@ function DiagnoseContent() {
     setWeight(d.weight);
     setWallThicknessMin(d.wallThicknessMin);
     setWallThicknessMax(d.wallThicknessMax);
+    // 샘플은 사진을 제공하지 않는다 — 로드 전 이미 올라와 있던 사진이 있으면 데모 기준값에
+    // 그대로 박혀 무로그인 사용자가 서버 판정(images 없어야 함)에서 401을 맞는 사고가 났었다.
+    // 반드시 비운다(D항 엣지케이스 실측). setState는 비동기라 images/moldDrawings state를 그대로
+    // imageIdentity에 넘기면 리셋 전 값을 읽으므로, 기준값은 imageIdentity([])로 명시한다.
+    setImages([]);
+    setMoldDrawings([]);
     setDemoSnapshot(JSON.stringify({
       defectType: d.defectType, resinType: d.resinType,
       nozzleTemp: d.nozzleTemp, zone1Temp: d.zone1Temp, zone2Temp: d.zone2Temp,
       moldTempFixed: d.moldTempFixed, injPressure1: d.injPressure1, holdPressure: d.holdPressure,
       injSpeed1: d.injSpeed1, holdTime: d.holdTime, coolTime: d.coolTime,
-      // 샘플 로드 시점의 이미지 상태를 기준값으로 고정(샘플은 사진 미제공 → 통상 빈 문자열).
-      images: imageIdentity(images),
+      images: imageIdentity([]),
     }));
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
