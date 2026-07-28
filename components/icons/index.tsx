@@ -46,8 +46,8 @@ export function IconFlask({ className, size = 20 }: IconProps) {
 export function IconBook({ className, size = 20 }: IconProps) {
   return (
     <svg {...base(size)} className={className}>
-      <path d="M4 5.5C4 4.67 4.67 4 5.5 4H11v16H5.5A1.5 1.5 0 0 1 4 18.5v-13z" />
-      <path d="M20 5.5c0-.83-.67-1.5-1.5-1.5H13v16h5.5a1.5 1.5 0 0 0 1.5-1.5v-13z" />
+      <path d="M3 5.5s2-1.2 4.5-1.2S12 6 12 6s2-1.7 4.5-1.7S21 5.5 21 5.5v13s-2-1.2-4.5-1.2S12 19 12 19s-2-1.7-4.5-1.7S3 18.5 3 18.5v-13z" />
+      <path d="M12 6v13" />
     </svg>
   );
 }
