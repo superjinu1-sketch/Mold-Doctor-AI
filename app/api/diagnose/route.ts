@@ -2,7 +2,7 @@ import Anthropic from '@anthropic-ai/sdk';
 import { NextRequest, NextResponse } from 'next/server';
 import { downscaleBase64 } from '@/lib/downscale';
 import { tryMock } from '@/lib/mock';
-import { getResinSpec, checkSettings, formatKbCompare } from '@/lib/resin-kb';
+import { getResinSpec, checkSettings, formatKbCompare, formatMechanism } from '@/lib/resin-kb';
 import { formatDefectGuide } from '@/lib/defect-kb';
 import { supabaseAdmin } from '@/lib/supabase/server';
 import { getSampleDemo } from '@/lib/sample-demo';
@@ -606,6 +606,9 @@ export async function POST(request: NextRequest) {
     const kbCompare = resinSpec
       ? formatKbCompare(resinSpec, checkSettings(resinSpec, s, a, resinInfo?.filler))
       : '';
+    // 수지 심층 KB Phase 0(resin-mechanism-schema-v1) — mechanism 필드가 채워진 수지만 텍스트 반환,
+    // 현재는 52종 전부 미채움이라 항상 빈 문자열(0토큰, 기존 동작 무영향). 값은 Phase 1에서 채워진다.
+    const mechanismText = resinSpec ? formatMechanism(resinSpec) : '';
     const defectGuide = formatDefectGuide(
       defectType || '',
       resinSpec,
@@ -813,7 +816,7 @@ ${(productInfo?.weight || productInfo?.wallThicknessMin || productInfo?.wallThic
 - 벽 두께: ${productInfo?.wallThicknessMin || '-'}~${productInfo?.wallThicknessMax || '-'}mm
 - 특이사항: ${productInfo?.notes || '없음'}
 ` : ''}
-${defectGuide ? `${defectGuide}\n\n` : ''}${moldMachineGuard ? `${moldMachineGuard}\n\n` : ''}${defectTempGuard ? `${defectTempGuard}\n\n` : ''}${tempOrderGuard ? `${tempOrderGuard}\n\n` : ''}${surfaceDepositGuard ? `${surfaceDepositGuard}\n\n` : ''}${depositGuide ? `${depositGuide}\n\n` : ''}${kbCompare ? `${kbCompare}\n\n` : ''}
+${defectGuide ? `${defectGuide}\n\n` : ''}${moldMachineGuard ? `${moldMachineGuard}\n\n` : ''}${defectTempGuard ? `${defectTempGuard}\n\n` : ''}${tempOrderGuard ? `${tempOrderGuard}\n\n` : ''}${surfaceDepositGuard ? `${surfaceDepositGuard}\n\n` : ''}${depositGuide ? `${depositGuide}\n\n` : ''}${kbCompare ? `${kbCompare}\n\n` : ''}${mechanismText ? `${mechanismText}\n\n` : ''}
 
 ${isFollowUp && previousDiagnosis ? `
 ## 후속 추정 정보 (${round}차 Follow-up)

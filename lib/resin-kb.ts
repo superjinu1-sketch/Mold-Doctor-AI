@@ -12,6 +12,48 @@ export type DefectKey =
   | 'flash' | 'short_shot' | 'sink_mark' | 'weld_line' | 'burn_mark'
   | 'flow_mark' | 'jetting' | 'silver_streak' | 'warpage';
 
+// ── 수지 심층 KB Phase 0 (스키마만, 값은 미채움 — resin-mechanism-schema-v1) ──
+// 절대 규칙: 어떤 수지에도 mechanism/moldInteraction 값을 채우지 마라. AI 지식으로 채우는 것이
+// 이 로드맵이 고치려는 실수 그 자체다. 값은 Phase 1에서 공급사 TDS·문헌 검증 후 코워크가 하나씩 넘긴다.
+//
+// 필드별로 바뀌는 진단(로드맵 제1원칙 — 진단 분기를 바꾸는 필드만 추가):
+//   moistureMode          hydrolysis 수지(PC·PBT 등)의 습기 성형품 → "재건조로 회복 불가, 로트 물성 손상"
+//                         안내. plasticization(PA)과 구분
+//   polymerizationClass   가수분해 리스크의 기전적 파생(축중합=물이 부산물=역반응). moistureMode
+//                         정합성 검사용 — addition인데 hydrolysis면 데이터 오류(콘솔 경고, formatMechanism 참조)
+//   residualMonomerRisk   plate-out·금형 퇴적·가스 불량의 재료 기인 분기(PA6→카프로락탐, POM→포름알데히드)
+//   mwdSensitivity        협폭(메탈로센계)=전단박화 작음 → 충전 개선에 속도↑가 안 먹히는 이유
+//   lotVariationNotes     "조건 무변경 + 간헐·로트성 발생" → 재료 로트 축 확인 항목
+//   crystallizationRate   fast(POM·PBT) 싱크 → 보압시간보다 게이트 동결 선검토
+//   viscositySensitivity  충전 불량에서 온도↑ vs 속도↑ 선택
+//   residenceSensitivity  high(POM·PVC·난연) 흑점·변색 → 체류시간 원인 가중
+//   shrinkageAnisotropy   GF 휨 → 배향(게이트 위치) 원인 우선
+//   ventingDemand         번마크·미성형 → 벤트 원인 가중
+//   corrosivity           반복 불량 → 금형 손상 가능성 언급
+export interface ResinMechanism {
+  moistureMode?: 'hydrolysis' | 'plasticization' | 'both' | 'none';
+  crystallizationRate?: 'fast' | 'medium' | 'slow';
+  viscositySensitivity?: 'temp-dominant' | 'shear-dominant' | 'balanced';
+  residenceSensitivity?: 'high' | 'medium' | 'low';
+  // ── 업스트림·중합 레이어 ──
+  polymerizationClass?: 'condensation' | 'addition' | 'ring-opening';
+  residualMonomerRisk?: { monomer: string; consequence: string };  // 영문
+  mwdSensitivity?: 'broad' | 'narrow' | 'grade-dependent';
+  lotVariationNotes?: string;  // 영문 — "조건 무변경+간헐 발생" 시나리오용
+  notes?: string;              // 영문, 프롬프트 주입용 기전 특이사항
+  sourceRefs?: string[];       // defect-kb와 동일 규율 — 실제 문헌·TDS 인용. 프롬프트엔 절대 미포함
+  verifiedAt?: string;         // ISO date
+}
+
+export interface MoldInteraction {
+  shrinkageAnisotropy?: { flow: [number, number]; transverse: [number, number] };
+  ventingDemand?: 'high' | 'medium' | 'low';
+  corrosivity?: 'none' | 'moderate' | 'high';
+  gateSensitivity?: string;    // 영문
+  sourceRefs?: string[];
+  verifiedAt?: string;
+}
+
 export interface ResinSpec {
   id: string;
   tier: Tier;
@@ -25,6 +67,8 @@ export interface ResinSpec {
   notes: string;
   source: 'experience' | 'verified';
   confidence: 'estimated' | 'verified';
+  mechanism?: ResinMechanism;
+  moldInteraction?: MoldInteraction;
 }
 
 // 키는 기존 resinKnowledge(route.ts) 키와 동일하게 유지 → UI/lookup 호환
@@ -477,4 +521,44 @@ export function formatKbCompare(spec: ResinSpec, checks: SettingCheck[]): string
   return `## 가공윈도우 사전 대조 (KB 기준, 참고용)
 ${lines}${flagNote}
 ※ 일반 가공윈도우 기준이다. 등급·충전재·벽두께에 따라 적정값이 달라질 수 있어 절대 기준이 아니다. 최종 판단은 전체 맥락으로 하라.`;
+}
+
+const MOISTURE_MODE_LABEL: Record<NonNullable<ResinMechanism['moistureMode']>, string> = {
+  hydrolysis: 'hydrolysis (chain scission — properties do NOT recover after re-drying)',
+  plasticization: 'plasticization (properties recover after re-drying)',
+  both: 'both hydrolysis and plasticization',
+  none: 'none (not moisture-sensitive)',
+};
+
+// mechanism KB(Phase 1에서 문헌 검증 후 채움) → 프롬프트 주입용 텍스트.
+// 검증된 필드가 있는 수지만 텍스트를 반환 — mechanism 미채움(현재 52종 전부)이면 빈 문자열(0토큰).
+// sourceRefs·verifiedAt은 개발자 메타데이터라 프롬프트에 절대 포함하지 않는다(defect-kb와 동일 규율).
+export function formatMechanism(spec: ResinSpec): string {
+  const m = spec.mechanism;
+  if (!m) return '';
+
+  // 모순 감지: addition(부가중합)인데 hydrolysis(가수분해)는 기전적으로 성립하지 않는다 —
+  // 가수분해는 축중합(condensation) 계열의 특징(에스터·아미드 결합이 물로 역가수분해). 데이터 오류 가능성.
+  if (m.polymerizationClass === 'addition' && (m.moistureMode === 'hydrolysis' || m.moistureMode === 'both')) {
+    console.warn(
+      `[resin-kb] ${spec.id}: polymerizationClass='addition'인데 moistureMode='${m.moistureMode}' — ` +
+      `가수분해는 축중합(condensation) 계열 특성이라 모순 가능성. mechanism 데이터를 확인하라.`
+    );
+  }
+
+  const lines: string[] = [];
+  if (m.moistureMode) lines.push(`- Moisture mode: ${MOISTURE_MODE_LABEL[m.moistureMode]}`);
+  if (m.crystallizationRate) lines.push(`- Crystallization rate: ${m.crystallizationRate}`);
+  if (m.viscositySensitivity) lines.push(`- Viscosity sensitivity: ${m.viscositySensitivity}`);
+  if (m.residenceSensitivity) lines.push(`- Residence time sensitivity: ${m.residenceSensitivity}`);
+  if (m.polymerizationClass) lines.push(`- Polymerization class: ${m.polymerizationClass}`);
+  if (m.residualMonomerRisk) lines.push(`- Residual monomer risk: ${m.residualMonomerRisk.monomer} — ${m.residualMonomerRisk.consequence}`);
+  if (m.mwdSensitivity) lines.push(`- MWD sensitivity: ${m.mwdSensitivity}`);
+  if (m.lotVariationNotes) lines.push(`- Lot variation: ${m.lotVariationNotes}`);
+  if (m.notes) lines.push(`- Notes: ${m.notes}`);
+
+  if (lines.length === 0) return '';
+
+  return `[Resin mechanism — ${spec.id}]
+${lines.join('\n')}`;
 }
