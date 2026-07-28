@@ -1572,5 +1572,34 @@
       "hallucination_forbidden": ["다캐비티/러너 밸런스", "핫러너", "게이트 2개 이상", "밸브게이트"],
       "trap": "보스 후육·냉각 공백을 못 읽고 건조·온도 일반론으로 가면 오진."
     }
+  },
+  {
+    "id": "pp-weldline-unreinforced-melttemp",
+    "source": "KB v1.8 GF분기 회귀가드 — 비강화 웰드(코워크 2026-07-28)",
+    "title": "PP 비강화 웰드라인 강도 부족 — 멜트온도 지배 분기",
+    "difficulty": "hard",
+    "description": "PP 호모 비강화. 홀 하류 웰드 위치에서 낙하 시 파단. 외관상 웰드선은 옅게 보임. GF 케이스(case-010)와 대비되는 비강화 분기 검사용.",
+    "input": {
+      "defect_type": "웰드라인 (Weld Line)",
+      "resin_type": "PP",
+      "resin_detail": "PP 호모 비강화 (무충전)",
+      "machine_settings": {
+        "nozzle_temp": 200, "zone1_temp": 200, "zone2_temp": 195, "zone3_temp": 190, "zone4_temp": 180,
+        "mold_temp_fixed": 25, "mold_temp_moving": 25,
+        "injection_pressure": 90, "holding_pressure": 65,
+        "injection_speed_1": 35, "back_pressure": 4, "screw_rpm": 90
+      },
+      "mold_info": { "mold_type": "2판", "gate_type": "사이드", "cavity_count": 1 },
+      "product_info": { "wall_thickness_min": 2.0, "wall_thickness_max": 2.5 },
+      "defect_description": "관통홀 하류 합류부에서 낙하 충격 시 파단. 웰드선은 옅게 보이나 외관 불량으로는 접수 안 됨. 배럴온도는 수지 권장범위(210~250℃) 하단보다 낮게 운전 중."
+    },
+    "expected": {
+      "root_cause": "비강화 수지에서 웰드 강도를 지배하는 인자는 멜트온도다. 200℃는 PP 권장범위 하단 미만이라 합류면 분자 확산(힐링)이 불충분. 저속 사출(35%)과 저금형온도(25℃)가 유동선단 온도 하락을 가중해 합류 시점 계면 온도가 더 떨어진다.",
+      "key_recommendations": ["멜트온도 200→220~240℃ 상향 (최우선)", "사출속도 상향으로 유동선단 온도 유지", "금형온도 25→40~50℃ 상향", "조건으로 모재 수준 회복은 불가 — 잔존 시 게이트 위치 변경·오버플로우 탭 검토"],
+      "expected_phase": "filling",
+      "severity": "high",
+      "hallucination_forbidden": ["유리섬유·섬유 배향·GF 함량", "건조 부족 (PP는 비흡습)", "보압을 1순위 대책으로 제시"],
+      "trap": "case-010(GF40)의 학습이 전이되어 '보압↑' 또는 '섬유 배향'을 1순위로 내면 오진. 보압 지배는 GF 분기다. KB v1.8 분기가 작동하는지가 이 케이스의 판정 포인트."
+    }
   }
 ]

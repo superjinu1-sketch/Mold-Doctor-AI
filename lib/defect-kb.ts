@@ -4,7 +4,7 @@
 // 수정 순서: taxonomy.md → 이 파일 → KB_VERSION bump → eval 회귀.
 import type { ResinSpec } from './resin-kb';
 
-export const KB_VERSION = 'defect-kb-v1.8';
+export const KB_VERSION = 'defect-kb-v1.9';
 
 export type Cause = {
   rank: number;
@@ -96,6 +96,10 @@ export const DEFECT_KB: Record<string, DefectNode> = {
     sharedGates: ['mold_temp_insufficient'],
     priorityLogic: '특정캐비티만=Mold 우선. 전체 균등=Machine/Method. Air Trap 겸발=벤팅 먼저.',
     source: 'synthesis-1.1,taxonomy-1', confidence: 'high',
+    sourceRefs: [
+      'Plastics Technology — How to Properly Size Gates, Runners and Sprues (gate 40~70% of wall by viscosity)',
+    ],
+    verifiedAt: '2026-07-28',
   },
 
   // ─── 2. Flash (플래시/버) ──────────────────────────────────
@@ -108,7 +112,7 @@ export const DEFECT_KB: Record<string, DefectNode> = {
         baseProbability: 55,
         trigger: '캐비티압×투영면적 > 클램프력. 사출·홀드압 과고.',
         evidence: '클램프력·사출압·홀드압 입력값.',
-        verification: '클램프력 계산(투영면적×캐비티압÷9.8≈ton). 블루마킹(밀착패턴).',
+        verification: '클램프력 계산: 형체력(ton) ≈ 투영면적(cm²) × 캐비티내압(kgf/cm²) ÷ 1000. 캐비티내압 미측정 시 300~500 kgf/cm² 대입(≈2~4 US ton/in²). 블루마킹(밀착패턴).',
         adjustment: '클램프력↑(과도시 벤트 압착→Diesel 주의), 홀드압↓, V/P 전환 앞당김.' },
       { rank: 2, cause: '파팅면 마모·이물·평행도 불량', category: 'Mold',
         baseProbability: 30,
@@ -118,7 +122,7 @@ export const DEFECT_KB: Record<string, DefectNode> = {
         adjustment: '파팅면 재연마, 이물 제거, 이젝터핀 clearance 수정.' },
       { rank: 3, cause: '극저점도 super EP(LCP·PPS·PA4T·PA6T) — 홀딩압·정밀도 우선', category: 'Material',
         baseProbability: 10,
-        trigger: 'resin-kb super-engineering 수지(LCP·PPS·PA4T·PA6T 등) + 파팅면 전체 or 미세 버.',
+        trigger: 'PPS 계열 우선(저플래시 전용 그레이드가 존재할 만큼 알려진 문제). LCP는 문헌상 오히려 저플래시 특성(저전단에서 점도 급상승) — LCP에서 flash 발생 시 수지 특성이 아니라 과열·과보압·PL 정밀도를 먼저 의심. + 파팅면 전체 or 미세 버.',
         evidence: '수지 종류(resin-kb tier=super-engineering). 불량 분포.',
         verification: '홀딩압↓ + V/P 전환 앞당김 후 재시험.',
         adjustment: 'holding/packing 압력 최소화, V/P 전환 위치 앞당김, PL면 정밀도 점검. (단순 클램프력↑만으론 한계)' },
@@ -138,6 +142,15 @@ export const DEFECT_KB: Record<string, DefectNode> = {
     sharedGates: [],
     priorityLogic: '역설 주의: 클램프력 과도 → 벤트 압착 → Diesel 겸발. 필요최소 클램프력 사용. LCP·PPS 등 극저점도=holding압↓+V/P 전환+PL면 정밀도 우선.',
     source: 'synthesis-1.2,taxonomy-2', confidence: 'high',
+    sourceRefs: [
+      'KEYENCE Injection Molding Formulas — F(tf)=p(kgf/cm²)×A(cm²)÷1000, cavity pressure 300~500 kgf/cm²',
+      'Plastics Technology — Clamp Tonnage: More Is Better...Right? (over-tonnage → crushed vents, burns, cracked cavity block)',
+      'RJG — Why Machine Tonnage Matters and How to Set It Correctly (3~5 tons/in², clamp force optimization study)',
+      'Celanese — Vectra LCP Precision Molding Tech Tips (LCP keeps flash formation low)',
+      'PlasticsToday — The Troubleshooter Part 65: LCP ("doesn\'t flash"; fix = lower barrel heat + underpack)',
+      'Find Out About Plastics — 6 Inputs for Reducing Flash Behaviour of PPS (low-flash grades exist)',
+    ],
+    verifiedAt: '2026-07-28',
   },
 
   // ─── 3. Jetting (제팅) ─────────────────────────────────────
@@ -305,13 +318,18 @@ export const DEFECT_KB: Record<string, DefectNode> = {
     },
     sharedGates: [],
     source: 'synthesis-2.1,taxonomy-7', confidence: 'high',
+    sourceRefs: [
+      'Plastics Technology — How to Set Second-Stage (Pack & Hold) Pressure (%-rule is screening; gate seal study confirms)',
+      'RJG — Injection Pressure: What Is It',
+    ],
+    verifiedAt: '2026-07-28',
   },
 
   // ─── 8. Void / Bubble (보이드/기포) ───────────────────────
   void_bubble: {
     id: 'void_bubble', nameKo: '기포/보이드', nameEn: 'Void/Bubble', phase: '보압',
     typicalSeverity: 'medium~high (구조부품 강도 직결 시 high)',
-    discriminators: '내부 공동. 진공보이드(보압부족·스킨 견고) vs 가스포켓(수분·공기·압해제 팽창). 가열 감별: 꺼짐=진공 / 부풂=가스.',
+    discriminators: '내부 공동. 진공보이드(보압부족·스킨 견고) vs 가스포켓(수분·공기·압해제 팽창). 가열 감별: 꺼짐=진공 / 부풂=가스. (시험 성립 조건: 기포 지름 ≥3mm, 성형 후 4시간 이내)',
     causes: [
       { rank: 1, cause: '결정성+두꺼운벽+보압 부족', category: 'Machine',
         baseProbability: 40,
@@ -320,29 +338,29 @@ export const DEFECT_KB: Record<string, DefectNode> = {
         verification: '가열테스트(진공=꺼짐). 보압↑후 소멸=보압부족 확진.',
         adjustment: '보압↑, 보압시간↑, 게이트 두꺼운부위 배치.' },
       { rank: 2, cause: '수분 미건조(가스포켓)', category: 'Material',
-        baseProbability: 30,
+        baseProbability: 25,
         trigger: '흡습성 수지(PA·PC·PBT·PET) + 건조 미흡. 가열 시 부풂.',
         evidence: '건조조건 입력값. resin-kb drying 권장 대비.',
         verification: '건조 강화 후 소멸=수분 확진.',
-        adjustment: '건조 규정 엄수, 배압 5~10bar↑(가스 압축 배출).' },
+        adjustment: '건조 규정 엄수, 배압 0.5~1MPa씩↑(가스 압축 배출).' },
       { rank: 3, cause: '배압 부족으로 탈기 불충분', category: 'Machine',
-        baseProbability: 20,
-        trigger: '배압 낮음(<5MPa). 스크루 계량 시 가스 포함.',
+        baseProbability: 15,
+        trigger: '배압 낮음(수지압 기준 <5MPa ≈ 725psi. 유압 게이지 값과 혼동 금지). 스크루 계량 시 가스 포함.',
         evidence: '배압 입력값.',
-        verification: '배압 5~10bar씩↑ 후 보이드 감소 확인.',
+        verification: '배압 0.5~1MPa씩↑ (권장 작동대 3.4~6.9MPa = 500~1,000 psi 수지압) 후 보이드 감소 확인.',
         adjustment: '배압 소폭↑(GF 수지=섬유 파손 주의).' },
       { rank: 4, cause: '환경 온도 드리프트(낮밤 기온차) → 금형/배럴 온도 불안정', category: 'Machine',
-        baseProbability: 25,
+        baseProbability: 12,
         trigger: '낮밤 기온차 큰 환경 + 두꺼운부 + 간헐 발생(겨울 문닫으면 정상). 성형조건 조정과 무관.',
         evidence: '주야·계절 발생 패턴. 금형/배럴 실측온도 안정성.',
         verification: '기온차 측정 + 사출기 차폐/격리 후 재현 확인.',
         adjustment: '사출기 차폐·격리(비닐 등)로 낮밤 온도차 차단(근본), 금형·배럴 온도 일정 유지.' },
-      { rank: 5, cause: '설비·금형 하드웨어(스크류/체크링 마모·노즐후퇴 미사용·코어측 벤트/오버플로우 부재)', category: 'Machine',
-        baseProbability: 20,
+      { rank: 5, cause: '설비·금형 하드웨어(스크류/체크링 마모·노즐후퇴 설정 부적정(과다/미사용)·코어측 벤트/오버플로우 부재)', category: 'Machine',
+        baseProbability: 8,
         trigger: '성형조건 다 조정해도 무효 + 두꺼운부 보이드 고정위치. 스크류서 기포 혼입.',
         evidence: '스크류·체크링 마모 이력. 보이드 위치 고정성.',
-        verification: '노즐후퇴(decompression) 적용·스크류 점검. 고정위치면 코어측 벤트/오버플로우 추가 후 확인.',
-        adjustment: '노즐후퇴로 기포 배출, 스크류/체크링 점검, 보이드 고정위치면 코어측 오버플로우·가스밴트 추가.' },
+        verification: '노즐후퇴(감압) 설정 점검 — 과다 감압은 공기를 흡입해 기포를 유발하므로 먼저 감압을 줄여 재시험(특히 핫러너). 스크류·체크링 마모 점검. 고정위치면 코어측 벤트/오버플로우 추가 후 확인.',
+        adjustment: '감압을 드룰 방지 최소값까지 축소(과다 감압이 원인일 때 즉효), 스크류/체크링 점검, 보이드 고정위치면 코어측 오버플로우·가스밴트 추가.' },
     ],
     patternHints: {
       '성형조건(보압·배압·온도·속도) 다 조정해도 무효 + 두꺼운부 + 낮밤 간헐': '공정 원인 아님 → 환경 온도드리프트·설비(스크류/노즐후퇴)·금형(코어측 벤트/오버플로우) 하드웨어 우선. 성형조건 미세조정 반복은 함정.',
@@ -351,6 +369,12 @@ export const DEFECT_KB: Record<string, DefectNode> = {
     priorityLogic: '조건무효 시 공정 미세조정에 머물지 말고 환경(온도 드리프트)·설비(스크류·노즐후퇴)·금형(벤트/오버플로우) 하드웨어 축으로 전환. 단 보압부족(rank1)·수분(rank2) 기본 단서가 명확하면 그대로 우선.',
     sharedGates: [],
     source: 'synthesis-2.2,taxonomy-8', confidence: 'high',
+    sourceRefs: [
+      'Plastics Technology — How to Get Rid of Bubbles (heat test: ≥3mm bubble, part <4h old; excessive decompression causes gas bubbles)',
+      'RJG — What Is Back Pressure in Injection Molding (500~1,000 specific psi; intensification ratio)',
+      'Plastics Technology — Troubleshooting Mold Temperature Control (ambient conditions affect heat-transfer system)',
+    ],
+    verifiedAt: '2026-07-28',
   },
 
   // ─── 9. Warpage (휨/변형) ──────────────────────────────────
@@ -433,15 +457,15 @@ export const DEFECT_KB: Record<string, DefectNode> = {
       { rank: 1, cause: '잔류 수분에 의한 가스 발생 (moisture splay)', category: 'Material',
         baseProbability: 55,
         trigger: '흡습성 수지(PA·PC·PBT·PET·ABS) + 건조 조건 미달 또는 미입력',
-        evidence: '수지 흡습성(resin-kb hygroscopic 참조). 건조 온도·시간·이슬점. 허용수분: PA66≤0.20%, PC·PBT≤0.02%, ABS≤0.10%.',
-        verification: '건조 강화 후 소멸=수분 확진. 수분계 측정. 이슬점 −29~−40°C 확인.',
+        evidence: '수지 흡습성(resin-kb hygroscopic 참조). 건조 온도·시간·이슬점. 허용수분: PA66≤0.20%(무충전 기준 — GF·미네랄 충전 시 충전율에 비례해 임계 축소), PC·PBT≤0.02%, ABS≤0.10%(0.05% 이하 권장, 0.05~0.10%는 경계 → 건조 강화 재시험으로 확진).',
+        verification: '건조 강화 후 소멸=수분 확진. 수분계 측정. 이슬점 −29~−40°C 확인. 노즐 퍼지 용융물이 발포·기포 다수면 수분 유력.',
         adjustment: '건조 시간·온도↑, 제습식 건조기 전환. resin-kb drying 참조.' },
       { rank: 2, cause: '열분해에 의한 가스 발생 (thermal splay)', category: 'Machine',
         baseProbability: 20,
-        trigger: '배럴온도 resin-kb meltC.degradeAbove 초과 또는 체류 과다(사이클 정지·shot<배럴 20%). 황변·냄새 동반 시.',
+        trigger: '배럴온도 resin-kb meltC.degradeAbove 초과 또는 체류 과다(사이클 정지·shot<배럴 25%). 황변·냄새 동반 시.',
         evidence: '노즐·배럴 온도. 사이클 시간. resin-kb meltC.degradeAbove 값 대비.',
         verification: '배럴온도 5~10°C↓ 재시험. 퍼지 3~5shot 후 소멸=잔류탄화.',
-        adjustment: '배럴온도↓, 사이클단축, 체류↓(shot 비율 20~80% 범위 유지).' },
+        adjustment: '배럴온도↓, 사이클단축, 체류↓(shot 비율 25~65% 범위 유지).' },
       { rank: 3, cause: '과도 전단에 의한 가스 발생 (shear splay)', category: 'Machine',
         baseProbability: 15,
         trigger: '게이트 과소, 또는 사출속도·스크루 RPM이 수지 권장 상한(resin-kb 참조) 초과. 게이트 주변 집중, 건조 정상인데 지속.',
@@ -452,7 +476,7 @@ export const DEFECT_KB: Record<string, DefectNode> = {
         baseProbability: 7,
         trigger: '서크백(감압) 과다 또는 벤팅 불량. 비흡습 수지(PP·PE·PS)에서 발생.',
         evidence: '서크백 설정값. 수지 흡습성(resin-kb 참조).',
-        verification: '서크백 축소 후 재시험. 벤팅 청소 후 재시험.',
+        verification: '서크백 축소 후 재시험. 벤팅 청소 후 재시험. 감압 스트로크 2.5~10mm(0.1~0.4in) 초과 시 과다 의심.',
         adjustment: '서크백↓, 벤팅 청소·추가, 사출속도↓.' },
       { rank: 5, cause: '리그라인드·오염에 의한 가스 (contamination splay)', category: 'Material',
         baseProbability: 3,
@@ -478,6 +502,15 @@ export const DEFECT_KB: Record<string, DefectNode> = {
 복합 원인(수분+전단 동시 작용 시 더 심화) 가능.
 ★ GF 강화수지 + 건조 조건 정상(resin-kb 충족) + 안 닦이는 방사상 백화면 silver_streak(수분 splay)이 아니라 fiber_readout(GF 표면백화)로 분류 전환하고 금형온도↑를 1순위로 권고하라. (단 건조가 부족하면 그대로 moisture 유지 — 이 전환은 "건조 정상"에만 적용.)`,
     source: 'synthesis-3.1,taxonomy-11', confidence: 'high',
+    sourceRefs: [
+      'Plastics Technology — Identifying and Correcting Splay (moisture/heat/shear discrimination; decompression 0.1~0.4 in.)',
+      'Plastics Technology — Revisiting Shot Size vs. Barrel Capacity (25~65% of barrel capacity)',
+      'Plastics Technology — Why (and What) You Need to Dry (dew point −20~−40°F; PC·PBT·ABS ≤0.02%)',
+      'Plastics Technology — Resin Drying KC: Resin Types (nylon 0.18%, ABS 0.05~0.08%, PC 0.02%)',
+      'Teknor Apex — Drying Nylon Resin (unfilled PA 0.02~0.20%; reinforcement narrows the moisture window)',
+      'Toray TOYOLAC ABS Processing Information (<0.1%, preferably 0.05%; non-dried ABS causes silver streaking)',
+    ],
+    verifiedAt: '2026-07-28',
   },
 
   // ─── 12. Discoloration (변색) ──────────────────────────────
