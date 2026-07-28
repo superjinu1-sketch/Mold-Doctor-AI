@@ -20,8 +20,8 @@ export default function Footer() {
           <Link href="/tryout" className="text-faint text-xs hover:text-muted transition-colors">{m['landing.tool_tryout_title']}</Link>
           <Link href={isEn ? '/en/resins' : '/resins'} className="text-faint text-xs hover:text-muted transition-colors">{m['landing.tool_resins_title']}</Link>
           <Link href={isEn ? '/en/guide' : '/guide'} className="text-faint text-xs hover:text-muted transition-colors">{m['footer.guide']}</Link>
-          {isEn && <Link href="/en/notes" className="text-faint text-xs hover:text-muted transition-colors">Notes</Link>}
-          {isEn && <Link href="/en/about" className="text-faint text-xs hover:text-muted transition-colors">About</Link>}
+          <Link href="/en/notes" className="text-faint text-xs hover:text-muted transition-colors">{m['footer.notes']}</Link>
+          <Link href="/en/about" className="text-faint text-xs hover:text-muted transition-colors">{m['footer.about']}</Link>
         </nav>
         <div className="flex flex-col md:flex-row items-center justify-between gap-4">
           <Link href="/" className="flex items-center gap-2 font-bold">

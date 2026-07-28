@@ -67,3 +67,12 @@ export const NOTES: Note[] = [
 export function getNoteBySlug(slug: string): Note | undefined {
   return NOTES.find(n => n.slug === slug);
 }
+
+/**
+ * 최신 글 1건(publishedAt 내림차순 첫 항목) — 홈 노트 블록(internal-links-to-notes-v1)용.
+ * NOTES는 항상 1건 이상 하드코딩되어 있으므로 undefined 분기 없이 반환한다 —
+ * 호출부에서 `latestNote &&` 같은 조건부 렌더를 만들지 않기 위함(그게 이 mandate가 고치려는 버그다).
+ */
+export function getLatestNote(): Note {
+  return [...NOTES].sort((a, b) => b.publishedAt.localeCompare(a.publishedAt))[0];
+}

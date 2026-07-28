@@ -24,6 +24,9 @@ export const en: Record<string, string> = {
   'landing.tool_resins_title': 'Resin Library',
   'landing.tool_resins_desc': 'Drying, melt temp, shrinkage — field reference',
   'landing.tools_all_link': 'View all free tools →',
+  'landing.notes_title': 'Notes',
+  'landing.notes_sub': 'What came out of building the diagnosis, and correcting it.',
+  'landing.notes_all': 'View all',
 
   /* ── Free tools hub (/tools) ───────────────────────────── */
   'tools.h1': 'Free Tools for the Shop Floor',
@@ -40,6 +43,8 @@ export const en: Record<string, string> = {
   'tools.cta_button': 'Start free estimate',
 
   'footer.guide': 'Defect Guide',
+  'footer.notes': 'Notes',
+  'footer.about': 'About',
   'footer.privacy': 'Privacy Policy',
   'footer.terms': 'Terms of Service',
   'landing.stat_1': '30+',

@@ -4,10 +4,12 @@ import Link from 'next/link';
 import { useLocale } from '@/contexts/LocaleContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { IconClipboard, IconCheckSquare, IconFlask } from '@/components/icons';
+import { getLatestNote } from '@/lib/notes';
 
 export default function HomePage() {
   const { t, locale } = useLocale();
   const { user } = useAuth();
+  const latestNote = getLatestNote();
 
   const meta = (user?.user_metadata ?? {}) as Record<string, unknown>;
   const name = (typeof meta.name === 'string' && meta.name)
@@ -105,6 +107,16 @@ export default function HomePage() {
             </Link>
           </div>
           <Link href="/tools" className="text-brand hover:text-brand-ink text-label font-medium mt-4 min-h-[44px] flex items-center justify-center">{t('landing.tools_all_link')}</Link>
+
+          {/* 기술 노트 — 크롤러가 홈에서 도달 가능한 링크 확보(internal-links-to-notes-v1).
+              조건부 렌더 금지 대상이라 항상 렌더. 무료 도구 카드보다 시각적 위계를 낮게. */}
+          <h2 className="text-h3 font-bold text-ink mt-10 mb-2">{t('landing.notes_title')}</h2>
+          <p className="text-muted text-label mb-4">{t('landing.notes_sub')}</p>
+          <Link href={`/en/notes/${latestNote.slug}`} className="ui-card p-4 flex flex-col items-start gap-1 hover:border-[var(--brand-border)] transition-colors mb-3">
+            <span className="font-medium text-ink text-body break-keep">{latestNote.title}</span>
+            <span className="text-muted text-label leading-snug">{latestNote.description}</span>
+          </Link>
+          <Link href="/en/notes" className="text-faint hover:text-muted text-label font-medium min-h-[44px] flex items-center justify-center">{t('landing.notes_all')}</Link>
         </div>
       </section>
     </div>

@@ -24,6 +24,9 @@ export const ko: Record<string, string> = {
   'landing.tool_resins_title': '수지 라이브러리',
   'landing.tool_resins_desc': '건조·사출온도·수축률 현장 요약',
   'landing.tools_all_link': '무료 도구 전체 보기 →',
+  'landing.notes_title': '기술 노트',
+  'landing.notes_sub': 'AI 진단을 만들면서 정리한 기록입니다. 영문으로 작성됩니다.',
+  'landing.notes_all': '전체 보기',
 
   /* ── 무료 도구 허브(/tools) ───────────────────────────── */
   'tools.h1': '현장을 위한 무료 도구',
@@ -40,6 +43,8 @@ export const ko: Record<string, string> = {
   'tools.cta_button': '무료로 추정 시작',
 
   'footer.guide': '불량 가이드',
+  'footer.notes': '기술 노트 (영문)',
+  'footer.about': '만든 사람 (영문)',
   'footer.privacy': '개인정보처리방침',
   'footer.terms': '이용약관',
   'landing.stat_1': '30종+',
