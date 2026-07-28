@@ -120,6 +120,13 @@ export default function GuideDetailView({
         <p className="text-[length:var(--text-label)] text-faint text-center pt-2">
           {L('본 내용은 현장 참고용 요약입니다. 최종 판단은 현장 엔지니어의 검증이 필요합니다.', 'This content is a field-reference summary. Final judgment requires on-site engineer verification.')}
         </p>
+
+        {/* 저자 바이라인 — en 전용(author-page-en-v1) */}
+        {locale === 'en' && (
+          <p className="text-faint text-sm text-center">
+            <Link href="/en/about" className="hover:text-muted transition-colors">Written by Jinwoo Park</Link>
+          </p>
+        )}
       </div>
     </div>
   );

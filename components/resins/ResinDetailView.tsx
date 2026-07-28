@@ -226,6 +226,13 @@ export default function ResinDetailView({
         <p className="text-[length:var(--text-label)] text-faint text-center pt-2">
           {L('본 데이터는 현장 참고용 요약입니다. 최종 확인은 수지 제조사 TDS 기준입니다.', 'This data is a field-reference summary. Always verify against the resin manufacturer’s official TDS.')}
         </p>
+
+        {/* 저자 바이라인 — en 전용(author-page-en-v1) */}
+        {locale === 'en' && (
+          <p className="text-faint text-sm text-center">
+            <Link href="/en/about" className="hover:text-muted transition-colors">Written by Jinwoo Park</Link>
+          </p>
+        )}
       </div>
     </div>
   );
