@@ -1601,5 +1601,62 @@
       "hallucination_forbidden": ["유리섬유·섬유 배향·GF 함량", "건조 부족 (PP는 비흡습)", "보압을 1순위 대책으로 제시"],
       "trap": "case-010(GF40)의 학습이 전이되어 '보압↑' 또는 '섬유 배향'을 1순위로 내면 오진. 보압 지배는 GF 분기다. KB v1.8 분기가 작동하는지가 이 케이스의 판정 포인트."
     }
+  },
+  {
+    "id": "pp-flash-clamp-tonnage-calc",
+    "source": "KB v1.9 회귀가드 — flash 클램프력 계산식 정정(코워크 2026-07-29)",
+    "title": "PP 컨테이너 전둘레 플래시 — 형체력 부족 판정·계산",
+    "difficulty": "hard",
+    "description": "파팅면 전체 둘레 플래시. 투영면적과 기계 톤수가 제시되어 형체력 계산이 진단의 핵심. 구 KB의 ÷9.8 오류(100배 과대)면 4,000톤급 오답이 나온다.",
+    "input": {
+      "defect_type": "플래시 (Flash)",
+      "resin_type": "PP",
+      "resin_detail": "PP 호모 일반사출",
+      "machine_settings": {
+        "nozzle_temp": 230, "zone1_temp": 230, "zone2_temp": 225, "zone3_temp": 215, "zone4_temp": 200,
+        "mold_temp_fixed": 40, "mold_temp_moving": 40,
+        "injection_pressure": 110, "holding_pressure": 85,
+        "injection_speed_1": 60, "back_pressure": 4, "screw_rpm": 120
+      },
+      "product_info": { "wall_thickness_min": 1.5, "wall_thickness_max": 2.5 },
+      "defect_description": "식품용 컨테이너. 파팅면 전체 둘레에 얇은 플래시가 매 샷 발생. 부분 위치 반복이 아니라 전둘레 균일. 투영면적 약 450cm², 사용 중인 사출기는 120톤. 금형은 신품(파팅면 마모 없음)."
+    },
+    "expected": {
+      "root_cause": "형체력 부족. 투영면적 450cm² 기준 필요 형체력 ≈ 450 × 300~500kgf/cm² ÷ 1000 = 135~225톤인데 보유 기계는 120톤. 전둘레 균일 발생 + 신품 금형이 클램프/과압 축을 가리킨다.",
+      "key_recommendations": ["상위 톤수 기계로 이관 (필요 형체력 135~225톤 수준)", "임시 완화: 홀드압 하향 + V/P 전환 앞당김 (캐비티압 저감)", "사출압·속도 하향 검토"],
+      "expected_phase": "packing",
+      "severity": "medium",
+      "hallucination_forbidden": ["수천 톤 단위 형체력 요구 (구 ÷9.8 오류의 100배 과대 산출)", "파팅면 재연마를 1순위로 (신품 금형 명시됨)", "클램프력 무조건 최대로 (과클램프→벤트 압착 역설 무시)"],
+      "trap": "필요 형체력을 계산해 보이는지가 판정 포인트. 계산 없이 '클램프력을 올려라'만 내면 감점, 4,000톤급 수치가 나오면 실패(구 KB 오류 재발)."
+    }
+  },
+  {
+    "id": "pc-gasvoid-excess-decompression",
+    "source": "KB v1.9 회귀가드 — void_bubble 노즐후퇴 방향 정정(코워크 2026-07-29)",
+    "title": "PC 후육부 가스 기포 — 과다 서크백이 원인",
+    "difficulty": "hard",
+    "description": "가열 시 부풂(=가스 포켓) + 건조 정상 + 서크백 과다. 감압을 '대책'이 아니라 '원인'으로 짚는지가 판정 포인트. 구 KB는 '노즐후퇴로 기포 배출'이라는 반대 방향 처방이었다.",
+    "input": {
+      "defect_type": "기포/보이드 (Void/Bubble)",
+      "resin_type": "PC",
+      "resin_detail": "PC 투명 일반사출",
+      "machine_settings": {
+        "nozzle_temp": 300, "zone1_temp": 295, "zone2_temp": 290, "zone3_temp": 280, "zone4_temp": 270,
+        "mold_temp_fixed": 90, "mold_temp_moving": 90,
+        "injection_pressure": 130, "holding_pressure": 90,
+        "injection_speed_1": 45, "back_pressure": 6, "screw_rpm": 80,
+        "drying_temp": 120, "drying_time": 4
+      },
+      "product_info": { "wall_thickness_min": 3.0, "wall_thickness_max": 6.0 },
+      "defect_description": "투명 PC 부품 후육부에 기포. 5mm 기포를 성형 직후 가열해 보면 부풀어 오른다(꺼지지 않음). 건조는 120°C 4시간 제습건조기로 규정 준수, 수분계 측정 0.015%. 핫러너 금형. 최근 실끌림(스트링잉) 대응으로 서크백을 12mm까지 늘린 뒤부터 발생 빈도가 급증했다."
+    },
+    "expected": {
+      "root_cause": "과다 감압(서크백 12mm)이 공기를 흡입해 만든 가스 포켓. 가열 시 부풂 = 가스 확진(진공보이드면 꺼짐). 건조 데이터 정상(0.015% < PC 임계 0.02%)이라 수분 아님. 서크백 증량 시점과 발생 급증이 일치.",
+      "key_recommendations": ["서크백을 드룰 방지 최소값(2.5~10mm 하단)까지 축소 후 재시험", "실끌림은 감압 증량 대신 노즐 온도 하향·밸브게이트 점검으로 대응", "보압/보압시간은 유지 (진공보이드 아님 — 보압 축 아님)"],
+      "expected_phase": "material",
+      "severity": "medium",
+      "hallucination_forbidden": ["노즐후퇴(감압) 적용·증량으로 기포 배출 (방향 반전 — 구 KB 오류)", "건조 부족을 1순위로 (측정치 0.015%로 임계 이하 명시됨)", "보압↑을 1순위로 (가열 감별이 가스를 가리킴)"],
+      "trap": "PC=흡습 수지라 반사적으로 건조를 의심하기 쉽지만 수분 데이터가 깨끗하다. '가열 시 부풂' 감별과 서크백 이력을 연결해 감압 축소를 처방하는지가 핵심. 감압을 늘리라고 하면 실패."
+    }
   }
 ]

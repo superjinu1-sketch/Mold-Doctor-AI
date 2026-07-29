@@ -29,7 +29,10 @@ export type DefectNode = {
   sharedGates?: string[];
   priorityLogic?: string;
   source?: string;
-  confidence?: 'high' | 'med' | 'low';
+  confidence?: 'verified' | 'contested' | 'estimated';
+  // verified  = sourceRefs 있음 + 문헌 일치 (WS1 검증 통과)
+  // contested = sourceRefs 있음 + 문헌 충돌 미해소 (WS2 처리 중)
+  // estimated = 미검증 (구 high/med는 전부 여기로 — AI 종합 출처라 등급 근거가 없었다)
   sourceRefs?: string[];   // 개별 문헌 인용 + 검증 상태(예: "NOT verified (paywall)") — 정직한 출처 추적용
   verifiedAt?: string;     // sourceRefs 최근 검증일(ISO)
 };
@@ -95,7 +98,7 @@ export const DEFECT_KB: Record<string, DefectNode> = {
     },
     sharedGates: ['mold_temp_insufficient'],
     priorityLogic: '특정캐비티만=Mold 우선. 전체 균등=Machine/Method. Air Trap 겸발=벤팅 먼저.',
-    source: 'synthesis-1.1,taxonomy-1', confidence: 'high',
+    source: 'synthesis-1.1,taxonomy-1', confidence: 'verified',
     sourceRefs: [
       'Plastics Technology — How to Properly Size Gates, Runners and Sprues (gate 40~70% of wall by viscosity)',
     ],
@@ -141,7 +144,7 @@ export const DEFECT_KB: Record<string, DefectNode> = {
     },
     sharedGates: [],
     priorityLogic: '역설 주의: 클램프력 과도 → 벤트 압착 → Diesel 겸발. 필요최소 클램프력 사용. LCP·PPS 등 극저점도=holding압↓+V/P 전환+PL면 정밀도 우선.',
-    source: 'synthesis-1.2,taxonomy-2', confidence: 'high',
+    source: 'synthesis-1.2,taxonomy-2', confidence: 'verified',
     sourceRefs: [
       'KEYENCE Injection Molding Formulas — F(tf)=p(kgf/cm²)×A(cm²)÷1000, cavity pressure 300~500 kgf/cm²',
       'Plastics Technology — Clamp Tonnage: More Is Better...Right? (over-tonnage → crushed vents, burns, cracked cavity block)',
@@ -177,7 +180,7 @@ export const DEFECT_KB: Record<string, DefectNode> = {
       '동심원': '흐름자국(flow mark)으로 재분류 검토',
     },
     sharedGates: [],
-    source: 'synthesis-1.3,taxonomy-3', confidence: 'high',
+    source: 'synthesis-1.3,taxonomy-3', confidence: 'estimated',
   },
 
   // ─── 4. Weld Line (웰드라인) ───────────────────────────────
@@ -213,7 +216,7 @@ export const DEFECT_KB: Record<string, DefectNode> = {
     },
     sharedGates: ['mold_temp_insufficient'],
     priorityLogic: '구조적 웰드(홀·코어핀 등)=조건만으론 한계, 게이트 위치 이동이 근본. 강도·파단 요구 시나리오(기능부품·GF 수지)에서는 Mold(게이트 위치) 원인을 우선 검토 — 비강화 수지(PP·PE 등)는 멜트온도가 웰드 강도의 주요 인자(분자 확산·힐링 지배)다. GF 강화 수지는 멜트온도·금형온도의 강도 기여가 미미하고(연신·외관엔 유효) 보압↑이 강도를 실제로 개선한다. 어느 경우든 조건만으로 모재 수준 회복은 안 된다. 외관 양품 ≠ 강도 OK.',
-    source: 'synthesis-1.4,taxonomy-4', confidence: 'high',
+    source: 'synthesis-1.4,taxonomy-4', confidence: 'verified',
     sourceRefs: [
       'Polymers (MDPI) 15(20):4102 (2023) — PA6+30%GF: packing pressure dominates weld UTS; melt temp affects elongation, not UTS. Full text verified 2026-07-28',
       'Wu & Liang (cited in 15:4102 intro) — PP/HDPE: melt temp dominates weld strength. Original full text NOT verified (paywall)',
@@ -256,7 +259,7 @@ export const DEFECT_KB: Record<string, DefectNode> = {
     },
     sharedGates: [],
     priorityLogic: '벤팅 최우선(SPE). 클램프력 과도=벤트 압착 역설. 신금형=벤트 설계 누락 검토.',
-    source: 'synthesis-1.5,taxonomy-5', confidence: 'high',
+    source: 'synthesis-1.5,taxonomy-5', confidence: 'estimated',
   },
 
   // ─── 6. Flow Mark (흐름자국) ───────────────────────────────
@@ -285,7 +288,7 @@ export const DEFECT_KB: Record<string, DefectNode> = {
       '신규 금형·이관 직후': 'air_trap_burn 분기 참조. 신금형은 벤트 설계 누락이 흔하다. 같은 재료가 다른 금형에서 정상이면 재료 원인은 강등하고 금형(벤팅) 우선.',
     },
     sharedGates: ['mold_temp_insufficient'],
-    source: 'synthesis-3.2,taxonomy-6', confidence: 'high',
+    source: 'synthesis-3.2,taxonomy-6', confidence: 'estimated',
   },
 
   // ─── 7. Sink Mark (싱크마크) ───────────────────────────────
@@ -318,7 +321,7 @@ export const DEFECT_KB: Record<string, DefectNode> = {
       '보압 올려도 지속': '게이트 조기고화 또는 설계 문제 검토',
     },
     sharedGates: [],
-    source: 'synthesis-2.1,taxonomy-7', confidence: 'high',
+    source: 'synthesis-2.1,taxonomy-7', confidence: 'verified',
     sourceRefs: [
       'Plastics Technology — How to Set Second-Stage (Pack & Hold) Pressure (%-rule is screening; gate seal study confirms)',
       'RJG — Injection Pressure: What Is It',
@@ -369,7 +372,7 @@ export const DEFECT_KB: Record<string, DefectNode> = {
     },
     priorityLogic: '조건무효 시 공정 미세조정에 머물지 말고 환경(온도 드리프트)·설비(스크류·노즐후퇴)·금형(벤트/오버플로우) 하드웨어 축으로 전환. 단 보압부족(rank1)·수분(rank2) 기본 단서가 명확하면 그대로 우선.',
     sharedGates: [],
-    source: 'synthesis-2.2,taxonomy-8', confidence: 'high',
+    source: 'synthesis-2.2,taxonomy-8', confidence: 'verified',
     sourceRefs: [
       'Plastics Technology — How to Get Rid of Bubbles (heat test: ≥3mm bubble, part <4h old; excessive decompression causes gas bubbles)',
       'RJG — What Is Back Pressure in Injection Molding (500~1,000 specific psi; intensification ratio)',
@@ -410,7 +413,7 @@ export const DEFECT_KB: Record<string, DefectNode> = {
     },
     sharedGates: [],
     priorityLogic: 'GF+결정성=코어-캐비티 온도차 최우선. 비결정성=보압 불균일 검토.',
-    source: 'synthesis-2.3,taxonomy-9', confidence: 'high',
+    source: 'synthesis-2.3,taxonomy-9', confidence: 'estimated',
   },
 
   // ─── 10. Crack / Crazing (크랙/균열) ──────────────────────
@@ -446,7 +449,7 @@ export const DEFECT_KB: Record<string, DefectNode> = {
     },
     sharedGates: [],
     priorityLogic: '건조 조건(dryTemp·dryTime)이 resin-kb 권장 범위를 충족하면 수분(1순위) 분기를 하향하고 과보압(2순위)를 우선 검토. 홀드압이 1차압 60% 초과+시간차 발현=잔류응력 거의 확진.',
-    source: 'synthesis-2.4,taxonomy-10', confidence: 'high',
+    source: 'synthesis-2.4,taxonomy-10', confidence: 'estimated',
   },
 
   // ─── 11. Silver Streak (은선/은줄) — 5분기 풀 ─────────────
@@ -502,7 +505,7 @@ export const DEFECT_KB: Record<string, DefectNode> = {
 비흡습 수지(PP·PE·PS) → 즉시 전단/공기 분기.
 복합 원인(수분+전단 동시 작용 시 더 심화) 가능.
 ★ GF 강화수지 + 건조 조건 정상(resin-kb 충족) + 안 닦이는 방사상 백화면 silver_streak(수분 splay)이 아니라 fiber_readout(GF 표면백화)로 분류 전환하고 금형온도↑를 1순위로 권고하라. (단 건조가 부족하면 그대로 moisture 유지 — 이 전환은 "건조 정상"에만 적용.)`,
-    source: 'synthesis-3.1,taxonomy-11', confidence: 'high',
+    source: 'synthesis-3.1,taxonomy-11', confidence: 'verified',
     sourceRefs: [
       'Plastics Technology — Identifying and Correcting Splay (moisture/heat/shear discrimination; decompression 0.1~0.4 in.)',
       'Plastics Technology — Revisiting Shot Size vs. Barrel Capacity (25~65% of barrel capacity)',
@@ -546,7 +549,7 @@ export const DEFECT_KB: Record<string, DefectNode> = {
       '색불균일|분산 줄무늬|마스터배치 분산': '안료·MB 분산 불량(전체 열변색 아님 — 분산 줄무늬는 color_streaks 계열). 배압 상향은 소폭이 아니라 단계적 대폭(현재 대비 2배 수준 목표) + 스크루 RPM 하향 병행(체류·혼련 확보). GF 수지는 섬유 파손 주의.',
     },
     sharedGates: [],
-    source: 'synthesis-3.3,taxonomy-12', confidence: 'high',
+    source: 'synthesis-3.3,taxonomy-12', confidence: 'estimated',
   },
 
   // ── 나머지 18종 골격 (append-friendly) ──────────────────────
@@ -566,7 +569,7 @@ export const DEFECT_KB: Record<string, DefectNode> = {
         verification: '이형제 없이 테스트.',
         adjustment: '이형제 최소화, 금형 청소.' },
     ],
-    source: 'synthesis-3.4,taxonomy-13', confidence: 'high',
+    source: 'synthesis-3.4,taxonomy-13', confidence: 'estimated',
   },
 
   fiber_readout: {
@@ -581,7 +584,7 @@ export const DEFECT_KB: Record<string, DefectNode> = {
         adjustment: '금형온도↑(단일 최대 효과), 배럴온도 GF 비강화 대비 10~30°C↑.' },
     ],
     sharedGates: ['mold_temp_insufficient'],
-    source: 'synthesis-3.5,taxonomy-14', confidence: 'high',
+    source: 'synthesis-3.5,taxonomy-14', confidence: 'estimated',
   },
 
   surface_gloss: {
@@ -601,7 +604,7 @@ export const DEFECT_KB: Record<string, DefectNode> = {
         adjustment: '보압↑.' },
     ],
     sharedGates: ['mold_temp_insufficient'],
-    source: 'synthesis-3.6,taxonomy-15', confidence: 'high',
+    source: 'synthesis-3.6,taxonomy-15', confidence: 'estimated',
   },
 
   dimensional_instability: {
@@ -622,7 +625,7 @@ export const DEFECT_KB: Record<string, DefectNode> = {
     patternHints: {
       '직후 양품|시간경과 치수증가|다습 보관|이틀 뒤 초과': 'PA 흡습 팽창(material) — 성형조건 아님. 측정 타이밍 표준화·어닐링, 공정 변경 보류.',
     },
-    source: 'synthesis-2.5,taxonomy-16', confidence: 'high',
+    source: 'synthesis-2.5,taxonomy-16', confidence: 'estimated',
   },
 
   tiger_stripe: {
@@ -647,7 +650,7 @@ export const DEFECT_KB: Record<string, DefectNode> = {
       '범퍼|장거리 유동|게이트서 멀어질수록|먼 곳일수록 심함': '유동길이 기인 → 게이트·유동길이 설계 + 고유동 그레이드 검토(재료한계).',
     },
     sharedGates: ['mold_temp_insufficient'],
-    source: 'synthesis-3.2,taxonomy-17', confidence: 'med',
+    source: 'synthesis-3.2,taxonomy-17', confidence: 'estimated',
   },
 
   record_groove: {
@@ -661,7 +664,7 @@ export const DEFECT_KB: Record<string, DefectNode> = {
         adjustment: '게이트 확대, 금형온도↑, 사출속도↑.' },
     ],
     sharedGates: ['mold_temp_insufficient'],
-    source: 'synthesis-3.2,taxonomy-18', confidence: 'high',
+    source: 'synthesis-3.2,taxonomy-18', confidence: 'estimated',
   },
 
   black_specks: {
@@ -674,7 +677,7 @@ export const DEFECT_KB: Record<string, DefectNode> = {
         verification: '퍼지 3~5shot 후 소멸=잔류탄화.',
         adjustment: '완전 퍼지, 스크루 점검, 원료 검사.' },
     ],
-    source: 'synthesis-4,taxonomy-19', confidence: 'high',
+    source: 'synthesis-4,taxonomy-19', confidence: 'estimated',
   },
 
   color_streaks: {
@@ -706,7 +709,7 @@ export const DEFECT_KB: Record<string, DefectNode> = {
       '배압↑후 개선': '1순위(배압) 확진',
       '재료교체 후 발생': '3순위(오염) 강점 분기',
     },
-    source: 'synthesis-4,taxonomy-20', confidence: 'high',
+    source: 'synthesis-4,taxonomy-20', confidence: 'estimated',
   },
 
   cold_slug: {
@@ -719,7 +722,7 @@ export const DEFECT_KB: Record<string, DefectNode> = {
         verification: '노즐온도↑ 후 재시험.',
         adjustment: '노즐온도↑, 콜드슬러그웰 추가.' },
     ],
-    source: 'synthesis-4,taxonomy-21', confidence: 'high',
+    source: 'synthesis-4,taxonomy-21', confidence: 'estimated',
   },
 
   sticking: {
@@ -732,7 +735,7 @@ export const DEFECT_KB: Record<string, DefectNode> = {
         verification: '홀드압↓ 후 재시험.',
         adjustment: '드래프트↑, 보압↓, 이형제, 금형 연마.' },
     ],
-    source: 'synthesis-4,taxonomy-22', confidence: 'high',
+    source: 'synthesis-4,taxonomy-22', confidence: 'estimated',
   },
 
   ejector_marks: {
@@ -745,7 +748,7 @@ export const DEFECT_KB: Record<string, DefectNode> = {
         verification: '냉각시간↑ 후 재시험.',
         adjustment: '냉각시간↑, 이젝터 면적↑·균일 배치.' },
     ],
-    source: 'synthesis-4,taxonomy-23', confidence: 'high',
+    source: 'synthesis-4,taxonomy-23', confidence: 'estimated',
   },
 
   stringing: {
@@ -758,7 +761,7 @@ export const DEFECT_KB: Record<string, DefectNode> = {
         verification: '노즐온도↓ 후 재시험.',
         adjustment: '노즐온도↓, 서크백↑.' },
     ],
-    source: 'synthesis-4,taxonomy-24', confidence: 'high',
+    source: 'synthesis-4,taxonomy-24', confidence: 'estimated',
   },
 
   parting_line_mismatch: {
@@ -771,7 +774,7 @@ export const DEFECT_KB: Record<string, DefectNode> = {
         verification: '블루마킹.',
         adjustment: '금형 정비, 파팅면 재연마.' },
     ],
-    source: 'synthesis-4,taxonomy-25', confidence: 'high',
+    source: 'synthesis-4,taxonomy-25', confidence: 'estimated',
   },
 
   brittleness: {
@@ -784,7 +787,7 @@ export const DEFECT_KB: Record<string, DefectNode> = {
         verification: '버진 수지 단독 런. 건조조건 표준화.',
         adjustment: '건조조건 최적화, 재생재↓.' },
     ],
-    source: 'synthesis-2.4,taxonomy-26', confidence: 'high',
+    source: 'synthesis-2.4,taxonomy-26', confidence: 'estimated',
   },
 
   residual_stress_esc: {
@@ -797,7 +800,7 @@ export const DEFECT_KB: Record<string, DefectNode> = {
         verification: '편광 응력분석. 보압↓ 테스트.',
         adjustment: '보압↓, 금형온도↑, PC 어닐링(125~135°C×1~4h).' },
     ],
-    source: 'synthesis-2.4,taxonomy-27', confidence: 'high',
+    source: 'synthesis-2.4,taxonomy-27', confidence: 'estimated',
   },
 
   overpacking: {
@@ -810,7 +813,7 @@ export const DEFECT_KB: Record<string, DefectNode> = {
         verification: 'V/P 전환 앞당김 후 재시험.',
         adjustment: 'V/P 전환 앞당김, 홀드압↓.' },
     ],
-    source: 'synthesis,taxonomy-28', confidence: 'high',
+    source: 'synthesis,taxonomy-28', confidence: 'estimated',
   },
 
   gate_blush: {
@@ -838,7 +841,7 @@ export const DEFECT_KB: Record<string, DefectNode> = {
     },
     priorityLogic: '조건무효 + 밸브게이트면 게이트 하드웨어(밸브핀·핫러너온도)로 전환. 핫러너 게이트온도(미점검 흔함)를 금형분해(밸브핀)보다 먼저 시도. 닦임 여부로 mold_deposit 감별.',
     sharedGates: ['mold_temp_insufficient'],
-    source: 'synthesis,taxonomy-29', confidence: 'med',
+    source: 'synthesis,taxonomy-29', confidence: 'estimated',
   },
 
   // ─── 31. Mold Deposit / Plate-out (금형 석출/플레이트아웃) ───
@@ -874,7 +877,7 @@ export const DEFECT_KB: Record<string, DefectNode> = {
     },
     sharedGates: [],
     priorityLogic: '"닦임=표면 부착물"이 분류 결정 단서. 금형 세정 후 일시 소멸·재누적이면 plate-out 확진. 닦이는 잔류물을 웰드/플로우로 분류하지 마라.',
-    source: 'synthesis,taxonomy-31', confidence: 'med',
+    source: 'synthesis,taxonomy-31', confidence: 'estimated',
   },
 
 };
