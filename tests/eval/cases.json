@@ -1719,5 +1719,76 @@
       ],
       "trap": "닦으면 지워짐 = plate-out 감별이 1차 관문. 2차 관문은 'PA66에선 없었다'는 대비에서 카프로락탐(재료 축)을 짚는지 — 공정 조건 미세조정 반복으로 답하면 감점."
     }
+  },
+  {
+    "id": "pbt-sink-gate-freeze-fast-crystallization",
+    "source": "WS6 Phase 2 crystallizationRate 회귀가드(코워크 2026-07-29)",
+    "title": "PBT 싱크마크 — 보압 상향 무효, 게이트 동결 선검토",
+    "difficulty": "hard",
+    "input": {
+      "defect_type": "싱크마크 (Sink Mark)",
+      "resin_type": "PBT",
+      "resin_detail": "PBT GF15",
+      "machine_settings": {
+        "nozzle_temp": 255, "zone1_temp": 250, "zone2_temp": 245, "zone3_temp": 240, "zone4_temp": 230,
+        "mold_temp_fixed": 40, "mold_temp_moving": 40,
+        "injection_pressure": 110, "holding_pressure": 75, "injection_speed_1": 55,
+        "back_pressure": 5, "screw_rpm": 90, "drying_temp": 120, "drying_time": 4
+      },
+      "product_info": { "wall_thickness_min": 1.2, "wall_thickness_max": 3.0 },
+      "defect_description": "PBT 커넥터 보스 뒷면 싱크마크. 보압을 75에서 90까지, 보압시간을 2초에서 5초까지 올렸는데 싱크 깊이가 거의 안 변한다. 게이트는 핀포인트 0.8mm. 건조는 규정대로 했다."
+    },
+    "expected": {
+      "root_cause": "게이트 조기 동결. PBT는 결정화가 매우 빨라(공급사: almost instantaneous) 저온 금형(40°C)+0.8mm 핀포인트에서 보압 전달 창이 먼저 닫힌다. '보압 올려도 불변'이 게이트 실링 선행의 전형 신호.",
+      "key_recommendations": [
+        "게이트 실링 시간 실측(보압시간 스텝별 부품 중량) — 중량이 안 늘면 게이트가 이미 동결",
+        "게이트 확대 또는 랜드 단축 검토",
+        "금형온도 상향(PBT 권장 대역으로) — 결정화 전 보압 전달 창 확보",
+        "보압 수치 추가 상향은 무효 (전달 경로가 닫힌 상태)"
+      ],
+      "expected_phase": "packing",
+      "severity": "medium",
+      "hallucination_forbidden": [
+        "보압·보압시간 추가 상향을 1순위로 (불변 이력 명시됨)",
+        "건조 부족 1순위 (규정 준수 명시됨)",
+        "수지 로트 교체 단정"
+      ],
+      "trap": "'보압을 올려도 안 변한다'에서 게이트 동결(결정화 속도)로 넘어가는지가 관문. 보압 파라미터 미세조정 반복 처방이면 실패."
+    }
+  },
+  {
+    "id": "pa66-brittle-residence-bigbarrel",
+    "source": "WS6 Phase 2 residenceSensitivity 회귀가드(코워크 2026-07-29)",
+    "title": "PA66 간헐 취성 파단 — 대형 배럴 소샷 체류 열화",
+    "difficulty": "hard",
+    "input": {
+      "defect_type": "기타 (조립 시 취성 파단)",
+      "resin_type": "PA66",
+      "resin_detail": "PA66 무충전",
+      "machine_settings": {
+        "nozzle_temp": 300, "zone1_temp": 295, "zone2_temp": 290, "zone3_temp": 285, "zone4_temp": 275,
+        "mold_temp_fixed": 80, "mold_temp_moving": 80,
+        "injection_pressure": 105, "holding_pressure": 70, "injection_speed_1": 60,
+        "back_pressure": 5, "screw_rpm": 90, "drying_temp": 80, "drying_time": 5
+      },
+      "defect_description": "스냅핏 클립이 조립 시 간헐적으로 깨진다. 외관·치수는 정상, 변색도 없다. 건조는 규정대로(80°C 5시간, 제습). 최근 큰 기계로 옮겨서 샷 크기가 배럴 용량의 10% 정도다. 용융온도는 300°C 상단으로 쓰고 있다."
+    },
+    "expected": {
+      "root_cause": "체류 열화. 배럴 용량 대비 10% 샷 = 과도한 체류시간, 300°C 상단과 결합 시 분자량 저하(공급사 데이터: 310°C에서 10분 −6%, 30분 −17%)로 인성 저하. 변색 없이 진행되는 무증상 열화 + 간헐성(체류 분포)이 특징. 건조 정상이므로 수분 축 아님.",
+      "key_recommendations": [
+        "샷/배럴 비율 확보 — 소형 배럴 기계로 환원 또는 캐비티 증설 검토",
+        "용융온도를 대역 하단으로 하향 (체류 불가피하면 온도로 보상)",
+        "중단·재개 시 퍼지 규율 (첫 샷들 폐기)",
+        "충전 불량이 생기면 온도 상향 대신 사출속도 상향 우선 (PA는 전단 박화 지배)"
+      ],
+      "expected_phase": "material",
+      "severity": "high",
+      "hallucination_forbidden": [
+        "건조 부족을 1순위로 (규정 준수·변색 없음 명시)",
+        "변색이 없으므로 열화 아님 (무증상 열화 부정)",
+        "이형제·윤활제 오염 단정"
+      ],
+      "trap": "PA66+취성이면 반사적으로 수분·건조로 가기 쉽다. 샷 10%/300°C 조합에서 체류 축을 짚는지, '변색 없음=열화 없음' 함정을 피하는지가 관문. severity는 파단(기능 부품)이라 high."
+    }
   }
 ]

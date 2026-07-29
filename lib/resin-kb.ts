@@ -82,6 +82,10 @@ export const RESIN_KB: Record<string, ResinSpec> = {
     source: 'verified', confidence: 'verified',
     mechanism: {
       moistureMode: 'both',
+      crystallizationRate: 'fast',
+      viscositySensitivity: 'shear-dominant',
+      residenceSensitivity: 'medium',
+      polymerizationClass: 'ring-opening',
       notes: 'Moisture acts at two stages — keep them separate when advising: (1) WET PELLETS at melt temp → hydrolysis; parts molded from wet resin have permanently reduced strength/toughness (cannot be restored by re-drying or reprocessing). (2) MOLDED PARTS absorbing ambient moisture → plasticization; reversible, and conditioning to ~2-3% water is standard practice for toughness.',
       residualMonomerRisk: {
         monomer: 'caprolactam',
@@ -90,6 +94,7 @@ export const RESIN_KB: Record<string, ResinSpec> = {
       sourceRefs: [
         'DuPont Zytel/Minlon Molding Guide — moisture <0.2%; hydrolysis above; "cannot be restored by further processing"; part conditioning ~3% water (verified 2026-07-29)',
         'Interplas Insights — caprolactam residual monomer in PA: outgassing, deposit formation, surface bloom, splay/voids (verified 2026-07-29)',
+        'DuPont Zytel Molding Guide — "crystallize rapidly"; HUT at 310°C: MW −6%/10min, −17%/30min; viscosity shear-dominant, less temp-sensitive unreinforced (verified 2026-07-29)',
       ],
       verifiedAt: '2026-07-29',
     } },
@@ -101,8 +106,15 @@ export const RESIN_KB: Record<string, ResinSpec> = {
     source: 'verified', confidence: 'verified',
     mechanism: {
       moistureMode: 'both',
+      crystallizationRate: 'fast',
+      viscositySensitivity: 'shear-dominant',
+      residenceSensitivity: 'medium',
+      polymerizationClass: 'condensation',
       notes: 'Moisture acts at two stages — keep them separate when advising: (1) WET PELLETS at melt temp → hydrolysis; parts molded from wet resin have permanently reduced strength/toughness (cannot be restored by re-drying or reprocessing). (2) MOLDED PARTS absorbing ambient moisture → plasticization; reversible, and conditioning to ~2-3% water is standard practice for toughness.',
-      sourceRefs: ['DuPont Zytel/Minlon Molding Guide — moisture <0.2%; hydrolysis above; "cannot be restored by further processing"; part conditioning ~3% water (verified 2026-07-29)'],
+      sourceRefs: [
+        'DuPont Zytel/Minlon Molding Guide — moisture <0.2%; hydrolysis above; "cannot be restored by further processing"; part conditioning ~3% water (verified 2026-07-29)',
+        'DuPont Zytel Molding Guide — "crystallize rapidly"; HUT at 310°C: MW −6%/10min, −17%/30min; viscosity shear-dominant, less temp-sensitive unreinforced (verified 2026-07-29)',
+      ],
       verifiedAt: '2026-07-29',
     } },
   'PA46': { id: 'PA46', tier: 'super-engineering', crystalline: true, hygroscopic: 'very-high',
@@ -193,7 +205,14 @@ export const RESIN_KB: Record<string, ResinSpec> = {
     source: 'verified', confidence: 'verified',
     mechanism: {
       moistureMode: 'hydrolysis',
-      sourceRefs: ['Plastics Technology — You Must Dry Hygroscopic Resins (PBT in hydrolysis list); BASF Ultradur B4500 PDS — moisture <0.04% (verified 2026-07-29)'],
+      crystallizationRate: 'fast',
+      residenceSensitivity: 'medium',
+      polymerizationClass: 'condensation',
+      notes: 'Residence caution: for some grades, properties are lost within ~6 min at 260°C melt (grade-dependent) — at the top of the melt range, keep residence short and downsize the barrel before blaming mold or resin lot.',
+      sourceRefs: [
+        'Plastics Technology — You Must Dry Hygroscopic Resins (PBT in hydrolysis list); BASF Ultradur B4500 PDS — moisture <0.04% (verified 2026-07-29)',
+        'Celanese Celanex Tech Manual p.5 — "almost instantaneous crystallization from the melt"; PT Residence Time Pt.1 — PBT 260°C/6min property loss (verified 2026-07-29)',
+      ],
       verifiedAt: '2026-07-29',
     } },
   'PET': { id: 'PET', tier: 'engineering', crystalline: true, hygroscopic: 'high',
@@ -222,6 +241,7 @@ export const RESIN_KB: Record<string, ResinSpec> = {
     source: 'verified', confidence: 'verified',
     mechanism: {
       moistureMode: 'hydrolysis',
+      polymerizationClass: 'condensation',
       sourceRefs: ['Plastics Technology — You Must Dry Hygroscopic Resins (PC hydrolysis, premature failure); PT Resin Types — PC target 0.02%/200ppm (verified 2026-07-29)'],
       verifiedAt: '2026-07-29',
     } },
@@ -246,6 +266,7 @@ export const RESIN_KB: Record<string, ResinSpec> = {
     source: 'verified', confidence: 'verified',
     mechanism: {
       moistureMode: 'none',
+      residenceSensitivity: 'high',
       notes: 'Very low moisture uptake; drying normally unnecessary (recommended only for consistency). Surface moisture can cause splay/odor but does not degrade the polymer.',
       residualMonomerRisk: {
         monomer: 'formaldehyde',
@@ -254,6 +275,7 @@ export const RESIN_KB: Record<string, ResinSpec> = {
       sourceRefs: [
         'Celanese Celcon Processing Guide — no drying normally required; splay/odor only, no degradation (verified 2026-07-29)',
         'Celanese Celcon Processing Guide — degradation above 238°C / >15min above 193°C releases formaldehyde; ventilation & blow-back warnings (verified 2026-07-29)',
+        'Tangram Plastics Data File POM — thermal damage >230°C unless residence kept short (corroborates Celcon limits) (verified 2026-07-29)',
       ],
       verifiedAt: '2026-07-29',
     } },
@@ -314,6 +336,7 @@ export const RESIN_KB: Record<string, ResinSpec> = {
     source: 'verified', confidence: 'verified',
     mechanism: {
       moistureMode: 'none',
+      polymerizationClass: 'addition',
       sourceRefs: ['Plastics Technology — Resin Types: non-hygroscopic, surface moisture only (verified 2026-07-29)'],
       verifiedAt: '2026-07-29',
     } },
@@ -324,6 +347,7 @@ export const RESIN_KB: Record<string, ResinSpec> = {
     source: 'verified', confidence: 'verified',
     mechanism: {
       moistureMode: 'none',
+      polymerizationClass: 'addition',
       sourceRefs: ['Plastics Technology — Resin Types: non-hygroscopic, surface moisture only (verified 2026-07-29)'],
       verifiedAt: '2026-07-29',
     } },
@@ -344,6 +368,7 @@ export const RESIN_KB: Record<string, ResinSpec> = {
     source: 'verified', confidence: 'verified',
     mechanism: {
       moistureMode: 'none',
+      polymerizationClass: 'addition',
       sourceRefs: ['Plastics Technology — Resin Types: non-hygroscopic, surface moisture only (verified 2026-07-29)'],
       verifiedAt: '2026-07-29',
     } },
@@ -355,6 +380,7 @@ export const RESIN_KB: Record<string, ResinSpec> = {
     source: 'verified', confidence: 'verified',
     mechanism: {
       moistureMode: 'none',
+      polymerizationClass: 'addition',
       notes: 'Hygroscopic (needs drying, see drying spec) BUT no hydrolysis — C-C backbone has no hydrolyzable bonds. Wet-molding damage is cosmetic (splay/bubbles) only; the resin itself recovers with re-drying. Never tell the user a wet ABS lot is chemically damaged.',
       sourceRefs: ['M.Holland EI Thermoplastic Drying — ABS hygroscopic; Toray TOYOLAC — drying <0.1%; no-hydrolysis = C-C backbone [Common Practice] (verified 2026-07-29)'],
       verifiedAt: '2026-07-29',
