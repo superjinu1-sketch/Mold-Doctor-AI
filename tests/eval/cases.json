@@ -1658,5 +1658,31 @@
       "hallucination_forbidden": ["노즐후퇴(감압) 적용·증량으로 기포 배출 (방향 반전 — 구 KB 오류)", "건조 부족을 1순위로 (측정치 0.015%로 임계 이하 명시됨)", "보압↑을 1순위로 (가열 감별이 가스를 가리킴)"],
       "trap": "PC=흡습 수지라 반사적으로 건조를 의심하기 쉽지만 수분 데이터가 깨끗하다. '가열 시 부풂' 감별과 서크백 이력을 연결해 감압 축소를 처방하는지가 핵심. 감압을 늘리라고 하면 실패."
     }
+  },
+  {
+    "id": "pc-wetlot-hydrolysis-no-recovery",
+    "source": "WS6 Phase 1 moistureMode 회귀가드 — PC hydrolysis(코워크 2026-07-29)",
+    "title": "PC 젖은 수지 성형 로트 — 외관 양품이어도 물성 손상 안내",
+    "difficulty": "hard",
+    "input": {
+      "defect_type": "은줄 (Silver Streak)",
+      "resin_type": "PC",
+      "resin_detail": "PC 투명 일반사출",
+      "machine_settings": {
+        "nozzle_temp": 300, "zone1_temp": 295, "zone2_temp": 290, "zone3_temp": 280, "zone4_temp": 270,
+        "mold_temp_fixed": 90, "mold_temp_moving": 90,
+        "injection_pressure": 125, "holding_pressure": 85, "injection_speed_1": 50,
+        "back_pressure": 5, "screw_rpm": 80, "drying_temp": 100, "drying_time": 1
+      },
+      "defect_description": "건조기 고장으로 PC를 1시간만 건조하고 오전 내내 생산. 오전 중반부터 은줄이 나왔다 안 나왔다 했고, 지금 재건조 후에는 은줄이 사라졌다. 은줄 없이 나온 오전 생산분은 그대로 출하해도 되는지?"
+    },
+    "expected": {
+      "root_cause": "건조 부족(1시간, PC 권장 대비 미달)으로 인한 수분 은줄. 핵심은 출하 질문 — PC는 용융 중 가수분해로 분자량이 영구 저하되므로, 은줄이 안 보인 오전 생산분도 물성이 손상됐을 수 있다.",
+      "key_recommendations": ["오전 생산 로트 전체 격리 — 외관 양품이어도 물성 손상 가능(가수분해는 재건조로 회복 불가)", "기능·강도 요구 부품이면 해당 로트 인장/충격 확인 후 출하 판단", "건조 규정 복구(120°C 2~4h 제습, 목표 0.02%) 후 생산 재개"],
+      "expected_phase": "material",
+      "severity": "high",
+      "hallucination_forbidden": ["은줄 없으면 출하 가능 (외관 기준 판정)", "재건조하면 이미 성형된 부품 물성도 회복", "PA처럼 컨디셔닝하면 된다"],
+      "trap": "외관 양품 = OK로 답하면 실패. PC hydrolysis의 비가역성과 무증상 손상(no splay visible, fails prematurely)을 짚는지가 판정 포인트."
+    }
   }
 ]

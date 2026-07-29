@@ -1,6 +1,7 @@
 // lib/resin-mechanism.test.ts
-// 수지 심층 KB Phase 0(resin-mechanism-schema-v1) 검증. mock ResinSpec은 이 파일 안에만 존재 —
-// 프로덕션 RESIN_KB에는 어떤 mechanism 값도 채우지 않는다(이번 mandate의 절대 규칙).
+// 수지 심층 KB Phase 0(resin-mechanism-schema-v1) + Phase 1 moistureMode(resin-mechanism-phase1-moisture-v1) 검증.
+// mock ResinSpec은 이 파일 안에만 존재. 프로덕션 RESIN_KB는 Phase 1에서 문헌 검증된 verified 10종만
+// mechanism.moistureMode가 채워진다 — estimated 42종은 여전히 미채움(§3-4 스코프 확인).
 // 실행: node --test lib/resin-mechanism.test.ts
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
@@ -61,16 +62,21 @@ test('formatMechanism: mechanism 필드 자체가 없으면 빈 문자열(0토�
   assert.equal(formatMechanism(noMechanism), '');
 });
 
-test('formatMechanism: 실제 프로덕션 수지(PP, mechanism 미채움)는 빈 문자열 — 현 상태 무변화 확인', () => {
-  const pp = RESIN_KB['PP'];
-  assert.ok(pp, 'RESIN_KB.PP가 존재해야 이 테스트가 의미 있다');
-  assert.equal(pp.mechanism, undefined, 'Phase 0에서는 어떤 수지도 mechanism 값이 채워지면 안 된다');
-  assert.equal(formatMechanism(pp), '');
+test('formatMechanism: estimated 수지(PA46, mechanism 미채움)는 빈 문자열 — Phase 1 스코프 밖 무변화 확인', () => {
+  const pa46 = RESIN_KB['PA46'];
+  assert.ok(pa46, 'RESIN_KB.PA46이 존재해야 이 테스트가 의미 있다');
+  assert.equal(pa46.confidence, 'estimated', 'PA46은 estimated 42종에 속해야 이 테스트가 의미 있다');
+  assert.equal(pa46.mechanism, undefined, 'estimated 42종은 Phase 1에서 채워지면 안 된다');
+  assert.equal(formatMechanism(pa46), '');
 });
 
-test('formatMechanism: RESIN_KB 전 수지(52종) mechanism 미채움 — 프로덕션 데이터 무변경 재확인', () => {
-  const withMechanism = Object.values(RESIN_KB).filter(spec => spec.mechanism !== undefined);
-  assert.deepEqual(withMechanism, [], `mechanism이 채워진 수지가 있으면 안 된다: ${withMechanism.map(s => s.id).join(', ')}`);
+test('formatMechanism: RESIN_KB에서 mechanism이 채워진 수지 = Phase 1 verified 10종과 정확히 일치', () => {
+  const PHASE1_VERIFIED_IDS = ['PA6', 'PA66', 'PBT', 'PC', 'POM(아세탈)', 'PP', 'PE(HDPE)', 'PS', 'ABS', 'PC/ABS'].sort();
+  const withMechanism = Object.entries(RESIN_KB)
+    .filter(([, spec]) => spec.mechanism !== undefined)
+    .map(([key]) => key)
+    .sort();
+  assert.deepEqual(withMechanism, PHASE1_VERIFIED_IDS, `mechanism 채움 목록이 Phase 1 대상 10종과 달라졌다: ${withMechanism.join(', ')}`);
 });
 
 test('formatMechanism: polymerizationClass=addition + moistureMode=hydrolysis → 콘솔 경고', () => {
