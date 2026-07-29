@@ -83,7 +83,14 @@ export const RESIN_KB: Record<string, ResinSpec> = {
     mechanism: {
       moistureMode: 'both',
       notes: 'Moisture acts at two stages — keep them separate when advising: (1) WET PELLETS at melt temp → hydrolysis; parts molded from wet resin have permanently reduced strength/toughness (cannot be restored by re-drying or reprocessing). (2) MOLDED PARTS absorbing ambient moisture → plasticization; reversible, and conditioning to ~2-3% water is standard practice for toughness.',
-      sourceRefs: ['DuPont Zytel/Minlon Molding Guide — moisture <0.2%; hydrolysis above; "cannot be restored by further processing"; part conditioning ~3% water (verified 2026-07-29)'],
+      residualMonomerRisk: {
+        monomer: 'caprolactam',
+        consequence: 'Residual/regenerated caprolactam volatilizes at melt temperature and condenses as mold/vent deposits (plate-out), surface bloom, and odor; also contributes to splay and voids. If deposits recur on PA6 but not on PA66 under the same mold and conditions, suspect this material axis rather than process settings.',
+      },
+      sourceRefs: [
+        'DuPont Zytel/Minlon Molding Guide — moisture <0.2%; hydrolysis above; "cannot be restored by further processing"; part conditioning ~3% water (verified 2026-07-29)',
+        'Interplas Insights — caprolactam residual monomer in PA: outgassing, deposit formation, surface bloom, splay/voids (verified 2026-07-29)',
+      ],
       verifiedAt: '2026-07-29',
     } },
   'PA66': { id: 'PA66', tier: 'engineering', crystalline: true, hygroscopic: 'very-high',
@@ -240,7 +247,14 @@ export const RESIN_KB: Record<string, ResinSpec> = {
     mechanism: {
       moistureMode: 'none',
       notes: 'Very low moisture uptake; drying normally unnecessary (recommended only for consistency). Surface moisture can cause splay/odor but does not degrade the polymer.',
-      sourceRefs: ['Celanese Celcon Processing Guide — no drying normally required; splay/odor only, no degradation (verified 2026-07-29)'],
+      residualMonomerRisk: {
+        monomer: 'formaldehyde',
+        consequence: 'Overheating or excess residence regenerates formaldehyde gas (Celanese: never above 238°C; do not hold above 193°C for more than 15 min without purging) — odor, gas-related defects, vent deposits. Safety: ventilation required; blocked vents can cause pressure blow-back. For POM odor/burn complaints, check residence time and temperature before mold-side causes.',
+      },
+      sourceRefs: [
+        'Celanese Celcon Processing Guide — no drying normally required; splay/odor only, no degradation (verified 2026-07-29)',
+        'Celanese Celcon Processing Guide — degradation above 238°C / >15min above 193°C releases formaldehyde; ventilation & blow-back warnings (verified 2026-07-29)',
+      ],
       verifiedAt: '2026-07-29',
     } },
   // ── 고성능 (super engineering) ──

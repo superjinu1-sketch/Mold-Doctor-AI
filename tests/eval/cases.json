@@ -1684,5 +1684,40 @@
       "hallucination_forbidden": ["은줄 없으면 출하 가능 (외관 기준 판정)", "재건조하면 이미 성형된 부품 물성도 회복", "PA처럼 컨디셔닝하면 된다"],
       "trap": "외관 양품 = OK로 답하면 실패. 채점 핵심은 severity 표시가 아니라 실질 조치다 — 로트 격리·가수분해 비가역성 명시·'기능부품이면 high' 에스컬레이션 안내가 나와야 한다. 용도 불명 입력이므로 severity는 medium이 정답(카브아웃 조건 2), high로 내면 과평가."
     }
+  },
+  {
+    "id": "pa6-molddeposit-caprolactam-axis",
+    "source": "WS6 Phase 1 residualMonomerRisk 회귀가드(코워크 2026-07-29)",
+    "title": "PA6 게이트·벤트 주변 백색 퇴적 반복 — 재료 축(카프로락탐) 식별",
+    "difficulty": "hard",
+    "input": {
+      "defect_type": "기타 (게이트 주변 백색 퇴적)",
+      "resin_type": "PA6",
+      "resin_detail": "PA6 무충전",
+      "machine_settings": {
+        "nozzle_temp": 260, "zone1_temp": 255, "zone2_temp": 250, "zone3_temp": 245, "zone4_temp": 235,
+        "mold_temp_fixed": 80, "mold_temp_moving": 80,
+        "injection_pressure": 100, "holding_pressure": 70, "injection_speed_1": 55,
+        "back_pressure": 5, "screw_rpm": 100, "drying_temp": 80, "drying_time": 5
+      },
+      "defect_description": "PA6 커넥터 양산에서 2~3시간마다 게이트와 벤트 주변에 뿌연 백색 막이 쌓여 제품에 전사된다. 닦으면 지워지고, 금형 세정 후 한동안 괜찮다가 다시 쌓인다. 같은 금형으로 PA66을 돌릴 때는 이런 게 없었다. 건조는 규정대로(80°C 5시간) 하고 있다."
+    },
+    "expected": {
+      "root_cause": "mold_deposit(plate-out) — PA6의 잔류/재생성 카프로락탐이 용융 중 휘발해 금형 저온부(게이트·벤트)에 응축. 닦으면 지워짐 + 세정 후 재누적 + PA66에서는 무발생이 재료 기인(카프로락탐) 축을 가리킨다. 건조 정상이므로 수분 축 아님.",
+      "key_recommendations": [
+        "주기적 금형 세정 주기 확립 + 벤트 청소 (당장의 대응)",
+        "멜트온도 하향 여지 확인·체류시간 단축 (휘발량 저감)",
+        "저휘발(low-extractables) PA6 그레이드 검토 또는 공급사에 카프로락탐 잔류량 문의",
+        "벤팅 개선 (가스 응축 집중 완화)"
+      ],
+      "expected_phase": "material",
+      "severity": "low",
+      "hallucination_forbidden": [
+        "건조 부족을 1순위로 (규정 준수 명시됨)",
+        "닦이는 퇴적을 구조적 불량(웰드·은줄)으로 분류",
+        "금형 손상·부식으로 단정"
+      ],
+      "trap": "닦으면 지워짐 = plate-out 감별이 1차 관문. 2차 관문은 'PA66에선 없었다'는 대비에서 카프로락탐(재료 축)을 짚는지 — 공정 조건 미세조정 반복으로 답하면 감점."
+    }
   }
 ]
