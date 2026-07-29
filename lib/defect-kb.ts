@@ -4,7 +4,7 @@
 // 수정 순서: taxonomy.md → 이 파일 → KB_VERSION bump → eval 회귀.
 import type { ResinSpec } from './resin-kb';
 
-export const KB_VERSION = 'defect-kb-v1.9';
+export const KB_VERSION = 'defect-kb-v1.10';
 
 export type Cause = {
   rank: number;
@@ -77,7 +77,7 @@ export const DEFECT_KB: Record<string, DefectNode> = {
         adjustment: '멜트온도↑, 사출속도↑(과하면 제팅·플래시), 사출압↑.' },
       { rank: 2, cause: '게이트·런너 과소 또는 특정캐비티 밸런스 불량', category: 'Mold',
         baseProbability: 25,
-        trigger: '특정 캐비티만 반복 미충전, 또는 게이트 단면 < 벽두께 50%',
+        trigger: '특정 캐비티만 반복 미충전, 또는 게이트 단면이 벽두께 대비 과소 — 점도별 하한: 고점도(PC·PMMA 등) 60~70%, 중점도 50~60%, 저점도(PE·PA 등) 40~50%. 하한 미만이면 과소 의심.',
         evidence: '게이트 타입·캐비티 수. 특정 캐비티 패턴 여부.',
         verification: '불량 캐비티 위치 기록. 런너 밸런스 검토.',
         adjustment: '게이트 확대, 런너 밸런스 수정, 캐비티 수 조정.' },
@@ -184,7 +184,7 @@ export const DEFECT_KB: Record<string, DefectNode> = {
   weld_line: {
     id: 'weld_line', nameKo: '웰드라인', nameEn: 'Weld Line', phase: '충전',
     typicalSeverity: 'medium (외관). GF 수지 강도 직결·기능부품 시 high',
-    discriminators: '홀·보스·코어핀 주변, 멀티게이트 합류부 가는 선. 합류각<135°=weld(강도저하 큼) / >135°=meld. GF수지=강도 모재 50~80%↓. 닦아도 안 지워지는 구조적 선. 닦으면 옅어지는 백색 잔류물이면 웰드 아님 → mold_deposit(석출) 검토.',
+    discriminators: '홀·보스·코어핀 주변, 멀티게이트 합류부 가는 선. 합류각<135°=weld(강도저하 큼) / >135°=meld. GF수지=강도 모재 대비 큰 폭 저하(통상 50~80%↓로 인용되나, PA6-GF30 실측은 유지율 59.6~66.5% = 33.5~40.4%↓ — 수지·GF함량·웰드각에 따라 편차가 크므로 단정하지 말 것). 닦아도 안 지워지는 구조적 선. 닦으면 옅어지는 백색 잔류물이면 웰드 아님 → mold_deposit(석출) 검토.',
     causes: [
       { rank: 1, cause: '멜트온도 부족 (비강화 수지에서 강도 지배 인자)', category: 'Method',
         baseProbability: 45,
@@ -219,8 +219,9 @@ export const DEFECT_KB: Record<string, DefectNode> = {
       'Wu & Liang (cited in 15:4102 intro) — PP/HDPE: melt temp dominates weld strength. Original full text NOT verified (paywall)',
       'Jadhav & Gaval et al., J. Thermoplastic Composite Materials (2023) — packing pressure effect on stagnation weld-line strength',
       'Mokarizadehhaghighishirazi et al., Polymer Composites (2024) — fiber orientation at weld plane',
+      'Materials (MDPI) 17(14):3428 (2024) — PA6-GF30: base UTS 110 MPa vs weld line 65.51~73.19 MPa (retention 59.6~66.5%). Full text verified 2026-07-28',
     ],
-    verifiedAt: '2026-07-28',
+    verifiedAt: '2026-07-29',
   },
 
   // ─── 5. Air Trap / Burn Mark (에어트랩·버닝) ───────────────
@@ -297,7 +298,7 @@ export const DEFECT_KB: Record<string, DefectNode> = {
         baseProbability: 50,
         trigger: '홀드압 < 사출1차압의 50% 또는 보압시간 < 게이트씰 시간',
         evidence: '홀드압·보압시간·게이트 크기.',
-        verification: 'Gate Seal Study: 보압시간 1초씩↑ → 중량 안정(±0.1g)=씰 확인.',
+        verification: 'Gate Seal Study: 보압시간 1초씩↑ → 중량 안정 시 씰 확인. 안정 판정은 ±0.1g 또는 샷 중량의 ±0.1% 중 큰 값(소형 부품은 절대 기준, 대형 부품은 상대 기준이 맞다).',
         adjustment: '보압↑(1차압의 50~80%), 보압시간↑(게이트씰까지+1~2초).' },
       { rank: 2, cause: '게이트 조기 고화', category: 'Mold',
         baseProbability: 25,
