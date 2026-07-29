@@ -53,3 +53,4 @@ next-env.d.ts
 /android/capacitor-cordova-android-plugins
 /android/local.properties
 /.cap-excluded
+/*.pdf
