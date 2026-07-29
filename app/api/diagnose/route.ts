@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { downscaleBase64 } from '@/lib/downscale';
 import { tryMock } from '@/lib/mock';
 import { getResinSpec, checkSettings, formatKbCompare, formatMechanism } from '@/lib/resin-kb';
-import { formatDefectGuide } from '@/lib/defect-kb';
+import { formatDefectGuide, KB_VERSION } from '@/lib/defect-kb';
 import { supabaseAdmin } from '@/lib/supabase/server';
 import { getSampleDemo } from '@/lib/sample-demo';
 import { matchesSampleCase } from '@/lib/sampleCase';
@@ -192,6 +192,11 @@ export const HYGROSCOPICITY_GUARD = `[흡습성 정확성 — 반드시 준수]
 - 물은 비결정 영역으로 침투(결정 영역은 배제) → 같은 수지면 결정성↑일수록 흡습↓.
 - PC·PET·PBT 등이 건조 필수인 이유는 흡습량이 많아서가 아니라, 고온 성형 시 소량의 잔류 수분도 카보네이트/에스터를 가수분해(수분이 열에 분해돼 분자량 저하·가스 발생)시키기 때문이다(0.07~0.1%만 돼도 splay/은줄). → 흡습량과 무관하게 건조.
 - 따라서 PC 은줄 설명 시 "비결정질이라 흡습성 강함" 류 표현 금지. 올바른 표현: "카보네이트 극성으로 흡습(흡습량은 PA보다 낮음), 단 고온 가수분해 감수성이 높아 건조 필수."`;
+
+// 프롬프트 버전 — FIXED_FRAMEWORK·VISUAL_DIFFERENTIAL·HYGROSCOPICITY_GUARD 등
+// 모델 입력에 들어가는 지시문이 바뀔 때마다 bump한다. 진단 레코드에 기록되어
+// "어느 프롬프트로 나온 답인가"를 사후 추적하는 근거가 된다.
+export const PROMPT_VERSION = 'v19';
 
 const FIXED_FRAMEWORK = `You are an expert injection molding troubleshooter trained in Scientific Molding methodology (RJG/Paulson approach, Decoupled Molding II/III). You have 15+ years of hands-on experience and apply systematic, data-driven analysis rather than trial-and-error.
 
@@ -896,6 +901,10 @@ CRITICAL: Your entire response must be ONLY the JSON object. No text before or a
       output_tokens: u.output_tokens,
       cache_read: (u as unknown as Record<string, number>).cache_read_input_tokens ?? 0,
     };
+    // 진단 레코드 KB·프롬프트 버전 추적용 — 헤더가 아니라 body(diagnosis-record-kb-version-v1).
+    // 헤더로 보내면 Access-Control-Expose-Headers 등록 누락 시 앱(cross-origin)에서만 조용히 null이 된다.
+    result.kbVersion = KB_VERSION;
+    result.promptVersion = PROMPT_VERSION;
 
     // 부분성공(파싱 폴백)이면 크레딧 환불(멱등). throw 아니라 200 경로라 여기서 처리.
     let finalBalance = creditBalance;

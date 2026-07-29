@@ -994,6 +994,8 @@ function DiagnoseContent() {
           timestamp: new Date().toISOString(),
           id: newId,
           round: diagnosisRound,
+          kbVersion: data.kbVersion,
+          promptVersion: data.promptVersion,
           beforeResin: resinType === '기타 (직접 입력)' ? customResin : resinType,
           beforeSettings: { ...settings },
           beforeInput: {

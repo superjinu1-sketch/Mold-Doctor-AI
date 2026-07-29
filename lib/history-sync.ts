@@ -25,6 +25,8 @@ export interface HistoryRecord {
   causes?: DiagnosisCause[];
   recommendations?: DiagnosisRec[];
   beforeInput?: Record<string, unknown>;
+  kbVersion?: string;
+  promptVersion?: string;
   [key: string]: unknown;
 }
 
@@ -66,6 +68,8 @@ function recordToRow(rec: HistoryRecord, userId: string): Row {
     before_photo: rec.beforePhoto ?? null,
     after_photo: rec.afterPhoto ?? null,
     before_input: rec.beforeInput ?? null,
+    kb_version: rec.kbVersion ?? null,
+    prompt_version: rec.promptVersion ?? null,
     resolved: coerceResolved(rec.resolved),
     resolved_at: rec.resolvedAt ?? null,
     resolved_memo: rec.resolvedMemo ?? null,
@@ -90,6 +94,8 @@ function rowToRecord(row: Row): HistoryRecord {
     beforePhoto: (row.before_photo as string) ?? undefined,
     afterPhoto: (row.after_photo as string) ?? undefined,
     beforeInput: (row.before_input as Record<string, unknown>) ?? undefined,
+    kbVersion: (row.kb_version as string) ?? undefined,
+    promptVersion: (row.prompt_version as string) ?? undefined,
     resolved: (row.resolved as string) ?? undefined,
     resolvedAt: (row.resolved_at as string) ?? undefined,
     resolvedMemo: (row.resolved_memo as string) ?? undefined,
