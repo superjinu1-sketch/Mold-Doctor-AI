@@ -4,7 +4,7 @@
 // 수정 순서: taxonomy.md → 이 파일 → KB_VERSION bump → eval 회귀.
 import type { ResinSpec } from './resin-kb';
 
-export const KB_VERSION = 'defect-kb-v1.10';
+export const KB_VERSION = 'defect-kb-v1.11';
 
 export type Cause = {
   rank: number;
@@ -504,7 +504,8 @@ export const DEFECT_KB: Record<string, DefectNode> = {
 배럴온도가 resin-kb meltC.degradeAbove 초과 시 → thermal splay(2순위) 우선 분기.
 비흡습 수지(PP·PE·PS) → 즉시 전단/공기 분기.
 복합 원인(수분+전단 동시 작용 시 더 심화) 가능.
-★ GF 강화수지 + 건조 조건 정상(resin-kb 충족) + 안 닦이는 방사상 백화면 silver_streak(수분 splay)이 아니라 fiber_readout(GF 표면백화)로 분류 전환하고 금형온도↑를 1순위로 권고하라. (단 건조가 부족하면 그대로 moisture 유지 — 이 전환은 "건조 정상"에만 적용.)`,
+★ GF 강화수지 + 건조 조건 정상(resin-kb 충족) + 안 닦이는 방사상 백화면 silver_streak(수분 splay)이 아니라 fiber_readout(GF 표면백화)로 분류 전환하고 금형온도↑를 1순위로 권고하라. (단 건조가 부족하면 그대로 moisture 유지 — 이 전환은 "건조 정상"에만 적용.)
+★ 가수분해 카브아웃: 수지의 moisture mode가 hydrolysis 또는 both(PC·PBT·PA 등 — resin mechanism 참조)이고 건조 조건이 권장 미달로 확인되면, 이 건은 외관 문제가 아니라 물성 문제다. (1) 은줄이 보이지 않는 로트·샷도 물성 손상 가능성을 명시하고, 해당 생산분 격리 + 물성 확인(인장/충격) 후 출하 판단을 권고하라. "외관 양품 = 출하 가능"이라고 답하지 마라 — 가수분해는 재건조로 회복되지 않고, 은줄 없이도 조기 파손할 수 있다. (2) 기능·강도 요구 부품이면 severity를 high로 판정하라(파단 강도 부족 기준 해당). 외관 전용 부품이면 medium 유지. (3) 건조 조건이 권장을 충족하면 이 카브아웃은 적용하지 않는다.`,
     source: 'synthesis-3.1,taxonomy-11', confidence: 'verified',
     sourceRefs: [
       'Plastics Technology — Identifying and Correcting Splay (moisture/heat/shear discrimination; decompression 0.1~0.4 in.)',
