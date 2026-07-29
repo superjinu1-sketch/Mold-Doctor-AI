@@ -5,11 +5,17 @@ export type NoteBlock =
   | { type: 'h2'; text: string }
   | { type: 'diagram'; id: 'cross-section' | 'flow' };
 
+// lib/notesDiagramSvg.ts(node:fs 사용, 서버 전용)가 이 타입을 가져다 쓴다 — 반대 방향(이 파일이
+// notesDiagramSvg.ts에서 import)이면 lib/notes.ts를 가져다 쓰는 클라이언트 컴포넌트(app/page.tsx)가
+// 번들러 설정에 따라 fs를 함께 끌고 들어올 위험이 있어 여기서 정의한다(notes-list-thumbnail-v1).
+export type NoteThumbId = 'splay-branch';
+
 export interface Note {
   slug: string;
   title: string;
   description: string;
   publishedAt: string; // ISO
+  thumb?: NoteThumbId;  // 목록 카드용 축약 도식. 없으면 텍스트만 렌더
   body: NoteBlock[];
 }
 
@@ -23,6 +29,7 @@ export const NOTES: Note[] = [
     title: 'If the drying data is clean, it might not be splay',
     description: "Moisture is the usual answer for splay on glass-filled nylon. When the dryer checks out, the next answer isn't a longer drying cycle.",
     publishedAt: '2026-07-28',
+    thumb: 'splay-branch',
     body: [
       p('The longest-running wrong answer I dealt with while building Mold Doctor was a white streak on glass-filled PA66.'),
       p("The AI called moisture every time. It called moisture even when the drying conditions entered were fine. Temperature, time, moisture target, all within the recommended range for PA66, and the answer didn't move."),
