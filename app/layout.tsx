@@ -5,8 +5,10 @@ import Footer from '@/components/Footer';
 import UpdateGate from '@/components/UpdateGate';
 import { LocaleProvider } from '@/contexts/LocaleContext';
 import { AuthProvider } from '@/contexts/AuthContext';
+import { SITE_URL } from '@/lib/siteUrl';
 
 export const metadata: Metadata = {
+  metadataBase: new URL(SITE_URL),
   title: 'Mold Doctor AI — 사출 불량 트러블슈팅',
   description: '사출기 셋팅 값과 불량 사진을 입력하면 AI가 원인을 분석하고 해결 조건을 제시합니다.',
   manifest: '/manifest.json',
