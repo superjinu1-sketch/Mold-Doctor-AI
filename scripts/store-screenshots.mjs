@@ -8,7 +8,7 @@
 //   2 02-diagnose-input.png   진단 입력            — 로그인 필요
 //   3 03-diagnose-result.png  진단 결과(기존 이력)  — 로그인 필요, 신규 진단 실행 없음
 //   4 04-tryout.png           시사출 체크리스트    — 로그인 필요(/tryout 자체가 로그인 게이트)
-//   5 05-pricing.png          요금 페이지          — 비로그인 (구매 액션 전까지는 로그인 불요)
+//   5 05-tools.png            무료 도구 모음       — 비로그인 (/tools, useAuth 미사용·이메일 미노출)
 //
 // 자격이 없으면 로그인 불요 대상(1·5)만 찍고, 로그인 필요 대상은 건너뛰며 안내를 출력한다.
 // --only=<쉼표로 구분된 번호> 로 특정 번호만 재실행 가능 (예: --only=4,5).
@@ -107,12 +107,12 @@ const TARGETS = [
   },
   {
     n: 5,
-    file: '05-pricing.png',
-    needsLogin: false, // 구매 액션 전까지는 로그인 불요, 이메일도 미노출
+    file: '05-tools.png',
+    needsLogin: false, // useAuth 미사용 — 로그인 게이트 없음, 이메일도 미노출
     capture: async (page) => {
-      await page.goto(`${BASE_URL}/pricing`, { waitUntil: 'networkidle' });
+      await page.goto(`${BASE_URL}/tools`, { waitUntil: 'networkidle' });
       await page.waitForSelector('h1', { timeout: 15000 });
-      await page.screenshot({ path: path.join(OUT_DIR, '05-pricing.png'), fullPage: false });
+      await page.screenshot({ path: path.join(OUT_DIR, '05-tools.png'), fullPage: false });
     },
   },
 ];
