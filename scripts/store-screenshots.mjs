@@ -36,6 +36,12 @@ function parseOnly() {
 }
 
 async function loginViaModal(page) {
+  // --only 조합에 따라 01(홈)이 선택되지 않으면 page가 about:blank 상태라 "로그인" 버튼이
+  // 존재하지 않는다 — 로그인 전 항상 홈으로 진입해 네비바를 확보한다(조합과 무관하게 고정 순서).
+  log('로그인 전 홈 진입...');
+  await page.goto(`${BASE_URL}/`, { waitUntil: 'networkidle' });
+  await page.waitForSelector('h1', { timeout: 15000 });
+
   log('로그인 진행...');
   await page.getByRole('button', { name: '로그인', exact: true }).first().click();
   const dialog = page.getByRole('dialog');
