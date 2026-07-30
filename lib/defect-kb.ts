@@ -4,7 +4,7 @@
 // 수정 순서: taxonomy.md → 이 파일 → KB_VERSION bump → eval 회귀.
 import type { ResinSpec } from './resin-kb';
 
-export const KB_VERSION = 'defect-kb-v1.12';
+export const KB_VERSION = 'defect-kb-v1.13';
 
 export type Cause = {
   rank: number;
@@ -164,7 +164,7 @@ export const DEFECT_KB: Record<string, DefectNode> = {
     causes: [
       { rank: 1, cause: '게이트 위치·크기 부적절 + 사출속도 과고', category: 'Mold',
         baseProbability: 60,
-        trigger: '게이트가 오픈공간 정면. 게이트 두께 < 벽두께 50~80%.',
+        trigger: '게이트가 오픈공간 정면. 게이트 두께 < 벽두께 대비 수지별 기준(PE/PP 50%·ABS/아세탈 75%·PC류 ~90%) 미달.',
         evidence: '게이트 타입. 사출속도. 불량 패턴(구불선).',
         verification: '사단사출 1단 속도만↓ → 소멸=Process / 미소멸=Gate 설계.',
         adjustment: '게이트통과 속도↓(다단), 게이트 위치 벽면방향, 게이트 확대.' },
@@ -180,7 +180,7 @@ export const DEFECT_KB: Record<string, DefectNode> = {
       '동심원': '흐름자국(flow mark)으로 재분류 검토',
     },
     sharedGates: [],
-    source: 'synthesis-1.3,taxonomy-3', confidence: 'estimated',
+    source: 'synthesis-1.3,taxonomy-3', confidence: 'verified',
   },
 
   // ─── 4. Weld Line (웰드라인) ───────────────────────────────
@@ -238,7 +238,7 @@ export const DEFECT_KB: Record<string, DefectNode> = {
         trigger: '벤트 없음 또는 탄화 퇴적 막힘. 동일 위치 반복.',
         evidence: '불량 위치(말단·리브끝·보스 내). 기존 금형 갑작 발생=막힘 의심.',
         verification: '벤트 청소 후 재시험. Progressive Short-Shot(에어트랩 위치 확인).',
-        adjustment: '벤트 추가·청소(최우선). 깊이: 결정성 0.025mm·비결정성 0.038mm.' },
+        adjustment: '벤트 추가·청소(최우선). 깊이 가이드: 결정성(PA·PP·PE 등 저점도) 0.013~0.025mm, 비결정성(ABS·PC 등) 0.025~0.076mm — 범위 하한부터 가공 후 플래시 없으면 증분(현장 표준 관행). 저점도 PA는 하한 쪽.' },
       { rank: 2, cause: '사출속도 과고', category: 'Machine',
         baseProbability: 30,
         trigger: '사출속도 입력값 과다. 속도↓ 시 소멸 확인.',
@@ -253,13 +253,13 @@ export const DEFECT_KB: Record<string, DefectNode> = {
         adjustment: '클램프력 필요최소로↓.' },
     ],
     patternHints: {
-      '말단 고정': '벤팅 먼저 확인(SPE: 항상 불충분 벤팅의 신호)',
+      '말단 고정': '벤팅 먼저 확인(말단 고정 탄화는 불충분 벤팅의 대표 신호)',
       '기존 금형 갑작 발생': '벤트 막힘(탄화 퇴적) 확인',
       '탄냄새': 'POM·ABS 포름알데히드·부산물. 온도 엄수.',
     },
     sharedGates: [],
-    priorityLogic: '벤팅 최우선(SPE). 클램프력 과도=벤트 압착 역설. 신금형=벤트 설계 누락 검토.',
-    source: 'synthesis-1.5,taxonomy-5', confidence: 'estimated',
+    priorityLogic: '벤팅 최우선. 클램프력 과도=벤트 압착 역설. 신금형=벤트 설계 누락 검토.',
+    source: 'synthesis-1.5,taxonomy-5', confidence: 'verified',
   },
 
   // ─── 6. Flow Mark (흐름자국) ───────────────────────────────
@@ -288,7 +288,7 @@ export const DEFECT_KB: Record<string, DefectNode> = {
       '신규 금형·이관 직후': 'air_trap_burn 분기 참조. 신금형은 벤트 설계 누락이 흔하다. 같은 재료가 다른 금형에서 정상이면 재료 원인은 강등하고 금형(벤팅) 우선.',
     },
     sharedGates: ['mold_temp_insufficient'],
-    source: 'synthesis-3.2,taxonomy-6', confidence: 'estimated',
+    source: 'synthesis-3.2,taxonomy-6', confidence: 'verified',
   },
 
   // ─── 7. Sink Mark (싱크마크) ───────────────────────────────
@@ -550,7 +550,7 @@ export const DEFECT_KB: Record<string, DefectNode> = {
       '색불균일|분산 줄무늬|마스터배치 분산': '안료·MB 분산 불량(전체 열변색 아님 — 분산 줄무늬는 color_streaks 계열). 배압 상향은 소폭이 아니라 단계적 대폭(현재 대비 2배 수준 목표) + 스크루 RPM 하향 병행(체류·혼련 확보). GF 수지는 섬유 파손 주의.',
     },
     sharedGates: [],
-    source: 'synthesis-3.3,taxonomy-12', confidence: 'estimated',
+    source: 'synthesis-3.3,taxonomy-12', confidence: 'verified',
   },
 
   // ── 나머지 18종 골격 (append-friendly) ──────────────────────
@@ -575,6 +575,7 @@ export const DEFECT_KB: Record<string, DefectNode> = {
 
   fiber_readout: {
     id: 'fiber_readout', nameKo: 'GF 표면백화', nameEn: 'Fiber Read-out', phase: '표면',
+    typicalSeverity: 'medium (외관)',
     discriminators: 'GF수지 표면 흰 방사상 흔적·거침. 흑색 부품서 두드러짐.',
     causes: [
       { rank: 1, cause: '금형온도 과소(섬유 캡슐화 실패)', category: 'Mold',
@@ -582,14 +583,15 @@ export const DEFECT_KB: Record<string, DefectNode> = {
         trigger: 'GF 강화 + resin-kb moldC.gf 범위 미달.',
         evidence: '금형온도. resin-kb moldC.gf 대비.',
         verification: '금형온도 10°C↑ 후 개선 확인.',
-        adjustment: '금형온도↑(단일 최대 효과), 배럴온도 GF 비강화 대비 10~30°C↑.' },
+        adjustment: '금형온도↑(단일 최대 효과 — GF 강화는 비강화 대비 금형온도 상단 필요: 예 PA66 비강화 ~70°C vs GF ~100°C, 공급사 가이드). 배럴온도는 공급사 권장 범위 내 유지 — GF라고 배럴을 더 올리지 마라(PA66은 비강화와 권장 멜트 동일 285~305°C, 과열은 체류 열화만 유발).' },
     ],
     sharedGates: ['mold_temp_insufficient'],
-    source: 'synthesis-3.5,taxonomy-14', confidence: 'estimated',
+    source: 'synthesis-3.5,taxonomy-14', confidence: 'verified',
   },
 
   surface_gloss: {
     id: 'surface_gloss', nameKo: '표면거침/광택불균일', nameEn: 'Surface Roughness/Gloss', phase: '표면',
+    typicalSeverity: 'medium (외관)',
     discriminators: '광택 전이(고/저광택 교대 경계선) vs 전체 거침. flow mark(유동방향 줄무늬)와 구분.',
     causes: [
       { rank: 1, cause: '금형온도 과저·불균일', category: 'Mold',
@@ -605,7 +607,7 @@ export const DEFECT_KB: Record<string, DefectNode> = {
         adjustment: '보압↑.' },
     ],
     sharedGates: ['mold_temp_insufficient'],
-    source: 'synthesis-3.6,taxonomy-15', confidence: 'estimated',
+    source: 'synthesis-3.6,taxonomy-15', confidence: 'verified',
   },
 
   dimensional_instability: {

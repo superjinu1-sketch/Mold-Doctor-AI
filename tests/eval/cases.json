@@ -1790,5 +1790,74 @@
       ],
       "trap": "PA66+취성이면 반사적으로 수분·건조로 가기 쉽다. 샷 10%/300°C 조합에서 체류 축을 짚는지, '변색 없음=열화 없음' 함정을 피하는지가 관문. severity는 파단(기능 부품)이라 high."
     }
+  },
+  {
+    "id": "pa66gf-fiber-readout-moldtemp-axis",
+    "source": "Batch 2 회귀가드 — fiber_readout 배럴온도 실오류 정정(코워크 2026-07-30)",
+    "title": "PA66 GF30 표면 백화 — 배럴 추가 상향 대신 금형온도 축",
+    "difficulty": "hard",
+    "input": {
+      "defect_type": "GF 표면백화 (Fiber Read-out)",
+      "resin_type": "PA66",
+      "resin_detail": "PA66 GF30 흑색",
+      "machine_settings": {
+        "nozzle_temp": 300, "zone1_temp": 295, "zone2_temp": 290, "zone3_temp": 285, "zone4_temp": 275,
+        "mold_temp_fixed": 70, "mold_temp_moving": 70,
+        "injection_pressure": 110, "holding_pressure": 75, "injection_speed_1": 65,
+        "back_pressure": 5, "screw_rpm": 90, "drying_temp": 80, "drying_time": 5
+      },
+      "defect_description": "흑색 PA66 GF30 하우징 표면에 흰 유리섬유 자국이 비쳐 보인다. 배럴 온도를 이미 300°C 상단까지 올려봤는데 개선이 미미하다. 건조는 규정대로."
+    },
+    "expected": {
+      "root_cause": "금형온도 부족(70°C)으로 충전 중 용융 선단이 저온 금형면(70°C)에 닿는 순간 표층이 조기 동결되어 섬유를 덮지 못함. GF 강화는 비강화 대비 금형온도 상단(~100°C 수준)이 필요. 배럴은 이미 권장 상한(285~305°C)이라 추가 상향은 개선 없이 체류 열화만 유발.",
+      "key_recommendations": [
+        "금형온도 70 → 90~100°C 상향 (단일 최대 효과)",
+        "배럴온도는 현 수준 유지 또는 미세 하향 (추가 상향은 개선 없이 체류 열화 리스크)",
+        "사출속도 상향 검토 (전단 발열로 표층 유동성 보조)",
+        "외관 요구가 높으면 금형 표면온도 편차 점검"
+      ],
+      "expected_phase": "filling",
+      "severity": "medium",
+      "hallucination_forbidden": [
+        "GF 보정 명목으로 멜트온도(배럴 전반) 인상을 개선책으로 제시 — 공급사 권장 범위 내 존 프로파일 미세조정은 여기 해당하지 않음",
+        "건조 부족 1순위 (규정 준수 명시)",
+        "수지 교체를 1순위로"
+      ],
+      "trap": "판정 축 두 가지: ① 금형온도 상향(90~100°C)을 1순위 조치로 제시하는가 ② 배럴 추가 상향을 권하지 않는가(금지 선언까지 요구하지 않음 — 상향 처방이 없으면 회피 성공). phase는 filling(충전 중 표층 조기 동결)."
+    }
+  },
+  {
+    "id": "pa-burnmark-vent-depth-range",
+    "source": "Batch 2 회귀가드 — air_trap_burn 벤트 깊이 범위화(코워크 2026-07-30)",
+    "title": "PA6 리브 끝 버닝 — 벤트 신설 깊이 질문",
+    "difficulty": "basic",
+    "input": {
+      "defect_type": "버닝/가스마크 (Burn Mark)",
+      "resin_type": "PA6",
+      "resin_detail": "PA6 무충전",
+      "machine_settings": {
+        "nozzle_temp": 260, "zone1_temp": 255, "zone2_temp": 250, "zone3_temp": 245, "zone4_temp": 235,
+        "mold_temp_fixed": 80, "mold_temp_moving": 80,
+        "injection_pressure": 110, "holding_pressure": 70, "injection_speed_1": 70,
+        "back_pressure": 5, "screw_rpm": 100, "drying_temp": 80, "drying_time": 5
+      },
+      "defect_description": "깊은 리브 끝에 흑갈색 탄화가 매 샷 같은 자리에 생긴다. 신규 금형이고 그 리브에는 벤트가 없다. 벤트를 새로 파려는데 깊이를 얼마로 해야 하나?"
+    },
+    "expected": {
+      "root_cause": "리브 말단 에어트랩(벤트 부재)에 의한 단열압축 탄화. 신규 금형 + 동일 위치 반복 + 말단 고정이 벤팅 축 확진 신호.",
+      "key_recommendations": [
+        "리브 말단에 벤트 신설 — PA6(저점도 결정성)는 0.013mm 근방 하한에서 시작, 플래시 없으면 증분 (0.025mm를 초깃값으로 파지 말 것)",
+        "임시 완화: 사출속도 하향/다단화, 클램프력 필요최소 확인",
+        "벤트 주기 청소 계획"
+      ],
+      "expected_phase": "filling",
+      "severity": "high",
+      "hallucination_forbidden": [
+        "결정성 일괄 0.025mm 이상으로 파라는 단일값 처방 (PA 플래시 위험)",
+        "속도·온도 조정만으로 해결 단정 (벤트 부재 명시됨)",
+        "건조 부족 1순위"
+      ],
+      "trap": "벤트 깊이를 '범위+하한 시작'으로 답하는지가 관문. 탄화이므로 severity high가 정답(교리 예외)."
+    }
   }
 ]
