@@ -1859,5 +1859,39 @@
       ],
       "trap": "벤트 깊이를 '범위+하한 시작'으로 답하는지가 관문. 탄화이므로 severity high가 정답(교리 예외)."
     }
+  },
+  {
+    "id": "pp-tpo-tigerstripe-speed-reversal",
+    "source": "Batch 3 회귀가드 — tiger_stripe 속도 방향(코워크 2026-07-30)",
+    "title": "PP/TPO 범퍼 타이거스트라이프 — 속도 상향 역효과 함정",
+    "difficulty": "hard",
+    "input": {
+      "defect_type": "타이거스트라이프 (Tiger Stripe)",
+      "resin_type": "PP",
+      "resin_detail": "PP/EPDM/탈크 (TPO) 범퍼",
+      "machine_settings": {
+        "nozzle_temp": 220, "zone1_temp": 215, "zone2_temp": 210, "zone3_temp": 205, "zone4_temp": 195,
+        "mold_temp_fixed": 30, "mold_temp_moving": 30,
+        "injection_pressure": 120, "holding_pressure": 80, "injection_speed_1": 55,
+        "back_pressure": 4, "screw_rpm": 100
+      },
+      "defect_description": "대형 범퍼에서 유동에 수직인 광택/무광 줄무늬가 교대로 나타난다. 미성형인 줄 알고 사출속도를 55에서 70으로 올렸더니 줄무늬가 더 심해지고 간격이 좁아졌다. 게이트에서 멀수록 심하다."
+    },
+    "expected": {
+      "root_cause": "타이거스트라이프(유동 선단 불안정). '속도를 올리니 악화'가 확정 단서 — flow mark와 정반대 반응. 저온 금형(30°C)+장거리 유동(범퍼)이 배경.",
+      "key_recommendations": [
+        "사출속도를 원래보다 낮게(등속·감속 프로파일) — 속도 상향 금지",
+        "금형온도 상향(권장 대역으로) + 멜트온도 상향 검토",
+        "조건만으로 한계면 고유동(고MI) 그레이드·게이트/유동길이 설계 재검토 (재료 기인 한계 명시)"
+      ],
+      "expected_phase": "filling",
+      "severity": "medium",
+      "hallucination_forbidden": [
+        "사출속도 추가 상향 처방 (악화 이력 명시됨)",
+        "미성형(short shot)으로 분류",
+        "건조·수분을 1순위로"
+      ],
+      "trap": "'속도 올리니 악화'에서 flow mark가 아니라 tiger stripe로 분기해 속도를 내리는지가 관문. 속도를 올리라고 하면 실패."
+    }
   }
 ]

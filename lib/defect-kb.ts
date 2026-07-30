@@ -4,7 +4,7 @@
 // 수정 순서: taxonomy.md → 이 파일 → KB_VERSION bump → eval 회귀.
 import type { ResinSpec } from './resin-kb';
 
-export const KB_VERSION = 'defect-kb-v1.13';
+export const KB_VERSION = 'defect-kb-v1.14';
 
 export type Cause = {
   rank: number;
@@ -557,6 +557,7 @@ export const DEFECT_KB: Record<string, DefectNode> = {
 
   delamination: {
     id: 'delamination', nameKo: '박리', nameEn: 'Delamination', phase: '재료준비',
+    typicalSeverity: 'medium (외관). 강도 요구 부품의 층분리 파단 우려 시 high',
     discriminators: 'fish scale 층 분리. 손톱으로 층 벗겨짐. 은선(흰 줄)과 구분.',
     causes: [
       { rank: 1, cause: '이종수지 오염', category: 'Material',
@@ -570,11 +571,11 @@ export const DEFECT_KB: Record<string, DefectNode> = {
         verification: '이형제 없이 테스트.',
         adjustment: '이형제 최소화, 금형 청소.' },
     ],
-    source: 'synthesis-3.4,taxonomy-13', confidence: 'estimated',
+    source: 'synthesis-3.4,taxonomy-13', confidence: 'verified',
   },
 
   fiber_readout: {
-    id: 'fiber_readout', nameKo: 'GF 표면백화', nameEn: 'Fiber Read-out', phase: '표면',
+    id: 'fiber_readout', nameKo: 'GF 표면백화', nameEn: 'Fiber Read-out', phase: '충전(표층 형성)',
     typicalSeverity: 'medium (외관)',
     discriminators: 'GF수지 표면 흰 방사상 흔적·거침. 흑색 부품서 두드러짐.',
     causes: [
@@ -590,7 +591,7 @@ export const DEFECT_KB: Record<string, DefectNode> = {
   },
 
   surface_gloss: {
-    id: 'surface_gloss', nameKo: '표면거침/광택불균일', nameEn: 'Surface Roughness/Gloss', phase: '표면',
+    id: 'surface_gloss', nameKo: '표면거침/광택불균일', nameEn: 'Surface Roughness/Gloss', phase: '충전/보압(표면 복제)',
     typicalSeverity: 'medium (외관)',
     discriminators: '광택 전이(고/저광택 교대 경계선) vs 전체 거침. flow mark(유동방향 줄무늬)와 구분.',
     causes: [
@@ -612,6 +613,7 @@ export const DEFECT_KB: Record<string, DefectNode> = {
 
   dimensional_instability: {
     id: 'dimensional_instability', nameKo: '치수 불안정', nameEn: 'Dimensional Instability', phase: '보압/냉각',
+    typicalSeverity: 'medium (치수). 조립·기능 공차 이탈로 전수 선별 시 high',
     discriminators: '동일조건 lot간·캐비티간·시간경과 치수 변동. warpage(형상)와 구분.',
     causes: [
       { rank: 1, cause: '결정성 수지 냉각·보압 변동', category: 'Machine',
@@ -633,6 +635,7 @@ export const DEFECT_KB: Record<string, DefectNode> = {
 
   tiger_stripe: {
     id: 'tiger_stripe', nameKo: '타이거스트라이프', nameEn: 'Tiger Stripe', phase: '충전',
+    typicalSeverity: 'medium (외관)',
     discriminators: 'PP·PP/EPDM/talc에서 유동 수직 광택/무광 교대 밴드. flow mark(유동방향)와 구분. 사출속도↑ 시 밴드 악화·간격 좁아짐 = 타이거스트라이프 확정 단서 (flow mark은 속도·온도↑로 개선 → 정반대).',
     causes: [
       { rank: 1, cause: 'PP 벽면 미끄럼(wall slip)+결정화', category: 'Material',
@@ -653,12 +656,13 @@ export const DEFECT_KB: Record<string, DefectNode> = {
       '범퍼|장거리 유동|게이트서 멀어질수록|먼 곳일수록 심함': '유동길이 기인 → 게이트·유동길이 설계 + 고유동 그레이드 검토(재료한계).',
     },
     sharedGates: ['mold_temp_insufficient'],
-    source: 'synthesis-3.2,taxonomy-17', confidence: 'estimated',
+    source: 'synthesis-3.2,taxonomy-17', confidence: 'verified',
   },
 
   record_groove: {
     id: 'record_groove', nameKo: '레코드홈', nameEn: 'Record Groove', phase: '충전',
-    discriminators: '게이트 중심 동심원 미세홈. 나일론+게이트 작을 때 발생.',
+    typicalSeverity: 'medium (외관)',
+    discriminators: '게이트 중심 동심원 미세홈. 저속·저온에서 유동 선단이 간헐 정지(stick-slip)하며 형성 — 급결정화 수지(PA 등)·게이트 과소에서 흔함(수지 한정 아님).',
     causes: [
       { rank: 1, cause: '게이트 과소+금형온도 낮음', category: 'Mold',
         trigger: '게이트 과소 + resin-kb moldC 미달.',
@@ -667,11 +671,12 @@ export const DEFECT_KB: Record<string, DefectNode> = {
         adjustment: '게이트 확대, 금형온도↑, 사출속도↑.' },
     ],
     sharedGates: ['mold_temp_insufficient'],
-    source: 'synthesis-3.2,taxonomy-18', confidence: 'estimated',
+    source: 'synthesis-3.2,taxonomy-18', confidence: 'verified',
   },
 
   black_specks: {
     id: 'black_specks', nameKo: '흑점', nameEn: 'Black Specks', phase: '재료준비',
+    typicalSeverity: 'medium (외관·이물). 전장·식품 등 이물 전수검사 요구 부품이면 high',
     discriminators: '소수 흑색 입자. 변색(전체·면적)과 구분.',
     causes: [
       { rank: 1, cause: '이전 수지 탄화잔류·스크루 마모', category: 'Machine',
@@ -679,8 +684,13 @@ export const DEFECT_KB: Record<string, DefectNode> = {
         evidence: '발생 패턴. 퍼지 이력.',
         verification: '퍼지 3~5shot 후 소멸=잔류탄화.',
         adjustment: '완전 퍼지, 스크루 점검, 원료 검사.' },
+      { rank: 2, cause: '스크루·배럴·체크링 데드스페이스 탄화 축적 → 간헐 박리', category: 'Machine',
+        trigger: '수지 전환 없이도 간헐 발생·소멸 반복. 몇 주 전 색상 잔재 관찰.',
+        evidence: '발생 간헐성(주기 없음). 배럴 용량 대비 샷 비율(25% 미만=체류 과다 가중).',
+        verification: '스크루 인발 점검(플라이트 뒤 탄화·구색 잔류 확인). 핫러너 존별 온도 점검.',
+        adjustment: '스크루 인발 세척(긁지 말 것), 배압을 기존 가이드 상한 내로 상향(플라이트 충전 개선), 샷/배럴 비율 확보, 데드스팟 적은 스크루·팁 사양 검토.' },
     ],
-    source: 'synthesis-4,taxonomy-19', confidence: 'estimated',
+    source: 'synthesis-4,taxonomy-19', confidence: 'verified',
   },
 
   color_streaks: {
@@ -717,6 +727,7 @@ export const DEFECT_KB: Record<string, DefectNode> = {
 
   cold_slug: {
     id: 'cold_slug', nameKo: '콜드슬러그', nameEn: 'Cold Slug', phase: '충전',
+    typicalSeverity: 'medium (외관·국부 강도)',
     discriminators: '스프루·노즐 냉각 선단(고화수지) 캐비티 유입.',
     causes: [
       { rank: 1, cause: '스프루·노즐 냉각 과다', category: 'Mold',
@@ -725,11 +736,12 @@ export const DEFECT_KB: Record<string, DefectNode> = {
         verification: '노즐온도↑ 후 재시험.',
         adjustment: '노즐온도↑, 콜드슬러그웰 추가.' },
     ],
-    source: 'synthesis-4,taxonomy-21', confidence: 'estimated',
+    source: 'synthesis-4,taxonomy-21', confidence: 'verified',
   },
 
   sticking: {
     id: 'sticking', nameKo: '이형 불량', nameEn: 'Sticking', phase: '이형',
+    typicalSeverity: 'medium (공정·이형)',
     discriminators: '캐비티 내 부착·이형 불량.',
     causes: [
       { rank: 1, cause: '드래프트 부족 + 언더컷 + 과보압', category: 'Mold',
@@ -743,6 +755,7 @@ export const DEFECT_KB: Record<string, DefectNode> = {
 
   ejector_marks: {
     id: 'ejector_marks', nameKo: '이젝터 마크', nameEn: 'Ejector Marks', phase: '이형',
+    typicalSeverity: 'medium (외관)',
     discriminators: '이젝터핀 위치 과도 함몰·자국.',
     causes: [
       { rank: 1, cause: '조기 이젝션 + 이젝터 면적 부족', category: 'Mold',
@@ -756,6 +769,7 @@ export const DEFECT_KB: Record<string, DefectNode> = {
 
   stringing: {
     id: 'stringing', nameKo: '실끌림', nameEn: 'Stringing/Drooling', phase: '이형',
+    typicalSeverity: 'medium (외관·공정)',
     discriminators: '노즐서 실처럼 끌리는 수지. 드룰링=개형 전 수지 방울.',
     causes: [
       { rank: 1, cause: '노즐온도 과고 + 서크백 부족', category: 'Machine',
@@ -769,6 +783,7 @@ export const DEFECT_KB: Record<string, DefectNode> = {
 
   parting_line_mismatch: {
     id: 'parting_line_mismatch', nameKo: '파팅라인 단차', nameEn: 'Parting Line Mismatch', phase: '이형/금형',
+    typicalSeverity: 'medium (외관·치수)',
     discriminators: '파팅면 단차·어긋남.',
     causes: [
       { rank: 1, cause: '금형 마모·평행도 불량', category: 'Mold',
@@ -782,6 +797,7 @@ export const DEFECT_KB: Record<string, DefectNode> = {
 
   brittleness: {
     id: 'brittleness', nameKo: '취성', nameEn: 'Brittleness', phase: '재료준비',
+    typicalSeverity: 'high (파단·물성)',
     discriminators: '충격에 쉽게 파손. 인장강도 저하.',
     causes: [
       { rank: 1, cause: '과건조→분자량↓ 또는 재생재 과다', category: 'Material',
@@ -795,6 +811,7 @@ export const DEFECT_KB: Record<string, DefectNode> = {
 
   residual_stress_esc: {
     id: 'residual_stress_esc', nameKo: '잔류응력·ESC', nameEn: 'Residual Stress/ESC', phase: '보압/냉각',
+    typicalSeverity: 'medium. 크랙 진전·ESC 파손 확인 시 high(파단)',
     discriminators: '표면응력 광학무늬. 용제접촉 후 균열(ESC). 사이클 후 시간차 크랙.',
     causes: [
       { rank: 1, cause: '과보압 → 잔류응력 과다', category: 'Machine',
@@ -808,6 +825,7 @@ export const DEFECT_KB: Record<string, DefectNode> = {
 
   overpacking: {
     id: 'overpacking', nameKo: '과충전', nameEn: 'Overpacking', phase: '보압',
+    typicalSeverity: 'medium (치수·잔류응력)',
     discriminators: '과도한 홀드압→플래시·잔류응력·이형불량 복합.',
     causes: [
       { rank: 1, cause: 'V/P 전환 지연 + 홀드압 과고', category: 'Method',
@@ -821,6 +839,7 @@ export const DEFECT_KB: Record<string, DefectNode> = {
 
   gate_blush: {
     id: 'gate_blush', nameKo: '게이트 블러시', nameEn: 'Gate Blush', phase: '충전',
+    typicalSeverity: 'medium (외관)',
     discriminators: '게이트 직후 흐림·광택 저하. 흐름자국(멀리까지)과 구분. 밸브게이트 사용·게이트 국한·간헐·조건무효면 게이트 하드웨어(밸브핀·핫러너 온도) 의심. 닦이면 표면 석출(mold_deposit) 감별.',
     causes: [
       { rank: 1, cause: '게이트 과소 + 금형온도 낮음', category: 'Mold',
@@ -844,12 +863,12 @@ export const DEFECT_KB: Record<string, DefectNode> = {
     },
     priorityLogic: '조건무효 + 밸브게이트면 게이트 하드웨어(밸브핀·핫러너온도)로 전환. 핫러너 게이트온도(미점검 흔함)를 금형분해(밸브핀)보다 먼저 시도. 닦임 여부로 mold_deposit 감별.',
     sharedGates: ['mold_temp_insufficient'],
-    source: 'synthesis,taxonomy-29', confidence: 'estimated',
+    source: 'synthesis,taxonomy-29', confidence: 'verified',
   },
 
   // ─── 31. Mold Deposit / Plate-out (금형 석출/플레이트아웃) ───
   mold_deposit: {
-    id: 'mold_deposit', nameKo: '금형 석출', nameEn: 'Mold Deposit', phase: '표면',
+    id: 'mold_deposit', nameKo: '금형 석출', nameEn: 'Mold Deposit', phase: '재료준비',
     typicalSeverity: 'medium (외관). 누적·전수화 시 수율 직결',
     discriminators: '닦으면 옅어지는 백색·뿌연 잔류물(표면 부착물). 닦아도 안 지워지는 구조적 불량(웰드선·플로우마크·은선 지속형·표면 요철)과 결정적으로 구분. 게이트·벤트 주변·특정 캐비티 집중. 반복생산 시 점진 누적, 금형 세정 직후 일시 소멸·재누적.',
     causes: [
