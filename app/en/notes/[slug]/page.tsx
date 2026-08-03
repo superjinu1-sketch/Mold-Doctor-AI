@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { SITE_URL } from '@/lib/siteUrl';
-import { NOTES, getNoteBySlug } from '@/lib/notes';
+import { NOTES, getNoteBySlug, type NoteDiagramId } from '@/lib/notes';
 import { readNoteDiagramSvg } from '@/lib/notesDiagramSvg';
 
 // Capacitor 정적 export(output:'export') 호환 — app/sitemap.ts 선례와 동일 원칙 적용.
@@ -34,7 +34,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 // 파일(public/notes/*.svg) 자체는 확정본 그대로 두고, 375px 대응 크기 처리만 바깥 wrapper에서 담당한다.
 // 도식은 article(max-w-[880px]) 전체 폭을 그대로 채운다 — 별도 max-width/mx-auto를 걸면
 // 텍스트 블록(max-w-[65ch], 좌측 정렬)과 중심이 달라져 좌측 기준선이 어긋난다(실측 확인됨).
-function Diagram({ id }: { id: 'cross-section' | 'flow' }) {
+function Diagram({ id }: { id: NoteDiagramId }) {
   const svg = readNoteDiagramSvg(id);
   return (
     // eslint-disable-next-line react/no-danger

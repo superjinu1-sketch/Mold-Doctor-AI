@@ -1,14 +1,16 @@
 // 영문 콘텐츠 축 B(/en/notes) 글 데이터 단일 소스. 본문은 진우 확정본 — 문구를 다듬지 않는다.
 // /en/about과 동일 원칙: 문법 교정·표현 개선·문장 병합 전부 금지.
+export type NoteDiagramId = 'cross-section' | 'flow' | 'weld-flow' | 'weld-section';
+
 export type NoteBlock =
   | { type: 'p'; text: string }
   | { type: 'h2'; text: string }
-  | { type: 'diagram'; id: 'cross-section' | 'flow' };
+  | { type: 'diagram'; id: NoteDiagramId };
 
 // lib/notesDiagramSvg.ts(node:fs 사용, 서버 전용)가 이 타입을 가져다 쓴다 — 반대 방향(이 파일이
 // notesDiagramSvg.ts에서 import)이면 lib/notes.ts를 가져다 쓰는 클라이언트 컴포넌트(app/page.tsx)가
 // 번들러 설정에 따라 fs를 함께 끌고 들어올 위험이 있어 여기서 정의한다(notes-list-thumbnail-v1).
-export type NoteThumbId = 'splay-branch';
+export type NoteThumbId = 'splay-branch' | 'weld-strength';
 
 export interface Note {
   slug: string;
@@ -21,9 +23,48 @@ export interface Note {
 
 const p = (text: string): NoteBlock => ({ type: 'p', text });
 const h2 = (text: string): NoteBlock => ({ type: 'h2', text });
-const diagram = (id: 'cross-section' | 'flow'): NoteBlock => ({ type: 'diagram', id });
+const diagram = (id: NoteDiagramId): NoteBlock => ({ type: 'diagram', id });
 
 export const NOTES: Note[] = [
+  {
+    slug: 'weld-line-appearance-vs-strength',
+    title: "A weld line that looks better isn't stronger",
+    description: 'More heat is the standard fix for a weld line. On glass-filled grades it changes how the line looks without changing what the part can carry.',
+    publishedAt: '2026-08-03',
+    thumb: 'weld-strength',
+    body: [
+      p('The second thing Mold Doctor kept getting almost right was the weld line.'),
+      p("Ask about one and the answer comes back the same way nearly every time. Raise the melt temperature. Raise the mold temperature. Fill faster. It isn't wrong, and on plenty of parts it works."),
+      p('What bothered me was the case where all of that had already been done, the line was barely visible, and the part still broke at it.'),
+      h2('Where the standard answer comes from'),
+      p('Two flow fronts meet. Each arrives with a skin that has already started to cool. For the joint to hold, polymer chains have to diffuse back and forth across the boundary and knit the two sides together.'),
+      p('Hotter melt means more of that diffusion. It is a real mechanism, and for unfilled resins it is the main thing you have to work with. On PP and HDPE the literature points to melt temperature as the dominant factor in how strong the weld ends up.'),
+      p('There is a visible version of the same effect. The small V-notch left at the surface where the fronts meet gets shallower as melt temperature rises. I have seen it quoted going from around 7 μm to 3 μm for a 10°C increase.'),
+      p('That is a measurement of the notch. It is not a measurement of strength. Holding onto that distinction is most of what this note is about.'),
+      diagram('weld-section'),
+      h2('Where it splits'),
+      p('Put glass in the resin and the mechanism changes underneath the same-looking defect.'),
+      p('Fibers do not cross the weld plane. They travel with the flow front, and when two fronts meet head-on the fibers end up lying parallel to the plane on both sides of it. What is left at the interface is resin meeting resin, with no fiber carrying load across the joint.'),
+      p('Heat does not move fibers. It still helps the resin diffuse, which shows up as better elongation and a cleaner-looking line, but the ultimate tensile strength at the weld barely responds.'),
+      p('On PA6 with 30% glass, the setting that moves weld tensile strength is packing pressure. Melt temperature moves elongation. Those are two different results from the same test, and it is easy to read one and think you got the other.'),
+      h2('The number'),
+      p('From a 2024 published test on PA6-GF30: the base material came in at 110 MPa, the weld line at 65 to 73 MPa. Retention somewhere around 60 to 66 percent.'),
+      p('You will also see 50 to 80 percent loss quoted for glass-filled weld lines. That is a wider claim than the measurements I could verify actually support. Retention shifts with the resin, the glass content, and the angle the fronts meet at. Treat any single figure as a starting estimate rather than a spec, and measure your own part if the number matters.'),
+      p('What holds is the direction. A weld line in a glass-filled part carries meaningfully less than the base material, and no combination of process settings closes that gap.'),
+      h2('What to actually do'),
+      p('If the resin has no glass in it, the standard answer stands. Melt temperature first, then mold temperature.'),
+      p('If it does have glass, look at packing pressure before you reach for heat. That is the setting with a measured effect on weld strength in filled grades, and it is the one most likely to be sitting lower than it needs to be.'),
+      p('And if the part has to carry load right there, the answer is not in the settings at all. A weld line forms where two flow fronts meet, and where they meet is decided by gate position. Moving the gate moves the weld to somewhere it does not matter. That is a mold change, slower and more expensive than turning a dial, which is exactly why it keeps getting postponed in favor of another round of condition tweaks.'),
+      diagram('weld-flow'),
+      h2('The part that does not change'),
+      p('Nothing above restores base material properties. Conditions narrow the gap. They do not close it.'),
+      p('The failure mode I care about most is the quiet one. The line stops being visible, the appearance complaint goes away, everyone moves on, and the load capacity is exactly where it was. If the part is structural, a weld line you cannot see is still a weld line.'),
+      h2('What went into the app'),
+      p('Mold Doctor branches on glass content for weld lines now. Unfilled goes to melt temperature. Filled puts packing pressure ahead of heat, and when the description mentions breakage or a strength requirement it moves gate position to the top and states plainly that conditions alone will not reach base material.'),
+      p('It also stopped treating a cleaner-looking line as a solved problem.'),
+      p('Mold Doctor takes a photo of the defect and your process settings and estimates likely causes and what to adjust. The logic above is part of it.'),
+    ],
+  },
   {
     slug: 'splay-or-fiber-readout',
     title: 'If the drying data is clean, it might not be splay',

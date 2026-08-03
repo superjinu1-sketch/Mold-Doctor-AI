@@ -6,20 +6,23 @@
 // lib/notes.ts를 참조해 fs를 그쪽으로 끌고 들어가지 않게 방향을 고정했다.)
 import fs from 'node:fs';
 import path from 'node:path';
-import type { NoteThumbId } from './notes';
+import type { NoteThumbId, NoteDiagramId } from './notes';
 
-const FILES: Record<'cross-section' | 'flow', string> = {
+const FILES: Record<NoteDiagramId, string> = {
   'cross-section': 'splay-fiber-cross-section.svg',
   flow: 'splay-fiber-flow.svg',
+  'weld-flow': 'weld-line-flow.svg',
+  'weld-section': 'weld-line-cross-section.svg',
 };
 
-export function readNoteDiagramSvg(id: 'cross-section' | 'flow'): string {
+export function readNoteDiagramSvg(id: NoteDiagramId): string {
   const filePath = path.join(process.cwd(), 'public', 'notes', FILES[id]);
   return fs.readFileSync(filePath, 'utf-8');
 }
 
 const THUMB_FILES: Record<NoteThumbId, string> = {
   'splay-branch': 'thumb-splay-branch.svg',
+  'weld-strength': 'thumb-weld-strength.svg',
 };
 
 export function readNoteThumbSvg(id: NoteThumbId): string {
