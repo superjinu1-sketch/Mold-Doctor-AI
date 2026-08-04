@@ -57,3 +57,5 @@ next-env.d.ts
 
 # 스토어 스크린샷 산출물 — 커밋 대상 아님(ios-screenshots-v1_3-v1)
 /store-assets/
+store-assets/ios-v1.4-en/
+store-assets/ios-v1.4-ko/
