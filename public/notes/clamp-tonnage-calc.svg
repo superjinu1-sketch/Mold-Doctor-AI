@@ -1,0 +1,26 @@
+<svg viewBox="0 0 720 250" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="cc-t cc-d">
+  <title id="cc-t">Required clamp force, and the unit that breaks it</title>
+  <desc id="cc-d">Required clamp force in tonnes-force equals projected area in square centimetres times cavity pressure in kilograms-force per square centimetre, divided by 1000. A 100 square centimetre part at 400 kgf per square centimetre needs about 40 tonnes. Dividing by 9.8 instead returns 4,082 tonnes, because 9.8 converts kilonewtons to tonnes-force and the product here is not in kilonewtons.</desc>
+
+  <rect x="14" y="8" width="692" height="30" rx="6" fill="var(--faint)" opacity=".12"/>
+  <text x="360" y="28" font-size="12.5" font-weight="600" text-anchor="middle" fill="var(--ink)">Required clamp force = projected area × cavity pressure</text>
+
+  <text x="360" y="70" font-size="17" font-weight="700" text-anchor="middle" fill="var(--ink)">F (tonf)  =  A (cm²)  ×  P (kgf/cm²)  ÷  1000</text>
+  <text x="360" y="91" font-size="10.5" text-anchor="middle" fill="var(--faint)">P unmeasured? use 300–500 kgf/cm². US form: A (in²) × 2–4 tons/in², start at 3</text>
+
+  <rect x="14" y="108" width="336" height="128" rx="7" fill="var(--ok)" opacity=".1"/>
+  <rect x="14" y="108" width="336" height="128" rx="7" fill="none" stroke="var(--ok)" stroke-width="1.4"/>
+  <text x="182" y="131" font-size="11.5" font-weight="700" text-anchor="middle" fill="var(--ok)">÷ 1000</text>
+  <text x="182" y="158" font-size="13" font-weight="600" text-anchor="middle" fill="var(--ink)">100 cm² × 400 kgf/cm² ÷ 1000</text>
+  <text x="182" y="188" font-size="21" font-weight="700" text-anchor="middle" fill="var(--ok)">40 tonf</text>
+  <text x="182" y="212" font-size="10.5" text-anchor="middle" fill="var(--faint)">a 50-ton press covers it</text>
+  <text x="182" y="228" font-size="10.5" text-anchor="middle" fill="var(--faint)">with margin to spare</text>
+
+  <rect x="370" y="108" width="336" height="128" rx="7" fill="var(--danger)" opacity=".08"/>
+  <rect x="370" y="108" width="336" height="128" rx="7" fill="none" stroke="var(--danger)" stroke-width="1.4"/>
+  <text x="538" y="131" font-size="11.5" font-weight="700" text-anchor="middle" fill="var(--danger)">÷ 9.8</text>
+  <text x="538" y="158" font-size="13" font-weight="600" text-anchor="middle" fill="var(--ink)">100 cm² × 400 kgf/cm² ÷ 9.8</text>
+  <text x="538" y="188" font-size="21" font-weight="700" text-anchor="middle" fill="var(--danger)">4,082 tonf</text>
+  <text x="538" y="212" font-size="10.5" text-anchor="middle" fill="var(--faint)">9.8 converts kN to tonf</text>
+  <text x="538" y="228" font-size="10.5" text-anchor="middle" fill="var(--faint)">this product is not in kN</text>
+</svg>

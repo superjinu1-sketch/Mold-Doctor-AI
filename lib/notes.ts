@@ -1,6 +1,6 @@
 // 영문 콘텐츠 축 B(/en/notes) 글 데이터 단일 소스. 본문은 진우 확정본 — 문구를 다듬지 않는다.
 // /en/about과 동일 원칙: 문법 교정·표현 개선·문장 병합 전부 금지.
-export type NoteDiagramId = 'cross-section' | 'flow' | 'weld-flow' | 'weld-section';
+export type NoteDiagramId = 'cross-section' | 'flow' | 'weld-flow' | 'weld-section' | 'clamp-calc' | 'clamp-flow';
 
 export type NoteBlock =
   | { type: 'p'; text: string }
@@ -10,7 +10,7 @@ export type NoteBlock =
 // lib/notesDiagramSvg.ts(node:fs 사용, 서버 전용)가 이 타입을 가져다 쓴다 — 반대 방향(이 파일이
 // notesDiagramSvg.ts에서 import)이면 lib/notes.ts를 가져다 쓰는 클라이언트 컴포넌트(app/page.tsx)가
 // 번들러 설정에 따라 fs를 함께 끌고 들어올 위험이 있어 여기서 정의한다(notes-list-thumbnail-v1).
-export type NoteThumbId = 'splay-branch' | 'weld-strength';
+export type NoteThumbId = 'splay-branch' | 'weld-strength' | 'clamp-window';
 
 export interface Note {
   slug: string;
@@ -26,6 +26,52 @@ const h2 = (text: string): NoteBlock => ({ type: 'h2', text });
 const diagram = (id: NoteDiagramId): NoteBlock => ({ type: 'diagram', id });
 
 export const NOTES: Note[] = [
+  {
+    slug: 'clamp-tonnage-calculation',
+    title: 'The clamp tonnage formula was off by a factor of 100',
+    description: 'How to calculate the clamp force an injection molded part needs, the unit error that inflates the answer 100 times, and why more tonnage than the calculation asks for burns parts.',
+    publishedAt: '2026-08-04',
+    thumb: 'clamp-window',
+    body: [
+      p('The first two things I wrote about here were judgment calls. The AI picked a defensible answer and stopped one condition short of the right one.'),
+      p('This one was not a judgment call. It was arithmetic.'),
+      p('Mold Doctor carried a formula for how much clamp force a part needs, and the formula was wrong. A job that needed 40 tons came back needing 4,082. No press like that exists for a part that size. Anyone who ran the number would have known something was broken, which is the only reason it was harmless.'),
+      p('I found it by checking units, before opening a single reference.'),
+      h2('The formula'),
+      p('Clamp force has to beat the force trying to push the mold open. That force is the pressure inside the cavity acting across the projected area of the part, which is the shadow the part casts on the parting plane. Runners and sprue count, because they are pressurized too.'),
+      p('Cavity pressure is not the pressure on the machine gauge. The gauge reads at the injection unit, upstream of the nozzle, the runner and the gate. What arrives in the cavity is a fraction of it.'),
+      p('In metric the calculation is F (tonf) = A (cm²) × P (kgf/cm²) ÷ 1000.'),
+      p('In US shops the same thing is usually carried as a rule of thumb instead: projected area in square inches times a tonnage factor of 2 to 4 tons per square inch, starting around 3. It is the same physics with the pressure term already folded into the factor.'),
+      diagram('clamp-calc'),
+      h2('Where the 100 came from'),
+      p('The version in the knowledge base divided by 9.8.'),
+      p('9.807 is a real constant. It converts kilonewtons to tonnes-force, and if the product in front of it is already in kilonewtons then dividing by it is exactly right. The product in front of it here was in kilogram-force, which is not the same unit and is not off by 9.8.'),
+      p('Square centimetres times kilograms-force per square centimetre, divided by 9.8, comes out about 100 times too high. Square centimetres times megapascals, divided by 9.8, comes out 10 times too high. There is no combination of the units people actually use where it is correct.'),
+      p('That is what makes this class of error durable. It does not look like a guess. It has a constant in it that anyone can look up and confirm is real, sitting in the one position where it does not belong.'),
+      p('The check that catches it needs no sources. Put a part you know into it and see whether the answer is a machine that exists.'),
+      h2('The pressure you probably do not have'),
+      p('The formula needs cavity pressure, and most shops are not measuring cavity pressure. A formula you cannot put a number into is not usable, and the version I inherited stopped at the formula.'),
+      p('The working default is 300 to 500 kgf/cm². The US tonnage factors land in the same place: 2 to 4 tons per square inch works out to roughly 280 to 560 kgf/cm². Two conventions from different places, describing the same band.'),
+      p('That agreement is worth something, but it is still a default. Thin walls, long flow lengths and stiff melts push it up. If the part is marginal against your press, the number to use is the one from a cavity pressure sensor, not this one.'),
+      h2('More is not safer'),
+      p('If 40 tons is enough, 200 tons should be safer. It is not, and this is the part that surprised me most.'),
+      p('Vents are shallow on purpose, tens of micrometres, deep enough to let air out and too shallow to let melt through. Clamp harder than the mold needs and you close them. The air that was supposed to leave stays in, gets compressed by the incoming melt, and heats up enough to scorch the resin at the end of fill. RJG puts it plainly: apply more tonnage than needed and the trapped air causes a burn.'),
+      p('Plastics Technology documents the more expensive version. A mold that needed around 100 tons, run at 400, came back with a cracked cavity block. Crushed vents and premature parting line wear come with it.'),
+      p('So tonnage has a window, not a floor. The calculation gives you the bottom of it. The top is set by the mold.'),
+      h2('And flash is not always tonnage'),
+      p('The reason any of this matters is flash, and flash gets blamed on tonnage more often than tonnage deserves.'),
+      p('Where the flash sits tells you which axis you are on. One repeating location is the mold: parting face wear, debris, ejector pin clearance. Clamping harder will not close a worn face, and it will wear it faster.'),
+      p('Flash around the whole perimeter is the machine or the pressure axis. Run the calculation. If the press is genuinely undersized for the projected area, that is the answer and no setting fixes it.'),
+      p('If the press already clears the calculation and you still have flash, the cavity is being overfilled rather than the mold being pushed open. Late V/P transfer, hold pressure sitting close to injection pressure. The test costs one shot: drop the hold pressure and see whether the flash drops with it. If it does, raising clamp force was never the lever.'),
+      diagram('clamp-flow'),
+      h2('What went into the app'),
+      p('The formula is corrected, with the cavity pressure default and the US tonnage factor stated next to it so the calculation can actually be completed.'),
+      p('The over-tonnage paradox is written in as a caution on the clamp force recommendation itself, rather than sitting in a separate note about burns. Raise clamp force and the app tells you in the same breath that too much of it causes the defect one row down.'),
+      p('There is also a regression test now. It feeds a projected area and a machine tonnage and fails if the answer comes back in the thousands. The old error cannot come back quietly.'),
+      p('The habit that came out of this one is smaller than the fix. Before checking whether a number matches the literature, check whether its units can produce that number at all. This one was caught on dimensions alone, and it was the fastest of the six errors I found to confirm.'),
+      p('Mold Doctor takes a photo of the defect and your process settings and estimates likely causes and what to adjust. The logic above is part of it.'),
+    ],
+  },
   {
     slug: 'weld-line-appearance-vs-strength',
     title: "A weld line that looks better isn't stronger",

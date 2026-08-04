@@ -1,0 +1,31 @@
+<svg viewBox="0 0 180 136" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="tcw-t tcw-d">
+  <title id="tcw-t">Clamp tonnage has a window, not a floor</title>
+  <desc id="tcw-d">Too little clamp force gives flash. On spec is what the calculation asks for: projected area times cavity pressure divided by 1000. Too much crushes vents, which traps air and produces burns.</desc>
+
+  <rect x="6" y="2" width="168" height="24" rx="7" fill="none" stroke="var(--faint)" stroke-width="1.2" opacity=".55"/>
+  <text x="90" y="18" font-size="12" font-weight="600" text-anchor="middle" fill="var(--ink)">Clamp tonnage</text>
+
+  <path d="M90 26 v6" fill="none" stroke="var(--faint)" stroke-width="1.2" opacity=".55"/>
+
+  <rect x="6" y="34" width="53" height="34" rx="6" fill="var(--danger)" opacity=".1"/>
+  <rect x="6" y="34" width="53" height="34" rx="6" fill="none" stroke="var(--danger)" stroke-width="1.2"/>
+  <text x="32.5" y="48" font-size="8.5" font-weight="600" text-anchor="middle" fill="var(--faint)">too little</text>
+  <text x="32.5" y="61" font-size="11" font-weight="700" text-anchor="middle" fill="var(--danger)">flash</text>
+
+  <rect x="63.5" y="34" width="53" height="34" rx="6" fill="var(--ok)" opacity=".14"/>
+  <rect x="63.5" y="34" width="53" height="34" rx="6" fill="none" stroke="var(--ok)" stroke-width="1.2"/>
+  <text x="90" y="48" font-size="8.5" font-weight="600" text-anchor="middle" fill="var(--faint)">enough</text>
+  <text x="90" y="61" font-size="11" font-weight="700" text-anchor="middle" fill="var(--ok)">on spec</text>
+
+  <rect x="121" y="34" width="53" height="34" rx="6" fill="var(--danger)" opacity=".1"/>
+  <rect x="121" y="34" width="53" height="34" rx="6" fill="none" stroke="var(--danger)" stroke-width="1.2"/>
+  <text x="147.5" y="48" font-size="8.5" font-weight="600" text-anchor="middle" fill="var(--faint)">too much</text>
+  <text x="147.5" y="61" font-size="11" font-weight="700" text-anchor="middle" fill="var(--danger)">burns</text>
+
+  <path d="M90 68 v6" fill="none" stroke="var(--faint)" stroke-width="1.2" opacity=".55"/>
+
+  <rect x="6" y="76" width="168" height="54" rx="7" fill="var(--faint)" opacity=".1"/>
+  <text x="90" y="95" font-size="10" font-weight="700" text-anchor="middle" fill="var(--ink)">A (cm²) × P (kgf/cm²) ÷ 1000</text>
+  <text x="90" y="112" font-size="10.5" font-weight="700" text-anchor="middle" fill="var(--danger)">more is not safer</text>
+  <text x="90" y="124" font-size="8.5" text-anchor="middle" fill="var(--faint)">over-tonnage crushes vents</text>
+</svg>

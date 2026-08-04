@@ -13,6 +13,8 @@ const FILES: Record<NoteDiagramId, string> = {
   flow: 'splay-fiber-flow.svg',
   'weld-flow': 'weld-line-flow.svg',
   'weld-section': 'weld-line-cross-section.svg',
+  'clamp-calc': 'clamp-tonnage-calc.svg',
+  'clamp-flow': 'clamp-tonnage-flow.svg',
 };
 
 export function readNoteDiagramSvg(id: NoteDiagramId): string {
@@ -23,6 +25,7 @@ export function readNoteDiagramSvg(id: NoteDiagramId): string {
 const THUMB_FILES: Record<NoteThumbId, string> = {
   'splay-branch': 'thumb-splay-branch.svg',
   'weld-strength': 'thumb-weld-strength.svg',
+  'clamp-window': 'thumb-clamp-window.svg',
 };
 
 export function readNoteThumbSvg(id: NoteThumbId): string {
