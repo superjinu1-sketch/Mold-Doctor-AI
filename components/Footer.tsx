@@ -4,12 +4,18 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { ko } from '@/messages/ko';
 import { en } from '@/messages/en';
+import { useLocale } from '@/contexts/LocaleContext';
 
 // 영문 라우트(/en/*)에서는 페이지 내용이 영문이므로 푸터도 영문이어야 함(실측 확인된 한국어 잔존 수정).
 // 기존 locale 토글 상태와 무관하게 URL 경로가 표시 언어를 결정 — 크롤러가 보는 SSR HTML도 항상 정확.
 export default function Footer() {
   const pathname = usePathname();
-  const isEn = pathname?.startsWith('/en') ?? false;
+  const { locale } = useLocale();
+  // 언어 판정 = 경로 OR 토글.
+  // 경로(/en/*)는 SSR HTML을 크롤러에게 항상 영문으로 보여주기 위해 유지하고,
+  // 토글은 앱 내부 화면(/tools, /tryout 등 en 변형이 없는 경로)에서 en 사용자를 커버한다.
+  // (Navbar의 isEnRoute + nt() 패턴과 동일 원칙)
+  const isEn = (pathname?.startsWith('/en') ?? false) || locale === 'en';
   const m = isEn ? en : ko;
 
   return (
