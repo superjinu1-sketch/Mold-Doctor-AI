@@ -180,7 +180,35 @@ function buildPayload(c) {
     },
     images:       loadFixtures(c.input.image_fixtures),
     moldDrawings: loadFixtures(c.input.drawing_fixtures),
+    locale:       c.input.locale,
   };
+}
+
+/* ── no_korean_in_output 가드 (en-locale-eval-probe-v1) ─
+ * locale='en' 케이스의 diagnose 응답 JSON을 재귀 스캔해 한글([가-힣]) 문자열 값을 찾는다.
+ * 허용 경로는 JSON path 단위로 정확히 1개(defect_type.ko) — 문자열 패턴 allowlist 금지. */
+const KOREAN_LEAK_ALLOWED_PATHS = new Set(['defect_type.ko']);
+function scanKoreanLeak(obj) {
+  const KOREAN_RE = /[가-힣]/;
+  const leaks = [];
+  function walk(node, path) {
+    if (node == null) return;
+    if (typeof node === 'string') {
+      if (KOREAN_RE.test(node) && !KOREAN_LEAK_ALLOWED_PATHS.has(path)) {
+        leaks.push({ path, snippet: node.slice(0, 120) });
+      }
+      return;
+    }
+    if (Array.isArray(node)) {
+      node.forEach((v, i) => walk(v, `${path}[${i}]`));
+      return;
+    }
+    if (typeof node === 'object') {
+      for (const [k, v] of Object.entries(node)) walk(v, path ? `${path}.${k}` : k);
+    }
+  }
+  walk(obj, '');
+  return leaks;
 }
 
 /* ── HTTP POST helper ────────────────────────────────── */
@@ -416,6 +444,23 @@ async function main() {
       }
     }
 
+    // 1c. no_korean_in_output 가드 — locale='en' 케이스만 (en-locale-eval-probe-v1)
+    let koreanLeak = null;
+    if (c.input.locale === 'en') {
+      let parsedForScan = null;
+      try { parsedForScan = JSON.parse(aiRaw); } catch { /* parse 실패 — 아래서 처리 */ }
+      if (parsedForScan) {
+        const leaks = scanKoreanLeak(parsedForScan);
+        koreanLeak = { scanned: true, count: leaks.length, leaks };
+      } else {
+        koreanLeak = { scanned: false, count: null, leaks: [], note: 'JSON 파싱 실패 — korean_leak 스캔 불가' };
+      }
+      console.log(`  [korean_leak scan] ${c.id}: ${koreanLeak.scanned ? `${koreanLeak.count}건` : koreanLeak.note}`);
+      if (koreanLeak.count > 0) {
+        for (const l of koreanLeak.leaks) console.log(`    - ${l.path}: "${l.snippet}"`);
+      }
+    }
+
     // 2. Judge
     let judgment;
     try {
@@ -442,6 +487,12 @@ async function main() {
       }
     }
     judgment.judge_scores = judgeScores;
+
+    // korean_leak 검출 시 FAIL 강제 (§3: locale='en' 응답에 허용 경로 밖 한글이 있으면 FAIL)
+    if (koreanLeak && koreanLeak.count > 0) {
+      judgment.pass = false;
+      judgment.korean_leak_forced_fail = true;
+    }
 
     // cost 집계 (--measure-cost 시)
     if (MEASURE_COST) {
@@ -472,6 +523,8 @@ async function main() {
       judge_scores: judgment.judge_scores || [judgment.score],
       reasoning: judgment.reasoning || '',
       error: null,
+      korean_leak: koreanLeak,
+      ai_response_raw: c.input.locale === 'en' ? aiRaw : undefined,
     });
 
     if (i < cases.length - 1) await new Promise(r => setTimeout(r, INTERVAL_MS));
@@ -551,6 +604,8 @@ async function main() {
       trap_avoided: r.trap_avoided ?? null,
       judge_scores: r.judge_scores ?? [r.score],
       judge_reasoning: r.reasoning || r.error || '',
+      korean_leak: r.korean_leak ?? null,
+      ai_response_raw: r.ai_response_raw,
     })),
   };
   const resultsPath = join(RESULTS_DIR, `eval-${kbVersion}-${stamp}.json`);

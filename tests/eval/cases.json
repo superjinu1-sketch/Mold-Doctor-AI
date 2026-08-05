@@ -1893,5 +1893,82 @@
       ],
       "trap": "'속도 올리니 악화'에서 flow mark가 아니라 tiger stripe로 분기해 속도를 내리는지가 관문. 속도를 올리라고 하면 실패."
     }
+  },
+  {
+    "id": "en-silverstreak-pa66gf-simple",
+    "source": "en-locale-eval-probe-v1 — case-001 미러링 + probe 절차서 고정 조건",
+    "title": "[EN locale] PA66 GF33 은줄 — 게이트 방사형 간헐(1/5 shots)",
+    "difficulty": "basic",
+    "input": {
+      "defect_type": "은줄 (Silver Streak)",
+      "resin_type": "PA66",
+      "resin_detail": "PA66 GF33%",
+      "machine_settings": {
+        "nozzle_temp": 285,
+        "mold_temp_fixed": 80,
+        "mold_temp_moving": 80,
+        "injection_pressure": 90,
+        "holding_pressure": 60,
+        "injection_speed_1": 60,
+        "cooling_time": 15
+      },
+      "defect_description": "Silver streaks radiating from the gate. Intermittent, about 1 in 5 shots.",
+      "locale": "en"
+    },
+    "expected": {
+      "root_cause": "Insufficient drying (2 hours is inadequate for PA66; 4-8 hours recommended)",
+      "key_recommendations": [
+        "Extend drying time to 4-8 hours",
+        "Increase back pressure 3→5-8 MPa"
+      ],
+      "expected_phase": "material",
+      "severity": "medium"
+    }
+  },
+  {
+    "id": "en-complex-1",
+    "source": "en-locale-eval-probe-v1 — pmma-void-thickwall-nighttemp-hardware 미러링",
+    "title": "[EN locale] PMMA 두꺼운 살두께 내부 보이드 — 야간 온도드리프트 + 설비/금형 하드웨어",
+    "difficulty": "hard",
+    "input": {
+      "defect_type": "내부 기포 (Internal Void)",
+      "resin_type": "PMMA",
+      "resin_detail": "PMMA(아크릴) 투명, 이중사출, 830톤급",
+      "machine_settings": {
+        "nozzle_temp": 220,
+        "zone1_temp": 220,
+        "zone2_temp": 218,
+        "zone3_temp": 215,
+        "zone4_temp": 210,
+        "mold_temp_fixed": 90,
+        "mold_temp_moving": 90,
+        "holding_pressure": 9.8,
+        "back_pressure": 30,
+        "injection_speed_1": 32,
+        "injection_speed_2": 8,
+        "holding_time": 8,
+        "cooling_time": 45,
+        "cushion": 9.6,
+        "screw_rpm": 64.6
+      },
+      "product_info": {
+        "wall_thickness_max": 8
+      },
+      "defect_description": "Two-shot clear PMMA product, 830-ton machine. Internal voids occur intermittently and in clusters at night in the thick-wall section. Quality is good in winter when working with the doors closed and no ventilation fan, but defects worsen when the day-night temperature swing is large. Mold temperature 90°C, nozzle 220°C, 1st-stage injection to the 70% position (lowering the 1st-stage speed further causes cracks/weld lines). Adjusting all molding conditions — back pressure, metering position, suck-back, nozzle temperature — does not improve it.",
+      "locale": "en"
+    },
+    "expected": {
+      "root_cause": "Multiple contributing causes — core: at night, falling ambient temperature causes the injection machine/mold temperature to drift, which fails to compensate for shrinkage in the thick-wall section → internal voids (shielding against the day-night temperature swing and temperature stabilization is the primary root cause). In addition, hardware factors combine: for an 830-ton PMMA job, a barrel temperature of 220°C is too low (typically 240-250°C), equipment issues (screw wear/geometry entraining air / reduced back-pressure capability, nozzle decompression not used), and mold issues (if the void location is fixed, missing core-side venting/overflow). Consensus among multiple field experts = molding conditions alone cannot resolve this.",
+      "key_recommendations": [
+        "Stabilize ambient temperature: shield/enclose the injection machine (e.g., plastic sheeting) to block the day-night temperature swing → keep machine/mold temperature consistent (root fix)",
+        "Raise barrel temperature 220→240-250°C (standard for large-machine PMMA; currently too low)",
+        "Use multi-stage holding pressure with a longer, fully low-speed hold; switch from position-based to time-based injection for the thick section if needed",
+        "Inspect equipment: screw wear/check ring, and use nozzle decompression (suck-back) to purge trapped gas",
+        "Review the mold: if the void location is fixed, add a core-side overflow/gas vent"
+      ],
+      "expected_phase": "packing",
+      "severity": "medium",
+      "trap": "①Repeating only fine-tuning of molding conditions (back pressure, metering position, suck-back, nozzle temperature) is the trap — all of these are already exhausted, and multiple experts agree 'conditions alone have hit their limit' → the real axis is environment/equipment/mold hardware. ②Attributing it solely to moisture/drying is also a trap (the main cause is ambient temperature drift + hardware). ③Recommending only keeping/fine-tuning the barrel temperature near 220 is a trap (too low for a large-machine PMMA job; 240-250 is required)."
+    }
   }
 ]
