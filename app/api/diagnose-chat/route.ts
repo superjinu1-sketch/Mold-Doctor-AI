@@ -13,9 +13,9 @@ const MAX_QUESTION = 2000;
 const MAX_DIAGNOSIS = 8000;
 const MAX_HISTORY_TURNS = 6;   // user+assistant 쌍 6턴
 const MAX_MSG = 2000;
-const capStr = (s: unknown, n: number): string => {
+const capStr = (s: unknown, n: number, isEn = false): string => {
   const t = typeof s === 'string' ? s : String(s ?? '');
-  return t.length > n ? t.slice(0, n) + '…(생략)' : t;
+  return t.length > n ? t.slice(0, n) + (isEn ? '...(truncated)' : '…(생략)') : t;
 };
 // machineSettings 허용 키 화이트리스트 (diagnose 입력 스키마 settings + advSettings). 자유 객체 통째 직렬화 금지.
 const MS_ALLOWED = new Set([
@@ -129,10 +129,10 @@ export async function POST(req: NextRequest) {
       '5. 답변은 간결하게 2~3문단 이내',
     ];
 
-    if (resinType) contextLines.push(`\n수지 종류: ${capStr(resinType, 200)}`);
+    if (resinType) contextLines.push(`\n${isEn ? 'Resin' : '수지 종류'}: ${capStr(resinType, 200, isEn)}`);
     const safeSettings = pickSettings(machineSettings);
-    if (Object.keys(safeSettings).length > 0) contextLines.push(`사출기 설정: ${JSON.stringify(safeSettings)}`);
-    if (contextResult) contextLines.push(`\n이전 추정 결과:\n${capStr(JSON.stringify(contextResult, null, 2), MAX_DIAGNOSIS)}`);
+    if (Object.keys(safeSettings).length > 0) contextLines.push(`${isEn ? 'Machine settings' : '사출기 설정'}: ${JSON.stringify(safeSettings)}`);
+    if (contextResult) contextLines.push(`\n${isEn ? 'Previous estimate' : '이전 추정 결과'}:\n${capStr(JSON.stringify(contextResult, null, 2), MAX_DIAGNOSIS, isEn)}`);
 
     const systemPrompt = contextLines.join('\n');
 
@@ -147,9 +147,9 @@ export async function POST(req: NextRequest) {
       messages: [
         ...recentHistory.map((m: { role: string; content: string }) => ({
           role: m.role as 'user' | 'assistant',
-          content: capStr(m.content, MAX_MSG),
+          content: capStr(m.content, MAX_MSG, isEn),
         })),
-        { role: 'user', content: capStr(question.trim(), MAX_QUESTION) },
+        { role: 'user', content: capStr(question.trim(), MAX_QUESTION, isEn) },
       ],
     });
 

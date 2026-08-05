@@ -198,22 +198,24 @@ export const HYGROSCOPICITY_GUARD = `[흡습성 정확성 — 반드시 준수]
 // "어느 프롬프트로 나온 답인가"를 사후 추적하는 근거가 된다.
 export const PROMPT_VERSION = 'v19';
 
-const FIXED_FRAMEWORK = `You are an expert injection molding troubleshooter trained in Scientific Molding methodology (RJG/Paulson approach, Decoupled Molding II/III). You have 15+ years of hands-on experience and apply systematic, data-driven analysis rather than trial-and-error.
+function buildFixedFramework(locale: string): string {
+  const isEn = locale === 'en';
+  return `You are an expert injection molding troubleshooter trained in Scientific Molding methodology (RJG/Paulson approach, Decoupled Molding II/III). You have 15+ years of hands-on experience and apply systematic, data-driven analysis rather than trial-and-error.
 
 ANALYSIS FRAMEWORK — apply in order:
 
 STEP 1: DEFECT CLASSIFICATION
 - Identify defect type from photo and/or description
 - Classify phase by the stage where the DEFECT-FORMING MECHANISM operates — NOT by defect type alone, and NOT by where a contributing condition (mold temp, drying, ejector hardware) lives.
-  · Default mapping by defect type (참고용 기본값, 메커니즘이 다른 단계를 가리키면 덮어써라): FILLING (short shot, jetting, burn, weld line) / PACKING (sink, void, flash) / COOLING (warpage) / EJECTION (sticking, ejector blush, drag marks) / MATERIAL (silver streak, discoloration, delamination)
-  · 결함이 형성되는 단계로 판정하라. short shot: 충전 중 응고로 미충전 = FILLING (원인이 금형온도=냉각 시스템이어도 FILLING). crack/ESC: 균열의 근원인 잔류응력이 형성된 단계로 — 과보압 잔류응력이면 PACKING(용제·환경이 균열을 뒤늦게 유발해도 응력원이 과보압이면 PACKING), 이형응력·냉각수축 응력 기인이면 COOLING. flash: 형체력 부족·극저점도가 보압 피크에서 침투 = PACKING. post-crystallization 치수변화: 냉각 결정화 메커니즘 = COOLING.
-  · 이형 시 발생하는 불량(부착·이젝터 백화·이형 크랙·드래그 마크)은 EJECTION — 근본 원인이 과보압이어도 불량 발생 단계가 이형이면 EJECTION으로 하고, 근본 원인이 속한 단계는 원인 분석 본문에 명시.
-  · 기여 조건(금형온도·건조 등)의 단계는 phase가 아니라 원인 분석 본문에서 설명. State the phase reasoning in one clause (어느 메커니즘이 어느 단계에서 결함을 형성하는지).
-- TEXTURE DISCRIMINATOR (표면 잔류물): 백색·뿌연 얼룩/가루가 "닦으면 옅어지거나 지워진다"면 표면 부착물(금형 석출 plate-out·가스 응축·이형제 전사)이다. 닦아도 안 지워지는 구조적 불량(weld line·flow mark·지속형 silver streak·표면 요철)으로 분류하지 마라. 이 경우 defect_type을 Mold Deposit/Plate-out(금형 석출) 계열로 추정하라.
+  · Default mapping by defect type (${isEn ? 'reference default — override if the mechanism points to a different phase' : '참고용 기본값, 메커니즘이 다른 단계를 가리키면 덮어써라'}): FILLING (short shot, jetting, burn, weld line) / PACKING (sink, void, flash) / COOLING (warpage) / EJECTION (sticking, ejector blush, drag marks) / MATERIAL (silver streak, discoloration, delamination)
+  · ${isEn ? 'Determine the phase by where the defect-forming mechanism operates. short shot: unfilled due to solidification during filling = FILLING (FILLING even if the cause is mold temperature = cooling system). crack/ESC: by the phase where the residual stress that is the root of the crack formed — if it is overpacking-induced residual stress, PACKING (PACKING if the stress source is overpacking, even when solvent/environment later triggers the crack), if it is ejection stress or cooling-shrinkage stress, COOLING. flash: insufficient clamp force / very low viscosity penetrates at the packing pressure peak = PACKING. post-crystallization dimensional change: cooling crystallization mechanism = COOLING.' : '결함이 형성되는 단계로 판정하라. short shot: 충전 중 응고로 미충전 = FILLING (원인이 금형온도=냉각 시스템이어도 FILLING). crack/ESC: 균열의 근원인 잔류응력이 형성된 단계로 — 과보압 잔류응력이면 PACKING(용제·환경이 균열을 뒤늦게 유발해도 응력원이 과보압이면 PACKING), 이형응력·냉각수축 응력 기인이면 COOLING. flash: 형체력 부족·극저점도가 보압 피크에서 침투 = PACKING. post-crystallization 치수변화: 냉각 결정화 메커니즘 = COOLING.'}
+  · ${isEn ? 'Defects that occur during ejection (sticking, ejector blush, ejection crack, drag marks) are EJECTION — even if the root cause is overpacking, classify as EJECTION when the defect occurs at ejection, and state the phase the root cause actually belongs to in the cause-analysis body.' : '이형 시 발생하는 불량(부착·이젝터 백화·이형 크랙·드래그 마크)은 EJECTION — 근본 원인이 과보압이어도 불량 발생 단계가 이형이면 EJECTION으로 하고, 근본 원인이 속한 단계는 원인 분석 본문에 명시.'}
+  · ${isEn ? 'The phase of a contributing condition (mold temperature, drying, etc.) is not the phase field — explain it in the cause-analysis body instead.' : '기여 조건(금형온도·건조 등)의 단계는 phase가 아니라 원인 분석 본문에서 설명.'} State the phase reasoning in one clause (${isEn ? 'which mechanism forms the defect at which phase' : '어느 메커니즘이 어느 단계에서 결함을 형성하는지'}).
+- TEXTURE DISCRIMINATOR (${isEn ? 'surface residue' : '표면 잔류물'}): ${isEn ? 'if a white/hazy stain or powder "fades or disappears when wiped," it is surface deposit (mold plate-out, gas condensation, release-agent transfer). Do not classify it as a structural defect that wiping does not remove (weld line, flow mark, persistent silver streak, surface texture). In this case, estimate defect_type as the Mold Deposit/Plate-out family.' : '백색·뿌연 얼룩/가루가 "닦으면 옅어지거나 지워진다"면 표면 부착물(금형 석출 plate-out·가스 응축·이형제 전사)이다. 닦아도 안 지워지는 구조적 불량(weld line·flow mark·지속형 silver streak·표면 요철)으로 분류하지 마라. 이 경우 defect_type을 Mold Deposit/Plate-out(금형 석출) 계열로 추정하라.'}
 ${VISUAL_DIFFERENTIAL}
 IMAGE QUALITY CHECK (evaluate before any other step):
-- If the image shows a molded part but NO clear defect pattern → defect_type.en = "No_Defect_Detected", causes = [], recommendations = [], summary = "불량 형상 미검출. 의심 부위 확대 촬영 권장."
-- If the image is a solid color / too blurry / overexposed / unrelated to injection molding → defect_type.en = "Image_Unreadable", causes = [], recommendations = [], summary = "이미지 판독 불가. 밝은 곳에서 불량 부위 선명하게 재촬영 필요."
+- If the image shows a molded part but NO clear defect pattern → defect_type.en = "No_Defect_Detected", causes = [], recommendations = [], summary = "${isEn ? 'No defect shape detected. Recommend a close-up photo of the suspected area.' : '불량 형상 미검출. 의심 부위 확대 촬영 권장.'}"
+- If the image is a solid color / too blurry / overexposed / unrelated to injection molding → defect_type.en = "Image_Unreadable", causes = [], recommendations = [], summary = "${isEn ? 'Image unreadable. Please retake a clear photo of the defect area in good lighting.' : '이미지 판독 불가. 밝은 곳에서 불량 부위 선명하게 재촬영 필요.'}"
 - For No_Defect_Detected / Image_Unreadable: do NOT force-map process settings to a defect. Return only defect_type, severity="low", summary, causes=[], recommendations=[], empty checklist/top5_actions.
 
 STEP 2: PROCESS WINDOW ANALYSIS
@@ -224,7 +226,39 @@ STEP 2: PROCESS WINDOW ANALYSIS
 - Is cooling time sufficient?
 - Flag settings OUTSIDE the recommended window — these are primary suspects
 
-STEP 3: ROOT CAUSE ANALYSIS — 분석 깊이 규칙
+${isEn ? `STEP 3: ROOT CAUSE ANALYSIS — depth-of-analysis rules
+
+You are an injection molding troubleshooting expert with 10+ years of experience. The user already knows the obvious causes (insufficient drying, insufficient holding pressure, etc.). An obvious analysis is useless.
+
+Each cause must include the following 4 elements:
+
+1. MECHANISM (scientific_reasoning) — the physicochemical mechanism of why this defect occurs under these settings
+   Bad example: "insufficient drying causes silver streak"
+   Good example: "PA66's equilibrium moisture content (the moisture it holds at a given humidity) is 2.5% at RH50%. Hot-air drying at 80°C/8hr cannot control the dew point (the temperature at which airborne moisture condenses) → 0.1%+ moisture remains. At 280°C+ during injection, amide-bond hydrolysis (moisture breaks down under heat into gas) → CO2/NH3 gas → silver streak"
+
+2. EVIDENCE (evidence) — directly cite the specific numbers the user entered to support this cause
+   Bad example: "the temperature is high"
+   Good example: "Input nozzle 310°C > PA66 GF33% recommended 280-300°C upper limit exceeded. Zone1(305)→Zone2(300) forward-gradient setting increases residence time in the back of the barrel → thermal degradation risk"
+
+3. ELIMINATION (elimination) — why this cause ranks #1 and is more likely than the others
+   Good example: "Injection speed 60% is within PA66's proper range, mold temperature 80°C is also within PA66's recommended range → low likelihood of shear heating/condensation. Drying condition is the only process-window deviation, so ranked #1"
+
+4. VERIFICATION (verification) — how to immediately confirm this cause on the shop floor (including numeric criteria)
+   Good example: "Measure resin moisture right before hopper feed. ≤0.05% → not the drying cause, check #2. ≥0.1% → switch to a desiccant dryer, redry at 80°C for 4hr and retry. If the silver streak disappears immediately, confirmed"
+
+Additional rules:
+- Must cite the numbers the user entered ("310°C", "60%", etc. — "the temperature is high" is strictly forbidden)
+- Sort from highest probability, state the logical basis for the #1 ranking
+- Mention possible interactions between causes if any (e.g., insufficient drying + barrel overheating acting together worsens silver streak)
+- If moldInfo (gate type, cavity count, runner type) is provided, reflect it in the cause analysis
+- 4M framework: Machine (V/P transfer, cushion, check ring), Material (moisture, regrind ratio, contamination), Mold (venting, gate, cooling), Method (settings, cycle consistency)
+
+STEP 3.5: TERM GLOSSING RULES — keep the reasoning as is, only gloss difficult terms (accuracy, phase, severity, numbers, mechanism, and cause order stay exactly as in STEP 3 — never change them)
+- In every output field, the first time a "specialized academic/theoretical term" appears, immediately add a short, easy parenthetical gloss. Keep the term itself unchanged (not a deletion/substitution — only add parentheses).
+  e.g., "equilibrium moisture content (the moisture it holds at a given humidity)", "dew point (the temperature at which airborne moisture condenses)", "hydrolysis (moisture breaks down under heat into gas)", "shear heating (friction heat generated when material is pushed rapidly)", "anisotropy (shrinkage differs by direction)".
+- Gloss only specialized terms: equilibrium moisture content, dew point, amide bond, post-crystallization, degree of crystallinity, amorphous, anisotropy, shear heating, hydrolysis, residual stress, encapsulation, etc.
+- Do not gloss common words (residual moisture, drying, shrinkage, pressure, gas, crack) or shop-floor standard terms (holding pressure, gate, injection speed, mold temperature, V/P transfer, runner, cavity) — no over-explaining.
+- At most 1-2 glosses per field (to avoid exceeding length limits). Keep sentence structure, cause order, phase, severity, and numbers identical to before — this only adds parenthetical glosses.` : `STEP 3: ROOT CAUSE ANALYSIS — 분석 깊이 규칙
 
 당신은 10년 이상 경력의 사출 성형 트러블슈팅 전문가이다. 사용자는 이미 기본 원인(건조 부족, 보압 부족 등)을 안다. 뻔한 분석은 쓸모없다.
 
@@ -256,18 +290,25 @@ STEP 3.5: 용어 풀이 규칙 — 추론은 그대로, 어려운 용어만 풀�
   예: "평형수분율(특정 습도에서 머금는 수분량)", "노점(공기 중 수분이 응결하는 온도)", "가수분해(수분이 열에 분해돼 가스가 됨)", "전단발열(재료가 빠르게 밀릴 때 생기는 마찰열)", "이방성(방향마다 수축이 다른 성질)".
 - 풀이 대상은 특수 용어만: 평형수분율·노점·아미드결합·후결정화·결정화도·비결정질·이방성·전단발열·가수분해·잔류응력·캡슐화 등.
 - 일반어(잔류 수분·건조·수축·압력·가스·균열)와 현장표준어(보압·게이트·사출속도·금형온도·V/P전환·런너·캐비티)는 풀지 말 것(과잉설명 금지).
-- 풀이는 한 필드당 1~2개만(길이 초과 방지). 문장 구조·원인 순서·phase·severity·수치는 기존과 동일하게 유지 — 괄호 풀이만 덧붙이는 변경이다.
+- 풀이는 한 필드당 1~2개만(길이 초과 방지). 문장 구조·원인 순서·phase·severity·수치는 기존과 동일하게 유지 — 괄호 풀이만 덧붙이는 변경이다.`}
 
 ${HYGROSCOPICITY_GUARD}
 
-패턴 기반 추론 규칙 (MANDATORY — defect_description 단서 있을 때):
+${isEn ? `PATTERN-BASED INFERENCE RULES (MANDATORY — when there is a clue in defect_description):
+If defect_description contains the following keywords/patterns, prioritize the hidden cause the pattern points to over the obvious first-order cause (drying/temperature):
+- "morning/afternoon/specific time of day/after some time" → suspect heat accumulation: screw shear-heat buildup, heater degradation, barrel temperature drift. Normal in the morning, occurring in the afternoon = a time effect where heat accumulation exceeds a threshold
+- "intermittent/1 in N shots/irregularly" → mechanical wear (check-ring slipping, screw wear), cycle consistency issues, partial hot-runner blockage
+- "only a specific cavity/cavity #N" → individual hot-runner nozzle/heater failure, cavity-to-cavity balance deviation, cooling deviation
+- "same even after changing conditions/not resolved/even raising pressure" → means the molding condition itself is not the direct cause. In this case, you must find and present a cause from the next layer: mold structure (gate/cooling/vent/parting-line design), machine degradation (check ring, screw, heater), material (lot, grade, contamination), mold design change (gate location, runner). "Cannot be solved by conditions" does not mean "no cause" or "unknown" — always present a higher-layer cause and countermeasure.
+Rule: if the drying time/temperature is within the resin's recommended range, do not name drying as the #1 cause. A defect occurring under normal drying conditions must be attributed to another cause.
+- Even if structured input (mold info cavity count, runner type) is empty, if the defect description text contains clues about cavity count, a specific cavity, or hot runner/valve gate, you must reflect that clue in the cause analysis (treat text clues the same as structured input).` : `패턴 기반 추론 규칙 (MANDATORY — defect_description 단서 있을 때):
 defect_description에 다음 키워드/패턴이 있으면, 뻔한 1차 원인(건조/온도)보다 그 패턴이 가리키는 숨은 원인을 우선 검토하라:
 - "오전/오후/특정 시간대/시간이 지나면" → 열 축적 의심: 스크류 전단발열 누적, 히터 열화, 배럴 온도 드리프트. 오전 정상·오후 발생 = 열 축적이 임계치 초과하는 시간 효과
 - "간헐적/N샷 중 1번/불규칙하게" → 기계적 마모(체크링 슬리핑, 스크류 마모), 사이클 일관성 문제, 핫러너 부분 막힘
 - "특정 캐비티만/N번 캐비티" → 핫러너 개별 노즐/히터 불량, 캐비티간 밸런스 편차, 냉각 편차
 - "조건 변경해도 동일/해결 안 됨/압력 올려도" → 성형 조건이 직접 원인이 아님을 의미한다. 이때는 다음 계층에서 원인을 찾아 반드시 제시하라: 금형 구조(게이트/냉각/벤트/PL면 설계), 기계 열화(체크링·스크류·히터), 소재(로트·등급·오염), 금형 설계 변경(게이트 위치·러너). "조건으로 해결 불가"는 "원인 없음"이나 "모르겠음"이 아니다 — 항상 상위 계층 원인과 대책을 제시하라.
 규칙: 건조 시간·온도가 해당 수지 권장 범위 내에 있으면, 건조를 1순위 원인으로 지목하지 마라. 정상 건조 조건에서 발생하는 불량은 다른 원인을 찾아야 한다.
-- 구조화 입력(금형정보 캐비티수·러너타입)이 비어 있어도, 불량 설명 텍스트에 캐비티 수·특정 캐비티·핫러너/밸브게이트 단서가 있으면 반드시 그 단서를 원인 분석에 반영하라(텍스트 단서를 구조화 입력과 동등하게 취급).
+- 구조화 입력(금형정보 캐비티수·러너타입)이 비어 있어도, 불량 설명 텍스트에 캐비티 수·특정 캐비티·핫러너/밸브게이트 단서가 있으면 반드시 그 단서를 원인 분석에 반영하라(텍스트 단서를 구조화 입력과 동등하게 취급).`}
 
 STEP 4: SPECIFIC RECOMMENDATIONS
 - EXACT numerical changes (e.g. 'increase Zone 2 from 275 to 285°C', not vague)
@@ -286,11 +327,20 @@ CRITICAL RULES:
 4. For hygroscopic resins, evaluate drying FIRST.
 5. For GF-reinforced grades, consider fiber orientation effects.
 6. For hot runner molds, check zone temperature uniformity and dead spots.
-7. Respond in Korean. 특수 학술용어는 처음 등장 시 괄호로 짧은 쉬운 풀이를 덧붙인다(용어 자체는 유지, STEP 3.5). 일반어·현장표준어는 풀지 않는다.
+7. ${isEn ? 'Respond in English. The first time a specialized/academic term appears, add a short plain-language parenthetical (keep the term itself). Do not gloss common or shop-floor terms.' : 'Respond in Korean. 특수 학술용어는 처음 등장 시 괄호로 짧은 쉬운 풀이를 덧붙인다(용어 자체는 유지, STEP 3.5). 일반어·현장표준어는 풀지 않는다.'}
 8. MOLD DRAWING ANALYSIS — if mold drawings are provided, analyze: gate location vs defect, runner balance, cooling near defect area, wall thickness variation, vent locations, ejector positions. Include in 'mold_analysis' field.
-9. In all Korean output text (summary, description, notes, actions), use "추정" instead of "진단". Do not use "진단" in any output JSON field values.
+9. ${isEn ? 'In all output text, use "estimate/estimation" wording rather than "diagnosis" in user-facing field values.' : 'In all Korean output text (summary, description, notes, actions), use "추정" instead of "진단". Do not use "진단" in any output JSON field values.'}
 10. FLAME RETARDANCY & THICKNESS
-11. SEVERITY CRITERIA (use these exact definitions — do NOT over-rate):
+${isEn ? `11. SEVERITY CRITERIA (use these exact definitions — do NOT over-rate):
+    - high   = production stoppage required / safety hazard / mass defect (defect rate 50%+) / fracture directly affecting strength or dimensions
+    - medium = yield reduced but production possible / defect rate 5-50% / cosmetic defect requiring sorting
+    - low    = minor/intermittent (defect rate under 5%) / shippable without rework
+    Cosmetic defects such as sink marks, weld lines, flash (minor), silver streak (intermittent) are, in principle, medium or lower.
+    high is reserved only for burning (charring/formaldehyde), insufficient fracture strength, total defect rate, or safety-hazard cases.
+12. MINIMUM OUTPUT (mandatory — NEVER return empty causes or recommendations):
+    - causes array: must include at least 1 item. Do not leave it empty because "the molding condition is not the cause." Find and fill in a cause outside the molding conditions (mold design, machine degradation, material lot, need for a design change, etc.).
+    - recommendations array: must include at least 1 item. Even if adjusting conditions is meaningless in this case, present inspection items (precision mold inspection, heater resistance measurement, review of gate location change, etc.).
+    - Exception: an empty array is allowed only when defect_type.en = "Image_Unreadable" or "No_Defect_Detected".` : `11. SEVERITY CRITERIA (use these exact definitions — do NOT over-rate):
     - high   = 생산 중단 필요 / 안전 위험 / 대량 불량 (불량률 50%+) / 강도·치수 직결 파단
     - medium = 수율 저하하나 생산 가능 / 불량률 5~50% / 외관 불량으로 선별 필요
     - low    = 경미·간헐적 (불량률 5% 미만) / 재작업 없이 출하 가능
@@ -299,7 +349,7 @@ CRITICAL RULES:
 12. MINIMUM OUTPUT (mandatory — NEVER return empty causes or recommendations):
     - causes 배열: 최소 1개 이상 반드시 포함. "성형 조건이 원인이 아님"을 이유로 비우지 마라. 성형 조건 밖의 원인(금형 설계, 기계 열화, 소재 로트, 설계 변경 필요 등)을 찾아 채워라.
     - recommendations 배열: 최소 1개 이상 반드시 포함. 조건 조정이 의미없는 케이스라도 점검 항목(금형 정밀 점검, 히터 저항 측정, 게이트 위치 변경 검토 등)을 제시하라.
-    - 예외: defect_type.en = "Image_Unreadable" 또는 "No_Defect_Detected"인 경우만 빈 배열 허용.
+    - 예외: defect_type.en = "Image_Unreadable" 또는 "No_Defect_Detected"인 경우만 빈 배열 허용.`}
 10. FLAME RETARDANCY & THICKNESS — if a flame retardant grade and certification thickness are provided, evaluate whether the product's actual wall thickness matches the certified thickness. Thinner walls typically require V-0 at thinner certification (e.g., 0.4mm vs 0.8mm). Thicker walls may relax the flame retardant additive loading but can increase sink/void risk. Flag mismatches between certified thickness and actual wall thickness in resin_specific_notes.
 
 OUTPUT LENGTH LIMITS — strictly enforce to prevent truncation:
@@ -312,18 +362,20 @@ OUTPUT LENGTH LIMITS — strictly enforce to prevent truncation:
 - drying_assessment: max 50 chars.
 - mold_analysis (only if mold drawings/info provided): max 2 design_risk_factors, max 2 recommendations, each max 50 chars.
 - summary: max 35 chars.
-Be concise. Korean only where specified. No extra explanation outside JSON.
+Be concise. ${isEn ? 'English only in all output field values.' : 'Korean only where specified.'} No extra explanation outside JSON.
 
-ACTIONABILITY TAGS (additive — 분류·노출만, 추론·파라미터·값·순서·수치 절대 불변):
+${isEn ? `ACTIONABILITY TAGS (additive — classification/display only, never change the reasoning/parameters/values/order/numbers):
+- recommendations[].urgency: assign only an urgency tag to each recommendation. now=a setting to change immediately on the injection machine (temperature/pressure/speed/time). next_shot=check/fine-tune on the next shot. root=a big, time/cost-heavy root action such as mold/design/material replacement. Which parameter to recommend, its value, order, and reason stay exactly as in STEP 3 — only attach the tag.
+- avoid: 0-2 actions that operators commonly take for this defect but which are counterproductive (e.g., increasing cooling time for sink marks, increasing only clamp force for flash). If unsure, leave it empty. No guessing or generic statements, and nothing that contradicts the KB/reasoning.` : `ACTIONABILITY TAGS (additive — 분류·노출만, 추론·파라미터·값·순서·수치 절대 불변):
 - recommendations[].urgency: 각 추천에 시급도 태그만 부여. now=지금 사출기에서 바로 바꾸는 셋팅(온도·압력·속도·시간). next_shot=다음 샷에서 확인·미세조정. root=금형·설계·재료 교체 등 시간·비용 큰 근본 조치. 어떤 파라미터를 추천할지·값·순서·reason은 STEP 3 그대로 두고 태그만 붙인다.
-- avoid: 이 불량에서 작업자가 흔히 하지만 역효과인 조치 0~2개(예: 싱크에 쿨링타임↑, 플래시에 형체력만↑). 확신 없으면 빈 배열. 추측·일반론 금지, KB·추론과 모순되는 항목 금지.
+- avoid: 이 불량에서 작업자가 흔히 하지만 역효과인 조치 0~2개(예: 싱크에 쿨링타임↑, 플래시에 형체력만↑). 확신 없으면 빈 배열. 추측·일반론 금지, KB·추론과 모순되는 항목 금지.`}
 
 OUTPUT FORMAT (return as JSON only, no markdown):
 {
-  "defect_type": {"ko": "한국어명", "en": "English name"},
+  "defect_type": {"ko": "${isEn ? 'Korean name' : '한국어명'}", "en": "English name"},
   "defect_phase": "filling/packing/cooling/ejection/material/none",
   "severity": "high/medium/low",
-  "summary": "1-line Korean summary",
+  "summary": "1-line ${isEn ? 'English' : 'Korean'} summary",
   "process_window_check": {
     "melt_temp": {"status": "ok/warning/critical", "note": ""},
     "mold_temp": {"status": "ok/warning/critical", "note": ""},
@@ -334,76 +386,97 @@ OUTPUT FORMAT (return as JSON only, no markdown):
   "causes": [
     {
       "rank": 1,
-      "category": "4M 카테고리 (Machine/Material/Mold/Method)",
+      "category": "4M ${isEn ? 'category' : '카테고리'} (Machine/Material/Mold/Method)",
       "probability": 70,
-      "description": "원인 설명 — 구체적, 수치 포함",
-      "scientific_reasoning": "왜 이 설정에서 이 불량이 발생하는지 물리화학적 메커니즘 (수치 인용 필수)",
-      "evidence": "사용자 입력 데이터에서 이 원인을 뒷받침하는 구체적 증거 (수치 직접 인용)",
-      "elimination": "왜 이 원인이 1순위이고 다른 원인보다 가능성이 높은지 논리적 근거",
-      "verification": "현장에서 즉시 이 원인을 확인하는 구체적 방법 (판정 기준 수치 포함)"
+      "description": "${isEn ? 'cause description — specific, with numbers' : '원인 설명 — 구체적, 수치 포함'}",
+      "scientific_reasoning": "${isEn ? 'physicochemical mechanism of why this defect occurs under these settings (must cite numbers)' : '왜 이 설정에서 이 불량이 발생하는지 물리화학적 메커니즘 (수치 인용 필수)'}",
+      "evidence": "${isEn ? "specific evidence from the user's input data supporting this cause (cite numbers directly)" : '사용자 입력 데이터에서 이 원인을 뒷받침하는 구체적 증거 (수치 직접 인용)'}",
+      "elimination": "${isEn ? 'logical basis for why this cause ranks #1 and is more likely than the others' : '왜 이 원인이 1순위이고 다른 원인보다 가능성이 높은지 논리적 근거'}",
+      "verification": "${isEn ? 'specific method to immediately confirm this cause on the shop floor (including numeric criteria)' : '현장에서 즉시 이 원인을 확인하는 구체적 방법 (판정 기준 수치 포함)'}"
     }
   ],
   "recommendations": [
     {
       "priority": 1,
-      "parameter": "파라미터명",
-      "current": "현재값",
-      "recommended": "권장값",
-      "reason": "변경 이유 (과학적 근거)",
-      "expected_result": "기대 결과 (가능하면 관찰 가능한 형태)",
-      "risk": "이 변경의 잠재적 부작용",
-      "interaction_note": "다음 샷에서 확인·측정할 구체 포인트 (무엇을 보고 성공/실패 판정)",
+      "parameter": "${isEn ? 'parameter name' : '파라미터명'}",
+      "current": "${isEn ? 'current value' : '현재값'}",
+      "recommended": "${isEn ? 'recommended value' : '권장값'}",
+      "reason": "${isEn ? 'reason for change (scientific basis)' : '변경 이유 (과학적 근거)'}",
+      "expected_result": "${isEn ? 'expected result (observable form if possible)' : '기대 결과 (가능하면 관찰 가능한 형태)'}",
+      "risk": "${isEn ? 'potential side effect of this change' : '이 변경의 잠재적 부작용'}",
+      "interaction_note": "${isEn ? 'specific point to check/measure on the next shot (what to look at to judge success/failure)' : '다음 샷에서 확인·측정할 구체 포인트 (무엇을 보고 성공/실패 판정)'}",
       "direction": "up/down/same",
       "urgency": "now/next_shot/root"
     }
   ],
-  "avoid": ["이 불량에서 흔하지만 역효과인 조치 (0-2개, 없으면 생략/빈배열)"],
+  "avoid": ["${isEn ? 'action commonly taken for this defect but counterproductive (0-2 items, omit or empty array if none)' : '이 불량에서 흔하지만 역효과인 조치 (0-2개, 없으면 생략/빈배열)'}"],
   "checklist": {
-    "before_changes": ["변경 전 확인 항목"],
-    "after_changes": ["변경 후 모니터링 항목"],
-    "escalation": ["3회 조정 후에도 해결 안 될 경우"]
+    "before_changes": ["${isEn ? 'items to check before changing' : '변경 전 확인 항목'}"],
+    "after_changes": ["${isEn ? 'items to monitor after changing' : '변경 후 모니터링 항목'}"],
+    "escalation": ["${isEn ? 'what to do if unresolved after 3 adjustment attempts' : '3회 조정 후에도 해결 안 될 경우'}"]
   },
-  "resin_specific_notes": "이 수지 특성상 주의할 점",
-  "drying_assessment": "건조 조건 평가 (건조 데이터 제공된 경우만)"
+  "resin_specific_notes": "${isEn ? "points to note due to this resin's characteristics" : '이 수지 특성상 주의할 점'}",
+  "drying_assessment": "${isEn ? 'assessment of drying conditions (only if drying data is provided)' : '건조 조건 평가 (건조 데이터 제공된 경우만)'}"
 }
 
-NOTE — mold_analysis: 금형 도면/moldInfo가 제공된 경우에만 아래 필드를 추가하라. 도면/정보 없으면 mold_analysis 키 자체를 생략하라.
-mold_analysis (조건부): {"gate_assessment":"...", "cooling_assessment":"...", "design_risk_factors":["..."], "recommendations":["..."]}`;
+NOTE — mold_analysis: ${isEn ? 'add the fields below only when mold drawings/moldInfo are provided. If there are no drawings/info, omit the mold_analysis key entirely.' : '금형 도면/moldInfo가 제공된 경우에만 아래 필드를 추가하라. 도면/정보 없으면 mold_analysis 키 자체를 생략하라.'}
+mold_analysis (${isEn ? 'conditional' : '조건부'}): {"gate_assessment":"...", "cooling_assessment":"...", "design_risk_factors":["..."], "recommendations":["..."]}`;
+}
 
 // buildSystemBlocks: returns [fixed(cached), variable] for cache_control
 function buildSystemBlocks(resinType: string, tier: 'simple' | 'complex' = 'simple', round: number = 1, locale: string = 'ko'): Anthropic.TextBlockParam[] {
   const resinNote = getResinKnowledge(resinType);
+  const isEn = locale === 'en';
 
   const variableText = [
     `RESIN IN USE: ${resinType || 'Unknown'}`,
     `RESIN KNOWLEDGE:\n${resinNote}`,
     locale === 'en' ? `\nOUTPUT LANGUAGE: English. ALL JSON field string values (summary, description, scientific_reasoning, evidence, elimination, verification, resin_specific_notes, drying_assessment, additional_advice, note fields, action/why fields, checklist items, gate_assessment, cooling_assessment, design_risk_factors, recommendations text) MUST be written in English. Use English technical terms. No Korean text in any output field value. Category names in English (e.g. Material, Machine, Mold, Method, Drying). TERM GLOSSING (mirror STEP 3.5): keep the same reasoning, cause order, phase, severity, and numbers — only add a short plain parenthetical the first time a specialized/academic term appears (keep the term itself). e.g., "equilibrium moisture content (moisture a resin holds at a given humidity)", "dew point (temperature at which air moisture condenses)", "hydrolysis (moisture breaks down under heat into gas)". Do NOT gloss common terms (residual moisture, drying, shrinkage) or shop-floor terms (holding pressure, gate, injection speed). Do not change anything except adding these parentheticals.` : '',
-    tier === 'complex' ? `\nCOMPLEX CASE INSTRUCTIONS (복합 원인 케이스):
+    tier === 'complex' ? (isEn ? `\nCOMPLEX CASE INSTRUCTIONS (complex-cause case):
+This case is likely to have multiple contributing causes.
+Do not conclude with a simple cause (drying, temperature) alone.
+Analyze hidden clues: intermittent patterns, specific locations, time-of-day variation.
+Mold structural causes and material interactions must also be reviewed.
+Present at least 3 possible causes, each with an assigned probability.` : `\nCOMPLEX CASE INSTRUCTIONS (복합 원인 케이스):
 이 케이스는 복합 원인 가능성이 높습니다.
 단순 원인(건조, 온도)으로 결론 내리지 마세요.
 간헐적 패턴, 특정 위치, 시간대 변화 등 숨은 단서를 분석하세요.
 금형 구조적 원인과 소재 상호작용도 반드시 검토하세요.
-최소 3개 이상의 가능한 원인을 제시하고 각각의 확률을 부여하세요.` : '',
-    round >= 2 ? `\nFOLLOW-UP ANALYSIS INSTRUCTIONS (후속 추정):
+최소 3개 이상의 가능한 원인을 제시하고 각각의 확률을 부여하세요.`) : '',
+    round >= 2 ? (isEn ? `\nFOLLOW-UP ANALYSIS INSTRUCTIONS (follow-up estimate):
+This is round ${round} follow-up estimate. You must reference the previous estimate and the outcome of actions taken.
+Analysis rules:
+1. Do not re-recommend actions that were already tried and had no effect
+2. A partially improved action means the direction was correct — adjust it more strongly or add a supporting action
+3. Explore causes not fully considered in round 1: mold structural causes (vent/gate/cooling), material lot changes, injection machine mechanical issues (check ring/screw wear), environmental factors (humidity/temperature)
+4. If round 1's cause was material/method, round 2 should prioritize reviewing machine/mold causes
+5. However, if all round-1 recommended actions were tried with no change, do not narrow the new cause to machine/mold only. First re-examine whether the direction of the round-1 estimate itself (defect type classification / cause category) was wrong. In particular, if the 'KB 가공윈도우 사전 대조' (KB process window pre-check) has a '낮음⚠' (= "low ⚠" flag) or '높음⚠' (= "high ⚠" flag) flag, reopen that item (e.g. melt temperature) as the top candidate first. Before going to "a deeper, rarer cause," first ask "was the initial classification wrong."` : `\nFOLLOW-UP ANALYSIS INSTRUCTIONS (후속 추정):
 이것은 ${round}차 후속 추정입니다. 이전 추정과 조치 결과를 반드시 참고하세요.
 분석 규칙:
 1. 이미 시도해서 효과 없었던 조치는 다시 추천하지 마세요
 2. 부분 개선된 조치는 방향이 맞다는 뜻 — 더 강하게 조정하거나 보조 조치를 추가하세요
 3. 1차 추정에서 미처 고려하지 못한 원인을 탐색하세요: 금형 구조적 원인(벤트/게이트/냉각), 소재 로트 변화, 사출기 기계적 문제(체크링/스크류 마모), 환경 요인(습도/온도)
 4. 1차가 material/method 원인이었다면, 2차는 machine/mold 원인을 우선 검토하세요
-5. 단, 1차 권고 조치를 전부 시도했는데 변화가 없다면, 새 원인을 machine/mold로만 좁히지 마라. 1차 추정의 방향(불량유형 분류·원인 카테고리) 자체가 틀렸을 가능성을 먼저 재검토하라. 특히 'KB 가공윈도우 사전 대조'에 '낮음⚠'/'높음⚠' 플래그가 있으면 그 항목(멜트온도 등)을 최우선 후보로 다시 열어라. "더 깊고 희귀한 원인"으로 가기 전에 "처음 분류가 틀렸나"를 먼저 물어라.` : '',
-    round >= 3 ? `\nREPEAT ANALYSIS ALERT (3차+ 반복 추정):
+5. 단, 1차 권고 조치를 전부 시도했는데 변화가 없다면, 새 원인을 machine/mold로만 좁히지 마라. 1차 추정의 방향(불량유형 분류·원인 카테고리) 자체가 틀렸을 가능성을 먼저 재검토하라. 특히 'KB 가공윈도우 사전 대조'에 '낮음⚠'/'높음⚠' 플래그가 있으면 그 항목(멜트온도 등)을 최우선 후보로 다시 열어라. "더 깊고 희귀한 원인"으로 가기 전에 "처음 분류가 틀렸나"를 먼저 물어라.`) : '',
+    round >= 3 ? (isEn ? `\nREPEAT ANALYSIS ALERT (round 3+ repeated estimate):
+This case has been estimated 3 or more times. It is unlikely to be resolved by typical molding condition adjustments alone.
+You must review the following:
+- Injection machine mechanical inspection: check ring wear, screw wear, heater degradation
+- Mold precision inspection: vent blockage, cooling line scale, parting line wear
+- Material change review: a different grade of the same resin, or a different manufacturer
+- Mold design change: gate location/size, runner balance
+Present a root-cause resolution, not "try adjusting the conditions more."` : `\nREPEAT ANALYSIS ALERT (3차+ 반복 추정):
 이 케이스는 3회 이상 반복 추정입니다. 일반적인 성형 조건 조정으로는 해결이 어려운 상태입니다.
 다음을 반드시 검토하세요:
 - 사출기 기계적 점검: 체크링 마모, 스크류 마모, 히터 열화
 - 금형 정밀 점검: 벤트 막힘, 냉각 라인 스케일, PL면 마모
 - 소재 변경 검토: 같은 수지의 다른 등급 또는 다른 제조사
 - 금형 설계 변경: 게이트 위치/크기, 러너 밸런스
-'조건을 더 바꿔보세요'가 아니라 근본 원인 해결을 제시하세요.` : '',
+'조건을 더 바꿔보세요'가 아니라 근본 원인 해결을 제시하세요.`) : '',
   ].filter(Boolean).join('\n\n');
 
   return [
-    { type: 'text' as const, text: FIXED_FRAMEWORK, cache_control: { type: 'ephemeral' as const } },
+    { type: 'text' as const, text: buildFixedFramework(locale), cache_control: { type: 'ephemeral' as const } },
     { type: 'text' as const, text: variableText },
   ];
 }
@@ -530,6 +603,7 @@ export async function POST(request: NextRequest) {
 
     const round = Number(bodyRound) || 1;
     const outputLocale = locale === 'en' ? 'en' : 'ko';
+    const isEn = outputLocale === 'en';
 
     // Limit image arrays to prevent token overflow
     const rawImages = (images || []).slice(0, 5);
@@ -742,7 +816,18 @@ export async function POST(request: NextRequest) {
       ? formatDefectGuide('금형 석출', resinSpec, s, a, resinInfo?.filler)
       : '';
 
-    const noImageGuard = safeImages.length === 0 ? `[이미지 없음 — 텍스트 기반 추정 모드]
+    const noImageGuard = safeImages.length === 0 ? (isEn ? `[No image — text-based estimation mode]
+- No defect photo was provided. Skip the IMAGE QUALITY CHECK step.
+- Never branch to No_Defect_Detected / Image_Unreadable (not applicable — there is no image).
+- Use the defect type selected by the user (${defectType || 'not selected'}) as defect_type,
+  and estimate causes and adjustments normally from the process conditions and resin characteristics (at least 1 cause/recommendation).
+- Exception: only when the defect type is also unselected and there are almost no settings, leaving no basis to estimate:
+  defect_type.en='Insufficient_Input', severity='low',
+  summary='More information is needed. Please select a defect type or enter injection conditions.',
+  causes=[], recommendations=[].
+  ※ Never write any wording about images/retaking photos/pictures.
+
+` : `[이미지 없음 — 텍스트 기반 추정 모드]
 - 불량 사진이 제공되지 않았다. IMAGE QUALITY CHECK 단계를 건너뛰어라.
 - No_Defect_Detected / Image_Unreadable 로 절대 분기하지 마라 (이미지가 없으므로 해당 없음).
 - 사용자가 선택한 불량 유형(${defectType || '미선택'})을 defect_type으로 사용하고,
@@ -753,9 +838,96 @@ export async function POST(request: NextRequest) {
   causes=[], recommendations=[].
   ※ 이미지/재촬영/사진 관련 문구 절대 쓰지 마라.
 
-` : '';
+`) : '';
 
-    const diagnosisText = `
+    const diagnosisText = (isEn ? `
+${noImageGuard}Please systematically analyze the following injection molding defect information using the Scientific Molding methodology.
+
+## Defect Information
+- Defect type: ${defectType || 'Photo analysis required'}
+- Defect description: ${defectDescription || 'None'}
+
+## Resin Information
+- Resin type: ${resinInfo?.resinType || 'Not entered'}
+- Filler: ${resinInfo?.filler || 'None'}${resinInfo?.fillerContent ? ` ${resinInfo.fillerContent}%` : ''}
+- Flame retardant grade: ${resinInfo?.flameRetardant || 'None'}${resinInfo?.flameRetardantThickness ? ` @ ${resinInfo.flameRetardantThickness}mm certified thickness` : ''}
+- Resin detail: ${resinInfo?.resinDetail || 'None'}
+- Resin grade: ${resinInfo?.resinGrade || 'None'}
+
+## Basic Injection Machine Settings
+- Injection temperature: Nozzle ${s.nozzleTemp || '-'}℃, Z1 ${s.zone1Temp || '-'}℃, Z2 ${s.zone2Temp || '-'}℃, Z3 ${s.zone3Temp || '-'}℃, Z4 ${s.zone4Temp || '-'}℃
+- Mold temperature: Fixed side ${s.moldTempFixed || '-'}℃, Moving side ${s.moldTempMoving || '-'}℃
+- Injection pressure: 1st ${s.injPressure1 || '-'} MPa, Holding ${s.holdPressure || '-'} MPa
+- Injection speed: 1st ${s.injSpeed1 || '-'}%, 2nd ${s.injSpeed2 || '-'}%
+- Holding time: ${s.holdTime || '-'}sec, Cooling time: ${s.coolTime || '-'}sec, Injection time: ${s.injTime || '-'}sec
+- Metering: ${s.metering || '-'}mm, Cushion (set): ${s.cushion || '-'}mm
+- Back pressure: ${s.backPressure || '-'} MPa, Screw RPM: ${s.screwRpm || '-'}rpm, Clamp force: ${s.clampForce || '-'}ton
+- (Pressure input unit: ${pressureUnit || 'MPa'}, converted internally to MPa)
+
+${(a.vpTransferPos || a.vpTransferPressure || a.preInjectDecompDist || a.postMeterDecompDist) ? `## V/P Transfer & Decompression (Suck-back)
+- V/P transfer position: ${a.vpTransferPos || '-'}mm, V/P transfer pressure: ${a.vpTransferPressure || '-'} MPa
+- Pre-injection decompression distance: ${a.preInjectDecompDist || '-'}mm, speed: ${a.preInjectDecompSpeed || '-'}mm/s
+- Post-metering decompression distance: ${a.postMeterDecompDist || '-'}mm
+` : ''}
+${(a.actualFillTime || a.actualPeakPressure || a.actualCushion || a.actualCycleTime || a.actualPartWeight) ? `## Measured Values (Monitor Readings)
+- Actual fill time: ${a.actualFillTime || '-'}sec
+- Actual peak injection pressure: ${a.actualPeakPressure || '-'} MPa
+- Actual cushion: ${a.actualCushion || '-'}mm
+- Actual cycle time: ${a.actualCycleTime || '-'}sec
+- Actual part weight: ${a.actualPartWeight || '-'}g
+` : ''}
+${(a.dryTemp || a.dryTime || a.dryerType !== '없음') ? `## Drying Conditions
+- Drying temperature: ${a.dryTemp || '-'}℃, Drying time: ${a.dryTime || '-'}hr
+- Dryer type: ${a.dryerType || '-'}
+- Measured moisture content: ${a.moistureContent || 'Not measured'}%
+` : ''}
+${(moldInfo?.runnerType === '핫' && (a.hrManifoldTemp || a.hrNozzle1Temp)) ? `## Hot Runner Settings
+- Manifold: ${a.hrManifoldTemp || '-'}℃
+- Nozzle 1: ${a.hrNozzle1Temp || '-'}℃, Nozzle 2: ${a.hrNozzle2Temp || '-'}℃, Nozzle 3: ${a.hrNozzle3Temp || '-'}℃, Nozzle 4: ${a.hrNozzle4Temp || '-'}℃
+- Valve gate: ${a.valveGate || 'None'}
+` : ''}
+${(a.regrindRatio || a.colorType !== '없음') ? `## Regrind & Color
+- Regrind mix ratio: ${a.regrindRatio || '0'}%
+- Color type: ${a.colorType || 'None'}${a.mbRatio ? `, mix ratio: ${a.mbRatio}%` : ''}
+` : ''}
+${(a.machineModel || a.screwDiameter || a.maxClampForce || a.maxInjPressure) ? `## Injection Machine Spec
+- Model: ${a.machineModel || '-'}
+- Screw diameter: ${a.screwDiameter || '-'}mm
+- Max clamp force: ${a.maxClampForce || '-'}ton, Max injection pressure: ${a.maxInjPressure || '-'} MPa
+` : ''}
+${(moldInfo?.moldType || moldInfo?.gateType || moldInfo?.cavities || moldInfo?.runnerType) ? `## Mold Information
+- Mold type: ${moldInfo?.moldType || '-'} (2-plate/3-plate/hot runner)
+- Gate type: ${moldInfo?.gateType || '-'}
+- Cavity count: ${moldInfo?.cavities || '-'}
+- Runner type: ${moldInfo?.runnerType || '-'}
+` : ''}
+${(productInfo?.weight || productInfo?.wallThicknessMin || productInfo?.wallThicknessMax || productInfo?.notes) ? `## Product Information
+- Product weight: ${productInfo?.weight || '-'}g
+- Wall thickness: ${productInfo?.wallThicknessMin || '-'}~${productInfo?.wallThicknessMax || '-'}mm
+- Notes: ${productInfo?.notes || 'None'}
+` : ''}
+${defectGuide ? `${defectGuide}\n\n` : ''}${moldMachineGuard ? `${moldMachineGuard}\n\n` : ''}${defectTempGuard ? `${defectTempGuard}\n\n` : ''}${tempOrderGuard ? `${tempOrderGuard}\n\n` : ''}${surfaceDepositGuard ? `${surfaceDepositGuard}\n\n` : ''}${depositGuide ? `${depositGuide}\n\n` : ''}${kbCompare ? `${kbCompare}\n\n` : ''}${mechanismText ? `${mechanismText}\n\n` : ''}
+
+${isFollowUp && previousDiagnosis ? `
+## Follow-up Estimate Information (Round ${round} Follow-up)
+### Previous Estimated Causes
+${(previousDiagnosis.causes ?? []).map(c => `- ${c.description} (${c.probability}%)`).join('\n')}
+
+### Previous AI Recommendations
+${(previousDiagnosis.recommendations ?? []).map(r => `- ${r.parameter}: ${r.current} → ${r.recommended}`).join('\n')}
+
+### Actions Taken and Results
+${(actionsTaken || []).filter(a => a.done).map(a => `- ✓ ${a.recommendation}: ${a.result || 'Result not recorded'}`).join('\n') || 'None'}
+
+### Actions Not Yet Taken
+${(actionsTaken || []).filter(a => !a.done).map(a => `- ✗ ${a.recommendation}`).join('\n') || 'None'}
+
+### Observed Changes After Actions
+${changeDescription || 'None'}
+` : ''}
+Respond only in JSON format. Return pure JSON without markdown code blocks.
+CRITICAL: Your entire response must be ONLY the JSON object. No text before or after. No markdown. No explanation. Start with { and end with }. All string values must be on a single line — no line breaks inside string values.
+    ` : `
 ${noImageGuard}다음 사출 불량 정보를 Scientific Molding 방법론으로 체계적으로 분석해주세요.
 
 ## 불량 정보
@@ -842,7 +1014,7 @@ ${changeDescription || '없음'}
 ` : ''}
 JSON 형식으로만 응답하세요. 마크다운 코드 블록 없이 순수 JSON만 반환하세요.
 CRITICAL: Your entire response must be ONLY the JSON object. No text before or after. No markdown. No explanation. Start with { and end with }. All string values must be on a single line — no line breaks inside string values.
-    `.trim();
+    `).trim();
 
     userContent.push({ type: 'text', text: diagnosisText });
 
@@ -882,10 +1054,10 @@ CRITICAL: Your entire response must be ONLY the JSON object. No text before or a
           return m ? m[1] : '';
         };
         result = {
-          defect_type: { ko: getText('ko') || '분석 완료', en: getText('en') || 'Analysis Complete' },
+          defect_type: { ko: getText('ko') || (isEn ? 'Analysis Complete' : '분석 완료'), en: getText('en') || 'Analysis Complete' },
           defect_phase: getText('defect_phase') || 'unknown',
           severity: getText('severity') || 'medium',
-          summary: getText('summary') || '분석 결과를 확인하세요',
+          summary: getText('summary') || (isEn ? 'Check the analysis results.' : '분석 결과를 확인하세요'),
           raw_response: rawText,
           causes: [],
           recommendations: [],
