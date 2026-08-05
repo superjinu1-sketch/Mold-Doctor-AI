@@ -61,7 +61,7 @@ export default function HomePage() {
             ) : (
               <>
                 <Link href="/diagnose" className="ui-cta w-full bg-surface text-brand hover:bg-surface-sunken text-body">{t('landing.cta_primary_loggedout')}</Link>
-                <Link href="/guide" className="ui-cta w-full bg-transparent border-2 border-[var(--on-brand)] text-on-brand hover:bg-brand-ink text-body">{t('landing.cta_secondary')}</Link>
+                <Link href={locale === 'en' ? '/en/guide' : '/guide'} className="ui-cta w-full bg-transparent border-2 border-[var(--on-brand)] text-on-brand hover:bg-brand-ink text-body">{t('landing.cta_secondary')}</Link>
               </>
             )}
           </div>

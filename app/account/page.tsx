@@ -43,7 +43,7 @@ export default function AccountPage() {
   const [historyOpen, setHistoryOpen] = useState(true);
 
   async function handleDeleteAccount() {
-    if (deleteText !== '삭제') return;
+    if (deleteText !== t('account.delete_confirm_placeholder')) return;
     setDeleting(true);
     try {
       const res = await apiFetch('/api/account/delete', {
@@ -133,7 +133,7 @@ export default function AccountPage() {
                   <div className="flex items-center gap-2">
                     <button
                       type="button"
-                      disabled={deleteText !== '삭제' || deleting}
+                      disabled={deleteText !== t('account.delete_confirm_placeholder') || deleting}
                       onClick={handleDeleteAccount}
                       className="min-h-[var(--touch-cta)] px-5 rounded-full bg-danger text-on-brand font-bold text-sm disabled:opacity-40 transition-colors"
                     >

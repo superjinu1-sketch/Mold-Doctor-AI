@@ -85,7 +85,7 @@ export default function HistoryList({ records }: { records: HistoryRecord[] }) {
     locale === 'en' ? (r.defect_type?.en ?? '—') : (r.defect_type?.ko ?? r.defect_type?.en ?? '—');
 
   if (reportRecord) {
-    return <ReportModal record={reportRecord} onClose={() => setReportRecord(null)} />;
+    return <ReportModal record={reportRecord} locale={locale} onClose={() => setReportRecord(null)} />;
   }
 
   if (ledgerModalRecord && user) {
@@ -139,7 +139,7 @@ export default function HistoryList({ records }: { records: HistoryRecord[] }) {
               <div className="text-faint text-sm">
                 {r.beforeResin && <span className="mr-2">{r.beforeResin}</span>}
                 <span>{formatDate(r.timestamp, locale)}</span>
-                {r.round && r.round > 1 && <span className="ml-2 text-warn">{r.round}차</span>}
+                {r.round && r.round > 1 && <span className="ml-2 text-warn">{locale === 'en' ? `Round ${r.round}` : `${r.round}차`}</span>}
               </div>
               {r.summary && <p className="text-muted text-sm mt-1 line-clamp-1">{r.summary}</p>}
             </div>
