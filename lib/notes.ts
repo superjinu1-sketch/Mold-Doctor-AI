@@ -243,3 +243,16 @@ export function getNoteBySlug(slug: string): Note | undefined {
 export function getLatestNote(): Note {
   return [...NOTES].sort((a, b) => b.publishedAt.localeCompare(a.publishedAt))[0];
 }
+
+/** 홈 Notes 섹션(home-notes-redesign-v1)용 — 배열 앞에서 count건. /en/notes와 동일한 배열 순서. */
+export function getLatestNotes(count: number): Note[] {
+  return NOTES.slice(0, count);
+}
+
+export interface HomeNoteCard {
+  slug: string;
+  title: string;
+  description: string;
+  publishedAt: string;
+  thumbSvg: string | null; // 서버에서 읽은 인라인 SVG. thumb 없으면 null
+}
