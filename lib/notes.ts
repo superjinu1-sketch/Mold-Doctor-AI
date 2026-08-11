@@ -1,6 +1,6 @@
 // 영문 콘텐츠 축 B(/en/notes) 글 데이터 단일 소스. 본문은 진우 확정본 — 문구를 다듬지 않는다.
 // /en/about과 동일 원칙: 문법 교정·표현 개선·문장 병합 전부 금지.
-export type NoteDiagramId = 'cross-section' | 'flow' | 'weld-flow' | 'weld-section' | 'clamp-calc' | 'clamp-flow';
+export type NoteDiagramId = 'cross-section' | 'flow' | 'weld-flow' | 'weld-section' | 'clamp-calc' | 'clamp-flow' | 'fr-paths' | 'fr-ppa-grades' | 'fr-barrel' | 'fr-levers';
 
 export type NoteBlock =
   | { type: 'p'; text: string }
@@ -10,7 +10,7 @@ export type NoteBlock =
 // lib/notesDiagramSvg.ts(node:fs 사용, 서버 전용)가 이 타입을 가져다 쓴다 — 반대 방향(이 파일이
 // notesDiagramSvg.ts에서 import)이면 lib/notes.ts를 가져다 쓰는 클라이언트 컴포넌트(app/page.tsx)가
 // 번들러 설정에 따라 fs를 함께 끌고 들어올 위험이 있어 여기서 정의한다(notes-list-thumbnail-v1).
-export type NoteThumbId = 'splay-branch' | 'weld-strength' | 'clamp-window';
+export type NoteThumbId = 'splay-branch' | 'weld-strength' | 'clamp-window' | 'fr-corrosion';
 
 export interface Note {
   slug: string;
@@ -26,6 +26,44 @@ const h2 = (text: string): NoteBlock => ({ type: 'h2', text });
 const diagram = (id: NoteDiagramId): NoteBlock => ({ type: 'diagram', id });
 
 export const NOTES: Note[] = [
+  {
+    slug: 'halogen-free-flame-retardant-corrosion',
+    title: 'A halogen-free flame retardant wore out the feed screw in three months',
+    description: 'Why flame-retardant PPA corrodes the screw and barrel, why the halogen-free grade can be harder on the machine than the halogenated one it replaced, and the three process levers — drying, heat, shutdown — that decide how fast it happens.',
+    publishedAt: '2026-08-11',
+    thumb: 'fr-corrosion',
+    body: [
+      p('Flame-retardant PPA is one of the few resins that damages the machine faster than it damages the part. A feed screw that would last years on unfilled nylon can come out of a flame-retardant PPA job looking etched in a matter of weeks. The corrosion is not a defect in the usual sense. It is chemistry doing exactly what it does, and most of the levers that slow it down are set at the press.'),
+      p('The part that surprised me is the direction. The industry moved off halogenated flame retardants for good reasons, and the halogen-free grade that replaced them is often the more corrosive one to run.'),
+      h2('What is actually attacking the metal'),
+      p('A flame retardant works by releasing something during thermal decomposition. That is the whole point of it. The question for the machine is what gets released, and whether it is acidic.'),
+      p('Halogenated systems — brominated or chlorinated, usually with an antimony trioxide synergist — release hydrogen halides when they get hot. HBr, HCl. Those combine with any moisture present and become acid, and that acid etches steel. This is old and well understood, and it is why halogenated resins have a reputation for eating tooling.'),
+      p('Halogen-free flame retardants for high-temperature nylons are mostly phosphorus. Two kinds matter here. Metal phosphinates — aluminum diethylphosphinate is the common one, sold under names like Exolit OP — and red phosphorus in the cheaper grades. Both are phosphorus, and under heat and moisture both can end up as phosphorus oxyacids: phosphoric and phosphorous acid. Red phosphorus is the more aggressive of the two, because it reacts with moisture and heat to give off phosphine gas and leave acid behind, and it carries its own black color into any speck it forms.'),
+      p('Here is the part that trips people up. The datasheet for a phosphorus flame retardant will often say it avoids the corrosion problem of halogenated systems, and for a lot of resins that is true — the aromatic phosphates used in PC and ABS are genuinely mild. But PPA is not PC. It melts around 320 to 345°C, far hotter than the halogenated PA66 it often replaces, and phosphoric acid does not boil off at those temperatures the way a hydrogen halide partly does. It stays, it concentrates, and it sits on the screw. The chemistry the datasheet measured and the chemistry that happens in a hot PPA barrel at the end of a shift are not the same event.'),
+      p('The clearest evidence that this is real is that the material suppliers now sell around it. BASF released a flame-retardant PPA in 2022 whose headline feature was that it does not corrode the connector\'s metal contacts. You do not engineer and market a non-corrosive grade unless the corrosive one was a problem people were living with.'),
+      diagram('fr-paths'),
+      h2('The grade sets the speed'),
+      p('PPA is not one material. It is a family — PA6T, PA6T/66, PA9T, PA10T and a few more — and they do not all run at the same temperature. The flame retardant is what corrodes the barrel, not the base resin. But the base resin decides how hot the barrel has to be, and heat is what turns the retardant into acid.'),
+      p('The spread is real. A PA10T grade processes around 310 to 330°C. A PA6T grade runs 330 to 340°C. That is twenty or thirty degrees on a resin where the retardant is already close to its own decomposition point, and the hotter grade gives the same retardant more chance to break down on every shot. If the grade is yours to choose and the part allows it, the cooler-running one is easier on the screw.'),
+      p('Moisture cuts the other way, and it is the part people get backwards. The semi-aromatic PPAs are low-absorption resins — the aromatic rings in the backbone block water from bonding to the amide groups, so they take up around 0.3 to 0.5%, against 1.5 to 2% for a standard PA66. PA9T and PA10T are the lowest of the low. That reads like permission to run them wet. It is not. The corrosion does not care how much water the resin holds at equilibrium; it cares how much is in the barrel during the shot, and even a low-absorption grade holds enough to feed the reaction if it goes in undried.'),
+      p('So the base grade is usually not your call — it is set by the part\'s temperature and mechanical spec. But it tells you how much margin you are working with. A hot PA6T grade on a flame-retardant compound is the combination that eats screws fastest, and it is the one where the levers below stop being optional.'),
+      diagram('fr-ppa-grades'),
+      h2('The three levers that decide how fast'),
+      p('The metallurgy is mostly bought, not set. But how quickly the metal you have gets consumed is set at the press, and it comes down to three things.'),
+      p('The first lever is moisture, and it is the one most often lost. PPA is hygroscopic, so it arrives wet and picks up more from the air. Water does two bad things at once here. It hydrolyzes the polymer, which drops molecular weight and shows up as splay and brittleness. And it feeds the reaction that turns the flame retardant into acid. So under-drying does not just give you a cosmetic defect — it accelerates the corrosion underneath it. Amodel\'s guide asks for the resin under 0.10% moisture, dried at 110 to 120°C for at least four hours, on a desiccant dryer holding a −30°C dew point. Those numbers are not about surface finish. They are the difference between running dry acid precursors and running wet ones.'),
+      p('The second lever is heat and residence time. Every degree and every extra minute in the barrel gives the flame retardant more chance to break down into acid. PPA already runs hot; the instruction is to stay in the 320 to 345°C band and treat 350°C as a ceiling, above which the polymer itself degrades. Residence time should stay under about six minutes. This is where an oversized barrel quietly hurts you: a small shot in a large barrel sits hot for a long time, and a flame-retardant grade punishes that far more than a plain resin does. If the shot-to-barrel ratio is wrong for the job, the corrosion clock runs faster than the cycle does.'),
+      p('The third lever is shutdown. The acid does its worst work when the machine is not moving. Resin left sitting in a hot barrel over a break, a weekend, or overnight is acid in contact with steel with nothing flushing it. The fix is to purge the machine empty before it goes cold. Amodel\'s procedure is to purge the screw clear of resin and then run high-density polyethylene through until it comes out clean. HDPE has no flame retardant in it, so what is sitting against the screw through the shutdown is inert.'),
+      diagram('fr-levers'),
+      h2('When the screw is already going'),
+      p('If the levers were missed for long enough, the machine tells you before the parts do. A screw that is corroding takes on a rough, pitted surface — one coatings vendor describes it as orange-peel after four to six weeks, and powder-metallurgy screws consumed in as little as three months on this kind of material. Non-return valve check rings wear out and stop sealing, so cushion and shot size drift. Flakes of corrosion product then show up in the parts as black specks.'),
+      diagram('fr-barrel'),
+      p('The metallurgy answer is not a process setting, but it is worth knowing so the problem gets sent to the right place. Standard hardened tool steel is not enough for a steady diet of flame-retardant PPA. Tungsten-carbide encapsulation applied by HVOF, or a genuinely corrosion-resistant barrel and screw, is what takes a three-month screw life out to eighteen or twenty-four months. That is a capital decision, not a shift decision — but a molder who knows the black specks are corrosion product, not contamination, is the one who makes the case for it instead of chasing a phantom material problem.'),
+      h2('How it reaches you as a defect'),
+      p('The reason a process engineer cares about barrel chemistry is that it arrives disguised as ordinary defects. Black specks read as contamination. Splay reads as wet resin. Discoloration reads as overheating. On a flame-retardant PPA all three can be the same underlying event — the flame retardant breaking down and taking the metal with it — and the fix for each is on the same three levers above, not on the ones you would reach for if you took the defect at face value.'),
+      p('That is the case this note is really about. On a flame-retardant PPA, "black specks" is not one cause. It could be corrosion product from a going screw, unpurged degraded resin from the last shutdown, or scorch from trapped air. They look alike and they do not share a fix.'),
+      p('Mold Doctor takes a photo of the defect and your process settings and estimates the likely causes and what to adjust. Telling it the resin is a flame-retardant PPA is what lets it weigh drying, residence time and shutdown discipline ahead of the causes that would top the list on a plainer material.'),
+    ],
+  },
   {
     slug: 'clamp-tonnage-calculation',
     title: 'The clamp tonnage formula was off by a factor of 100',

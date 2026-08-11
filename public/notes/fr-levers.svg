@@ -1,0 +1,35 @@
+<svg viewBox="0 0 720 250" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="frl-t frl-d">
+  <title id="frl-t">Three levers set at the press decide how fast the screw goes</title>
+  <desc id="frl-d">Drying keeps the resin under 0.10 percent moisture, dried at 110 to 120 C for four hours on a minus 30 C dew point dryer, because wet resin feeds the acid reaction. Heat and residence stay in the 320 to 345 C band with a 350 C ceiling and under six minutes in the barrel, because heat breaks the retardant into acid. At shutdown, purge the screw empty and run high density polyethylene until it comes out clear, because the acid does its worst work while the machine is idle. None of these need new metal.</desc>
+
+  <text x="360" y="20" font-size="13" font-weight="700" text-anchor="middle" fill="var(--ink)">Three levers, all set at the press</text>
+
+  <rect x="20" y="34" width="216" height="152" rx="8" fill="none" stroke="var(--border)" stroke-width="1.4"/>
+  <rect x="20" y="34" width="216" height="28" rx="8" fill="var(--brand-tint)"/>
+  <text x="128" y="53" font-size="12.5" font-weight="700" text-anchor="middle" fill="var(--brand-ink)">Drying</text>
+  <text x="128" y="86" font-size="12" font-weight="600" text-anchor="middle" fill="var(--ink)">&lt; 0.10% moisture</text>
+  <text x="128" y="107" font-size="12" font-weight="600" text-anchor="middle" fill="var(--ink)">110–120°C · 4 h</text>
+  <text x="128" y="128" font-size="12" font-weight="600" text-anchor="middle" fill="var(--ink)">dew point −30°C</text>
+  <line x1="40" y1="146" x2="216" y2="146" stroke="var(--border)" stroke-width="1"/>
+  <text x="128" y="168" font-size="10.5" text-anchor="middle" fill="var(--faint)">wet resin feeds the acid</text>
+
+  <rect x="252" y="34" width="216" height="152" rx="8" fill="none" stroke="var(--border)" stroke-width="1.4"/>
+  <rect x="252" y="34" width="216" height="28" rx="8" fill="var(--brand-tint)"/>
+  <text x="360" y="53" font-size="12.5" font-weight="700" text-anchor="middle" fill="var(--brand-ink)">Heat &amp; residence</text>
+  <text x="360" y="86" font-size="12" font-weight="600" text-anchor="middle" fill="var(--ink)">320–345°C</text>
+  <text x="360" y="107" font-size="12" font-weight="600" text-anchor="middle" fill="var(--ink)">ceiling 350°C</text>
+  <text x="360" y="128" font-size="12" font-weight="600" text-anchor="middle" fill="var(--ink)">≤ 6 min in the barrel</text>
+  <line x1="272" y1="146" x2="448" y2="146" stroke="var(--border)" stroke-width="1"/>
+  <text x="360" y="168" font-size="10.5" text-anchor="middle" fill="var(--faint)">heat breaks FR into acid</text>
+
+  <rect x="484" y="34" width="216" height="152" rx="8" fill="none" stroke="var(--border)" stroke-width="1.4"/>
+  <rect x="484" y="34" width="216" height="28" rx="8" fill="var(--brand-tint)"/>
+  <text x="592" y="53" font-size="12.5" font-weight="700" text-anchor="middle" fill="var(--brand-ink)">Shutdown</text>
+  <text x="592" y="86" font-size="12" font-weight="600" text-anchor="middle" fill="var(--ink)">purge the screw empty</text>
+  <text x="592" y="107" font-size="12" font-weight="600" text-anchor="middle" fill="var(--ink)">then HDPE</text>
+  <text x="592" y="128" font-size="12" font-weight="600" text-anchor="middle" fill="var(--ink)">until it runs clear</text>
+  <line x1="504" y1="146" x2="680" y2="146" stroke="var(--border)" stroke-width="1"/>
+  <text x="592" y="168" font-size="10.5" text-anchor="middle" fill="var(--faint)">acid works while idle</text>
+
+  <text x="360" y="230" font-size="11.5" font-weight="600" text-anchor="middle" fill="var(--ink)">None of these need new metal — they slow how fast the metal you have is consumed.</text>
+</svg>
