@@ -1,0 +1,27 @@
+<svg viewBox="0 0 180 136" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="tff-t tff-d">
+  <title id="tff-t">White haze on a glass-filled part is the fiber</title>
+  <desc id="tff-d">On a glass-filled part, a white hazy surface is glass fiber showing through a thin skin, not a drying problem. A hotter mold wall lets resin cover the fiber. Mold temperature is the first lever.</desc>
+
+  <text x="90" y="17" font-size="11" font-weight="700" text-anchor="middle" fill="var(--ink)">Glass-filled surface</text>
+
+  <!-- cold: fiber at surface -->
+  <rect x="10" y="26" width="160" height="40" rx="6" fill="var(--danger)" opacity=".08" stroke="var(--danger)" stroke-width="1.1"/>
+  <g stroke="var(--muted)" stroke-width="1.8" stroke-linecap="round">
+    <line x1="28" y1="52" x2="52" y2="50"/>
+    <line x1="76" y1="54" x2="100" y2="52"/>
+    <line x1="120" y1="50" x2="144" y2="52"/>
+  </g>
+  <g stroke="var(--danger)" stroke-width="2" stroke-linecap="round">
+    <line x1="44" y1="44" x2="40" y2="31"/>
+    <line x1="96" y1="44" x2="100" y2="31"/>
+  </g>
+  <text x="90" y="60" font-size="8.5" text-anchor="middle" fill="var(--danger)">white haze = fiber, not drying</text>
+
+  <path d="M90 66 v8" fill="none" stroke="var(--faint)" stroke-width="1.2"/>
+
+  <rect x="10" y="76" width="160" height="34" rx="6" fill="var(--ok)" opacity=".1"/>
+  <text x="90" y="91" font-size="10.5" font-weight="700" text-anchor="middle" fill="var(--ok)">mold temperature first</text>
+  <text x="90" y="104" font-size="8.5" text-anchor="middle" fill="var(--faint)">hot wall → resin covers it</text>
+
+  <text x="90" y="127" font-size="8.5" font-weight="600" text-anchor="middle" fill="var(--muted)">every glass-filled resin does it</text>
+</svg>

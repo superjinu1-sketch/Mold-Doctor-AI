@@ -19,6 +19,9 @@ const FILES: Record<NoteDiagramId, string> = {
   'fr-ppa-grades': 'fr-ppa-grades.svg',
   'fr-barrel': 'fr-barrel.svg',
   'fr-levers': 'fr-levers.svg',
+  'fiber-float-fountain': 'fiber-float-fountain.svg',
+  'fiber-float-resins': 'fiber-float-resins.svg',
+  'fiber-float-section': 'fiber-float-section.svg',
 };
 
 export function readNoteDiagramSvg(id: NoteDiagramId): string {
@@ -31,6 +34,7 @@ const THUMB_FILES: Record<NoteThumbId, string> = {
   'weld-strength': 'thumb-weld-strength.svg',
   'clamp-window': 'thumb-clamp-window.svg',
   'fr-corrosion': 'thumb-fr-corrosion.svg',
+  'fiber-float': 'thumb-fiber-float.svg',
 };
 
 export function readNoteThumbSvg(id: NoteThumbId): string {

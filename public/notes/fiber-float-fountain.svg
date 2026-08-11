@@ -1,0 +1,47 @@
+<svg viewBox="0 0 720 240" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="fff-t fff-d">
+  <title id="fff-t">Fountain flow carries the fiber to the surface</title>
+  <desc id="fff-d">A side view of the melt filling a cavity. The fast material at the center reaches the flow front and rolls outward toward the cold mold walls, like a fountain turning over. Glass fibers riding near the front get rolled onto the wall and freeze there before the resin behind them can flow over and bury them.</desc>
+
+  <text x="360" y="20" font-size="13" font-weight="700" text-anchor="middle" fill="var(--ink)">Fountain flow rolls the fiber onto the wall</text>
+
+  <!-- mold walls -->
+  <rect x="40" y="52" width="600" height="14" rx="2" fill="var(--muted)" opacity=".3"/>
+  <text x="52" y="62" font-size="8.5" font-weight="600" fill="var(--muted)">mold wall (cold)</text>
+  <rect x="40" y="174" width="600" height="14" rx="2" fill="var(--muted)" opacity=".3"/>
+  <text x="52" y="184" font-size="8.5" font-weight="600" fill="var(--muted)">mold wall (cold)</text>
+
+  <!-- cavity / melt -->
+  <path d="M40 66 L520 66 Q560 120 520 174 L40 174 Z" fill="var(--brand-tint)"/>
+  <text x="70" y="124" font-size="10" font-weight="600" fill="var(--brand-ink)">melt →</text>
+
+  <!-- advancing arrow (center, fast) -->
+  <line x1="150" y1="120" x2="470" y2="120" stroke="var(--brand)" stroke-width="2.4"/>
+  <path d="M470 120 l-9 -5 l0 10 Z" fill="var(--brand)"/>
+  <text x="300" y="112" font-size="9.5" font-weight="600" text-anchor="middle" fill="var(--brand)">fast center flow</text>
+
+  <!-- fountain roll-over arrows at the front -->
+  <path d="M492 120 Q532 96 524 74" fill="none" stroke="var(--brand)" stroke-width="1.8"/>
+  <path d="M524 74 l-6 6 l8 3 Z" fill="var(--brand)"/>
+  <path d="M492 120 Q532 144 524 166" fill="none" stroke="var(--brand)" stroke-width="1.8"/>
+  <path d="M524 166 l-6 -6 l8 -3 Z" fill="var(--brand)"/>
+  <text x="560" y="122" font-size="9.5" font-weight="700" fill="var(--ink)">flow front</text>
+  <text x="560" y="136" font-size="8.5" fill="var(--faint)">rolls outward</text>
+
+  <!-- core fibers (aligned) -->
+  <g stroke="var(--muted)" stroke-width="2.2" stroke-linecap="round">
+    <line x1="120" y1="104" x2="176" y2="106"/>
+    <line x1="220" y1="100" x2="280" y2="102"/>
+    <line x1="150" y1="140" x2="212" y2="138"/>
+    <line x1="260" y1="146" x2="322" y2="144"/>
+    <line x1="330" y1="112" x2="390" y2="114"/>
+    <line x1="360" y1="150" x2="420" y2="148"/>
+  </g>
+  <!-- fibers rolled onto the walls, frozen -->
+  <g stroke="var(--danger)" stroke-width="2.4" stroke-linecap="round">
+    <line x1="470" y1="80" x2="510" y2="72"/>
+    <line x1="486" y1="86" x2="524" y2="80"/>
+    <line x1="470" y1="160" x2="510" y2="168"/>
+    <line x1="486" y1="154" x2="524" y2="160"/>
+  </g>
+  <text x="470" y="214" font-size="9.5" font-weight="600" text-anchor="middle" fill="var(--danger)">fiber frozen against the wall, before resin covers it</text>
+</svg>

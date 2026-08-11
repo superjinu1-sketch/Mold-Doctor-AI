@@ -1,6 +1,6 @@
 // 영문 콘텐츠 축 B(/en/notes) 글 데이터 단일 소스. 본문은 진우 확정본 — 문구를 다듬지 않는다.
 // /en/about과 동일 원칙: 문법 교정·표현 개선·문장 병합 전부 금지.
-export type NoteDiagramId = 'cross-section' | 'flow' | 'weld-flow' | 'weld-section' | 'clamp-calc' | 'clamp-flow' | 'fr-paths' | 'fr-ppa-grades' | 'fr-barrel' | 'fr-levers';
+export type NoteDiagramId = 'cross-section' | 'flow' | 'weld-flow' | 'weld-section' | 'clamp-calc' | 'clamp-flow' | 'fr-paths' | 'fr-ppa-grades' | 'fr-barrel' | 'fr-levers' | 'fiber-float-fountain' | 'fiber-float-resins' | 'fiber-float-section';
 
 export type NoteBlock =
   | { type: 'p'; text: string }
@@ -10,7 +10,7 @@ export type NoteBlock =
 // lib/notesDiagramSvg.ts(node:fs 사용, 서버 전용)가 이 타입을 가져다 쓴다 — 반대 방향(이 파일이
 // notesDiagramSvg.ts에서 import)이면 lib/notes.ts를 가져다 쓰는 클라이언트 컴포넌트(app/page.tsx)가
 // 번들러 설정에 따라 fs를 함께 끌고 들어올 위험이 있어 여기서 정의한다(notes-list-thumbnail-v1).
-export type NoteThumbId = 'splay-branch' | 'weld-strength' | 'clamp-window' | 'fr-corrosion';
+export type NoteThumbId = 'splay-branch' | 'weld-strength' | 'clamp-window' | 'fr-corrosion' | 'fiber-float';
 
 export interface Note {
   slug: string;
@@ -26,6 +26,41 @@ const h2 = (text: string): NoteBlock => ({ type: 'h2', text });
 const diagram = (id: NoteDiagramId): NoteBlock => ({ type: 'diagram', id });
 
 export const NOTES: Note[] = [
+  {
+    slug: 'fiber-float-surface-whitening',
+    title: 'The white haze on a glass-filled part is the fiber, and drying won\'t touch it',
+    description: 'Why glass fiber floats to the surface and turns a part white, why mold temperature is the first lever that pulls it back under the skin, and what to reach for — process, then material, then mold — when it does not.',
+    publishedAt: '2026-08-11',
+    thumb: 'fiber-float',
+    body: [
+      p('A glass-filled part comes out with a white, hazy surface, and the reflex is to blame drying. On a glass-filled resin that reflex is usually wrong. The white is the glass fiber sitting in the surface, showing through a skin that is too thin to hide it, and no amount of drying moves it.'),
+      p('I wrote earlier about telling that white mark apart — whether it wipes off, whether the resin is even glass-filled, whether the drying was actually done. That note ends at the point where the fiber is confirmed and everything else is ruled out. This is the branch that starts there. The fiber is the cause; now it has to be pulled back under the surface, and the lever that does it is mold temperature. The reason is worth understanding before reaching for the setting.'),
+      h2('Why the fiber floats'),
+      p('Melt does not fill a cavity like water filling a glass. It fills by fountain flow: the material at the center of the stream is fastest, and when it reaches the flow front it rolls outward and forward, laying itself against the cold mold wall like a fountain turning over. Whatever is riding near the front gets rolled onto the surface and frozen there.'),
+      p('In a glass-filled resin, what rides near the front is the fiber. Glass and polymer do not flow the same — different density, different response to shear — so they separate a little as they move, and the fiber ends up at the leading edge. Fountain flow then rolls it onto the wall, where it hits cold steel and freezes before the resin behind it can flow over and bury it. The skin that should be a smooth resin layer is instead full of fiber ends sitting at the surface, and that is what reads as white haze.'),
+      p('The interface makes it worse. If the bond between fiber and polymer is weak — and low melt viscosity and high shear both weaken it — the fiber sheds its resin coating more easily and sits more proud of the surface. So the same conditions that shear the melt hard are the ones that leave the most fiber showing.'),
+      diagram('fiber-float-fountain'),
+      h2('Some resins float more than others'),
+      p('None of this is specific to one resin. The mechanism is physics, not chemistry — fountain flow and a density difference — so any short-glass-reinforced thermoplastic does it. PA, PBT, PP, PC, PPS, POM: fill any of them with chopped glass and the fiber will try to reach the surface. What changes from one to the next is how hard it tries.'),
+      p('The dividing line is crystallinity. A semi-crystalline resin — nylon, PBT, PP, POM, PPS — shrinks more as it cools, because the polymer packs into crystals and pulls in on itself. That shrink draws the resin back off the fiber and leaves the fiber standing more proud, so semi-crystalline grades float worse. An amorphous resin — PC, ABS, PC/ABS — shrinks less and floats less, though it is often chosen for a glossy surface where the little float there is shows up more.'),
+      p('Two other things push it up. Higher glass loading floats more, simply because there is more fiber trying to reach the surface — a 30% grade is worse than a 15% one. And polypropylene is a case of its own: it is non-polar, so the bond between glass and polymer is weak to start with and the fiber sheds its coating easily, which is why glass-filled PP almost always carries a maleic-anhydride compatibilizer and still floats readily.'),
+      p('The practical point is that the levers are the same for all of them — mold temperature first — but the numbers are not. A semi-crystalline nylon and an amorphous polycarbonate reach a clean surface at different mold temperatures, and the band that works for one is not the band for the other.'),
+      diagram('fiber-float-resins'),
+      h2('The setting that pulls it back'),
+      p('The metallurgy of the problem is set by the resin, but how much fiber ends up frozen at the surface is set at the press, and mold temperature is the first thing to move.'),
+      p('A hot mold wall lets the surface skin stay molten a moment longer. In that moment the resin behind the frozen front has time to flow forward and over the fiber, burying it under a resin-rich layer instead of freezing it exposed. On a glass-filled nylon the working band is roughly 80 to 120°C, and for a part fighting fiber float it belongs at the top of that band, not the bottom. This is the single change that fixes most floating-fiber surfaces, and it is the one shops skip because a hotter mold means a longer cycle.'),
+      p('Injection speed is the second lever, and it works the opposite way from intuition. Faster filling shortens the time the flow front spends freezing against the wall, so less fiber locks in before the resin can cover it. It also cuts the relative slip between fiber and polymer that separates them in the first place.'),
+      p('Melt temperature helps at the margin — a glass-filled nylon runs around 270 to 300°C, and the hotter end keeps the resin fluid enough to flow over the fiber — but it has a ceiling. Push it too high and the extra shear and heat degrade the fiber-resin bond, which is the interface problem above, and you lose on the interface what you gained on flow. Injection pressure sits high already on these resins, around 75 to 100 MPa, because glass raises the viscosity; that is a consequence of the filler, not a lever for the surface.'),
+      diagram('fiber-float-section'),
+      h2('When the press can\'t reach it'),
+      p('Sometimes the process band is not enough — the part is thin, the flow length is long, or the surface spec is cosmetic and unforgiving. Then the fix moves off the press.'),
+      p('The material side comes first. Compounders sell low-float or surface-improved grades of the same resin, and the difference is usually the coupling chemistry — silane treatments and maleic-anhydride-grafted compatibilizers that make the fiber hold its resin coating instead of shedding it. If a standard grade floats no matter what the press does, a surface grade of the same resin and fiber loading is the cheaper answer than fighting it shot to shot.'),
+      p('The mold side is the expensive answer. Rapid-heat-cycle or variotherm molding heats the cavity surface well above the normal mold temperature during fill, so the skin stays molten across the whole flow path, then cools it for ejection. It is the most complete fix for fiber float and weld-line whitening both, and it costs the most in tooling and cycle. Short of that, a matte or textured surface finish does not stop the fiber floating but stops it reading as a defect — it breaks up the reflection that makes the haze visible, which is why so many glass-filled parts are specified textured in the first place.'),
+      h2('The short version'),
+      p('Floating fiber is not a diagnosis problem once the fiber is confirmed — it is an order-of-operations problem. Raise the mold temperature toward the top of the band first, because that fixes most of them. Raise injection speed next. Nudge melt temperature up, but not past the point where it degrades the bond. If the process band runs out, move to a surface grade of the resin, and only then to variotherm tooling or a texture that hides what you cannot prevent. The sequence matters because each step costs more than the one before it, and most parts never need to leave the first.'),
+      p('Mold Doctor takes a photo of the defect and your process settings and estimates the likely causes and what to adjust. Tell it the resin is glass-filled and the white surface stops reading as drying and starts reading as fiber, with mold temperature at the top of the list where it belongs.'),
+    ],
+  },
   {
     slug: 'halogen-free-flame-retardant-corrosion',
     title: 'A halogen-free flame retardant wore out the feed screw in three months',
