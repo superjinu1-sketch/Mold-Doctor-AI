@@ -1,5 +1,6 @@
 'use client';
 
+import { useRef, useState } from 'react';
 import Link from 'next/link';
 import { useLocale } from '@/contexts/LocaleContext';
 import { useAuth } from '@/contexts/AuthContext';
@@ -10,9 +11,32 @@ function formatDate(iso: string): string {
   return new Date(iso).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
 }
 
-export default function HomeClient({ latestNotes }: { latestNotes: HomeNoteCard[] }) {
+function pageWindow(current: number, total: number): (number | 'ellipsis')[] {
+  if (total <= 7) return Array.from({ length: total }, (_, i) => i + 1);
+  const out: (number | 'ellipsis')[] = [1];
+  if (current > 3) out.push('ellipsis');
+  const start = Math.max(2, current - 1);
+  const end = Math.min(total - 1, current + 1);
+  for (let p = start; p <= end; p++) out.push(p);
+  if (current < total - 2) out.push('ellipsis');
+  out.push(total);
+  return out;
+}
+
+const PAGE_SIZE = 4;
+
+export default function HomeClient({ notes }: { notes: HomeNoteCard[] }) {
   const { t, locale } = useLocale();
   const { user } = useAuth();
+  const [page, setPage] = useState(1); // 1-indexed
+  const notesSectionRef = useRef<HTMLDivElement>(null);
+  const totalPages = Math.max(1, Math.ceil(notes.length / PAGE_SIZE));
+  const pageNotes = notes.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
+
+  function goToPage(next: number) {
+    setPage(next);
+    notesSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
 
   const meta = (user?.user_metadata ?? {}) as Record<string, unknown>;
   const name = (typeof meta.name === 'string' && meta.name)
@@ -114,13 +138,18 @@ export default function HomeClient({ latestNotes }: { latestNotes: HomeNoteCard[
 
         {/* 기술 노트 — 크롤러가 홈에서 도달 가능한 링크 확보(internal-links-to-notes-v1).
             조건부 렌더 금지 대상이라 항상 렌더. 무료 도구 카드보다 시각적 위계를 낮게.
-            컴팩트 스택 리스트(home-notes-redesign-v1) — 최신 N건, 첫 행에 NEW 배지.
-            행 안에 고정폭 썸네일이 들어가 max-w-md보다 넓은 컨테이너가 필요해 별도 wrapper로 분리. */}
-        <div className="max-w-2xl mx-auto">
+            컴팩트 스택 리스트(home-notes-redesign-v1) — 현재 페이지 4건, 전체 최신 1건에만 NEW 배지.
+            행 안에 고정폭 썸네일이 들어가 max-w-md보다 넓은 컨테이너가 필요해 별도 wrapper로 분리.
+            인플레이스 페이지네이션(home-notes-pagination-v1) — 서버가 전체 노트를 넘기고 클라이언트가
+            PAGE_SIZE(4)씩 자른다. 정적 앱이라 페이지 전환에 서버 왕복 없음(URL 파라미터 없음).
+            스케일 주의: 노트 전체의 인라인 썸네일 SVG가 홈 HTML에 직렬화된다 — 현재 5건은 무해(≈7KB).
+            노트가 ~25건을 넘기면 홈 payload가 무거워지니 그때는 정적 서버 페이지네이션(/en/notes/page/N)
+            전환을 검토한다. */}
+        <div className="max-w-2xl mx-auto" ref={notesSectionRef}>
           <h2 className="text-h3 font-bold text-ink mt-10 mb-2">{t('landing.notes_title')}</h2>
           <p className="text-muted text-label mb-4">{t('landing.notes_sub')}</p>
           <div className="flex flex-col gap-2.5 mb-3">
-            {latestNotes.map((n, i) => (
+            {pageNotes.map((n, i) => (
               <Link key={n.slug} href={`/en/notes/${n.slug}`} className="ui-card p-3.5 flex gap-3.5 items-start hover:border-[var(--brand-border)] transition-colors">
                 {n.thumbSvg && (
                   <div
@@ -132,7 +161,7 @@ export default function HomeClient({ latestNotes }: { latestNotes: HomeNoteCard[
                 <div className="min-w-0 flex-1">
                   <div className="flex items-start gap-2">
                     <span className="font-bold text-ink text-[15.5px] leading-snug">{n.title}</span>
-                    {i === 0 && (
+                    {page === 1 && i === 0 && (
                       <span className="text-[10px] font-extrabold text-white bg-brand rounded-full px-2 py-0.5 shrink-0">NEW</span>
                     )}
                   </div>
@@ -142,7 +171,42 @@ export default function HomeClient({ latestNotes }: { latestNotes: HomeNoteCard[
               </Link>
             ))}
           </div>
-          <Link href="/en/notes" className="text-faint hover:text-muted text-label font-medium min-h-[44px] flex items-center justify-center">{t('landing.notes_all')}</Link>
+
+          {totalPages > 1 && (
+            <nav aria-label="Notes pagination" className="flex items-center justify-center gap-1.5 mt-2">
+              <button
+                type="button"
+                onClick={() => goToPage(Math.max(1, page - 1))}
+                disabled={page === 1}
+                aria-label="Previous page"
+                className="min-w-[36px] min-h-[36px] px-2 rounded-lg text-muted disabled:opacity-40 hover:bg-[color:var(--surface-sunken,#f4f5f7)] transition-colors"
+              >‹</button>
+
+              {pageWindow(page, totalPages).map((it, idx) =>
+                it === 'ellipsis'
+                  ? <span key={`e${idx}`} className="px-1 text-faint select-none">…</span>
+                  : <button
+                      key={it}
+                      type="button"
+                      onClick={() => goToPage(it)}
+                      aria-current={it === page ? 'page' : undefined}
+                      className={`min-w-[36px] min-h-[36px] rounded-lg text-sm font-medium transition-colors ${
+                        it === page
+                          ? 'bg-brand text-white'
+                          : 'text-muted hover:bg-[color:var(--surface-sunken,#f4f5f7)]'
+                      }`}
+                    >{it}</button>
+              )}
+
+              <button
+                type="button"
+                onClick={() => goToPage(Math.min(totalPages, page + 1))}
+                disabled={page === totalPages}
+                aria-label="Next page"
+                className="min-w-[36px] min-h-[36px] px-2 rounded-lg text-muted disabled:opacity-40 hover:bg-[color:var(--surface-sunken,#f4f5f7)] transition-colors"
+              >›</button>
+            </nav>
+          )}
         </div>
       </section>
     </div>
