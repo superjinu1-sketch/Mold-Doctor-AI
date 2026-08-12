@@ -117,3 +117,15 @@ export function IconNote({ className, size = 20 }: IconProps) {
     </svg>
   );
 }
+
+// 스토어 배지(store-badges-v1) — 다운로드 화살표. 공식 스토어 로고(사과·삼각) 대신
+// 범용 아이콘 사용 — 상표 마크 재현 리스크 회피, 스토어명 텍스트가 구분자 역할.
+export function IconDownload({ className, size = 20 }: IconProps) {
+  return (
+    <svg {...base(size)} className={className}>
+      <path d="M12 3v12" />
+      <polyline points="7 10 12 15 17 10" />
+      <path d="M4 18v1a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-1" />
+    </svg>
+  );
+}

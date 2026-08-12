@@ -5,6 +5,7 @@ import { usePathname } from 'next/navigation';
 import { ko } from '@/messages/ko';
 import { en } from '@/messages/en';
 import { useLocale } from '@/contexts/LocaleContext';
+import StoreBadges from '@/components/StoreBadges';
 
 // 영문 라우트(/en/*)에서는 페이지 내용이 영문이므로 푸터도 영문이어야 함(실측 확인된 한국어 잔존 수정).
 // 기존 locale 토글 상태와 무관하게 URL 경로가 표시 언어를 결정 — 크롤러가 보는 SSR HTML도 항상 정확.
@@ -31,6 +32,11 @@ export default function Footer() {
           <Link href="/en/notes" className="text-faint text-xs hover:text-muted transition-colors">{m['footer.notes']}</Link>
           <Link href="/en/about" className="text-faint text-xs hover:text-muted transition-colors">{m['footer.about']}</Link>
         </nav>
+        {/* 스토어 배지(store-badges-v1) — 전 페이지 공통 노출(푸터 자연 확산). 네이티브 앱에서는
+            StoreBadges 내부 게이팅으로 DOM 자체가 생성되지 않는다. */}
+        <div className="mb-6">
+          <StoreBadges variant="footer" />
+        </div>
         <div className="flex flex-col md:flex-row items-center justify-between gap-4">
           <Link href="/" className="flex items-center gap-2 font-bold">
             <div className="w-6 h-6 rounded-md bg-brand flex items-center justify-center shadow-sm">

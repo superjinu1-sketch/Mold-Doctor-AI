@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useLocale } from '@/contexts/LocaleContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { IconClipboard, IconCheckSquare, IconFlask } from '@/components/icons';
+import StoreBadges from '@/components/StoreBadges';
 import type { HomeNoteCard } from '@/lib/notes';
 
 function formatDate(iso: string): string {
@@ -92,6 +93,10 @@ export default function HomeClient({ notes }: { notes: HomeNoteCard[] }) {
               </>
             )}
           </div>
+
+          {/* 스토어 배지(store-badges-v1) — CTA 스택 하단, 로그인/비로그인 모두 노출. 네이티브 앱에서는
+              StoreBadges 내부 게이팅으로 DOM 자체가 생성되지 않는다. */}
+          <StoreBadges variant="hero" />
 
           {!user && <p className="text-on-brand/70 text-label mt-4 text-center">{t('landing.hero_trust')}</p>}
         </div>
