@@ -16,6 +16,7 @@ import { apiFetch } from '@/lib/apiBase';
 import { saveDiagnosisRecord, updateResolution, patchRecordFields, type HistoryRecord } from '@/lib/history-sync';
 import { IconClipboard, IconCamera } from '@/components/icons';
 import { SAMPLE_CASES } from '@/lib/sampleCase';
+import { requestInAppReviewIfEligible } from '@/lib/inAppReview';
 
 // --- Types ---
 interface ImageFile {
@@ -1156,6 +1157,10 @@ function DiagnoseContent() {
         }
       }
     } catch { /* ignore */ }
+    // 인앱 리뷰 요청(in-app-review-v1) — 작업표준 저장 등 위 로직 완료 후, "완전 해결"(만족 확인)일 때만.
+    // 부분개선·미해결에서는 호출하지 않는다(불만족 사용자에게 리뷰 요청은 역효과). 웹·30일 가드·실패
+    // 무시는 requestInAppReviewIfEligible 내부에서 처리 — 실패해도 이 흐름에 영향 없음.
+    if (status === 'solved') void requestInAppReviewIfEligible();
   };
 
   const handleStartFollowUp = () => {
