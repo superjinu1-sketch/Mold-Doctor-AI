@@ -1,0 +1,53 @@
+<svg viewBox="0 0 720 300" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="nmam-t nmam-d">
+  <title id="nmam-t">From phones to energy: the same sealed pass-through</title>
+  <desc id="nmam-d">Two application families. Consumer electronics: antenna lines, waterproof frames, and structural mid-frames in phones, laptops, and watches, where radio must pass through metal. Energy and automotive: battery cover terminal modules, hydrogen tank parts, PTC heaters, and hermetic connectors, where current and heat must pass through sealed walls. The joint is the same; the cost of a leak rises from a dead phone to a safety event.</desc>
+
+  <text x="360" y="22" font-size="13" font-weight="700" text-anchor="middle" fill="var(--ink)">One problem, restated across industries</text>
+
+  <!-- LEFT: phones & consumer -->
+  <rect x="40" y="44" width="280" height="190" rx="8" fill="var(--brand)" opacity=".05"/>
+  <rect x="40" y="44" width="280" height="190" rx="8" fill="none" stroke="var(--brand)" stroke-width="1.2"/>
+  <text x="180" y="66" font-size="11.5" font-weight="700" text-anchor="middle" fill="var(--brand-ink)">phones &amp; consumer</text>
+  <text x="180" y="80" font-size="8.5" text-anchor="middle" fill="var(--faint)">what must pass: radio</text>
+  <g fill="var(--brand)">
+    <rect x="58" y="97" width="6" height="6" rx="1"/>
+    <rect x="58" y="121" width="6" height="6" rx="1"/>
+    <rect x="58" y="145" width="6" height="6" rx="1"/>
+    <rect x="58" y="169" width="6" height="6" rx="1"/>
+  </g>
+  <g font-size="9.5" fill="var(--ink)">
+    <text x="72" y="104">antenna lines — radio windows</text>
+    <text x="72" y="128">waterproof frames — IP-rated seals</text>
+    <text x="72" y="152">mid-frame skeletons — bosses, ribs, zones</text>
+    <text x="72" y="176">laptops · watches · cameras · connectors</text>
+  </g>
+  <text x="180" y="214" font-size="8.5" text-anchor="middle" fill="var(--faint)">a leak kills the phone</text>
+
+  <!-- MIDDLE: arrow -->
+  <text x="360" y="120" font-size="9.5" font-weight="600" text-anchor="middle" fill="var(--muted)">same joint,</text>
+  <path d="M330 134 h56" stroke="var(--muted)" stroke-width="1.6"/>
+  <path d="M392 134 l-7 -4.5 v9 Z" fill="var(--muted)"/>
+  <text x="360" y="154" font-size="9.5" font-weight="600" text-anchor="middle" fill="var(--muted)">higher stakes</text>
+
+  <!-- RIGHT: energy & automotive -->
+  <rect x="400" y="44" width="280" height="190" rx="8" fill="var(--warn)" opacity=".06"/>
+  <rect x="400" y="44" width="280" height="190" rx="8" fill="none" stroke="var(--warn)" stroke-width="1.2"/>
+  <text x="540" y="66" font-size="11.5" font-weight="700" text-anchor="middle" fill="var(--warn)">energy &amp; automotive</text>
+  <text x="540" y="80" font-size="8.5" text-anchor="middle" fill="var(--faint)">what must pass: current, heat</text>
+  <g fill="var(--warn)">
+    <rect x="418" y="97" width="6" height="6" rx="1"/>
+    <rect x="418" y="121" width="6" height="6" rx="1"/>
+    <rect x="418" y="145" width="6" height="6" rx="1"/>
+    <rect x="418" y="169" width="6" height="6" rx="1"/>
+  </g>
+  <g font-size="9.5" fill="var(--ink)">
+    <text x="432" y="104">battery cover modules — Al·Cu terminals in PPS</text>
+    <text x="432" y="128">hydrogen tank parts — FCEV</text>
+    <text x="432" y="152">PTC heaters · hermetic connectors</text>
+    <text x="432" y="176">ultracapacitor seals</text>
+  </g>
+  <text x="540" y="214" font-size="8.5" font-weight="600" text-anchor="middle" fill="var(--danger)">a leak here is a safety event</text>
+
+  <text x="360" y="262" font-size="11" font-weight="600" text-anchor="middle" fill="var(--ink)">The wall changes; the job doesn't — pass one thing through, seal against everything else.</text>
+  <text x="360" y="280" font-size="9.5" text-anchor="middle" fill="var(--faint)">Stakes climb; the levers at the press stay the same.</text>
+</svg>

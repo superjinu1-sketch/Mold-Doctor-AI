@@ -1,6 +1,6 @@
 // 영문 콘텐츠 축 B(/en/notes) 글 데이터 단일 소스. 본문은 진우 확정본 — 문구를 다듬지 않는다.
 // /en/about과 동일 원칙: 문법 교정·표현 개선·문장 병합 전부 금지.
-export type NoteDiagramId = 'cross-section' | 'flow' | 'weld-flow' | 'weld-section' | 'clamp-calc' | 'clamp-flow' | 'fr-paths' | 'fr-ppa-grades' | 'fr-barrel' | 'fr-levers' | 'fiber-float-fountain' | 'fiber-float-resins' | 'fiber-float-section' | 'nmt-pores' | 'nmt-families';
+export type NoteDiagramId = 'cross-section' | 'flow' | 'weld-flow' | 'weld-section' | 'clamp-calc' | 'clamp-flow' | 'fr-paths' | 'fr-ppa-grades' | 'fr-barrel' | 'fr-levers' | 'fiber-float-fountain' | 'fiber-float-resins' | 'fiber-float-section' | 'nmt-pores' | 'nmt-families' | 'nmt-frame' | 'nmt-app-map';
 
 export type NoteBlock =
   | { type: 'p'; text: string }
@@ -10,7 +10,7 @@ export type NoteBlock =
 // lib/notesDiagramSvg.ts(node:fs 사용, 서버 전용)가 이 타입을 가져다 쓴다 — 반대 방향(이 파일이
 // notesDiagramSvg.ts에서 import)이면 lib/notes.ts를 가져다 쓰는 클라이언트 컴포넌트(app/page.tsx)가
 // 번들러 설정에 따라 fs를 함께 끌고 들어올 위험이 있어 여기서 정의한다(notes-list-thumbnail-v1).
-export type NoteThumbId = 'splay-branch' | 'weld-strength' | 'clamp-window' | 'fr-corrosion' | 'fiber-float' | 'nmt-bond';
+export type NoteThumbId = 'splay-branch' | 'weld-strength' | 'clamp-window' | 'fr-corrosion' | 'fiber-float' | 'nmt-bond' | 'nmt-frame';
 
 export interface Note {
   slug: string;
@@ -26,6 +26,36 @@ const h2 = (text: string): NoteBlock => ({ type: 'h2', text });
 const diagram = (id: NoteDiagramId): NoteBlock => ({ type: 'diagram', id });
 
 export const NOTES: Note[] = [
+  {
+    slug: 'nmt-antenna-lines-waterproofing',
+    title: 'Why metal phones need plastic lines, and where the technology went next',
+    description: 'Metal blocks radio and waterproofing hates openings — the two jobs that made nano molding standard in phones, and how the same sealed pass-through problem is now moving into EV battery covers, hydrogen tanks, and connectors.',
+    publishedAt: '2026-08-12',
+    thumb: 'nmt-frame',
+    body: [
+      p('Part one of this series was about how the bond works: a treated metal surface full of nanometre-scale pores, filled by melt under pressure, frozen into millions of anchors. This part is about why anyone goes to that much trouble. The answer starts with a problem that has nothing to do with bonding at all — metal blocks radio.'),
+      p('Once you see the two jobs this technology does in a phone, you will recognize the same pair everywhere it spreads: let something pass through a metal wall, and seal the opening so nothing else does. Phones needed radio waves to pass. The applications lining up behind them — battery covers, hydrogen tanks, connectors — need current, and the stakes of the seal go up each time.'),
+      h2('The radio problem'),
+      p('A phone frame made entirely of metal is a beautiful object with one defect: it is a shield around the radios. Antennas cannot radiate through a closed conductive shell, so a metal phone has to be opened up — slots cut through the frame where the antennas need to see out. Those slots are the thin plastic lines from part one, and their placement is not styling. They sit where the antennas sit, which is why they cluster near the corners.'),
+      p('The slot itself creates the engineering problem. It cannot stay empty: the frame would lose stiffness at exactly the cut, and water would walk straight in. It has to be filled with something rigid, radio-transparent, and bonded well enough to restore the frame into one structural piece — at a wall thickness of a couple of millimetres, with no room for screws, gaskets or a bead of glue. That specification is what nano molding was commercialized to meet. Reports of phone makers testing NMT for exactly this go back to 2011, and filled antenna lines have been the standard construction for metal phones since. More radios per phone has only pushed it further — every band added is another place the shell has to open.'),
+      p('There were other ways out, and the market tried them: all-glass backs, plastic unibodies, antenna bands worn on the outside of the case. They trade away the thing metal was chosen for — stiffness at low thickness, and the feel of the material. The combination a flagship phone actually demands — metal construction, a dozen radio paths, an IP rating and a couple of millimetres of wall — has, so far, exactly one construction that meets all of it at once: molding the windows in.'),
+      h2('The water problem'),
+      p('The second job hides inside the first. A waterproof phone is rated to keep water out under pressure — and every antenna line is a through-cut in the structural wall. There is no gasket around it, no O-ring, no adhesive bead. The seal is the metal-resin interface itself: the same nanoporous bond from part one, doing double duty as a barrier. If the resin filled the treatment layer completely, the joint is tight. If it filled ninety percent, the missing ten percent is a leak path that no inspection of the outside will show you.'),
+      p('This is worth pausing on, because it changes what a good part means. A mechanical joint that lost a fraction of its strength usually still works. A seal that lost a fraction of its continuity has failed — water does not average. It is why these parts are leak-tested, not just pull-tested, and why part four of this series spends so much time on molding conditions: the leak path is usually made at the press, invisibly, in the first seconds of fill.'),
+      diagram('nmt-frame'),
+      h2('The quiet third job: structure'),
+      p('Look at the inside of a metal frame part and there is usually a resin skeleton molded onto it: bosses for screws, ribs, snap hooks, insulated zones keeping the metal away from the electronics. That is the third job — the one nobody advertises. Metal gives the part its stiffness and its feel; resin carries all the small functional geometry that would be expensive or impossible to machine into the metal. One insert-molded part replaces a bracket, fasteners and an assembly step.'),
+      p('That anatomy is why the technology did not stay in phones. Laptop chassis, watch cases, camera bodies, connector housings — anywhere a designer wants metal outside and functional plastic inside, the same construction shows up. These applications are less demanding than the antenna lines; they mostly borrow the structural trick. The demanding ones came later, and from a different industry.'),
+      h2('The next wave: batteries, hydrogen, heat'),
+      p('The supplier behind TRI publishes its application list, and reading it is like watching the technology change jobs. An ultracapacitor seal for an automaker. Cover modules for automotive lithium-ion batteries — aluminum and copper terminals molded into a PPS cover that has to insulate, carry current through the wall, and stay waterproof under pressure. Parts for hydrogen tanks in fuel-cell vehicles. PTC heaters. Hermetic connectors. Every one of them is the phone problem restated: something must pass through a sealed wall — this time current or heat instead of radio — and the pass-through must not leak.'),
+      p('The stakes climb with each of these. A phone that leaks kills a phone. A battery cover that leaks, or an insulation zone that breaks down, is a safety event — and a hydrogen tank raises that again. The engineering answer is the same nanoporous interface, but the durability envelope from part one now matters far more than it did in a pocket: automotive parts live through the −40 to 120°C kind of thermal cycling that grinds a metal-resin joint down toward half its strength if the materials are not chosen for it. That is why copper appears next to aluminum on the terminal side, why PPS keeps appearing on the resin side, and why part three of this series is about materials at all.'),
+      diagram('nmt-app-map'),
+      h2('What every one of them asks of the press'),
+      p('Strip the applications down and they make one demand in common: a joint that is simultaneously structure and seal, formed in a few seconds inside a mold, on an insert whose invisible surface treatment someone else already paid for. The molder does not choose the antenna layout or the battery chemistry. The molder decides whether the melt reached the bottom of the pores before it froze — and in every application above, that decision is the difference between a part and a leak.'),
+      p('Part three looks at the materials that make the joint possible — why glass-filled PPS became the default resin, what the aluminum grades bring, and what changes when copper or stainless enters. Part four is the troubleshooting note: the defects, the levers, and which failures belong to the press versus which arrived in the box of inserts.'),
+      p('Mold Doctor takes a photo of the defect and your process settings and estimates likely causes and what to adjust. If your parts are the kind in this note — an insert that must seal, not just hold — the stakes of every setting it reasons about are higher, and part four will bring the two together.'),
+    ],
+  },
   {
     slug: 'nmt-metal-resin-bonding',
     title: 'The plastic lines in a metal phone frame are not glued in',
