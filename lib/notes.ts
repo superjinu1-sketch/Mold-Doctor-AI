@@ -1,6 +1,6 @@
 // 영문 콘텐츠 축 B(/en/notes) 글 데이터 단일 소스. 본문은 진우 확정본 — 문구를 다듬지 않는다.
 // /en/about과 동일 원칙: 문법 교정·표현 개선·문장 병합 전부 금지.
-export type NoteDiagramId = 'cross-section' | 'flow' | 'weld-flow' | 'weld-section' | 'clamp-calc' | 'clamp-flow' | 'fr-paths' | 'fr-ppa-grades' | 'fr-barrel' | 'fr-levers' | 'fiber-float-fountain' | 'fiber-float-resins' | 'fiber-float-section';
+export type NoteDiagramId = 'cross-section' | 'flow' | 'weld-flow' | 'weld-section' | 'clamp-calc' | 'clamp-flow' | 'fr-paths' | 'fr-ppa-grades' | 'fr-barrel' | 'fr-levers' | 'fiber-float-fountain' | 'fiber-float-resins' | 'fiber-float-section' | 'nmt-pores' | 'nmt-families';
 
 export type NoteBlock =
   | { type: 'p'; text: string }
@@ -10,7 +10,7 @@ export type NoteBlock =
 // lib/notesDiagramSvg.ts(node:fs 사용, 서버 전용)가 이 타입을 가져다 쓴다 — 반대 방향(이 파일이
 // notesDiagramSvg.ts에서 import)이면 lib/notes.ts를 가져다 쓰는 클라이언트 컴포넌트(app/page.tsx)가
 // 번들러 설정에 따라 fs를 함께 끌고 들어올 위험이 있어 여기서 정의한다(notes-list-thumbnail-v1).
-export type NoteThumbId = 'splay-branch' | 'weld-strength' | 'clamp-window' | 'fr-corrosion' | 'fiber-float';
+export type NoteThumbId = 'splay-branch' | 'weld-strength' | 'clamp-window' | 'fr-corrosion' | 'fiber-float' | 'nmt-bond';
 
 export interface Note {
   slug: string;
@@ -26,6 +26,40 @@ const h2 = (text: string): NoteBlock => ({ type: 'h2', text });
 const diagram = (id: NoteDiagramId): NoteBlock => ({ type: 'diagram', id });
 
 export const NOTES: Note[] = [
+  {
+    slug: 'nmt-metal-resin-bonding',
+    title: 'The plastic lines in a metal phone frame are not glued in',
+    description: 'How nano molding technologies like NMT and TRI bond resin directly to metal — where the strength actually comes from, why the pores matter more than the chemistry, and why the press ends up deciding whether it holds.',
+    publishedAt: '2026-08-12',
+    thumb: 'nmt-bond',
+    body: [
+      p('Look at the metal frame of almost any phone. Somewhere along the edge there are thin plastic lines breaking up the metal — usually near the corners, always where the antennas live. Those lines are not glued in, and they are not snapped in. They were injection molded directly onto the metal, and if the part was made right, you could tear the frame apart and the plastic would break before the joint does.'),
+      p('The family of technologies that makes this possible goes by several names — NMT, nano molding, TRI — and it sits in an odd position: it is chemistry and surface engineering on the front end, but whether the bond actually holds is decided at the injection molding machine. That makes it our kind of topic. This is the first of four notes on it: what the technology actually is, where it is used, what materials it works with, and what to do when the bond fails.'),
+      h2('The problem it solves'),
+      p('Metal and plastic do not want to stick to each other. A polymer melt will happily flow over a machined aluminum surface, freeze, and then pop off with almost no force — the surface is too smooth to grip and too foreign to bond. For decades the answers were mechanical: screws, heat stakes, snap features, or a bead of adhesive. All of them add parts, thickness, process steps, or a material that ages.'),
+      p('Phones broke that compromise. A metal frame needs slots for antennas to radiate through, the slots need to be filled with something rigid that will not leak water, and the whole assembly has to survive drops and years of thermal cycling at a thickness of a couple of millimetres. Screws and glue do not fit in that space. What fits is resin molded straight onto the metal — if you can make it hold.'),
+      h2('Where the strength actually comes from'),
+      p('The trick is not an adhesive and it is not, mostly, chemistry. It is geometry at a scale you cannot see.'),
+      p('Before molding, the metal goes through a surface treatment that covers it with pores on the order of 20 to 50 nanometres — thousands of times smaller than the surface roughness you can feel with a fingernail. During molding, the melt is forced against this surface and into the pores. When it freezes there, the joint is held by millions of microscopic anchors per square millimetre. Pull on it and you are not peeling a glue line; you are trying to shear off a forest of resin roots embedded in the metal.'),
+      p('What surprised me in the research is which pore geometry wins. A study comparing two treated surfaces found that deeper is not better: a surface with isolated, straight pores about 500 nanometres deep bonded worse than one with a shallower, three-dimensionally interconnected pore network about 100 nanometres deep. The reason is filling. Resin could penetrate the connected network completely, while the deep isolated holes trapped air and filled partway. The strength comes from how much of the structure the resin actually occupies — not from how impressive the structure looks in a cross-section. Keep that idea; it comes back in part four, because everything the press does either helps or prevents that filling.'),
+      p('There is a chemical assist on top. On treated aluminum, the surface carries hydroxides that decompose under the heat of molding, and the reaction favors intimate contact between resin and metal. Suppliers formulate bonding grades around this. But the load-bearing mechanism — the thing you can measure in a lap-shear test — is the anchor structure.'),
+      diagram('nmt-pores'),
+      h2('Two families: etched pores and anodized films'),
+      p('The treatments that create this surface fall into two main families, and the two names in this series\' title are one of each.'),
+      p('NMT — Nano Molding Technology — is the name coined by Taisei Plas in Japan, and it is chemical etching: the aluminum is immersed in a treatment bath (the patented step is an amine-family solution) that eats nanoscale pits into the surface itself. This is the lineage behind the antenna lines on most metal phones, and the one with the deepest paper trail — patents, bonding-grade resins sold specifically for it, and published strength data.'),
+      p('TRI is the other family: anodizing. Instead of etching pits into the raw metal, the process grows an oxide film on the aluminum electrochemically, and that film carries the nanopores. TRI itself is the system commercialized by GEO Nation in Korea, in an exclusive partnership with Toa Denka of Japan, and it has shipped in waterproof phone housings for years. Same principle — a nanoporous surface the resin can root into — reached by growing a structured layer rather than carving one.'),
+      p('For a molding engineer the distinction matters less than the shared consequence: in both families, the metal arrives at your press already carrying its nanostructure, invisible and finished. You cannot see whether it is good. You can only mold it well or ruin it.'),
+      diagram('nmt-families'),
+      h2('How strong is it, in numbers'),
+      p('Published lap-shear values for well-made aluminum–PPS joints sit around 44 MPa, with butt-joint tensile strength in the same band. For scale, that is stronger than most structural adhesives manage on the same joint, and it is why suppliers can afford the confident demonstration: break the assembly and the fracture runs through the plastic, not along the interface. GEO Nation says it plainly about TRI joints — force the joint apart and the resin breaks and stays behind on the metal.'),
+      p('Durability is where the numbers get more interesting than the brochure. In published aging tests, an aluminum–PPS joint held its ~45 MPa through 3,000 hours at 85°C and 85% humidity, and through 1,500 thermal-shock cycles between −40 and 85°C. Stretch the cycle to −40 to 120°C and the joint degrades toward 25 MPa within 500 to 1,000 cycles — the thermal expansion mismatch between metal and resin grinds at the interface until it gives. The bond is strong, but it is strong within an envelope, and the envelope is set by temperature swing. That is a materials-selection problem, and it is most of why part three of this series exists.'),
+      h2('Why this lands on the molder\'s desk'),
+      p('Everything above happens before and after the press. The treatment is bought. The resin grade is specified. So why write about this in a series about injection molding?'),
+      p('Because the joint is formed in the first seconds after injection starts, and the press owns those seconds. The melt has to reach nanometre-scale pores and fill them before it freezes — and a melt freezes fast against metal. Taisei Plas\'s own patent states the failure mode in one line: the injected resin solidifies before entering the fine recesses of the treated surface. Every setting that governs how long the melt stays alive at the metal surface — mold temperature above all — is deciding, invisibly, whether those millions of anchors get formed or not. A perfectly treated insert molded cold gives you a part that looks identical and holds a fraction of the load.'),
+      p('That is the through-line of this series. Part two looks at where the technology shows up — phones first, then batteries, hydrogen tanks and everything else being built on it. Part three covers the resin and metal combinations and why PPS with glass fiber became the default. Part four is the one closest to this app\'s home ground: what goes wrong at the press, what the levers are, and which failures are yours to fix versus which arrived in the box of inserts.'),
+      p('Mold Doctor takes a photo of the defect and your process settings and estimates likely causes and what to adjust. Insert-molded metal-resin parts push the same physics the app already reasons about — skin formation, mold temperature, packing — to a scale where they decide everything.'),
+    ],
+  },
   {
     slug: 'fiber-float-surface-whitening',
     title: 'The white haze on a glass-filled part is the fiber, and drying won\'t touch it',

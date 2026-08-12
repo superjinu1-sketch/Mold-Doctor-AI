@@ -1,0 +1,22 @@
+<svg viewBox="0 0 180 136" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="tnb-t tnb-d">
+  <title id="tnb-t">Metal and resin bonded without glue</title>
+  <desc id="tnb-d">Resin injection molded directly onto treated metal holds by millions of nano-scale anchors, not adhesive. The joint is formed in the first seconds of fill, so the press decides whether it holds.</desc>
+
+  <text x="90" y="17" font-size="11" font-weight="700" text-anchor="middle" fill="var(--ink)">Metal + resin, no glue</text>
+
+  <!-- cross-section: resin on top, metal below, anchor teeth at interface -->
+  <rect x="14" y="28" width="152" height="30" rx="4" fill="var(--brand-tint)"/>
+  <text x="90" y="47" font-size="9.5" font-weight="600" text-anchor="middle" fill="var(--brand-ink)">resin</text>
+  <rect x="14" y="66" width="152" height="26" rx="4" fill="var(--muted)" opacity=".3"/>
+  <text x="90" y="83" font-size="9.5" font-weight="600" text-anchor="middle" fill="var(--muted)">metal</text>
+  <!-- anchors crossing the interface -->
+  <g fill="var(--brand)">
+    <path d="M23 58 h6 l-3 10 Z"/><path d="M43 58 h6 l-3 10 Z"/><path d="M63 58 h6 l-3 10 Z"/>
+    <path d="M83 58 h6 l-3 10 Z"/><path d="M103 58 h6 l-3 10 Z"/><path d="M123 58 h6 l-3 10 Z"/>
+    <path d="M143 58 h6 l-3 10 Z"/>
+  </g>
+  <text x="90" y="104" font-size="8.5" text-anchor="middle" fill="var(--faint)">nano anchors · 20–50 nm</text>
+
+  <rect x="14" y="110" width="152" height="20" rx="5" fill="var(--ok)" opacity=".1"/>
+  <text x="90" y="124" font-size="9" font-weight="700" text-anchor="middle" fill="var(--ok)">the press decides if it holds</text>
+</svg>

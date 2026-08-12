@@ -1,0 +1,55 @@
+<svg viewBox="0 0 720 300" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="nmf-t nmf-d">
+  <title id="nmf-t">Two routes to a nanoporous surface</title>
+  <desc id="nmf-d">NMT reaches a nanoporous surface by chemical etching: an amine-family bath eats nanoscale pits directly into the aluminum. TRI reaches it by anodizing: an electrochemical cell grows an oxide film on the aluminum, and the film carries the nanopores. Both routes deliver the same thing to the press: an invisible nanoporous surface ready to be filled by resin, or ruined by cold molding.</desc>
+
+  <text x="360" y="22" font-size="13" font-weight="700" text-anchor="middle" fill="var(--ink)">Two routes to the same nanoporous surface</text>
+
+  <!-- LEFT: NMT etching -->
+  <rect x="50" y="38" width="295" height="196" rx="8" fill="var(--brand)" opacity=".05"/>
+  <rect x="50" y="38" width="295" height="196" rx="8" fill="none" stroke="var(--brand)" stroke-width="1.2"/>
+  <text x="197" y="60" font-size="11.5" font-weight="700" text-anchor="middle" fill="var(--brand-ink)">NMT — chemical etching</text>
+  <text x="197" y="74" font-size="8.5" text-anchor="middle" fill="var(--faint)">Taisei Plas (T-treatment)</text>
+
+  <rect x="110" y="86" width="175" height="24" rx="5" fill="var(--muted)" opacity=".25"/>
+  <text x="197" y="102" font-size="9.5" font-weight="600" text-anchor="middle" fill="var(--ink)">aluminum</text>
+  <path d="M197 112 v10" stroke="var(--faint)" stroke-width="1.2"/>
+  <path d="M197 122 l-4 -5 h8 Z" fill="var(--faint)"/>
+  <rect x="90" y="128" width="215" height="26" rx="5" fill="var(--warn)" opacity=".14"/>
+  <text x="197" y="145" font-size="9.5" font-weight="600" text-anchor="middle" fill="var(--warn)">etching bath eats pits into the metal</text>
+  <path d="M197 156 v10" stroke="var(--faint)" stroke-width="1.2"/>
+  <path d="M197 166 l-4 -5 h8 Z" fill="var(--faint)"/>
+  <!-- etched surface: jagged metal top edge -->
+  <rect x="110" y="176" width="175" height="26" rx="4" fill="var(--muted)" opacity=".25"/>
+  <path d="M112 176 l6 6 6 -6 6 6 6 -6 6 6 6 -6 6 6 6 -6 6 6 6 -6 6 6 6 -6 6 6 6 -6 6 6 6 -6 6 6 6 -6 6 6 6 -6 6 6 6 -6 6 6 6 -6 6 6 6 -6 6 6"
+        fill="none" stroke="var(--brand)" stroke-width="1.6"/>
+  <text x="197" y="222" font-size="9" text-anchor="middle" fill="var(--faint)">pits carved in the metal itself · 20–50 nm</text>
+
+  <!-- RIGHT: TRI anodizing -->
+  <rect x="375" y="38" width="295" height="196" rx="8" fill="var(--ok)" opacity=".05"/>
+  <rect x="375" y="38" width="295" height="196" rx="8" fill="none" stroke="var(--ok)" stroke-width="1.2"/>
+  <text x="522" y="60" font-size="11.5" font-weight="700" text-anchor="middle" fill="var(--ok)">TRI — anodizing</text>
+  <text x="522" y="74" font-size="8.5" text-anchor="middle" fill="var(--faint)">GEO Nation × Toa Denka</text>
+
+  <rect x="435" y="86" width="175" height="24" rx="5" fill="var(--muted)" opacity=".25"/>
+  <text x="522" y="102" font-size="9.5" font-weight="600" text-anchor="middle" fill="var(--ink)">aluminum</text>
+  <path d="M522 112 v10" stroke="var(--faint)" stroke-width="1.2"/>
+  <path d="M522 122 l-4 -5 h8 Z" fill="var(--faint)"/>
+  <rect x="415" y="128" width="215" height="26" rx="5" fill="var(--warn)" opacity=".14"/>
+  <text x="522" y="145" font-size="9.5" font-weight="600" text-anchor="middle" fill="var(--warn)">anodizing cell grows an oxide film</text>
+  <path d="M522 156 v10" stroke="var(--faint)" stroke-width="1.2"/>
+  <path d="M522 166 l-4 -5 h8 Z" fill="var(--faint)"/>
+  <!-- anodized: film layer with pores on top of metal -->
+  <rect x="435" y="188" width="175" height="14" rx="3" fill="var(--muted)" opacity=".25"/>
+  <rect x="435" y="176" width="175" height="12" fill="var(--ok)" opacity=".3"/>
+  <g fill="var(--surface)">
+    <rect x="447" y="176" width="4" height="12"/><rect x="463" y="176" width="4" height="12"/>
+    <rect x="479" y="176" width="4" height="12"/><rect x="495" y="176" width="4" height="12"/>
+    <rect x="511" y="176" width="4" height="12"/><rect x="527" y="176" width="4" height="12"/>
+    <rect x="543" y="176" width="4" height="12"/><rect x="559" y="176" width="4" height="12"/>
+    <rect x="575" y="176" width="4" height="12"/><rect x="591" y="176" width="4" height="12"/>
+  </g>
+  <text x="522" y="222" font-size="9" text-anchor="middle" fill="var(--faint)">nano-thick porous film grown on the metal</text>
+
+  <text x="360" y="262" font-size="11" font-weight="600" text-anchor="middle" fill="var(--ink)">Either way, the insert arrives at the press already carrying its nanostructure —</text>
+  <text x="360" y="280" font-size="11" font-weight="600" text-anchor="middle" fill="var(--ink)">invisible, finished, and yours to fill or ruin.</text>
+</svg>

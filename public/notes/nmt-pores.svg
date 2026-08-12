@@ -1,0 +1,58 @@
+<svg viewBox="0 0 720 268" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="nmp-t nmp-d">
+  <title id="nmp-t">Connected pores beat deep pores</title>
+  <desc id="nmp-d">Two treated metal surfaces in cross-section. A three-dimensionally interconnected pore network about 100 nanometres deep fills completely with resin and bonds strongly. Isolated straight pores about 500 nanometres deep trap air, fill only partway, and bond weakly. Strength comes from how much of the structure the resin actually fills.</desc>
+
+  <text x="360" y="22" font-size="13" font-weight="700" text-anchor="middle" fill="var(--ink)">Strength = how much of the structure the resin actually fills</text>
+
+  <!-- LEFT: interconnected network (strong) -->
+  <rect x="40" y="40" width="310" height="168" rx="8" fill="var(--ok)" opacity=".07"/>
+  <rect x="40" y="40" width="310" height="168" rx="8" fill="none" stroke="var(--ok)" stroke-width="1.2"/>
+  <text x="195" y="62" font-size="11" font-weight="700" text-anchor="middle" fill="var(--ok)">3D connected network · ~100 nm</text>
+
+  <!-- resin above -->
+  <rect x="60" y="74" width="270" height="38" fill="var(--brand-tint)"/>
+  <text x="195" y="97" font-size="9.5" font-weight="600" text-anchor="middle" fill="var(--brand-ink)">resin</text>
+  <!-- metal below -->
+  <rect x="60" y="112" width="270" height="66" fill="var(--muted)" opacity=".25"/>
+  <!-- interconnected channels filled with resin (brand) -->
+  <g fill="var(--brand)" opacity=".85">
+    <path d="M80 112 q6 10 0 18 q-5 8 4 14 h10 q8 -6 2 -14 q-6 -9 2 -18 Z"/>
+    <path d="M128 112 q-6 9 1 16 q7 7 -2 15 h12 q9 -8 1 -16 q-7 -8 1 -15 Z"/>
+    <path d="M178 112 q5 8 -1 15 q-6 8 3 16 h11 q8 -8 1 -16 q-6 -8 1 -15 Z"/>
+    <path d="M228 112 q-5 10 1 17 q6 7 -2 14 h12 q8 -7 1 -15 q-6 -8 1 -16 Z"/>
+    <path d="M278 112 q6 9 0 17 q-5 8 3 14 h11 q7 -7 1 -15 q-6 -8 1 -16 Z"/>
+    <!-- lateral connections -->
+    <rect x="86" y="126" width="200" height="4" rx="2" opacity=".7"/>
+  </g>
+  <text x="195" y="170" font-size="9" text-anchor="middle" fill="var(--faint)">metal — channels connect, resin fills all the way</text>
+  <text x="195" y="198" font-size="10.5" font-weight="700" text-anchor="middle" fill="var(--ok)">complete fill → strong anchor</text>
+
+  <!-- RIGHT: isolated deep pores (weak) -->
+  <rect x="370" y="40" width="310" height="168" rx="8" fill="var(--danger)" opacity=".06"/>
+  <rect x="370" y="40" width="310" height="168" rx="8" fill="none" stroke="var(--danger)" stroke-width="1.2"/>
+  <text x="525" y="62" font-size="11" font-weight="700" text-anchor="middle" fill="var(--danger)">isolated straight pores · ~500 nm</text>
+
+  <rect x="390" y="74" width="270" height="38" fill="var(--brand-tint)"/>
+  <text x="525" y="97" font-size="9.5" font-weight="600" text-anchor="middle" fill="var(--brand-ink)">resin</text>
+  <rect x="390" y="112" width="270" height="66" fill="var(--muted)" opacity=".25"/>
+  <!-- deep slots: resin enters top only, air below -->
+  <g>
+    <rect x="420" y="112" width="10" height="52" fill="var(--surface)"/>
+    <rect x="420" y="112" width="10" height="20" fill="var(--brand)" opacity=".85"/>
+    <circle cx="425" cy="152" r="2.5" fill="var(--danger)"/>
+    <rect x="475" y="112" width="10" height="52" fill="var(--surface)"/>
+    <rect x="475" y="112" width="10" height="24" fill="var(--brand)" opacity=".85"/>
+    <circle cx="480" cy="150" r="2.5" fill="var(--danger)"/>
+    <rect x="530" y="112" width="10" height="52" fill="var(--surface)"/>
+    <rect x="530" y="112" width="10" height="18" fill="var(--brand)" opacity=".85"/>
+    <circle cx="535" cy="153" r="2.5" fill="var(--danger)"/>
+    <rect x="585" y="112" width="10" height="52" fill="var(--surface)"/>
+    <rect x="585" y="112" width="10" height="22" fill="var(--brand)" opacity=".85"/>
+    <circle cx="590" cy="151" r="2.5" fill="var(--danger)"/>
+  </g>
+  <text x="525" y="170" font-size="9" text-anchor="middle" fill="var(--faint)">deep but sealed — air trapped, partial fill</text>
+  <text x="525" y="198" font-size="10.5" font-weight="700" text-anchor="middle" fill="var(--danger)">partial fill → weak anchor</text>
+
+  <text x="360" y="238" font-size="11" font-weight="600" text-anchor="middle" fill="var(--ink)">Deeper is not better. Fillable is better.</text>
+  <text x="360" y="256" font-size="9.5" text-anchor="middle" fill="var(--faint)">— and everything the press does either helps or prevents that filling</text>
+</svg>

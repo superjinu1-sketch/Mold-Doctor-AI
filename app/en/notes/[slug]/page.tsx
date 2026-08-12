@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { SITE_URL } from '@/lib/siteUrl';
 import { NOTES, getNoteBySlug, type NoteDiagramId } from '@/lib/notes';
 import { readNoteDiagramSvg } from '@/lib/notesDiagramSvg';
+import { getNoteJaBySlug } from '@/lib/notesJa';
 
 // Capacitor 정적 export(output:'export') 호환 — app/sitemap.ts 선례와 동일 원칙 적용.
 export const dynamic = 'force-static';
@@ -17,6 +18,8 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const note = getNoteBySlug(slug);
   if (!note) return {};
   const url = `${SITE_URL}/en/notes/${slug}`;
+  // ja 번역이 있는 노트만 hreflang ja를 내보낸다 — 없는 slug로 내보내면 404 hreflang (en-notes-06-nmt-v1).
+  const hasJa = Boolean(getNoteJaBySlug(slug));
   return {
     title: note.title,
     description: note.description,
@@ -24,7 +27,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
       canonical: url,
       languages: {
         en: url,
-        ja: `${SITE_URL}/ja/notes/${slug}`,
+        ...(hasJa ? { ja: `${SITE_URL}/ja/notes/${slug}` } : {}),
       },
     },
     openGraph: { title: note.title, description: note.description, type: 'article', locale: 'en_US', url },
