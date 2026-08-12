@@ -50,10 +50,11 @@ export function LocaleProvider({ children }: { children: ReactNode }) {
   // <html lang> 클라 동기화(en-locale-leftover-fixes-v1 Fix A) — URL이 고정인 비-/en/* 페이지(예:
   // /diagnose)에서 클라 로케일 토글에 따라 <html lang>을 동기화한다. SSR 초기값(ko)은 그대로 둔다
   // — 크롤 기본값 유지, 클라 토글 시점에만 갱신이라 SEO 회귀 없음.
-  // /en/* 라우트는 URL 자체가 영문 콘텐츠라 layout.tsx 인라인 스크립트가 이미 lang='en'을 박아둔다 —
-  // 로케일 토글 상태(예: 사용자가 /en/*를 보며 토글은 ko로 둔 경우)로 이걸 덮어써 회귀시키지 않는다.
+  // /en/*·/ja/* 라우트는 URL 자체가 해당 언어 콘텐츠라 layout.tsx 인라인 스크립트가 이미
+  // lang='en'/'ja'를 박아둔다(ja는 ja-notes-axis-v1) — 로케일 토글 상태(예: 사용자가 그 페이지를
+  // 보며 토글은 ko로 둔 경우)로 이걸 덮어써 회귀시키지 않는다.
   useEffect(() => {
-    if (pathname?.startsWith('/en')) return;
+    if (pathname?.startsWith('/en') || pathname?.startsWith('/ja')) return;
     document.documentElement.lang = locale;
   }, [locale, pathname]);
 

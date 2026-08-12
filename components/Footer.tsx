@@ -15,7 +15,9 @@ export default function Footer() {
   // 경로(/en/*)는 SSR HTML을 크롤러에게 항상 영문으로 보여주기 위해 유지하고,
   // 토글은 앱 내부 화면(/tools, /tryout 등 en 변형이 없는 경로)에서 en 사용자를 커버한다.
   // (Navbar의 isEnRoute + nt() 패턴과 동일 원칙)
-  const isEn = (pathname?.startsWith('/en') ?? false) || locale === 'en';
+  // /ja/*(ja-notes-axis-v1)는 ja 전용 셸이 아직 없어 영문 셸로 폴백 — 한국어 SSR 잔존 방지가 목적이며
+  // 3-way 로케일 토글 신설이 아니다(messages/*·LocaleContext 무변경).
+  const isEn = (pathname?.startsWith('/en') ?? false) || (pathname?.startsWith('/ja') ?? false) || locale === 'en';
   const m = isEn ? en : ko;
 
   return (

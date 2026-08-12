@@ -2,42 +2,41 @@ import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { SITE_URL } from '@/lib/siteUrl';
-import { NOTES, getNoteBySlug, type NoteDiagramId } from '@/lib/notes';
+import type { NoteDiagramId } from '@/lib/notes';
+import { NOTES_JA, getNoteJaBySlug, JA_DISCLAIMER_TITLE, JA_DISCLAIMER_BODY } from '@/lib/notesJa';
 import { readNoteDiagramSvg } from '@/lib/notesDiagramSvg';
 
 // Capacitor 정적 export(output:'export') 호환 — app/sitemap.ts 선례와 동일 원칙 적용.
 export const dynamic = 'force-static';
 
 export function generateStaticParams() {
-  return NOTES.map(n => ({ slug: n.slug }));
+  return NOTES_JA.map(n => ({ slug: n.slug }));
 }
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
-  const note = getNoteBySlug(slug);
+  const note = getNoteJaBySlug(slug);
   if (!note) return {};
-  const url = `${SITE_URL}/en/notes/${slug}`;
+  const url = `${SITE_URL}/ja/notes/${slug}`;
   return {
     title: note.title,
     description: note.description,
     alternates: {
       canonical: url,
       languages: {
-        en: url,
-        ja: `${SITE_URL}/ja/notes/${slug}`,
+        en: `${SITE_URL}/en/notes/${slug}`,
+        ja: url,
       },
     },
-    openGraph: { title: note.title, description: note.description, type: 'article', locale: 'en_US', url },
-    // 루트 레이아웃의 twitter 메타는 한국어 고정값 — 영문 페이지에서는 페이지별 영문 title/description으로 덮어쓴다.
+    openGraph: { title: note.title, description: note.description, type: 'article', locale: 'ja_JP', url },
+    // 루트 레이아웃의 twitter 메타는 한국어 고정값 — ja 페이지에서는 페이지별 ja title/description으로 덮어쓴다.
     twitter: { card: 'summary', title: note.title, description: note.description },
   };
 }
 
 // SVG 도식을 <img src>가 아니라 인라인으로 주입 — SVG 내부 var(--ok) 등 CSS 커스텀 프로퍼티가
 // 페이지 :root를 상속받으려면 같은 DOM 트리에 있어야 한다(별도 문서 컨텍스트로 로드되면 색이 사라짐).
-// 파일(public/notes/*.svg) 자체는 확정본 그대로 두고, 375px 대응 크기 처리만 바깥 wrapper에서 담당한다.
-// 도식은 article(max-w-[880px]) 전체 폭을 그대로 채운다 — 별도 max-width/mx-auto를 걸면
-// 텍스트 블록(max-w-[65ch], 좌측 정렬)과 중심이 달라져 좌측 기준선이 어긋난다(실측 확인됨).
+// 도식은 영문판 SVG를 그대로 재사용한다(진우 확정 절충 — ja판 SVG는 별도 단계, ja-notes-axis-v1).
 function Diagram({ id }: { id: NoteDiagramId }) {
   const svg = readNoteDiagramSvg(id);
   return (
@@ -46,12 +45,12 @@ function Diagram({ id }: { id: NoteDiagramId }) {
   );
 }
 
-export default async function NoteDetailPageEn({ params }: { params: Promise<{ slug: string }> }) {
+export default async function NoteDetailPageJa({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const note = getNoteBySlug(slug);
+  const note = getNoteJaBySlug(slug);
   if (!note) notFound();
 
-  const url = `${SITE_URL}/en/notes/${slug}`;
+  const url = `${SITE_URL}/ja/notes/${slug}`;
   const jsonLd = {
     '@context': 'https://schema.org',
     '@type': 'Article',
@@ -75,15 +74,20 @@ export default async function NoteDetailPageEn({ params }: { params: Promise<{ s
     <>
       {/* eslint-disable-next-line react/no-danger */}
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
-      {/* article 자체를 max-w-[880px] mx-auto로 페이지에서 한 번만 중앙 정렬한다. 텍스트 블록은
-          그 안에서 max-w-[65ch]로 폭만 좁히고(mx-auto 없음 — 좌측 정렬 유지) 도식은 article 전체
-          폭(w-full)을 채운다. 텍스트·도식을 각자 mx-auto로 따로 중앙 정렬하면 서로 다른 폭
-          기준으로 중심이 갈라져 좌측 기준선이 어긋난다(실측 확인됨 — h2 x≈340 vs p x≈482). */}
       <article className="max-w-[880px] mx-auto px-4 sm:px-6 py-10">
-        <Link href="/en/notes" className="max-w-[65ch] text-faint hover:text-ink text-sm mb-3 min-h-[44px] inline-flex items-center gap-1">
-          ← Notes
+        <Link href="/ja/notes" className="max-w-[65ch] text-faint hover:text-ink text-sm mb-3 min-h-[44px] inline-flex items-center gap-1">
+          ← ノート一覧
         </Link>
-        <h1 className="max-w-[65ch] text-[length:var(--text-h1)] font-bold text-ink mb-6">{note.title}</h1>
+        <h1 className="max-w-[65ch] text-[length:var(--text-h1)] font-bold text-ink mb-4">{note.title}</h1>
+
+        {/* 디스클레이머 — 오역 한계 안내, 본문 시작 전 상시 노출(ja-notes-axis-v1) */}
+        <div className="max-w-[65ch] ui-card bg-surface-sunken p-4 mb-6">
+          <p className="font-bold text-label text-ink mb-1">{JA_DISCLAIMER_TITLE}</p>
+          <p className="text-muted text-label leading-relaxed">{JA_DISCLAIMER_BODY}</p>
+          <Link href={`/en/notes/${slug}`} className="inline-block text-brand hover:text-brand-ink text-label font-medium mt-2 min-h-[44px] items-center">
+            English version →
+          </Link>
+        </div>
 
         <div>
           {note.body.map((block, i) => {
@@ -105,7 +109,7 @@ export default async function NoteDetailPageEn({ params }: { params: Promise<{ s
           })}
         </div>
 
-        {/* 저자 바이라인 — /en/guide·/en/resins와 동일 스타일(author-page-en-v1) */}
+        {/* 저자 바이라인 — /en/notes와 동일 스타일 */}
         <p className="max-w-[65ch] text-faint text-sm text-center mt-10">
           <Link href="/en/about" className="hover:text-muted transition-colors">Written by Jinwoo Park</Link>
         </p>

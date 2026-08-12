@@ -45,7 +45,9 @@ export default function Navbar() {
   const { user, loading, signOut, credits } = useAuth();
   const pathname = usePathname();
   // 영문 라우트(/en/*)는 locale 토글 상태와 무관하게 항상 영문 내비 라벨 — 실측 확인된 한국어 잔존 수정.
-  const isEnRoute = pathname?.startsWith('/en') ?? false;
+  // /ja/*(ja-notes-axis-v1)는 ja 전용 셸이 아직 없어 영문 셸로 폴백 — 한국어 SSR 잔존 방지가 목적이며
+  // 3-way 로케일 토글 신설이 아니다(messages/*·LocaleContext 무변경).
+  const isEnRoute = (pathname?.startsWith('/en') ?? false) || (pathname?.startsWith('/ja') ?? false);
   const nt = (key: string) => (isEnRoute ? (enMessages[key] ?? key) : t(key));
 
   const toggleLocale = () => setLocale(locale === 'ko' ? 'en' : 'ko');
