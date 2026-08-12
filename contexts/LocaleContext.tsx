@@ -1,5 +1,6 @@
 'use client';
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { usePathname } from 'next/navigation';
 import { ko } from '@/messages/ko';
 import { en } from '@/messages/en';
 import { initClientObservability } from '@/lib/observability/client';
@@ -23,6 +24,7 @@ const LocaleContext = createContext<LocaleCtx>({
 
 export function LocaleProvider({ children }: { children: ReactNode }) {
   const [locale, setLocaleState] = useState<Locale>('ko');
+  const pathname = usePathname();
 
   useEffect(() => {
     try {
@@ -44,6 +46,16 @@ export function LocaleProvider({ children }: { children: ReactNode }) {
     setLocaleState(l);
     try { localStorage.setItem(LS_KEY, l); } catch {}
   };
+
+  // <html lang> 클라 동기화(en-locale-leftover-fixes-v1 Fix A) — URL이 고정인 비-/en/* 페이지(예:
+  // /diagnose)에서 클라 로케일 토글에 따라 <html lang>을 동기화한다. SSR 초기값(ko)은 그대로 둔다
+  // — 크롤 기본값 유지, 클라 토글 시점에만 갱신이라 SEO 회귀 없음.
+  // /en/* 라우트는 URL 자체가 영문 콘텐츠라 layout.tsx 인라인 스크립트가 이미 lang='en'을 박아둔다 —
+  // 로케일 토글 상태(예: 사용자가 /en/*를 보며 토글은 ko로 둔 경우)로 이걸 덮어써 회귀시키지 않는다.
+  useEffect(() => {
+    if (pathname?.startsWith('/en')) return;
+    document.documentElement.lang = locale;
+  }, [locale, pathname]);
 
   const t = (key: string): string =>
     MESSAGES[locale][key] ?? MESSAGES['ko'][key] ?? key;

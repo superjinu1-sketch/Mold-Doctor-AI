@@ -835,7 +835,7 @@ function DiagnoseContent() {
   const loadSample = (idx: number) => {
     const d = SAMPLE_CASES[idx];
     setDefectType(d.defectType);
-    setDefectDescription(d.defectDescription);
+    setDefectDescription(locale === 'en' ? d.defectDescriptionEn : d.defectDescription);
     setResinType(d.resinType);
     setFiller(d.filler);
     setFillerContent(d.fillerContent);

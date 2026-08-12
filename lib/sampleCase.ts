@@ -6,6 +6,7 @@ export const SAMPLE_CASES = [
     label: 'PA66 GF33%', defectTypeKey: 'defect.silver_streak',
     defectType: '은줄 (Silver Streak)',
     defectDescription: '제품 표면에 은색 줄무늬 발생. 5샷에 1번꼴, 게이트 부근에서 시작됨.',
+    defectDescriptionEn: 'Silver streaks on the part surface, about 1 in 5 shots, starting near the gate.',
     resinType: 'PA66', filler: 'GF(유리섬유)', fillerContent: '33', flameRetardant: '없음', flameRetardantThickness: '미입력', flameRetardantType: '해당없음', resinDetail: 'PA66 GF33%', resinGrade: '',
     nozzleTemp: '285', zone1Temp: '280', zone2Temp: '275', zone3Temp: '265', zone4Temp: '255',
     moldTempFixed: '80', moldTempMoving: '80', injPressure1: '120', holdPressure: '80',
