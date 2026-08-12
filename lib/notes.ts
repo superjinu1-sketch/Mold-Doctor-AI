@@ -1,6 +1,6 @@
 // 영문 콘텐츠 축 B(/en/notes) 글 데이터 단일 소스. 본문은 진우 확정본 — 문구를 다듬지 않는다.
 // /en/about과 동일 원칙: 문법 교정·표현 개선·문장 병합 전부 금지.
-export type NoteDiagramId = 'cross-section' | 'flow' | 'weld-flow' | 'weld-section' | 'clamp-calc' | 'clamp-flow' | 'fr-paths' | 'fr-ppa-grades' | 'fr-barrel' | 'fr-levers' | 'fiber-float-fountain' | 'fiber-float-resins' | 'fiber-float-section' | 'nmt-pores' | 'nmt-families' | 'nmt-frame' | 'nmt-app-map';
+export type NoteDiagramId = 'cross-section' | 'flow' | 'weld-flow' | 'weld-section' | 'clamp-calc' | 'clamp-flow' | 'fr-paths' | 'fr-ppa-grades' | 'fr-barrel' | 'fr-levers' | 'fiber-float-fountain' | 'fiber-float-resins' | 'fiber-float-section' | 'nmt-pores' | 'nmt-families' | 'nmt-frame' | 'nmt-app-map' | 'nmt-cte' | 'nmt-resin-map';
 
 export type NoteBlock =
   | { type: 'p'; text: string }
@@ -10,7 +10,7 @@ export type NoteBlock =
 // lib/notesDiagramSvg.ts(node:fs 사용, 서버 전용)가 이 타입을 가져다 쓴다 — 반대 방향(이 파일이
 // notesDiagramSvg.ts에서 import)이면 lib/notes.ts를 가져다 쓰는 클라이언트 컴포넌트(app/page.tsx)가
 // 번들러 설정에 따라 fs를 함께 끌고 들어올 위험이 있어 여기서 정의한다(notes-list-thumbnail-v1).
-export type NoteThumbId = 'splay-branch' | 'weld-strength' | 'clamp-window' | 'fr-corrosion' | 'fiber-float' | 'nmt-bond' | 'nmt-frame';
+export type NoteThumbId = 'splay-branch' | 'weld-strength' | 'clamp-window' | 'fr-corrosion' | 'fiber-float' | 'nmt-bond' | 'nmt-frame' | 'nmt-resin';
 
 export interface Note {
   slug: string;
@@ -26,6 +26,37 @@ const h2 = (text: string): NoteBlock => ({ type: 'h2', text });
 const diagram = (id: NoteDiagramId): NoteBlock => ({ type: 'diagram', id });
 
 export const NOTES: Note[] = [
+  {
+    slug: 'nmt-resin-metal-combinations',
+    title: 'The resin must flow like water, then move like metal',
+    description: 'Why the shortlist for metal-bonding resins is so short — the melt has to enter nanometre pores in a fraction of a second, then match aluminum\'s thermal expansion for the life of the part. How PPS, PBT and PA divide the work, always glass-filled, and what the metal choice locks in.',
+    publishedAt: '2026-08-12',
+    thumb: 'nmt-resin',
+    body: [
+      p('On paper, insert molding onto treated metal accepts any thermoplastic. In practice the shortlist is four resins — PPS, PBT, PA, PET — almost always glass-filled, almost always on aluminum. That is not fashion. The joint makes two demands that pull in opposite directions, and only a narrow band of compounds satisfies both.'),
+      p('The first demand comes from part one: the melt must enter pores tens of nanometres wide in the fraction of a second before it freezes. That asks for a resin that flows like water. The second demand comes from the durability data: once frozen, the resin must expand and contract with the metal through every temperature swing of the part\'s life. That asks for a resin that moves like metal. Flow like water, then move like metal — everything about the material choice follows from that pair.'),
+      h2('The expansion problem'),
+      p('Aluminum expands about 23 parts per million per degree. Unfilled thermoplastics run 60 to 100. Bond the two rigidly and every heating and cooling cycle turns that difference into shear at the interface — the joint gets worked back and forth like a wire being bent. Part one showed where that ends: cycling between −40 and 120°C grinds a joint from around 45 MPa toward 25. The interface does not fail in one event; it fatigues.'),
+      p('Taisei Plas\'s patent is explicit about the fix: the resin composition should sit at 20 to 40 parts per million — at or near the metal it bonds to. No neat polymer gets there. The way down is filler, and mostly that means glass fiber: stiff, cheap, and with almost no thermal expansion of its own, it drags the compound\'s expansion toward the metal\'s. This is why every bonding grade on the market is glass-filled, usually at 30 percent or more, and why the patent goes further and specifies glass fiber plus glass powder together — the powder trims the shrinkage that fiber alone leaves direction-dependent, pulling molding shrinkage down to around 0.4 to 0.5 percent and evening it out.'),
+      p('There is a catch, and it connects to a note I wrote earlier about fiber at surfaces. A glass fiber is around ten micrometres thick. The pores are two hundred times smaller. The fiber cannot enter the treatment layer — only the polymer between the fibers can. So the compound has to do two things at once: carry enough glass to move like metal in bulk, and still present a resin-rich skin at the wall where the actual anchoring happens. Bonding grades are formulated around that balance, and it is one reason a generic glass-filled pellet and a bonding grade of the same resin are not the same material.'),
+      diagram('nmt-cte'),
+      h2('Why PPS became the default'),
+      p('Within the shortlist, PPS with glass fiber is the combination the published numbers keep coming from, and its dominance is easy to defend. It is thermally rigid — it takes reflow soldering, paint ovens and anodizing lines without complaint, which matters because these parts usually go through more processing after molding. It barely absorbs water, so the dimensions and the interface it froze with are the dimensions it keeps. It crystallizes into a stiff, chemically resistant solid that concedes little to the environment. And in the melt it runs thin, which is exactly what demand one asks for.'),
+      p('Its published processing window in the bonding literature — melt around 290 to 330°C, mold around 120°C — already hints at part four\'s argument: this is a hot process, hotter than most shops\' habits, and the mold temperature line in particular is where field practice and datasheet part ways. I will leave that fight for the next note.'),
+      p('PPS has known weaknesses: unfilled it is brittle — another reason the glass is always there — and its dielectric properties are middling. Which is where the rest of the shortlist comes in.'),
+      h2('The rest of the shortlist'),
+      p('PBT takes the antenna work. Where the molded line is a radio window, the resin\'s dielectric behavior joins the selection list, and PBT grades are commonly chosen for those zones. The clearest sign of how established this niche is: resin makers sell PBT grades developed specifically for nano molding — SABIC introduced a flame-retardant PBT for exactly this joint — and specialty suppliers like Syensqo list bonding grades as a product category of their own. When the resin industry builds SKUs for your process, the process has stopped being exotic.'),
+      p('PA66 and PPA carry the structural and automotive end — tougher than PPS, happier in impact, and PPA in particular holds strength at underhood temperatures. Their tax is moisture: polyamides absorb water, swell, and shift properties, which has to be engineered around in a joint whose whole job is dimensional fidelity to a piece of metal. PET appears where cost and dielectric behavior favor it. All of them show up in the field glass-filled — the expansion argument does not care which polymer you picked.'),
+      diagram('nmt-resin-map'),
+      h2('The metal side'),
+      p('Aluminum is the standard for reasons that mirror the resin logic. The etching chemistry that started this field was developed on it; it anodizes readily, which is the TRI route; it is light and machines well; and its expansion is low enough that a filled resin can actually reach it. The common frame and housing alloys — 5052, 6063 and their neighbors — are the ones the published strength numbers are measured on.'),
+      p('Other metals come with asterisks. Copper enters the picture with battery terminals — part two\'s cover modules molded aluminum and copper into the same PPS part — because current wants copper. Stainless and titanium appear in premium housings and specialized parts. Each can be surface-treated, but not by the same bath: the pore-forming chemistry is metal-specific, and a treatment that texturizes aluminum does nothing for stainless. Practically, that means the metal choice picks the treatment vendor and process, and mixing metals in one part means qualifying two treatments that must both survive the same molding conditions.'),
+      h2('How to read a combination'),
+      p('So a combination sheet reads in five columns. Can the melt flow into the pores — viscosity, and the press conditions of part four. Does the compound move like the metal — filler content, shrinkage, CTE. Does the skin stay resin-rich enough to anchor. If the part is a radio window, what are the dielectrics. And what does the part endure after molding — soldering, anodizing, paint. Aluminum 5052 with 30 to 40 percent glass PPS answers all five for most sealed structural parts, which is why it is the default; the moment one column changes — antenna, terminal, underhood — the shortlist rotates but never leaves the family.'),
+      p('Part four is where this series has been heading: the defect list. Because here is the uncomfortable truth of the materials story — you can specify the right alloy, the right bonding grade, the right glass loading, and still ship joints that leak, because the last variable is the press. The best compound in the shortlist only moves like metal after it has entered the pores, and whether it enters is decided in seconds, by settings.'),
+      p('Mold Doctor takes a photo of the defect and your process settings and estimates likely causes and what to adjust. It already knows the resins in this note — PPS, PBT, PA and their glass-filled forms — and part four will put its home-ground levers, mold temperature first, against the specific ways this joint fails.'),
+    ],
+  },
   {
     slug: 'nmt-antenna-lines-waterproofing',
     title: 'Why metal phones need plastic lines, and where the technology went next',

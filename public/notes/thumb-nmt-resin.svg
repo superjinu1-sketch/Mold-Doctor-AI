@@ -1,0 +1,18 @@
+<svg viewBox="0 0 180 136" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="tnr-t tnr-d">
+  <title id="tnr-t">The resin must move like metal</title>
+  <desc id="tnr-d">Thermal expansion bars: aluminum near 23 parts per million per degree, glass-filled bonding grades at 20 to 40, unfilled resins at 60 to 100. Glass filler pulls the resin down to the metal, or the joint fatigues.</desc>
+
+  <text x="90" y="17" font-size="11" font-weight="700" text-anchor="middle" fill="var(--ink)">The resin must move like metal</text>
+
+  <rect x="28" y="34" width="25" height="10" rx="2" fill="var(--muted)"/>
+  <text x="59" y="42" font-size="8" fill="var(--ink)">aluminum</text>
+  <rect x="50" y="52" width="22" height="10" rx="2" fill="var(--ok)"/>
+  <text x="78" y="60" font-size="8" fill="var(--ink)">bonding grades</text>
+  <rect x="93" y="70" width="44" height="10" rx="2" fill="var(--danger)" opacity=".8"/>
+  <text x="141" y="78" font-size="8" fill="var(--ink)">unfilled</text>
+  <path d="M28 88 h124" stroke="var(--border)" stroke-width="1"/>
+  <text x="90" y="99" font-size="7.5" text-anchor="middle" fill="var(--faint)">0 → 100 ppm/°C</text>
+
+  <rect x="14" y="110" width="152" height="20" rx="5" fill="var(--ok)" opacity=".1"/>
+  <text x="90" y="124" font-size="9" font-weight="700" text-anchor="middle" fill="var(--ok)">glass pulls resin down to metal</text>
+</svg>

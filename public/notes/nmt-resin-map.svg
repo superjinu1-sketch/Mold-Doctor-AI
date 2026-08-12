@@ -1,0 +1,45 @@
+<svg viewBox="0 0 720 300" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="nmrm-t nmrm-d">
+  <title id="nmrm-t">The shortlist and how it divides the work</title>
+  <desc id="nmrm-d">Four resin families share the metal-bonding work. Glass-filled PPS is the default: it survives anodizing, paint and reflow, barely absorbs moisture, and runs thin in the melt. Glass-filled PBT takes radio windows, where dielectric behavior matters, and has dedicated nano-molding grades. Glass-filled PA66 and PPA carry automotive and structural parts, with moisture uptake as their tax. Glass-filled PET fills cost and dielectric niches. All of them are glass-filled, because the expansion argument does not depend on the polymer, and the skin at the wall must stay resin-rich.</desc>
+
+  <text x="360" y="22" font-size="13" font-weight="700" text-anchor="middle" fill="var(--ink)">The shortlist and how it divides the work</text>
+
+  <!-- card 1: PPS -->
+  <rect x="55" y="44" width="300" height="88" rx="8" fill="var(--brand)" opacity=".05"/>
+  <rect x="55" y="44" width="300" height="88" rx="8" fill="none" stroke="var(--brand)" stroke-width="1.5"/>
+  <text x="71" y="64" font-size="10.5" font-weight="700" fill="var(--brand-ink)">PPS GF — the default</text>
+  <rect x="285" y="52" width="58" height="16" rx="8" fill="var(--brand)"/>
+  <text x="314" y="63" font-size="8" font-weight="700" text-anchor="middle" fill="var(--surface)">default</text>
+  <text x="71" y="82" font-size="9" fill="var(--muted)">survives anodizing, paint ovens, reflow</text>
+  <text x="71" y="98" font-size="9" fill="var(--muted)">near-zero moisture uptake — keeps its dimensions</text>
+  <text x="71" y="114" font-size="9" fill="var(--muted)">runs thin in the melt — enters the pores</text>
+
+  <!-- card 2: PBT -->
+  <rect x="365" y="44" width="300" height="88" rx="8" fill="var(--ok)" opacity=".05"/>
+  <rect x="365" y="44" width="300" height="88" rx="8" fill="none" stroke="var(--ok)" stroke-width="1.2"/>
+  <text x="381" y="64" font-size="10.5" font-weight="700" fill="var(--ok)">PBT GF — radio windows</text>
+  <text x="381" y="82" font-size="9" fill="var(--muted)">dielectric-friendly where the line is an antenna</text>
+  <text x="381" y="98" font-size="9" fill="var(--muted)">dedicated nano-molding grades exist, incl. FR</text>
+  <text x="381" y="114" font-size="9" fill="var(--muted)">the niche has its own SKUs — it is established</text>
+
+  <!-- card 3: PA -->
+  <rect x="55" y="142" width="300" height="88" rx="8" fill="var(--warn)" opacity=".06"/>
+  <rect x="55" y="142" width="300" height="88" rx="8" fill="none" stroke="var(--warn)" stroke-width="1.2"/>
+  <text x="71" y="162" font-size="10.5" font-weight="700" fill="var(--warn)">PA66 · PPA GF — automotive, structural</text>
+  <text x="71" y="180" font-size="9" fill="var(--muted)">tougher than PPS, happier in impact</text>
+  <text x="71" y="196" font-size="9" fill="var(--muted)">PPA holds strength at underhood temperatures</text>
+  <text x="71" y="212" font-size="9" fill="var(--muted)">the tax: moisture uptake must be managed</text>
+
+  <!-- card 4: PET -->
+  <rect x="365" y="142" width="300" height="88" rx="8" fill="var(--muted)" opacity=".06"/>
+  <rect x="365" y="142" width="300" height="88" rx="8" fill="none" stroke="var(--muted)" stroke-width="1.2"/>
+  <text x="381" y="162" font-size="10.5" font-weight="700" fill="var(--muted)">PET GF — cost &amp; dielectric niches</text>
+  <text x="381" y="180" font-size="9" fill="var(--muted)">appears where cost and dielectrics favor it</text>
+  <text x="381" y="196" font-size="9" fill="var(--muted)">seen in the field alongside the other three</text>
+  <text x="381" y="212" font-size="9" fill="var(--muted)">same rule applies: glass-filled</text>
+
+  <!-- common band -->
+  <rect x="55" y="242" width="610" height="26" rx="6" fill="var(--brand-tint)"/>
+  <text x="360" y="259" font-size="10" font-weight="700" text-anchor="middle" fill="var(--brand-ink)">always glass-filled — the expansion argument does not care which polymer you picked</text>
+  <text x="360" y="284" font-size="9" text-anchor="middle" fill="var(--faint)">and the skin at the wall must stay resin-rich — the glass cannot enter the pores</text>
+</svg>

@@ -1,0 +1,45 @@
+<svg viewBox="0 0 720 300" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="nmcte-t nmcte-d">
+  <title id="nmcte-t">Thermal expansion: the resin must land near the metal</title>
+  <desc id="nmcte-d">Coefficient of thermal expansion compared on one scale. Aluminum sits near 23 parts per million per degree. The patent requires the bonding compound at 20 to 40, which glass-filled bonding grades reach. Unfilled thermoplastics run 60 to 100 — three to four times the metal. Glass fiber pulls the compound down into the landing zone; a mismatched joint fatigues at the interface with every temperature cycle.</desc>
+
+  <text x="360" y="22" font-size="13" font-weight="700" text-anchor="middle" fill="var(--ink)">Thermal expansion: the resin must land near the metal</text>
+
+  <!-- landing zone 20–40 ppm -->
+  <rect x="169" y="50" width="109" height="150" fill="var(--ok)" opacity=".08"/>
+
+  <!-- row 1: aluminum ~23 -->
+  <text x="174" y="64" font-size="9" font-weight="600" fill="var(--ink)">aluminum</text>
+  <rect x="174" y="70" width="22" height="16" rx="3" fill="var(--muted)"/>
+  <text x="204" y="82" font-size="9" fill="var(--faint)">≈23</text>
+
+  <!-- row 2: glass-filled bonding grades 20–40 -->
+  <text x="169" y="98" font-size="9" font-weight="600" fill="var(--ok)">glass-filled bonding grades</text>
+  <rect x="169" y="104" width="109" height="16" rx="3" fill="var(--ok)" opacity=".8"/>
+  <text x="223" y="115" font-size="8.5" font-weight="700" text-anchor="middle" fill="var(--surface)">20–40 · patent band</text>
+
+  <!-- row 3: unfilled thermoplastics 60–100 -->
+  <text x="387" y="132" font-size="9" font-weight="600" fill="var(--danger)">unfilled thermoplastics</text>
+  <rect x="387" y="138" width="218" height="16" rx="3" fill="var(--danger)" opacity=".75"/>
+  <text x="613" y="150" font-size="9" fill="var(--faint)">60–100</text>
+
+  <!-- glass pulls it down -->
+  <path d="M382 146 C 336 146, 316 130, 296 118" fill="none" stroke="var(--brand)" stroke-width="1.6"/>
+  <path d="M290 114 l10 0 l-4 8 Z" fill="var(--brand)"/>
+  <text x="352" y="172" font-size="9" font-weight="600" text-anchor="middle" fill="var(--brand)">glass fiber pulls it down</text>
+
+  <!-- axis -->
+  <path d="M60 200 h545" stroke="var(--border)" stroke-width="1.2"/>
+  <g stroke="var(--border)" stroke-width="1.2">
+    <path d="M60 200 v5"/><path d="M169 200 v5"/><path d="M278 200 v5"/>
+    <path d="M387 200 v5"/><path d="M496 200 v5"/><path d="M605 200 v5"/>
+  </g>
+  <g font-size="8.5" text-anchor="middle" fill="var(--faint)">
+    <text x="60" y="216">0</text><text x="169" y="216">20</text><text x="278" y="216">40</text>
+    <text x="387" y="216">60</text><text x="496" y="216">80</text><text x="605" y="216">100</text>
+  </g>
+  <text x="650" y="216" font-size="8.5" fill="var(--faint)">ppm/°C</text>
+  <text x="223" y="234" font-size="8.5" text-anchor="middle" fill="var(--ok)">the landing zone</text>
+
+  <text x="360" y="262" font-size="11" font-weight="600" text-anchor="middle" fill="var(--ink)">Bond aluminum to something that expands four times faster, and every swing shears the joint.</text>
+  <text x="360" y="280" font-size="9.5" text-anchor="middle" fill="var(--faint)">Part one measured the ending: −40↔120°C cycles, 45 → 25 MPa. Matching expansion is the fix.</text>
+</svg>
