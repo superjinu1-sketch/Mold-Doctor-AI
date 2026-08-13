@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { SITE_URL } from '@/lib/siteUrl';
-import { NOTES, getNoteBySlug, type NoteDiagramId } from '@/lib/notes';
+import { NOTES, getNoteBySlug, getSeriesForNote, type NoteDiagramId } from '@/lib/notes';
 import { readNoteDiagramSvg } from '@/lib/notesDiagramSvg';
 import { getNoteJaBySlug } from '@/lib/notesJa';
 
@@ -54,6 +54,8 @@ export default async function NoteDetailPageEn({ params }: { params: Promise<{ s
   const note = getNoteBySlug(slug);
   if (!note) notFound();
 
+  const seriesInfo = getSeriesForNote(slug);
+
   const url = `${SITE_URL}/en/notes/${slug}`;
   const jsonLd = {
     '@context': 'https://schema.org',
@@ -88,6 +90,29 @@ export default async function NoteDetailPageEn({ params }: { params: Promise<{ s
         </Link>
         <h1 className="max-w-[65ch] text-[length:var(--text-h1)] font-bold text-ink mb-6">{note.title}</h1>
 
+        {seriesInfo && (
+          <nav aria-label="Series" className="max-w-[65ch] bg-brand-tint border border-[var(--brand-border)] rounded-[var(--radius-card)] px-4 py-3 mb-8">
+            <p className="text-[length:var(--text-label)] font-bold text-brand-ink mb-2">
+              Series · {seriesInfo.series.name} — Part {seriesInfo.index + 1} of {seriesInfo.series.slugs.length}
+            </p>
+            <ol className="space-y-1">
+              {seriesInfo.series.slugs.map((s, i) => {
+                const n = getNoteBySlug(s);
+                if (!n) return null;
+                return (
+                  <li key={s} className="text-sm leading-snug">
+                    {i === seriesInfo.index ? (
+                      <span className="font-bold text-ink">{i + 1}. {n.title}</span>
+                    ) : (
+                      <Link href={`/en/notes/${s}`} className="text-brand-ink hover:underline underline-offset-2">{i + 1}. {n.title}</Link>
+                    )}
+                  </li>
+                );
+              })}
+            </ol>
+          </nav>
+        )}
+
         <div>
           {note.body.map((block, i) => {
             if (block.type === 'h2') {
@@ -107,6 +132,29 @@ export default async function NoteDetailPageEn({ params }: { params: Promise<{ s
             );
           })}
         </div>
+
+        {seriesInfo && (() => {
+          const len = seriesInfo.series.slugs.length;
+          const prev = seriesInfo.index > 0 ? getNoteBySlug(seriesInfo.series.slugs[seriesInfo.index - 1]) : undefined;
+          const next = seriesInfo.index < len - 1 ? getNoteBySlug(seriesInfo.series.slugs[seriesInfo.index + 1]) : undefined;
+          if (!prev && !next) return null;
+          return (
+            <nav aria-label="Series pagination" className="max-w-[65ch] mt-10 pt-6 border-t border-border flex flex-col sm:flex-row gap-3 sm:justify-between">
+              {prev ? (
+                <Link href={`/en/notes/${prev.slug}`} className="group flex-1 border border-border hover:border-brand rounded-[var(--radius-card)] px-4 py-3 transition-colors">
+                  <span className="block text-[length:var(--text-label)] text-faint mb-1">← Previous · Part {seriesInfo.index} of {len}</span>
+                  <span className="block text-sm font-medium text-ink group-hover:text-brand-ink">{prev.title}</span>
+                </Link>
+              ) : <span className="flex-1" />}
+              {next ? (
+                <Link href={`/en/notes/${next.slug}`} className="group flex-1 border border-border hover:border-brand rounded-[var(--radius-card)] px-4 py-3 transition-colors sm:text-right">
+                  <span className="block text-[length:var(--text-label)] text-faint mb-1">Next · Part {seriesInfo.index + 2} of {len} →</span>
+                  <span className="block text-sm font-medium text-ink group-hover:text-brand-ink">{next.title}</span>
+                </Link>
+              ) : <span className="flex-1" />}
+            </nav>
+          );
+        })()}
 
         {/* 저자 바이라인 — /en/guide·/en/resins와 동일 스타일(author-page-en-v1) */}
         <p className="max-w-[65ch] text-faint text-sm text-center mt-10">

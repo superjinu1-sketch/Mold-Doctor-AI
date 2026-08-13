@@ -388,3 +388,28 @@ export interface HomeNoteCard {
   publishedAt: string;
   thumbSvg: string | null; // 서버에서 읽은 인라인 SVG. thumb 없으면 null
 }
+
+// ── 노트 시리즈 (en-notes-series-nav-v1) ─────────────────────────
+// slugs는 읽는 순서(1→N). NOTES 배열(최신순)의 역순 — 손으로 확정, 배열에서 자동 도출 금지.
+export interface NoteSeries {
+  id: string;
+  name: string;      // 사용자 노출 시리즈명
+  slugs: string[];
+}
+
+export const NOTE_SERIES: NoteSeries[] = [
+  { id: 'nmt', name: 'Nano molding: NMT & TRI', slugs: [
+    'nmt-metal-resin-bonding',            // part 1 원리·정의
+    'nmt-antenna-lines-waterproofing',    // part 2 적용사례
+    'nmt-resin-metal-combinations',       // part 3 레진·금속 조합
+    'nmt-bond-failure-troubleshooting',   // part 4 불량·트러블슈팅
+  ]},
+];
+
+export function getSeriesForNote(slug: string): { series: NoteSeries; index: number } | null {
+  for (const s of NOTE_SERIES) {
+    const i = s.slugs.indexOf(slug);
+    if (i >= 0) return { series: s, index: i };
+  }
+  return null;
+}
