@@ -706,4 +706,19 @@ export const en: Record<string, string> = {
   'tryout.deleting': 'Deleting…',
   'tryout.confirm_delete': 'Tap again to delete',
   'tryout.delete_record': 'Delete tryout record',
+
+  // Help widget (help-desk-widget-v1)
+  'help.fab': 'Help',
+  'help.title': 'Help',
+  'help.subtitle': 'AI-powered answers',
+  'help.greeting': 'Ask me how to use the app — starting a diagnosis, credits, free tools, anything.',
+  'help.chip1': 'Start my first diagnosis',
+  'help.chip2': 'Can I diagnose without a photo?',
+  'help.chip3': 'What are credits?',
+  'help.chip4': 'How do the free tools work?',
+  'help.placeholder': 'Ask how to use the app…',
+  'help.cta_diagnose': 'Start new estimate',
+  'help.legal': 'AI-generated answers · still stuck? jinsimlabs@jinsimlabs.com',
+  'help.error': 'Something went wrong. Try again, or email jinsimlabs@jinsimlabs.com.',
+  'help.limit': 'You have reached today\'s question limit. Try again tomorrow or email us.',
 };

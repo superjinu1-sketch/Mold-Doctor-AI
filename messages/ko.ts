@@ -717,4 +717,19 @@ export const ko: Record<string, string> = {
   'tryout.deleting': '삭제 중…',
   'tryout.confirm_delete': '한 번 더 눌러서 삭제',
   'tryout.delete_record': '시사출 기록 삭제',
+
+  // 도움말 위젯 (help-desk-widget-v1)
+  'help.fab': '도움말',
+  'help.title': '도움말',
+  'help.subtitle': 'AI 자동 응답',
+  'help.greeting': '앱 사용법을 물어보세요. 진단 시작, 크레딧, 무료 도구 등 무엇이든요.',
+  'help.chip1': '첫 진단 시작하기',
+  'help.chip2': '사진 없이도 되나요?',
+  'help.chip3': '크레딧이 뭔가요?',
+  'help.chip4': '무료 도구 사용법',
+  'help.placeholder': '사용법을 물어보세요…',
+  'help.cta_diagnose': '새로 추정 시작',
+  'help.legal': 'AI 자동 응답입니다 · 해결이 안 되면 jinsimlabs@jinsimlabs.com',
+  'help.error': '잠시 오류가 있었어요. 다시 시도하거나 jinsimlabs@jinsimlabs.com 으로 문의해 주세요.',
+  'help.limit': '오늘 질문 한도에 도달했어요. 내일 다시 물어보시거나 이메일로 문의해 주세요.',
 };
