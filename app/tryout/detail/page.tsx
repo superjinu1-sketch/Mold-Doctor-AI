@@ -315,7 +315,7 @@ function TryoutDetailContent() {
                     </div>
                     {item.id === 1 && dryingRef && (
                       <p className="text-[length:var(--text-label)] text-brand-ink bg-brand-tint rounded-lg px-2.5 py-1.5 mb-2">
-                        {t('tryout.drying_reference')}: {dryingRef.tempC}°C, {dryingRef.hours[0]}~{dryingRef.hours[1]}{locale === 'en' ? 'h' : '시간'}
+                        {t('tryout.drying_reference')}: {dryingRef.tempC}°C, {dryingRef.hours[0] === dryingRef.hours[1] ? dryingRef.hours[0] : `${dryingRef.hours[0]}~${dryingRef.hours[1]}`}{locale === 'en' ? 'h' : '시간'}
                         {dryingRef.targetMoisturePct != null ? ` · <${dryingRef.targetMoisturePct}%` : ''}
                       </p>
                     )}

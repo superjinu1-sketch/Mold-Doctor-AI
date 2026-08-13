@@ -547,7 +547,7 @@ export function checkSettings(
     const dryTime = toNum(a.dryTime);
     if (dryTime !== null) {
       const status: CheckStatus = dryTime < d.hours[0] ? 'low' : 'ok';
-      out.push({ label: '건조 시간', value: dryTime, unit: 'hr', rangeText: `${d.hours[0]}-${d.hours[1]}hr`, status });
+      out.push({ label: '건조 시간', value: dryTime, unit: 'hr', rangeText: d.hours[0] === d.hours[1] ? `${d.hours[0]}hr` : `${d.hours[0]}-${d.hours[1]}hr`, status });
     }
     const moisture = toNum(a.moistureContent);
     if (moisture !== null && d.targetMoisturePct !== null) {
