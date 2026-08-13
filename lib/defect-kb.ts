@@ -4,7 +4,7 @@
 // 수정 순서: taxonomy.md → 이 파일 → KB_VERSION bump → eval 회귀.
 import type { ResinSpec } from './resin-kb';
 
-export const KB_VERSION = 'defect-kb-v1.14';
+export const KB_VERSION = 'defect-kb-v1.15';
 
 export type Cause = {
   rank: number;
@@ -49,7 +49,7 @@ export type SharedGate = {
 export const SHARED_GATES: Record<string, SharedGate> = {
   mold_temp_insufficient: {
     id: 'mold_temp_insufficient',
-    appliesTo: ['weld_line','flow_mark','short_shot','fiber_readout','surface_gloss','tiger_stripe','record_groove','gate_blush'],
+    appliesTo: ['weld_line','flow_mark','short_shot','fiber_readout','surface_gloss','tiger_stripe','record_groove','gate_blush','insert_bond_failure'],
     trigger: '금형온도 설정값 < resin-kb 권장 하한, 또는 super-engineering 수지(PPS·LCP·PEEK·PEI·PPSU 등), 또는 GF 강화 수지인 경우',
     guidance: `[금형온도 조언 — 참고용]
 - 셋팅값과 실제 금형표면 온도는 차이가 있을 수 있습니다. 배관 열손실로 실제 온도가 설정보다 최대 40°C 낮을 수 있습니다.
@@ -900,6 +900,53 @@ export const DEFECT_KB: Record<string, DefectNode> = {
     sharedGates: [],
     priorityLogic: '"닦임=표면 부착물"이 분류 결정 단서. 금형 세정 후 일시 소멸·재누적이면 plate-out 확진. 닦이는 잔류물을 웰드/플로우로 분류하지 마라.',
     source: 'synthesis,taxonomy-31', confidence: 'estimated',
+  },
+
+  insert_bond_failure: {
+    id: 'insert_bond_failure',
+    nameKo: '접합불량', nameEn: 'Insert Bond Failure',
+    phase: '충전(계면 침투)/냉각(CTE)',
+    typicalSeverity: 'high (구조·방수 기능부 — 접합 파단·리크는 안전/기능 상실). 외관만이면 medium',
+    discriminators: '인서트 사출(NMT/TRI 등 나노처리 금속+수지) 부품의 금속-수지 계면 박리·접합력 저하. 파단면으로 원인 판별: 금속면에 수지 잔류 = 현장(침투) 문제 / 금속면 맨질(수지 미잔류) = 표면처리·인서트 관리(앞단) 문제. 방수부품은 pull test 아닌 leak test.',
+    causes: [
+      { rank: 1, cause: '금형온도 부족(계면 조기 고화 → 나노기공 미침투)', category: 'Mold',
+        baseProbability: 55,
+        trigger: 'NMT/TRI 인서트 + 금형 실측온도 < 150°C. 설정값 아닌 표면 실측 기준.',
+        evidence: '금형표면 실측온도(열전대). 파단면 금속측 수지 잔류량. 특허 EP1559542A1: 용융수지가 미세요철 침투 전 고화.',
+        verification: '금형 실측온도 150°C+ 확보 후 접합강도 재확인. 온유기만으론 미달 시 카트리지 히터 삽입. 인서트 예열(200°C+) 병행.',
+        adjustment: '금형 실측온도 150°C 이상 확보(하한 — 나노기공 20~50nm는 스킨층보다 세 자릿수 작아 계면 스킨 형성 즉시 침투 종료). ⚠️ 온유기(water/oil TCU) 순환만으론 세팅 150°C라도 금형 실측 100°C 미달인 경우 많다 — 실측 150°C+는 보통 금형에 카트리지 히터를 직접 삽입해야 달성된다. 150°C는 하한이고 180°C 이상도 좋다(높을수록 침투 유리). 설정값 아닌 금형표면 실측으로 확인. 인서트 예열(특허 이상조건 200°C+) 가능하면 병행.' },
+      { rank: 2, cause: '사출속도·보압 부족(기공 충전·유지 실패)', category: 'Machine',
+        baseProbability: 20,
+        trigger: '충전 느림 → 유동선단 냉각. 보압 부족·조기 해제 → 기공서 수지 이완.',
+        evidence: '충전시간·보압 프로파일. 접합강도 산포.',
+        verification: '사출속도↑·보압↑·보압시간↑ 후 접합강도 개선 확인.',
+        adjustment: '사출속도↑(선단이 계면서 어는 시간 단축). 보압으로 기공에 수지 압입, 계면 고화까지 유지. 단 과속·과압은 전단열화 — "세게"가 아니라 "채우게".' },
+      { rank: 3, cause: '표면처리 불량/처리 인서트 관리 소홀(앞단 — 현장 판별·반송)', category: 'Material',
+        trigger: '처리 미흡·오염(지문·유분·수분), 보관기간 초과로 나노기공 열화. 파단면 금속측 맨질.',
+        evidence: '파단면(clean metal=미젖음). 인서트 로트·보관이력·핸들링 규정.',
+        verification: '양호 로트와 교차 성형 비교. 처리·핸들링 공정 확인.',
+        adjustment: '현장 조정으로 회복 불가 — 공정으로 뚫으면 필드 파단 위험. 의심 로트 격리·앞단 반송. 금형만 세게 돌려 접합 강제 금지.' },
+      { rank: 4, cause: '웰드라인이 접합부 통과(국부 강도 저하·리크 경로)', category: 'Mold',
+        trigger: '두 유동선단이 접합 계면서 합류. 방수부품서 리크.',
+        evidence: '웰드 위치 vs 접합부. leak test.',
+        verification: '게이트 위치 변경으로 웰드 이동 후 재확인.',
+        adjustment: '게이트 위치로 웰드를 접합부 밖 이동. 방수부품은 air/helium leak test로 연속성 검증(pull test 아님).' },
+      { rank: 5, cause: 'CTE 불일치 열사이클 열화(재료·설계 인자)', category: 'Material',
+        trigger: '금속(Al ~23ppm/°C)과 수지 CTE 격차. −40↔120°C 열사이클.',
+        evidence: '사용 온도범위·열사이클 이력. 접합강도 경시(예 45→25MPa).',
+        verification: 'GF 보강·저CTE 조성으로 개선 확인.',
+        adjustment: 'GF 강화 본딩 그레이드로 수지 CTE를 금속 근처(특허 20~40ppm/°C)로. 대표 Al+PPS GF. 사용 온도범위 정의·설계 여유. 성형 즉시 문제 아닌 내구 인자.' },
+    ],
+    sharedGates: ['mold_temp_insufficient'],
+    source: 'nmt-series-1~4, EP1559542A1, Manufacturing Review',
+    confidence: 'estimated',
+    sourceRefs: [
+      'Taisei Plas patent EP1559542A1 (금형/인서트온도, 수지 CTE 20-40ppm, GF+유리분말) — Google Patents 확인',
+      'Manufacturing Review (Al5052+PPS 랩전단 44.2±1.2 MPa, 내구 엔벨로프) — open-access 확인',
+      'GEO Nation geo-nation.com (TRI 양극산화, 수지 모재파괴) — 공식 사이트 실측',
+      '진우 현장 기준: 금형 실측 150°C+ (온유기 세팅≠실측, 카트리지 히터 필요, 180°C+ 가능)',
+    ],
+    verifiedAt: '2026-08-13',
   },
 
 };
