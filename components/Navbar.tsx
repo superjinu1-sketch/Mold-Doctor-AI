@@ -78,9 +78,14 @@ export default function Navbar() {
               <button
                 type="button"
                 onClick={toggleLocale}
-                className="min-w-[44px] min-h-[44px] flex items-center justify-center text-xs font-bold text-faint hover:text-ink border border-border hover:border-border-strong rounded-lg px-2 transition-colors"
+                className="min-w-[44px] min-h-[44px] flex items-center justify-center gap-1 text-xs font-bold text-muted hover:text-ink bg-surface border border-border-strong hover:border-brand rounded-lg px-2.5 transition-colors"
                 aria-label={isEnRoute ? 'Switch language' : '언어 전환 / Switch language'}
               >
+                <svg className="w-4 h-4 shrink-0" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24" aria-hidden="true">
+                  <circle cx="12" cy="12" r="9" />
+                  <line x1="3" y1="12" x2="21" y2="12" />
+                  <ellipse cx="12" cy="12" rx="4" ry="9" />
+                </svg>
                 {t('nav.locale_toggle')}
               </button>
 
@@ -165,9 +170,14 @@ export default function Navbar() {
               <button
                 type="button"
                 onClick={toggleLocale}
-                className="min-w-[44px] min-h-[44px] flex items-center justify-center text-xs font-bold text-faint hover:text-ink border border-border rounded-lg px-2 transition-colors"
+                className="min-w-[44px] min-h-[44px] flex items-center justify-center gap-1 text-xs font-bold text-muted hover:text-ink bg-surface border border-border-strong hover:border-brand rounded-lg px-2.5 transition-colors"
                 aria-label={isEnRoute ? 'Switch language' : '언어 전환 / Switch language'}
               >
+                <svg className="w-4 h-4 shrink-0" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24" aria-hidden="true">
+                  <circle cx="12" cy="12" r="9" />
+                  <line x1="3" y1="12" x2="21" y2="12" />
+                  <ellipse cx="12" cy="12" rx="4" ry="9" />
+                </svg>
                 {t('nav.locale_toggle')}
               </button>
 
