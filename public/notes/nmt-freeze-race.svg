@@ -1,0 +1,55 @@
+<svg viewBox="0 0 720 300" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="nmfz-t nmfz-d">
+  <title id="nmfz-t">Why a cold mold starves the bond</title>
+  <desc id="nmfz-d">Two cross-sections of resin meeting a treated metal surface. Against a cold mold, a solid skin freezes at the interface the instant the melt arrives and seals the nanopores with air still trapped inside, so the resin never enters and the bond is weak. Against a hot mold, the interface stays molten long enough for the resin to flow down into the pores and freeze there as anchors, giving a strong bond. Mold temperature is the lever that buys that time, and it is measured at the steel, above 150 degrees, not read off the setpoint.</desc>
+
+  <text x="360" y="22" font-size="13" font-weight="700" text-anchor="middle" fill="var(--ink)">The bond is decided in the instant the melt arrives</text>
+
+  <!-- LEFT: cold mold (weak) -->
+  <rect x="40" y="40" width="310" height="176" rx="8" fill="var(--danger)" opacity=".06"/>
+  <rect x="40" y="40" width="310" height="176" rx="8" fill="none" stroke="var(--danger)" stroke-width="1.2"/>
+  <text x="195" y="62" font-size="11" font-weight="700" text-anchor="middle" fill="var(--danger)">cold mold — skin freezes first</text>
+
+  <!-- resin above -->
+  <rect x="60" y="76" width="270" height="34" fill="var(--brand-tint)"/>
+  <text x="195" y="97" font-size="9.5" font-weight="600" text-anchor="middle" fill="var(--brand-ink)">resin</text>
+  <!-- frozen skin band sealing the pores -->
+  <rect x="60" y="110" width="270" height="7" fill="var(--faint)"/>
+  <text x="195" y="132" font-size="8.5" text-anchor="middle" fill="var(--danger)">a solid skin seals the pore mouths</text>
+  <!-- metal below with sealed pores (air trapped) -->
+  <rect x="60" y="138" width="270" height="58" fill="var(--muted)" opacity=".25"/>
+  <g>
+    <rect x="92" y="138" width="9" height="40" fill="var(--surface)"/><circle cx="96.5" cy="160" r="2.3" fill="var(--danger)"/>
+    <rect x="140" y="138" width="9" height="40" fill="var(--surface)"/><circle cx="144.5" cy="163" r="2.3" fill="var(--danger)"/>
+    <rect x="188" y="138" width="9" height="40" fill="var(--surface)"/><circle cx="192.5" cy="159" r="2.3" fill="var(--danger)"/>
+    <rect x="236" y="138" width="9" height="40" fill="var(--surface)"/><circle cx="240.5" cy="162" r="2.3" fill="var(--danger)"/>
+    <rect x="284" y="138" width="9" height="40" fill="var(--surface)"/><circle cx="288.5" cy="160" r="2.3" fill="var(--danger)"/>
+  </g>
+  <text x="195" y="190" font-size="8.5" text-anchor="middle" fill="var(--faint)">metal — pores sealed, air trapped, unfilled</text>
+  <text x="195" y="210" font-size="10.5" font-weight="700" text-anchor="middle" fill="var(--danger)">pores sealed → weak bond</text>
+
+  <!-- RIGHT: hot mold (strong) -->
+  <rect x="370" y="40" width="310" height="176" rx="8" fill="var(--ok)" opacity=".07"/>
+  <rect x="370" y="40" width="310" height="176" rx="8" fill="none" stroke="var(--ok)" stroke-width="1.2"/>
+  <text x="525" y="62" font-size="11" font-weight="700" text-anchor="middle" fill="var(--ok)">hot mold — interface stays molten</text>
+
+  <rect x="390" y="76" width="270" height="34" fill="var(--brand-tint)"/>
+  <text x="525" y="97" font-size="9.5" font-weight="600" text-anchor="middle" fill="var(--brand-ink)">resin</text>
+  <!-- resin flowing down into open pores -->
+  <rect x="390" y="138" width="270" height="58" fill="var(--muted)" opacity=".25"/>
+  <g fill="var(--brand)" opacity=".85">
+    <rect x="422" y="110" width="9" height="52"/>
+    <rect x="470" y="110" width="9" height="52"/>
+    <rect x="518" y="110" width="9" height="52"/>
+    <rect x="566" y="110" width="9" height="52"/>
+    <rect x="614" y="110" width="9" height="52"/>
+  </g>
+  <g fill="var(--brand)">
+    <path d="M426.5 172 l-4 -6 h8 Z"/><path d="M474.5 172 l-4 -6 h8 Z"/><path d="M522.5 172 l-4 -6 h8 Z"/>
+    <path d="M570.5 172 l-4 -6 h8 Z"/><path d="M618.5 172 l-4 -6 h8 Z"/>
+  </g>
+  <text x="525" y="190" font-size="8.5" text-anchor="middle" fill="var(--faint)">metal — resin flows in and freezes as anchors</text>
+  <text x="525" y="210" font-size="10.5" font-weight="700" text-anchor="middle" fill="var(--ok)">pores filled → strong anchor</text>
+
+  <text x="360" y="248" font-size="11" font-weight="600" text-anchor="middle" fill="var(--ink)">Mold temperature buys the melt time to fill before it freezes.</text>
+  <text x="360" y="268" font-size="9.5" text-anchor="middle" fill="var(--faint)">Measure it at the steel — 150°C or above for these resins — not off the setpoint.</text>
+</svg>

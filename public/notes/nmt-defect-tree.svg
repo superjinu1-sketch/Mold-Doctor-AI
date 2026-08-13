@@ -1,0 +1,54 @@
+<svg viewBox="0 0 720 316" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="nmdt-t nmdt-d">
+  <title id="nmdt-t">Which defects are the press's, and which came in the box</title>
+  <desc id="nmdt-d">Insert-molding defects sorted into two columns. Fixable at the press: a weak bond with resin left on the metal points to infiltration, so raise mold temperature, injection speed and packing; sink and flow marks around the insert mean a cold insert chilling the melt, so raise mold temperature and preheat the insert; a weld line landing on the joint is moved with a gate change. Send back upstream: a weak bond that separates to bare clean metal is a treatment or handling failure; flash points to insert dimensions or a damaged shut-off; an insert that shifts or deforms is a fixturing problem. The fracture face decides the first split: resin on the metal is the press's problem, bare metal is the box's. A part that must seal is proven with a leak test, not a pull test.</desc>
+
+  <text x="360" y="22" font-size="13" font-weight="700" text-anchor="middle" fill="var(--ink)">Read the defect back to its cause</text>
+
+  <!-- LEFT column: fix at the press -->
+  <rect x="30" y="36" width="320" height="212" rx="8" fill="var(--ok)" opacity=".06"/>
+  <rect x="30" y="36" width="320" height="212" rx="8" fill="none" stroke="var(--ok)" stroke-width="1.3"/>
+  <text x="190" y="58" font-size="11" font-weight="700" text-anchor="middle" fill="var(--ok)">Fix at the press</text>
+
+  <g font-size="9.5">
+    <rect x="44" y="72" width="292" height="50" rx="5" fill="var(--surface)"/>
+    <text x="56" y="90" font-weight="700" fill="var(--ink)">Weak bond, resin left on the metal</text>
+    <text x="56" y="106" fill="var(--muted)">infiltration — raise mold temp, speed, packing</text>
+    <text x="56" y="118" fill="var(--faint)" font-size="8.5">the surface was good; you did not fill it</text>
+
+    <rect x="44" y="128" width="292" height="50" rx="5" fill="var(--surface)"/>
+    <text x="56" y="146" font-weight="700" fill="var(--ink)">Sink &amp; flow marks around the insert</text>
+    <text x="56" y="162" fill="var(--muted)">cold insert chilling the melt</text>
+    <text x="56" y="174" fill="var(--faint)" font-size="8.5">raise mold temp, preheat the insert</text>
+
+    <rect x="44" y="184" width="292" height="50" rx="5" fill="var(--surface)"/>
+    <text x="56" y="202" font-weight="700" fill="var(--ink)">Weld line landing on the joint</text>
+    <text x="56" y="218" fill="var(--muted)">two flow fronts meeting at the interface</text>
+    <text x="56" y="230" fill="var(--faint)" font-size="8.5">move it with a gate change</text>
+  </g>
+
+  <!-- RIGHT column: send back upstream -->
+  <rect x="370" y="36" width="320" height="212" rx="8" fill="var(--warn)" opacity=".07"/>
+  <rect x="370" y="36" width="320" height="212" rx="8" fill="none" stroke="var(--warn)" stroke-width="1.3"/>
+  <text x="530" y="58" font-size="11" font-weight="700" text-anchor="middle" fill="var(--warn)">Send back upstream</text>
+
+  <g font-size="9.5">
+    <rect x="384" y="72" width="292" height="50" rx="5" fill="var(--surface)"/>
+    <text x="396" y="90" font-weight="700" fill="var(--ink)">Weak bond, bare clean metal</text>
+    <text x="396" y="106" fill="var(--muted)">treatment or handling failure</text>
+    <text x="396" y="118" fill="var(--faint)" font-size="8.5">never wet in — do not mold through it</text>
+
+    <rect x="384" y="128" width="292" height="50" rx="5" fill="var(--surface)"/>
+    <text x="396" y="146" font-weight="700" fill="var(--ink)">Flash</text>
+    <text x="396" y="162" fill="var(--muted)">insert dimensions or damaged shut-off</text>
+    <text x="396" y="174" fill="var(--faint)" font-size="8.5">incoming inspection / tooling</text>
+
+    <rect x="384" y="184" width="292" height="50" rx="5" fill="var(--surface)"/>
+    <text x="396" y="202" font-weight="700" fill="var(--ink)">Insert shifts or deforms</text>
+    <text x="396" y="218" fill="var(--muted)">support missing, one-sided pressure</text>
+    <text x="396" y="230" fill="var(--faint)" font-size="8.5">fixturing / gating</text>
+  </g>
+
+  <!-- bridge -->
+  <text x="360" y="272" font-size="11" font-weight="600" text-anchor="middle" fill="var(--ink)">The fracture face decides the split: resin on the metal is yours; bare metal came in the box.</text>
+  <text x="360" y="292" font-size="9.5" text-anchor="middle" fill="var(--faint)">And if the part must seal, prove it with a leak test, not a pull test — a seal does not average.</text>
+</svg>
