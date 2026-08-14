@@ -1,0 +1,58 @@
+<svg viewBox="0 0 720 356" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="mss-t mss-d">
+  <title id="mss-t">Order of checks for a white streak on a metallic part</title>
+  <desc id="mss-d">First check whether the mark wipes off; if it does, it is surface deposit. Then check whether the grade carries effect pigment; if not, stay on the splay path. Then tilt the part: if the streak changes with viewing angle and sits in the same spot every shot, it is flake orientation, an optical defect. If it looks the same from every angle or wanders shot to shot, it is gas, and the splay checks apply.</desc>
+
+  <rect x="240" y="8" width="240" height="34" rx="6" fill="var(--faint)" opacity=".12"/>
+  <text x="360" y="30" font-size="12.5" font-weight="600" text-anchor="middle" fill="var(--ink)">White streak on a metallic part</text>
+  <line x1="360" y1="42" x2="360" y2="60" stroke="var(--faint)" stroke-width="1.5"/>
+
+  <rect x="255" y="60" width="210" height="32" rx="6" fill="none" stroke="var(--faint)" stroke-width="1.5"/>
+  <text x="360" y="81" font-size="12.5" font-weight="600" text-anchor="middle" fill="var(--ink)">Does it wipe off?</text>
+  <line x1="255" y1="76" x2="150" y2="76" stroke="var(--faint)" stroke-width="1.5"/>
+  <line x1="150" y1="76" x2="150" y2="102" stroke="var(--faint)" stroke-width="1.5"/>
+  <text x="200" y="70" font-size="10.5" font-weight="600" text-anchor="middle" fill="var(--faint)">yes</text>
+  <rect x="18" y="102" width="215" height="56" rx="6" fill="var(--warn)" opacity=".13"/>
+  <text x="125" y="121" font-size="12" font-weight="700" text-anchor="middle" fill="var(--warn)">Surface deposit</text>
+  <text x="125" y="137" font-size="10.5" text-anchor="middle" fill="var(--faint)">plate-out · vent gas · release agent</text>
+  <text x="125" y="151" font-size="10.5" text-anchor="middle" fill="var(--faint)">it sits on the mold, not in the part</text>
+  <line x1="360" y1="92" x2="360" y2="114" stroke="var(--faint)" stroke-width="1.5"/>
+  <text x="378" y="108" font-size="10.5" font-weight="600" fill="var(--faint)">no</text>
+
+  <rect x="240" y="114" width="240" height="32" rx="6" fill="none" stroke="var(--faint)" stroke-width="1.5"/>
+  <text x="360" y="135" font-size="12.5" font-weight="600" text-anchor="middle" fill="var(--ink)">Effect pigment in the grade?</text>
+  <line x1="480" y1="130" x2="580" y2="130" stroke="var(--faint)" stroke-width="1.5"/>
+  <line x1="580" y1="130" x2="580" y2="156" stroke="var(--faint)" stroke-width="1.5"/>
+  <text x="528" y="124" font-size="10.5" font-weight="600" text-anchor="middle" fill="var(--faint)">no</text>
+  <rect x="478" y="156" width="224" height="40" rx="6" fill="var(--faint)" opacity=".12"/>
+  <text x="590" y="173" font-size="11.5" font-weight="600" text-anchor="middle" fill="var(--ink)">This branch is closed</text>
+  <text x="590" y="188" font-size="10.5" text-anchor="middle" fill="var(--faint)">stay on the splay path</text>
+  <line x1="360" y1="146" x2="360" y2="168" stroke="var(--faint)" stroke-width="1.5"/>
+  <text x="378" y="162" font-size="10.5" font-weight="600" fill="var(--faint)">yes</text>
+
+  <rect x="228" y="168" width="264" height="32" rx="6" fill="none" stroke="var(--faint)" stroke-width="1.5"/>
+  <text x="360" y="189" font-size="12.5" font-weight="600" text-anchor="middle" fill="var(--ink)">Changes when you tilt the part?</text>
+  <line x1="228" y1="184" x2="120" y2="184" stroke="var(--faint)" stroke-width="1.5"/>
+  <line x1="120" y1="184" x2="120" y2="210" stroke="var(--faint)" stroke-width="1.5"/>
+  <text x="172" y="178" font-size="10.5" font-weight="600" text-anchor="middle" fill="var(--faint)">no</text>
+  <rect x="20" y="210" width="200" height="40" rx="6" fill="var(--faint)" opacity=".12"/>
+  <text x="120" y="227" font-size="11.5" font-weight="600" text-anchor="middle" fill="var(--ink)">Reads as gas</text>
+  <text x="120" y="242" font-size="10.5" text-anchor="middle" fill="var(--faint)">drying · shear · venting checks</text>
+  <line x1="360" y1="200" x2="360" y2="222" stroke="var(--faint)" stroke-width="1.5"/>
+  <text x="378" y="216" font-size="10.5" font-weight="600" fill="var(--faint)">yes</text>
+
+  <rect x="238" y="222" width="244" height="32" rx="6" fill="none" stroke="var(--faint)" stroke-width="1.5"/>
+  <text x="360" y="243" font-size="12.5" font-weight="600" text-anchor="middle" fill="var(--ink)">Same spot every shot?</text>
+  <line x1="482" y1="238" x2="580" y2="238" stroke="var(--faint)" stroke-width="1.5"/>
+  <line x1="580" y1="238" x2="580" y2="264" stroke="var(--faint)" stroke-width="1.5"/>
+  <text x="532" y="232" font-size="10.5" font-weight="600" text-anchor="middle" fill="var(--faint)">no — it wanders</text>
+  <rect x="478" y="264" width="224" height="40" rx="6" fill="var(--faint)" opacity=".12"/>
+  <text x="590" y="281" font-size="11.5" font-weight="600" text-anchor="middle" fill="var(--ink)">Back to the splay path</text>
+  <text x="590" y="296" font-size="10.5" text-anchor="middle" fill="var(--faint)">gas is wherever the gas was</text>
+  <line x1="360" y1="254" x2="360" y2="278" stroke="var(--ok)" stroke-width="2"/>
+  <text x="378" y="272" font-size="10.5" font-weight="600" fill="var(--ok)">yes</text>
+
+  <rect x="240" y="278" width="240" height="64" rx="6" fill="var(--ok)" opacity=".14"/>
+  <text x="360" y="298" font-size="12.5" font-weight="700" text-anchor="middle" fill="var(--ok)">Flake orientation</text>
+  <text x="360" y="314" font-size="10.5" text-anchor="middle" fill="var(--faint)">an optical defect — manage the flow, not the gas</text>
+  <text x="360" y="330" font-size="10.5" text-anchor="middle" fill="var(--faint)">confirm: a solid color runs the same tool clean</text>
+</svg>

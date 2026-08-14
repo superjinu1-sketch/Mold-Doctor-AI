@@ -30,6 +30,8 @@ const FILES: Record<NoteDiagramId, string> = {
   'nmt-resin-map': 'nmt-resin-map.svg',
   'nmt-freeze-race': 'nmt-freeze-race.svg',
   'nmt-defect-tree': 'nmt-defect-tree.svg',
+  'flake-tilt': 'metallic-flake-tilt.svg',
+  'metallic-split': 'metallic-streak-split.svg',
 };
 
 export function readNoteDiagramSvg(id: NoteDiagramId): string {
@@ -47,6 +49,7 @@ const THUMB_FILES: Record<NoteThumbId, string> = {
   'nmt-frame': 'thumb-nmt-frame.svg',
   'nmt-resin': 'thumb-nmt-resin.svg',
   'nmt-troubleshoot': 'thumb-nmt-troubleshoot.svg',
+  'metallic-streak': 'thumb-metallic-streak.svg',
 };
 
 export function readNoteThumbSvg(id: NoteThumbId): string {

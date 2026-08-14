@@ -1,6 +1,6 @@
 // 영문 콘텐츠 축 B(/en/notes) 글 데이터 단일 소스. 본문은 진우 확정본 — 문구를 다듬지 않는다.
 // /en/about과 동일 원칙: 문법 교정·표현 개선·문장 병합 전부 금지.
-export type NoteDiagramId = 'cross-section' | 'flow' | 'weld-flow' | 'weld-section' | 'clamp-calc' | 'clamp-flow' | 'fr-paths' | 'fr-ppa-grades' | 'fr-barrel' | 'fr-levers' | 'fiber-float-fountain' | 'fiber-float-resins' | 'fiber-float-section' | 'nmt-pores' | 'nmt-families' | 'nmt-frame' | 'nmt-app-map' | 'nmt-cte' | 'nmt-resin-map' | 'nmt-freeze-race' | 'nmt-defect-tree';
+export type NoteDiagramId = 'cross-section' | 'flow' | 'weld-flow' | 'weld-section' | 'clamp-calc' | 'clamp-flow' | 'fr-paths' | 'fr-ppa-grades' | 'fr-barrel' | 'fr-levers' | 'fiber-float-fountain' | 'fiber-float-resins' | 'fiber-float-section' | 'nmt-pores' | 'nmt-families' | 'nmt-frame' | 'nmt-app-map' | 'nmt-cte' | 'nmt-resin-map' | 'nmt-freeze-race' | 'nmt-defect-tree' | 'flake-tilt' | 'metallic-split';
 
 export type NoteBlock =
   | { type: 'p'; text: string }
@@ -10,7 +10,7 @@ export type NoteBlock =
 // lib/notesDiagramSvg.ts(node:fs 사용, 서버 전용)가 이 타입을 가져다 쓴다 — 반대 방향(이 파일이
 // notesDiagramSvg.ts에서 import)이면 lib/notes.ts를 가져다 쓰는 클라이언트 컴포넌트(app/page.tsx)가
 // 번들러 설정에 따라 fs를 함께 끌고 들어올 위험이 있어 여기서 정의한다(notes-list-thumbnail-v1).
-export type NoteThumbId = 'splay-branch' | 'weld-strength' | 'clamp-window' | 'fr-corrosion' | 'fiber-float' | 'nmt-bond' | 'nmt-frame' | 'nmt-resin' | 'nmt-troubleshoot';
+export type NoteThumbId = 'splay-branch' | 'weld-strength' | 'clamp-window' | 'fr-corrosion' | 'fiber-float' | 'nmt-bond' | 'nmt-frame' | 'nmt-resin' | 'nmt-troubleshoot' | 'metallic-streak';
 
 export interface Note {
   slug: string;
@@ -26,6 +26,49 @@ const h2 = (text: string): NoteBlock => ({ type: 'h2', text });
 const diagram = (id: NoteDiagramId): NoteBlock => ({ type: 'diagram', id });
 
 export const NOTES: Note[] = [
+  {
+    slug: 'metallic-flake-white-streaks',
+    title: "If the streak changes when you tilt the part, it isn't gas",
+    description: 'On metallic molded-in-color parts, some white streaks carry no gas and no moisture at all: the aluminum flakes froze at the wrong angle. Two checks split the optical streak from the real splay, and the fixes barely overlap.',
+    publishedAt: '2026-08-14',
+    thumb: 'metallic-streak',
+    body: [
+      p('A white streak on a molded part has a well-worn answer path. Dry the resin. If the drying data checks out, look at heat and shear. If the grade is glass-filled and the mark will not wipe off, consider fiber read-out. I wrote that logic into Mold Doctor, and on most parts it holds.'),
+      p('Metallic parts are where it stopped holding. A molded-in-color TPO with aluminum flake in the grade, a big exterior part with a long flow path, white streaks running just past the gate, and a reject rate that will not move. Speed up, speed down. Barrel hotter, barrel cooler. The resin dried again to be safe. The streak stays where it was.'),
+      p('It stays because on an effect-pigmented part there is a kind of streak that has no gas in it, no moisture in it, and nothing wrong with the dispersion. The material is fine. The pigment is lying at the wrong angle, and a patch of tilted flakes reads as a pale line from where you stand.'),
+      p('That sounds like a cosmetic distinction. It changes every fix that follows.'),
+      h2('What the flake is doing'),
+      p('An aluminum effect pigment is a flat metal platelet, tens of micrometres across and a fraction of one thick. The metallic look depends on those platelets lying parallel to the surface, just under the skin, acting as millions of small mirrors facing the same way. Flow does the aligning: shear during filling lays the flakes down flat, the way a current lays down leaves.'),
+      p('Anywhere the flow is disturbed, the alignment breaks. Two fronts recombining behind a hole or a rib. The swirl just downstream of a gate. A step or a sharp corner in the runner that folds the melt before it enters the cavity. A front that hesitates, slows, and restarts. In each of those zones the flakes freeze in at an angle to the surface, and a tilted mirror does not send light back at you.'),
+      p('The published work on this is recent and consistent: visible defects track how sharply flake orientation changes between neighboring regions, and a zone of steeply tilted flakes reads darker or brighter than its surroundings depending on where you stand. Nothing is in the streak. The streak is an angle.'),
+      diagram('flake-tilt'),
+      h2('Why the gas playbook did not close it'),
+      p('None of the standard moves are wrong. They treat real defects. They just were not treating this one.'),
+      p('Drying first. On a polyolefin like TPO the base resin barely takes up water, which is the first quiet sign the drying loop was never going to close the case; what moisture there is usually rides in on the masterbatch or a filler. Drying it again costs a shift and moves nothing.'),
+      p('Speed is the same story with more sweat in it. Slower filling calms shear splay and jetting. Faster filling can carry a front through before it freezes. Both directions treat something real, and crews will walk the profile up and down for days on a streak like this. One published test that stepped process settings across a flake-pigmented grade found injection rate and mold temperature mattered most, and the direction runs against instinct: the slower fill and the cooler mold scored better. But the gains were incremental, not categorical. The marks softened. They did not leave, because the zones that scramble orientation are built into the flow path, and they scramble it at every speed you are willing to run.'),
+      p('The trap hiding in the playbook is back pressure. A streaky colored part normally invites more of it: richer mixing, better dispersion, and for an ordinary pigment that is decent advice. Aluminum flakes are metal foil. Work them hard enough with back pressure and screw speed and they fold and tear, and a torn flake stops working as a mirror. The whole part drifts duller and grayer while the streak you were chasing sits exactly where it was. Effect pigment suppliers write low shear into their processing guidance for exactly this reason.'),
+      h2('The split'),
+      p('So the question, as usual, is not what causes a white streak. It is which white streak you have. The checks run in an order, and the order is the point.'),
+      p('The first check is the one this site keeps coming back to. If the mark wipes off, it is deposit sitting on the mold, not a defect in the part. The second is definitional: if the grade carries no effect pigment, none of what follows applies — stay on the splay path.'),
+      p("Then the two that belong to metallics. Hold one marked part under a fixed light and roll it. A gas streak stays put visually: the same dull, silvery patch from every direction, stronger from one angle and fainter from another, but always the same thing in the same place. A flake mark comes and goes: it darkens, it brightens, and it can swap sides with its background as the part turns, because you are swinging in and out of the tilted mirrors' line of reflection."),
+      p('Second, mark where the streak sits on ten consecutive shots. Moisture splay wanders, because the gas is wherever the gas happened to be. A flake mark is geometry. It holds its shape and its position shot after shot, parked downstream of whatever disturbed the flow. One caveat, and it is the reason the tilt check comes first: shear-driven gas also parks itself near the gate. A streak that holds its position but never moves with the light is shear territory, not orientation.'),
+      p('If you want the confirming run, mold the same tool in the natural or a solid color. If the streak is gone, the flow disturbance was always there — the effect pigment was just the first colorant honest enough to show it. If a mark survives in the solid color, it was never about the flakes: you are back to gas or deposit, and the earlier notes apply.'),
+      diagram('metallic-split'),
+      h2('What actually moves it'),
+      p('Once the streak is confirmed as orientation, the working set changes. You are no longer managing gas. You are managing where the flow gets disturbed, and how steadily the front moves through the zone you can see.'),
+      p('Steadiness is the process half. A profile that decelerates and re-accelerates across the visible face plants a hesitation band right where it shows, so the aim is one speed through the surfaces that matter, with the stage changes pushed to where the eye does not go. And check that the profile you set is the profile you get: a machine riding its injection pressure limit has quietly stopped following your speed settings, the front wanders and hesitates on its own schedule, and the flakes record every wobble. That gap between set speed and actual speed is worth a note of its own.'),
+      p('Geometry is the other half, and honestly the bigger one. Every step and sharp corner in the runner, the gate land, and the gate exit folds the flow once, and a metallic surface prints every fold. Shops that run molded-in metallics as a specialty converge on the same tooling habits: generous gates, radiused transitions, no steps on the melt path ahead of a show surface, and gates placed so their disturbance lands where the eye does not. If the streak is parked behind a feature, no dial on the press moves the feature.'),
+      p('Mold temperature deserves an honest sentence. It is the reflex answer for surface appearance, and for plenty of defects raising it is right. On flake marks the measured evidence is thinner and does not all point the same way; the test above scored the cooler mold better. Treat it as a variable to test on your part, not a direction to assume.'),
+      p('And material sets the floor. Finer flakes forgive more, because each mirror is smaller and the eye averages them; coarse bright flakes flop harder and print every disturbance. A higher-flow grade fills at lower pressure, which keeps the machine off its limit and the front steady. Some combinations of geometry and effect cannot be molded clean, and that is the point where the honest answer is paint, film, or a different pigment shape rather than another week of trials.'),
+      h2("Don't reorder this"),
+      p('If the drying data is short, dry first. Moisture splay is still the most common white streak on hygroscopic grades, and this note does not move it out of first place. The metallic branch opens when the grade actually carries effect pigment, and after the old checks pass, not instead of them.'),
+      p("And do not stretch this over TPO's other famous mark. Tiger stripes are alternating gloss bands, roughly perpendicular to flow, marching away from the gate at intervals: a flow-front instability with its own logic and its own fixes. Same material family, different defect. If the mark is a repeating band pattern rather than a streak parked at one feature, that is the branch to read instead."),
+      h2('What went into the app'),
+      p('Mold Doctor now switches to flake orientation when three things line up at once. The grade carries effect pigment — metallic, MIC, aluminum flake, pearl. The complaint is a streak. And the answers point to an optic: it moves with the viewing angle, and it repeats in place. When the description leaves those two checks open, it tells you to run them before it lets the gas logic decide.'),
+      p('Two guards came with it. The usual dispersion fix for color streaks, more back pressure, is suppressed on effect pigments, because the adjustment that helps an ordinary pigment is the one that grinds a metallic dull. And when the drying data is short, moisture keeps first place. The new branch opens after the fundamentals, not around them.'),
+      p('Mold Doctor takes a photo of the defect and your process settings and estimates likely causes and what to adjust. The logic above is part of it.'),
+    ],
+  },
   {
     slug: 'nmt-bond-failure-troubleshooting',
     title: 'When the bond fails, the mold was probably too cold',

@@ -4,7 +4,7 @@
 // 수정 순서: taxonomy.md → 이 파일 → KB_VERSION bump → eval 회귀.
 import type { ResinSpec } from './resin-kb';
 
-export const KB_VERSION = 'defect-kb-v1.15';
+export const KB_VERSION = 'defect-kb-v1.16';
 
 export type Cause = {
   rank: number;
@@ -497,6 +497,7 @@ export const DEFECT_KB: Record<string, DefectNode> = {
       '재가동 첫 샷': '1순위(수분 재흡수) 또는 2순위(체류 열분해)',
       '오후|시간경과|간헐|N샷마다': '열축적 누적(배럴온도↑) 또는 전단 누적(RPM·속도) → 2순위(thermal)·3순위(shear) 우선. 건조 정상이면 1순위(수분) 아님.',
       'GF강화|유리섬유|GF30 + 안닦임·방사상 백화 + 건조정상': 'fiber_readout(GF 표면백화)로 분류전환 — 은줄(수분 splay) 아님. 금형온도↑가 1순위.',
+      '메탈릭|펄|MIC|알루미늄 + 각도 의존|위치 고정': 'flake_orientation(메탈릭 플레이크 배향)으로 분류 전환 검토 — 기울여서 명암이 변하고 위치가 샷간 고정이면 가스 아님.',
     },
     sharedGates: [],   // 금형온도 게이트 미적용(taxonomy §4.1 명시)
     priorityLogic: `★ 건조 조건(dryTemp·dryTime)이 resin-kb drying 권장을 충족하면 moisture splay(1순위)를 원인 목록에서 제외하라. 언급해야 하면 "건조 정상 → 수분 해당 없음"으로 명기.
@@ -636,7 +637,7 @@ export const DEFECT_KB: Record<string, DefectNode> = {
   tiger_stripe: {
     id: 'tiger_stripe', nameKo: '타이거스트라이프', nameEn: 'Tiger Stripe', phase: '충전',
     typicalSeverity: 'medium (외관)',
-    discriminators: 'PP·PP/EPDM/talc에서 유동 수직 광택/무광 교대 밴드. flow mark(유동방향)와 구분. 사출속도↑ 시 밴드 악화·간격 좁아짐 = 타이거스트라이프 확정 단서 (flow mark은 속도·온도↑로 개선 → 정반대).',
+    discriminators: 'PP·PP/EPDM/talc에서 유동 수직 광택/무광 교대 밴드. flow mark(유동방향)와 구분. 사출속도↑ 시 밴드 악화·간격 좁아짐 = 타이거스트라이프 확정 단서 (flow mark은 속도·온도↑로 개선 → 정반대). 메탈릭/펄 그레이드의 위치 고정 단일 줄무늬(주기 밴드 아님)+각도 의존이면 flake_orientation 감별.',
     causes: [
       { rank: 1, cause: 'PP 벽면 미끄럼(wall slip)+결정화', category: 'Material',
         baseProbability: 50,
@@ -657,6 +658,51 @@ export const DEFECT_KB: Record<string, DefectNode> = {
     },
     sharedGates: ['mold_temp_insufficient'],
     source: 'synthesis-3.2,taxonomy-17', confidence: 'verified',
+  },
+
+  // ─── Flake Orientation Mark (메탈릭 플레이크 배향 자국) — en-note-metallic-flake-v1 ───
+  flake_orientation: {
+    id: 'flake_orientation', nameKo: '메탈릭 플레이크 배향 자국', nameEn: 'Flake Orientation Mark', phase: '충전',
+    typicalSeverity: 'medium (외관)',
+    discriminators: '메탈릭/펄/MIC(알루미늄 플레이크·효과안료) 그레이드 한정. 시야각 의존(부품을 굴리면 어두워지고 밝아지고 배경과 자리를 바꿈) + 샷간 위치·형상 고정(유동 교란 지점 하류). 은줄 수분(위치 랜덤, 전 각도 동일한 은빛 패치)·은줄 전단(게이트 인접 고정이지만 각도 무반응)·색줄(분산 불량, 배압 반응)·타이거스트라이프(유동 수직 주기 밴드)·게이트블러시(게이트 직후 흐림, 각도 무반응)·석출(닦임)과 감별. 솔리드/내추럴 컬러로 같은 금형을 돌려 그 줄이 사라지면 확진.',
+    causes: [
+      { rank: 1, cause: '유동 교란 기하에서 플레이크 배향 이탈', category: 'Mold',
+        baseProbability: 55,
+        trigger: '러너/게이트 단차·급전환, 게이트 직후 난류·스월, 리브/홀 후방 재합류부. 가시면 고정 위치에 출현.',
+        evidence: '게이트 타입·위치. 러너/게이트 단차 여부. 줄 위치와 유동 경로 형상의 대응.',
+        verification: '샷 10회 위치 고정 확인 + 부품을 굴려 명암 변화 확인. 솔리드 컬러 런에서 소멸=확진.',
+        adjustment: '러너·게이트 단차 제거, 전이 라운드 처리, 게이트 확대, 게이트 이설(교란이 가시면 밖에 떨어지게). 조건 조정만으로는 기하 기인 교란이 제거되지 않음을 명시.' },
+      { rank: 2, cause: '충전 프로파일 불안정 (감속-가속·헤지테이션·압력리밋 충돌)', category: 'Machine',
+        baseProbability: 30,
+        trigger: '가시면 통과 중 다단 감속·재가속. 또는 최대사출압이 압력리밋에 근접해 설정 속도 미달성(사실상 압력제어 충전) → 유동 선단 헤지테이션.',
+        evidence: '사출 다단 속도·위치 설정값. 샷데이터 최대사출압 vs 압력리밋 여유.',
+        verification: '최대사출압이 리밋에 붙는지 확인. 가시면 구간 등속 프로파일로 재시험.',
+        adjustment: '가시면 통과 구간 등속(스테이지 전환은 비가시 구간으로), 압력리밋 여유 확보. 속도 절대값보다 일정함이 우선.' },
+      { rank: 3, cause: '재료·안료 기인 한계 (코스 플레이크·저유동 그레이드)', category: 'Material',
+        baseProbability: 15,
+        trigger: '입경 큰 브라이트 플레이크, 저유동(저MI) 그레이드 + 장유동 부품.',
+        evidence: '안료 입경·마스터배치 정보. 수지 MI(resin-kb 참조) 대비 유동길이.',
+        verification: '파인 플레이크·고유동 그레이드 시험사출로 비교.',
+        adjustment: '파인 플레이크·고유동 그레이드 검토. 기하+효과 조합에 따라 성형만으로 은폐 불가한 한계 존재 — 도장/필름/안료 형상 변경 대안을 정직하게 명시.' },
+    ],
+    patternHints: {
+      '기울이면|굴리면|보는 각도|각도에 따라': '시야각 의존 = 이 노드 확정 단서. 가스(splay) 아님.',
+      '메탈릭|펄|MIC|알루미늄 플레이크|은분': '효과안료 그레이드 + 줄무늬 → 이 노드 감별 우선.',
+      '내추럴은 깨끗|검정은 깨끗|솔리드는 안 남': '배향 확진 — 유동 교란은 원래 있었고 효과안료가 드러낸 것.',
+      '건조 미달|건조 안 함': 'silver_streak(수분) 우선 유지 — 건조 정상화 후 이 노드 재감별.',
+    },
+    priorityLogic: `★ 효과안료(메탈릭/펄) 부품에 배압 대폭 상향을 권고하지 마라 — 플레이크 파단으로 전체 광택 저하·회색화된다(색줄 노드의 배압 처방은 효과안료에 적용 금지).
+★ 금형온도는 방향을 단정하지 마라 — 이 불량은 문헌 방향이 불일치한다(공정 실험은 저온 우세 보고 존재). "해당 부품에서 시험할 변수"로 안내.
+건조 조건이 resin-kb 권장 미달이면 이 노드로 전환하지 않는다 — silver_streak(수분) 우선, 건조 정상화 후 재감별.
+시야각 무반응 + 게이트 인접 고정이면 은줄 전단(shear splay) 또는 gate_blush 경로 유지.`,
+    sharedGates: [],   // mold_temp_insufficient 부착 금지 — 금형온도 증거 방향 불확정 (silver_streak 미적용과 동일 논리)
+    source: 'en-note-metallic-flake-v1', confidence: 'estimated',
+    sourceRefs: [
+      'Polymers 17(2):245 (2025) — Prediction Model for Flake Line Defects in Metallic Injection Molding (배향각-반사 기하, ΔF.O.T. 임계; 코워크 확인 2026-08-14)',
+      'Polymers 16(15):2193 (2024) — Effect of Process Parameters on Appearance Defects of Flake-Pigmented Metallic Polymer (Taguchi: 금형온도·사출률 저측 우세, 개선 점진적; 코워크 확인 2026-08-14)',
+      'Effect pigment supplier low-shear processing guidance — Common Practice (Silberline 백서 원문 사이트 이전으로 재검증 불가; NOT re-verified)',
+    ],
+    verifiedAt: '2026-08-14',
   },
 
   record_groove: {
@@ -722,6 +768,7 @@ export const DEFECT_KB: Record<string, DefectNode> = {
       '배압↑후 개선': '1순위(배압) 확진',
       '재료교체 후 발생': '3순위(오염) 강점 분기',
     },
+    priorityLogic: '★ 메탈릭/펄/효과안료 마스터배치면 1순위(배압 대폭 상향) 처방 금지 — 알루미늄 플레이크 파단으로 광택 저하·회색화된다. 먼저 flake_orientation(배향 자국) 감별: 각도 의존·위치 고정이면 분산 문제가 아니다.',
     source: 'synthesis-4,taxonomy-20', confidence: 'estimated',
   },
 
@@ -840,7 +887,7 @@ export const DEFECT_KB: Record<string, DefectNode> = {
   gate_blush: {
     id: 'gate_blush', nameKo: '게이트 블러시', nameEn: 'Gate Blush', phase: '충전',
     typicalSeverity: 'medium (외관)',
-    discriminators: '게이트 직후 흐림·광택 저하. 흐름자국(멀리까지)과 구분. 밸브게이트 사용·게이트 국한·간헐·조건무효면 게이트 하드웨어(밸브핀·핫러너 온도) 의심. 닦이면 표면 석출(mold_deposit) 감별.',
+    discriminators: '게이트 직후 흐림·광택 저하. 흐름자국(멀리까지)과 구분. 밸브게이트 사용·게이트 국한·간헐·조건무효면 게이트 하드웨어(밸브핀·핫러너 온도) 의심. 닦이면 표면 석출(mold_deposit) 감별. 메탈릭/펄 그레이드에서 게이트 인접 줄이 각도 의존(기울이면 명암 변화)이면 flake_orientation 감별.',
     causes: [
       { rank: 1, cause: '게이트 과소 + 금형온도 낮음', category: 'Mold',
         trigger: '게이트 과소 → 급속 감압. 금형온도 낮음.',

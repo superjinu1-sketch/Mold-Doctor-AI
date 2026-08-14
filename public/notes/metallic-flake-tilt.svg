@@ -1,0 +1,67 @@
+<svg viewBox="0 0 720 240" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="mft-t mft-d">
+  <title id="mft-t">Flake orientation at the part surface, aligned versus disturbed flow</title>
+  <desc id="mft-d">With steady flow, aluminum flakes lie parallel to the surface and reflect light back to the viewer as an even metallic sheen. Where flow was disturbed, flakes freeze in at an angle, reflect light away from the viewer, and the zone reads as a pale streak. Nothing is in the streak; it is an angle.</desc>
+
+  <text x="20" y="22" font-size="13" font-weight="700" fill="var(--ink)">Flakes lying flat</text>
+  <text x="20" y="40" font-size="11" fill="var(--faint)">steady flow laid them parallel</text>
+  <rect x="20" y="55" width="300" height="14" fill="var(--faint)" opacity=".28"/>
+  <text x="24" y="65" font-size="9" fill="var(--faint)">SURFACE</text>
+  <rect x="20" y="69" width="300" height="105" fill="var(--faint)" opacity=".07"/>
+  <g stroke="var(--brand)" stroke-width="3" stroke-linecap="round">
+    <line x1="40" y1="84" x2="70" y2="85"/><line x1="88" y1="85" x2="118" y2="84"/>
+    <line x1="136" y1="84" x2="166" y2="85"/><line x1="184" y1="85" x2="214" y2="84"/>
+    <line x1="232" y1="84" x2="262" y2="85"/><line x1="278" y1="85" x2="304" y2="84"/>
+    <line x1="52" y1="102" x2="82" y2="103"/><line x1="104" y1="103" x2="134" y2="102"/>
+    <line x1="156" y1="102" x2="186" y2="103"/><line x1="208" y1="103" x2="238" y2="102"/>
+    <line x1="258" y1="102" x2="288" y2="103"/>
+  </g>
+  <g stroke="var(--muted)" stroke-width="2.5" stroke-linecap="round" opacity=".4">
+    <line x1="44" y1="122" x2="74" y2="121"/><line x1="98" y1="121" x2="128" y2="122"/>
+    <line x1="152" y1="122" x2="182" y2="121"/><line x1="206" y1="121" x2="236" y2="122"/>
+    <line x1="260" y1="122" x2="290" y2="121"/>
+    <line x1="60" y1="142" x2="90" y2="143"/><line x1="140" y1="143" x2="170" y2="142"/>
+    <line x1="220" y1="142" x2="250" y2="143"/>
+  </g>
+  <g stroke="var(--ok)" stroke-width="1.5" fill="none" stroke-dasharray="4 3">
+    <line x1="294" y1="28" x2="252" y2="80"/>
+    <line x1="252" y1="80" x2="210" y2="28"/>
+  </g>
+  <path d="M210 28 L221 34.5 L214 40.2 Z" fill="var(--ok)"/>
+  <text x="20" y="200" font-size="12" font-weight="600" fill="var(--ok)">→ light returns to the eye: even metallic sheen</text>
+  <text x="20" y="218" font-size="11" fill="var(--faint)">millions of small mirrors facing the same way</text>
+
+  <text x="400" y="22" font-size="13" font-weight="700" fill="var(--ink)">Flakes tilted where flow was disturbed</text>
+  <text x="400" y="40" font-size="11" fill="var(--faint)">recombination · hesitation · a step ahead of the cavity</text>
+  <rect x="400" y="55" width="300" height="14" fill="var(--faint)" opacity=".28"/>
+  <text x="404" y="65" font-size="9" fill="var(--faint)">SURFACE</text>
+  <rect x="505" y="55" width="110" height="14" fill="var(--danger)" opacity=".18"/>
+  <text x="560" y="65" font-size="9" font-weight="700" text-anchor="middle" fill="var(--danger)">PALE STREAK</text>
+  <rect x="400" y="69" width="300" height="105" fill="var(--faint)" opacity=".07"/>
+  <line x1="505" y1="69" x2="505" y2="174" stroke="var(--danger)" stroke-width="1.2" stroke-dasharray="3 3" opacity=".4"/>
+  <line x1="615" y1="69" x2="615" y2="174" stroke="var(--danger)" stroke-width="1.2" stroke-dasharray="3 3" opacity=".4"/>
+  <g stroke="var(--brand)" stroke-width="3" stroke-linecap="round">
+    <line x1="414" y1="84" x2="444" y2="85"/><line x1="460" y1="85" x2="490" y2="84"/>
+    <line x1="418" y1="103" x2="448" y2="102"/><line x1="464" y1="102" x2="494" y2="103"/>
+    <line x1="630" y1="85" x2="660" y2="84"/><line x1="672" y1="84" x2="696" y2="85"/>
+    <line x1="634" y1="102" x2="664" y2="103"/>
+  </g>
+  <g stroke="var(--danger)" stroke-width="3" stroke-linecap="round">
+    <line x1="512" y1="118" x2="530" y2="92"/>
+    <line x1="536" y1="88" x2="558" y2="112"/>
+    <line x1="564" y1="122" x2="578" y2="92"/>
+    <line x1="586" y1="90" x2="606" y2="114"/>
+  </g>
+  <g stroke="var(--muted)" stroke-width="2.5" stroke-linecap="round" opacity=".4">
+    <line x1="424" y1="124" x2="454" y2="123"/><line x1="466" y1="123" x2="496" y2="124"/>
+    <line x1="630" y1="122" x2="660" y2="123"/><line x1="440" y1="144" x2="470" y2="145"/>
+    <line x1="636" y1="143" x2="666" y2="142"/>
+  </g>
+  <g stroke="var(--danger)" stroke-width="1.5" fill="none" stroke-dasharray="4 3">
+    <line x1="547" y1="86" x2="610" y2="140"/>
+  </g>
+  <path d="M610 140 L598 135.6 L603.8 128.8 Z" fill="var(--danger)"/>
+  <text x="620" y="158" font-size="10.5" font-weight="600" fill="var(--danger)">light leaves</text>
+  <text x="620" y="172" font-size="10.5" font-weight="600" fill="var(--danger)">at an angle</text>
+  <text x="400" y="200" font-size="12" font-weight="600" fill="var(--danger)">→ darkens or brightens as the part turns</text>
+  <text x="400" y="218" font-size="11" fill="var(--faint)">nothing is in the streak — the streak is an angle</text>
+</svg>
