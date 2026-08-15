@@ -4,7 +4,7 @@
 // 수정 순서: taxonomy.md → 이 파일 → KB_VERSION bump → eval 회귀.
 import type { ResinSpec } from './resin-kb';
 
-export const KB_VERSION = 'defect-kb-v1.17';
+export const KB_VERSION = 'defect-kb-v1.18';
 
 export type Cause = {
   rank: number;
@@ -288,7 +288,11 @@ export const DEFECT_KB: Record<string, DefectNode> = {
       '신규 금형·이관 직후': 'air_trap_burn 분기 참조. 신금형은 벤트 설계 누락이 흔하다. 같은 재료가 다른 금형에서 정상이면 재료 원인은 강등하고 금형(벤팅) 우선.',
     },
     sharedGates: ['mold_temp_insufficient'],
-    source: 'synthesis-3.2,taxonomy-6', confidence: 'estimated',
+    source: 'synthesis-3.2,taxonomy-6', confidence: 'verified',
+    sourceRefs: [
+      'RapidDirect — Flow Mark in Injection Molding (rapiddirect.com): 저금형온도·저사출속도=원인, 금형온도↑·속도↑=개선. Common Practice, 코워크 확인 2026-08-15',
+    ],
+    verifiedAt: '2026-08-15',
   },
 
   // ─── 7. Sink Mark (싱크마크) ───────────────────────────────
@@ -588,7 +592,11 @@ export const DEFECT_KB: Record<string, DefectNode> = {
         adjustment: '금형온도↑(단일 최대 효과 — GF 강화는 비강화 대비 금형온도 상단 필요: 예 PA66 비강화 ~70°C vs GF ~100°C, 공급사 가이드). 배럴온도는 공급사 권장 범위 내 유지 — GF라고 배럴을 더 올리지 마라(PA66은 비강화와 권장 멜트 동일 285~305°C, 과열은 체류 열화만 유발).' },
     ],
     sharedGates: ['mold_temp_insufficient'],
-    source: 'synthesis-3.5,taxonomy-14', confidence: 'estimated',
+    source: 'synthesis-3.5,taxonomy-14', confidence: 'verified',
+    sourceRefs: [
+      'Glass-Filled Nylon Molding Guide (nylon.com.tw): 저금형온도=GF 표면노출 원인, 금형온도↑=해법(수지리치 표층). 정확 몰드온도 수치는 resin-kb 공급사 검증값(~100°C) 우선. Common Practice, 코워크 확인 2026-08-15',
+    ],
+    verifiedAt: '2026-08-15',
   },
 
   surface_gloss: {
@@ -657,7 +665,13 @@ export const DEFECT_KB: Record<string, DefectNode> = {
       '범퍼|장거리 유동|게이트서 멀어질수록|먼 곳일수록 심함': '유동길이 기인 → 게이트·유동길이 설계 + 고유동 그레이드 검토(재료한계).',
     },
     sharedGates: ['mold_temp_insufficient'],
-    source: 'synthesis-3.2,taxonomy-17', confidence: 'estimated',
+    source: 'synthesis-3.2,taxonomy-17', confidence: 'verified',
+    sourceRefs: [
+      'Routsis Training — Correcting Tiger Striping (routsis.blog, 2013): slower injection speed·lower melt·lower pack help; 공기 함정·벽면 밀착 stick-slip 기전. Common Practice, 코워크 확인 2026-08-15',
+      'J. Appl. Polym. Sci. DOI 10.1002/app.55374 (2024) — PP tiger stripe 기전. 로케이터 확인, 전문 NOT verified (paywall/403)',
+      'AIP Conf. Proc. 1713:040001 (2016) DOI 10.1063/1.4942266 — tiger-striped flow mark 생성 가시화. 로케이터 확인, 전문 NOT verified (403)',
+    ],
+    verifiedAt: '2026-08-15',
   },
 
   // ─── Flake Orientation Mark (메탈릭 플레이크 배향 자국) — en-note-metallic-flake-v1 ───
@@ -910,7 +924,11 @@ export const DEFECT_KB: Record<string, DefectNode> = {
     },
     priorityLogic: '조건무효 + 밸브게이트면 게이트 하드웨어(밸브핀·핫러너온도)로 전환. 핫러너 게이트온도(미점검 흔함)를 금형분해(밸브핀)보다 먼저 시도. 닦임 여부로 mold_deposit 감별.',
     sharedGates: ['mold_temp_insufficient'],
-    source: 'synthesis,taxonomy-29', confidence: 'estimated',
+    source: 'synthesis,taxonomy-29', confidence: 'verified',
+    sourceRefs: [
+      'PlasticsToday Troubleshooter Part 44 — Predictability of Gate Blush (Bob Hatch, 2000): 게이트 과도 전단이 원인, 게이트 랜드 길이(≤.030in, 깊이의 1/2) 단축이 핵심 해법. 코워크 확인 2026-08-15',
+    ],
+    verifiedAt: '2026-08-15',
   },
 
   // ─── 31. Mold Deposit / Plate-out (금형 석출/플레이트아웃) ───
