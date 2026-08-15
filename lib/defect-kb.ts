@@ -4,7 +4,7 @@
 // 수정 순서: taxonomy.md → 이 파일 → KB_VERSION bump → eval 회귀.
 import type { ResinSpec } from './resin-kb';
 
-export const KB_VERSION = 'defect-kb-v1.16';
+export const KB_VERSION = 'defect-kb-v1.17';
 
 export type Cause = {
   rank: number;
@@ -180,7 +180,7 @@ export const DEFECT_KB: Record<string, DefectNode> = {
       '동심원': '흐름자국(flow mark)으로 재분류 검토',
     },
     sharedGates: [],
-    source: 'synthesis-1.3,taxonomy-3', confidence: 'verified',
+    source: 'synthesis-1.3,taxonomy-3', confidence: 'estimated',
   },
 
   // ─── 4. Weld Line (웰드라인) ───────────────────────────────
@@ -259,7 +259,7 @@ export const DEFECT_KB: Record<string, DefectNode> = {
     },
     sharedGates: [],
     priorityLogic: '벤팅 최우선. 클램프력 과도=벤트 압착 역설. 신금형=벤트 설계 누락 검토.',
-    source: 'synthesis-1.5,taxonomy-5', confidence: 'verified',
+    source: 'synthesis-1.5,taxonomy-5', confidence: 'estimated',
   },
 
   // ─── 6. Flow Mark (흐름자국) ───────────────────────────────
@@ -288,7 +288,7 @@ export const DEFECT_KB: Record<string, DefectNode> = {
       '신규 금형·이관 직후': 'air_trap_burn 분기 참조. 신금형은 벤트 설계 누락이 흔하다. 같은 재료가 다른 금형에서 정상이면 재료 원인은 강등하고 금형(벤팅) 우선.',
     },
     sharedGates: ['mold_temp_insufficient'],
-    source: 'synthesis-3.2,taxonomy-6', confidence: 'verified',
+    source: 'synthesis-3.2,taxonomy-6', confidence: 'estimated',
   },
 
   // ─── 7. Sink Mark (싱크마크) ───────────────────────────────
@@ -551,7 +551,7 @@ export const DEFECT_KB: Record<string, DefectNode> = {
       '색불균일|분산 줄무늬|마스터배치 분산': '안료·MB 분산 불량(전체 열변색 아님 — 분산 줄무늬는 color_streaks 계열). 배압 상향은 소폭이 아니라 단계적 대폭(현재 대비 2배 수준 목표) + 스크루 RPM 하향 병행(체류·혼련 확보). GF 수지는 섬유 파손 주의.',
     },
     sharedGates: [],
-    source: 'synthesis-3.3,taxonomy-12', confidence: 'verified',
+    source: 'synthesis-3.3,taxonomy-12', confidence: 'estimated',
   },
 
   // ── 나머지 18종 골격 (append-friendly) ──────────────────────
@@ -572,7 +572,7 @@ export const DEFECT_KB: Record<string, DefectNode> = {
         verification: '이형제 없이 테스트.',
         adjustment: '이형제 최소화, 금형 청소.' },
     ],
-    source: 'synthesis-3.4,taxonomy-13', confidence: 'verified',
+    source: 'synthesis-3.4,taxonomy-13', confidence: 'estimated',
   },
 
   fiber_readout: {
@@ -588,7 +588,7 @@ export const DEFECT_KB: Record<string, DefectNode> = {
         adjustment: '금형온도↑(단일 최대 효과 — GF 강화는 비강화 대비 금형온도 상단 필요: 예 PA66 비강화 ~70°C vs GF ~100°C, 공급사 가이드). 배럴온도는 공급사 권장 범위 내 유지 — GF라고 배럴을 더 올리지 마라(PA66은 비강화와 권장 멜트 동일 285~305°C, 과열은 체류 열화만 유발).' },
     ],
     sharedGates: ['mold_temp_insufficient'],
-    source: 'synthesis-3.5,taxonomy-14', confidence: 'verified',
+    source: 'synthesis-3.5,taxonomy-14', confidence: 'estimated',
   },
 
   surface_gloss: {
@@ -609,7 +609,7 @@ export const DEFECT_KB: Record<string, DefectNode> = {
         adjustment: '보압↑.' },
     ],
     sharedGates: ['mold_temp_insufficient'],
-    source: 'synthesis-3.6,taxonomy-15', confidence: 'verified',
+    source: 'synthesis-3.6,taxonomy-15', confidence: 'estimated',
   },
 
   dimensional_instability: {
@@ -657,7 +657,7 @@ export const DEFECT_KB: Record<string, DefectNode> = {
       '범퍼|장거리 유동|게이트서 멀어질수록|먼 곳일수록 심함': '유동길이 기인 → 게이트·유동길이 설계 + 고유동 그레이드 검토(재료한계).',
     },
     sharedGates: ['mold_temp_insufficient'],
-    source: 'synthesis-3.2,taxonomy-17', confidence: 'verified',
+    source: 'synthesis-3.2,taxonomy-17', confidence: 'estimated',
   },
 
   // ─── Flake Orientation Mark (메탈릭 플레이크 배향 자국) — en-note-metallic-flake-v1 ───
@@ -717,7 +717,7 @@ export const DEFECT_KB: Record<string, DefectNode> = {
         adjustment: '게이트 확대, 금형온도↑, 사출속도↑.' },
     ],
     sharedGates: ['mold_temp_insufficient'],
-    source: 'synthesis-3.2,taxonomy-18', confidence: 'verified',
+    source: 'synthesis-3.2,taxonomy-18', confidence: 'estimated',
   },
 
   black_specks: {
@@ -736,7 +736,7 @@ export const DEFECT_KB: Record<string, DefectNode> = {
         verification: '스크루 인발 점검(플라이트 뒤 탄화·구색 잔류 확인). 핫러너 존별 온도 점검.',
         adjustment: '스크루 인발 세척(긁지 말 것), 배압을 기존 가이드 상한 내로 상향(플라이트 충전 개선), 샷/배럴 비율 확보, 데드스팟 적은 스크루·팁 사양 검토.' },
     ],
-    source: 'synthesis-4,taxonomy-19', confidence: 'verified',
+    source: 'synthesis-4,taxonomy-19', confidence: 'estimated',
   },
 
   color_streaks: {
@@ -783,7 +783,7 @@ export const DEFECT_KB: Record<string, DefectNode> = {
         verification: '노즐온도↑ 후 재시험.',
         adjustment: '노즐온도↑, 콜드슬러그웰 추가.' },
     ],
-    source: 'synthesis-4,taxonomy-21', confidence: 'verified',
+    source: 'synthesis-4,taxonomy-21', confidence: 'estimated',
   },
 
   sticking: {
@@ -910,7 +910,7 @@ export const DEFECT_KB: Record<string, DefectNode> = {
     },
     priorityLogic: '조건무효 + 밸브게이트면 게이트 하드웨어(밸브핀·핫러너온도)로 전환. 핫러너 게이트온도(미점검 흔함)를 금형분해(밸브핀)보다 먼저 시도. 닦임 여부로 mold_deposit 감별.',
     sharedGates: ['mold_temp_insufficient'],
-    source: 'synthesis,taxonomy-29', confidence: 'verified',
+    source: 'synthesis,taxonomy-29', confidence: 'estimated',
   },
 
   // ─── 31. Mold Deposit / Plate-out (금형 석출/플레이트아웃) ───
