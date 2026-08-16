@@ -89,7 +89,7 @@ const resinKnowledge: Record<string, string> = {
   'TPC': 'TPC: thermoplastic copolyester elastomer. Drying: 100°C 4hrs. Melt: 220-250°C. Mold: 30-60°C. Key: good oil/chemical resistance.',
   'TPA': 'TPA: thermoplastic polyamide elastomer. Drying: 80°C 4hrs. Melt: 200-240°C. Key: similar to TPU but PA-based, moisture sensitive.',
   'TPEE': 'TPEE: thermoplastic polyester elastomer. Drying: 100°C 4hrs. Melt: 210-240°C. Mold: 30-60°C. Key: good flex fatigue resistance.',
-  'TPV': 'TPV: thermoplastic vulcanizate. Drying: not usually required. Melt: 180-220°C. Key: rubber-like, requires low shear processing.',
+  'TPV': 'TPV: thermoplastic vulcanizate. Drying: not usually required. Melt: 180-220°C (~205 typical). Mold: 20-30°C. Key: rubber-like but strongly shear-thinning — use medium-fast to fast injection speed (high shear lowers viscosity; gate shear ~10^4-10^5/s). Slow fill causes short shot/weld line/poor surface. Avoid excessive melt residence.',
   'TPO': 'TPO: thermoplastic olefin. Drying: not required. Melt: 180-230°C. Mold: 20-50°C. Key: automotive bumper/trim applications, good impact at low temp.',
   'default': 'General thermoplastic. Check material TDS for specific processing conditions. Apply standard troubleshooting: verify drying, check melt temp vs recommended range, evaluate mold temp, review fill pattern.',
 };
