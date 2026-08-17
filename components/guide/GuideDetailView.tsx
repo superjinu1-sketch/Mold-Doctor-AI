@@ -5,6 +5,7 @@ import Link from 'next/link';
 import type { GuideDefect } from '@/lib/defectGuide';
 import type { Locale } from '@/lib/guideDisplay';
 import { getResinDisplayName } from '@/lib/resinDisplay';
+import StoreBadges from '@/components/StoreBadges';
 
 export default function GuideDetailView({
   defect, locale, basePath, resinsBasePath, related,
@@ -106,7 +107,7 @@ export default function GuideDetailView({
           </section>
         )}
 
-        {/* CTA */}
+        {/* CTA — 웹 추정 */}
         <section>
           <Link
             href={`/diagnose?defect=${encodeURIComponent(defect.id)}`}
@@ -115,6 +116,9 @@ export default function GuideDetailView({
             {L(`${displayName} 불량이 보이면 — 사진과 셋팅값으로 원인을 추정해 드립니다`, `Got a ${displayName.toLowerCase()} defect? Upload a photo and settings — we'll estimate the cause`)}
           </Link>
         </section>
+
+        {/* 앱 설치 CTA (웹 추정과 병행) */}
+        <StoreBadges variant="article" locale={locale} />
 
         {/* 면책 */}
         <p className="text-[length:var(--text-label)] text-faint text-center pt-2">

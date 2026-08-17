@@ -5,6 +5,7 @@ import type { ResinSpec, DefectKey } from '@/lib/resin-kb';
 import { RESIN_NOTES_KO } from '@/lib/resinNotesKo';
 import { DEFECT_KEY_TO_GUIDE_ID, getGuideDefectById } from '@/lib/defectGuide';
 import { TIER_LABEL, HYGRO_LABEL, getResinDisplayName, type Locale } from '@/lib/resinDisplay';
+import StoreBadges from '@/components/StoreBadges';
 
 const FLOW_MARK_LABEL: Record<Locale, string> = { ko: '유동자국(플로우마크)', en: 'Flow Mark' };
 
@@ -208,19 +209,8 @@ export default function ResinDetailView({
           </section>
         )}
 
-        {/* 앱 배지 */}
-        <section className="flex flex-col items-center gap-3 pt-2">
-          <a
-            href="https://play.google.com/store/apps/details?id=com.jinsimlabs.molddoctor"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 bg-ink text-canvas px-5 py-3 rounded-xl min-h-[var(--touch-cta)] font-bold text-sm hover:opacity-90 transition-opacity"
-          >
-            <span aria-hidden>▶</span>
-            {L('Google Play에서 다운로드', 'Get it on Google Play')}
-          </a>
-          {/* App Store 배지 자리 — iOS 심사 승인 후 추가 */}
-        </section>
+        {/* 앱 설치 CTA (웹 추정과 병행) — StoreBadges article variant로 통일: App Store 추가 + 네이티브 게이팅 */}
+        <StoreBadges variant="article" locale={locale} />
 
         {/* 면책 */}
         <p className="text-[length:var(--text-label)] text-faint text-center pt-2">

@@ -12,8 +12,9 @@ import { IconDownload } from '@/components/icons';
 const PLAY_URL = 'https://play.google.com/store/apps/details?id=com.jinsimlabs.molddoctor';
 const APP_STORE_ID = '6793057343';
 
-export default function StoreBadges({ variant }: { variant: 'hero' | 'footer' }) {
-  const { locale } = useLocale();
+export default function StoreBadges({ variant, locale: localeProp }: { variant: 'hero' | 'footer' | 'article'; locale?: 'ko' | 'en' }) {
+  const { locale: ctxLocale } = useLocale();
+  const locale = localeProp ?? ctxLocale;
   // 네이티브 게이팅(§2, pricing-native-gate-v1 선례) — 정적 export 프리렌더 시점엔 네이티브
   // 브릿지가 없어 native=false로 시작하고 마운트 후 재평가로 흡수(웹은 항상 false 유지).
   // native === true면 이 컴포넌트는 null을 반환해 DOM 자체를 만들지 않는다(display:none 아님) —
@@ -46,6 +47,37 @@ export default function StoreBadges({ variant }: { variant: 'hero' | 'footer' })
           <IconDownload size={16} />
           Google Play
         </a>
+      </div>
+    );
+  }
+
+  if (variant === 'article') {
+    const blurb = locale === 'en'
+      ? 'Keep using it on the floor — your diagnosis history and machine conditions accumulate in the app.'
+      : '현장에서 계속 쓰려면 앱으로. 추정 이력과 설비 조건이 앱에 쌓입니다.';
+    const free = locale === 'en' ? 'Free 5 diagnoses when you sign up' : '가입하면 5회 무료 추정';
+    return (
+      <div className="ui-card ui-card-lg p-5 flex flex-col items-center gap-3 text-center">
+        <p className="text-body text-muted">{blurb}</p>
+        <div className="flex gap-2 w-full max-w-sm">
+          <a
+            href={appStoreUrl}
+            aria-label={appStoreLabel}
+            className="flex-1 inline-flex items-center justify-center gap-1.5 min-h-[var(--touch-cta)] px-3 rounded-xl bg-ink text-canvas hover:opacity-90 text-sm font-bold transition-opacity"
+          >
+            <IconDownload size={16} />
+            App Store
+          </a>
+          <a
+            href={PLAY_URL}
+            aria-label={playLabel}
+            className="flex-1 inline-flex items-center justify-center gap-1.5 min-h-[var(--touch-cta)] px-3 rounded-xl bg-ink text-canvas hover:opacity-90 text-sm font-bold transition-opacity"
+          >
+            <IconDownload size={16} />
+            Google Play
+          </a>
+        </div>
+        <p className="text-[length:var(--text-label)] text-faint">{free}</p>
       </div>
     );
   }
