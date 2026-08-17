@@ -169,6 +169,84 @@ export const defects: GuideDefect[] = [
     resinNotesEn: { PA: 'GF reinforcement can expose fibers at surface → raising mold temperature helps.', PC: 'Excellent surface gloss, but mold temperature is key.', ABS: 'Good surface reproducibility.' },
     color: 'slate',
   },
+  {
+    id: 'black-specks',
+    nameKo: '흑점', nameEn: 'Black Specks',
+    descriptionKo: '제품 표면이나 내부에 나타나는 검은 반점. 탄화된 수지 잔류물이나 이물 오염이 원인.',
+    descriptionEn: 'Dark specks on or inside the part, caused by carbonized resin residue or contamination.',
+    causesKo: ['이전 수지·색상 탄화 잔류 (퍼지 미흡)', '스크류·배럴·체크링 데드스페이스 탄화 축적', '수지 온도·체류시간 과다 (열분해)', '오염된 재생재·호퍼·주변 이물', '스크류/배럴 마모'],
+    causesEn: ['Carbonized residue from previous resin/color (incomplete purge)', 'Carbon buildup in screw/barrel/check-ring dead spots', 'Melt temperature or residence time too high (thermal degradation)', 'Contaminated regrind, hopper, or environment', 'Worn screw or barrel'],
+    solutionsKo: ['완전 퍼지 (전환 후 3~5샷 확인)', '스크류 인발 세척, 데드스페이스 적은 팁 검토', '수지 온도 하강·사이클 단축 (체류 감소)', '재생재·호퍼 청결 관리', '샷/배럴 용량 비율 확보'],
+    solutionsEn: ['Purge thoroughly (verify over 3–5 shots after a changeover)', 'Pull and clean the screw; consider low-dead-space tips', 'Lower melt temperature and shorten cycle (reduce residence)', 'Keep regrind and hopper clean', 'Ensure adequate shot-to-barrel ratio'],
+    resinNotesKo: { POM: '포름알데히드계 분해로 흑점·가스 발생 쉬움. 체류시간 최소화.', PVC: '열분해 민감. 온도·체류 엄격 관리.', '난연등급': '난연제 분해온도 확인. 체류 시 탄화 가중.' },
+    resinNotesEn: { POM: 'Prone to specks/gas from formaldehyde-type degradation. Minimize residence time.', PVC: 'Sensitive to thermal degradation. Strict temperature and residence control.', 'FR Grades': 'Check flame-retardant decomposition temperature; carbonizes with long residence.' },
+    color: 'slate',
+  },
+  {
+    id: 'stringing',
+    nameKo: '실끌림', nameEn: 'Stringing/Drooling',
+    descriptionKo: '노즐에서 수지가 실처럼 늘어지거나(스트링), 개형 전 방울져 떨어지는(드룰링) 현상.',
+    descriptionEn: 'Resin drawing into thin strings from the nozzle (stringing) or drooling as droplets before the mold opens.',
+    causesKo: ['노즐 온도 과다', '감압(서크백) 부족', '수지 온도 과다', '노즐 오리피스 과대·마모', '노즐 팁 냉각 부족'],
+    causesEn: ['Nozzle temperature too high', 'Insufficient decompression (suck-back)', 'Melt temperature too high', 'Nozzle orifice too large or worn', 'Insufficient nozzle-tip cooling'],
+    solutionsKo: ['노즐 온도 하강', '감압(서크백) 증가', '수지 온도 하강', '역테이퍼 노즐·오리피스 크기 재검토', '노즐 팁 온도 프로파일 조정'],
+    solutionsEn: ['Lower nozzle temperature', 'Increase decompression (suck-back)', 'Lower melt temperature', 'Review reverse-taper nozzle or orifice size', 'Adjust nozzle-tip temperature profile'],
+    resinNotesKo: { PA: '저점도·결정성으로 드룰링 쉬움. 감압·노즐온도 관리.', PP: '저점도. 노즐온도 과다 주의.', PE: '저점도. 스트링 쉬움.' },
+    resinNotesEn: { PA: 'Low viscosity and semi-crystalline → drools easily. Manage decompression and nozzle temp.', PP: 'Low viscosity. Watch for excessive nozzle temperature.', PE: 'Low viscosity. Prone to stringing.' },
+    color: 'blue',
+  },
+  {
+    id: 'gate-blush',
+    nameKo: '게이트 블러시', nameEn: 'Gate Blush',
+    descriptionKo: '게이트 바로 뒤 표면에 생기는 흐릿한 얼룩·광택 저하. 게이트 부위의 과도한 전단이 원인.',
+    descriptionEn: 'A hazy, dull halo on the surface just past the gate, caused by excessive shear at the gate.',
+    causesKo: ['게이트 부위 사출속도 과다 (과전단)', '게이트 과소 → 급속 감압', '금형 온도 낮음', '게이트 랜드 길이 과다', '밸브게이트 핀 마모·타이밍 불량 (핫러너)'],
+    causesEn: ['Injection speed too high at the gate (over-shear)', 'Gate too small → rapid pressure drop', 'Mold temperature too low', 'Excessive gate land length', 'Valve-gate pin wear or timing issue (hot runner)'],
+    solutionsKo: ['게이트 통과 구간 사출속도 감속 (다단 프로파일)', '게이트 확대, 랜드 길이 단축', '금형 온도 상승', '핫러너 게이트 온도 점검·상향', '(간헐·조건무효 시) 밸브핀 선단·스트로크 점검'],
+    solutionsEn: ['Slow injection speed through the gate (multi-stage profile)', 'Enlarge the gate; shorten the land length', 'Raise mold temperature', 'Check and raise hot-runner gate temperature', 'If intermittent and process-independent, inspect valve-pin tip and stroke'],
+    resinNotesKo: { '내열 ABS': '게이트 과전단에 민감. 속도 감속 우선.', PC: '고점도. 게이트 온도·속도 관리 중요.', 'PC/ABS': '게이트 블러시 흔함. 게이트 설계·속도 검토.' },
+    resinNotesEn: { 'Heat-resistant ABS': 'Sensitive to gate over-shear. Slow the speed first.', PC: 'High viscosity. Gate temperature and speed control matter.', 'PC/ABS': 'Gate blush is common. Review gate design and speed.' },
+    color: 'purple',
+  },
+  {
+    id: 'delamination',
+    nameKo: '박리', nameEn: 'Delamination',
+    descriptionKo: '표면이 물고기 비늘처럼 층으로 벗겨지는 현상. 손톱으로 층이 떨어짐.',
+    descriptionEn: 'The surface peels away in fish-scale layers; layers can be lifted with a fingernail.',
+    causesKo: ['이종 수지 오염 (비상용 폴리머 혼입)', '이형제 과다', '수분·미건조 재료', '멜트·금형 온도 낮음 (층간 융착 불량)', '게이트 과전단'],
+    causesEn: ['Contamination with incompatible resin', 'Excess mold release agent', 'Moisture or under-dried material', 'Melt or mold temperature too low (poor interlayer fusion)', 'Excessive shear at the gate'],
+    solutionsKo: ['완전 퍼지·원료 검사 (DSC로 이종 피크 확인)', '이형제 최소화, 금형 청소', '재료 건조 확인', '멜트·금형 온도 상승', '사출속도 감소 (전단 완화)'],
+    solutionsEn: ['Purge thoroughly and verify material (DSC for foreign peaks)', 'Minimize release agent; clean the mold', 'Verify material drying', 'Raise melt and mold temperature', 'Reduce injection speed (lower shear)'],
+    resinNotesKo: { PP: '극성 수지(PA 등)와 혼입 시 박리 심함. 재생재 분리.', PA: 'PE/PP 혼입에 민감. 원료 관리 철저.', '재생재': '이종 혼입 최다 원인. 로트 분리·검사.' },
+    resinNotesEn: { PP: 'Severe delamination if mixed with polar resins (e.g., PA). Segregate regrind.', PA: 'Sensitive to PE/PP contamination. Strict material control.', Regrind: 'Leading source of incompatible mixing. Segregate and inspect lots.' },
+    color: 'amber',
+  },
+  {
+    id: 'flow-mark',
+    nameKo: '흐름자국', nameEn: 'Flow Mark',
+    descriptionKo: '유동 방향을 따라 나타나는 물결·줄무늬 자국. 낮은 금형온도·사출속도가 주 원인.',
+    descriptionEn: 'Wavy or streaky marks along the flow direction, mainly from low mold temperature or injection speed.',
+    causesKo: ['금형 온도 과저 (특히 초기샷)', '사출 속도 과저', '멜트 온도 과저', '게이트·러너 유동 저항', '워밍업 부족'],
+    causesEn: ['Mold temperature too low (especially early shots)', 'Injection speed too low', 'Melt temperature too low', 'Flow restriction at gate/runner', 'Insufficient warm-up'],
+    solutionsKo: ['금형 온도 상승 (권장 범위 확보)', '사출 속도 증가', '멜트 온도 상승·사출압 증가', '게이트 확대 검토', '초기샷 워밍업 후 판정'],
+    solutionsEn: ['Raise mold temperature (into recommended range)', 'Increase injection speed', 'Raise melt temperature and injection pressure', 'Consider enlarging the gate', 'Warm up before judging early shots'],
+    resinNotesKo: { PP: '저금형온도서 물결 쉬움. 금형온도 확보.', ABS: '금형온도·속도로 개선 잘 됨.', PC: '고점도. 멜트·금형온도 충분히.' },
+    resinNotesEn: { PP: 'Prone to waviness at low mold temperature. Secure mold temp.', ABS: 'Improves well with mold temperature and speed.', PC: 'High viscosity. Adequate melt and mold temperature.' },
+    color: 'blue',
+  },
+  {
+    id: 'tiger-stripe',
+    nameKo: '타이거스트라이프', nameEn: 'Tiger Stripe',
+    descriptionKo: '주로 PP·TPO에서 유동에 수직으로 나타나는 광택/무광 교대 밴드. 사출속도를 올리면 오히려 악화되는 것이 특징.',
+    descriptionEn: 'Alternating glossy/matte bands perpendicular to flow, mostly in PP/TPO. Notably, raising injection speed makes it worse.',
+    causesKo: ['PP 벽면 미끄럼(wall slip)·유동 불안정', '금형·멜트 온도 낮음', '사출 속도 과다 (밴드 악화)', '장거리 유동 (범퍼류)', '저유동(저MI) 재료 한계'],
+    causesEn: ['PP wall slip and flow instability', 'Mold or melt temperature too low', 'Injection speed too high (worsens banding)', 'Long flow length (e.g., bumpers)', 'Low-flow (low-MI) material limitation'],
+    solutionsKo: ['금형·멜트 온도 상승 (단일 최대 효과)', '사출 속도 하향·등속 프로파일 (★속도 상향 금지)', '고유동(고MI)·핵제 개질 그레이드 검토', '게이트 위치·유동길이 설계 재검토', '재료 기인 한계 인지'],
+    solutionsEn: ['Raise mold and melt temperature (single biggest lever)', 'Lower injection speed; use a constant-speed profile (★ do NOT raise speed)', 'Consider high-flow (high-MI) or nucleated grades', 'Review gate location and flow length', 'Recognize material-driven limits'],
+    resinNotesKo: { PP: '타이거스트라이프 대표 수지. 금형온도↑·감속이 핵심.', 'PP/EPDM': '범퍼·트림 다발. 유동길이·그레이드 검토.', TPO: '연질 PP 계열. 동일 대응.' },
+    resinNotesEn: { PP: 'The classic tiger-stripe resin. Higher mold temp and slower speed are key.', 'PP/EPDM': 'Common in bumpers/trim. Review flow length and grade.', TPO: 'Soft PP-family. Same approach.' },
+    color: 'amber',
+  },
 ];
 
 // Brand-unified: all defect categories use the same brand color system
@@ -192,10 +270,11 @@ export const DEFECT_NUMS: Record<string, string> = {
   'short-shot': '1', 'flash': '2', 'sink-mark': '3', 'weld-line': '4',
   'burn-mark': '5', 'silver-streak': '6', 'discoloration': '7', 'crack': '8',
   'warpage': '9', 'void': '10', 'jetting': '11', 'surface-roughness': '12',
+  'black-specks': '13', 'stringing': '14', 'gate-blush': '15',
+  'delamination': '16', 'flow-mark': '17', 'tiger-stripe': '18',
 };
 
-// lib/resin-kb.ts DefectKey(underscore, MVP 9종) → guide 페이지 id(dash, 12종) 매핑.
-// flow_mark는 guide 12종에 대응 항목이 없어 미매핑(해당 시 /resins 페이지에서 링크 없이 텍스트만 표기).
+// lib/resin-kb.ts DefectKey(underscore) → guide 페이지 id(dash) 매핑.
 export const DEFECT_KEY_TO_GUIDE_ID: Partial<Record<DefectKey, string>> = {
   flash: 'flash',
   short_shot: 'short-shot',
@@ -205,6 +284,7 @@ export const DEFECT_KEY_TO_GUIDE_ID: Partial<Record<DefectKey, string>> = {
   silver_streak: 'silver-streak',
   warpage: 'warpage',
   jetting: 'jetting',
+  flow_mark: 'flow-mark',
 };
 
 export function getGuideDefectById(id: string): GuideDefect | undefined {

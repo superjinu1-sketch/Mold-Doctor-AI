@@ -9,8 +9,8 @@ import { SITE_URL } from '@/lib/siteUrl';
 export const dynamic = 'force-static';
 
 export const metadata: Metadata = {
-  title: '사출 불량 가이드 — 12종 원인과 해결 방법 | Mold Doctor',
-  description: '미성형·플래시·싱크마크·웰드라인 등 사출성형 불량 12종의 원인과 해결 방법을 정리했습니다.',
+  title: '사출 불량 가이드 — 18종 원인과 해결 방법 | Mold Doctor',
+  description: '미성형·플래시·싱크마크·웰드라인 등 사출성형 불량 18종의 원인과 해결 방법을 정리했습니다.',
   alternates: {
     canonical: `${SITE_URL}/guide`,
     languages: {
@@ -39,10 +39,10 @@ export default function GuidePage() {
         <div className="mb-10">
           <div className="inline-flex items-center gap-2 border border-[var(--brand-border)] bg-brand-tint text-brand-ink text-[length:var(--text-label)] font-medium px-3.5 py-1.5 rounded-full mb-5">
             <span className="w-1.5 h-1.5 bg-brand rounded-full" />
-            12종 불량 유형
+            18종 불량 유형
           </div>
           <h1 className="text-[length:var(--text-h1)] font-bold text-ink mb-2">사출 불량 가이드</h1>
-          <p className="text-muted text-body">12가지 주요 불량 유형별 원인과 해결 방향을 확인하세요.</p>
+          <p className="text-muted text-body">18가지 주요 불량 유형별 원인과 해결 방향을 확인하세요.</p>
         </div>
 
         <div className="space-y-2">
