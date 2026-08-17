@@ -7,7 +7,7 @@ import { readNoteThumbSvg } from '@/lib/notesDiagramSvg';
 // Capacitor 정적 export(output:'export') 호환 — app/sitemap.ts 선례와 동일 원칙 적용.
 export const dynamic = 'force-static';
 
-const TITLE = 'Notes — Mold Doctor';
+const TITLE = 'Field Notes — Mold Doctor';
 const DESCRIPTION = 'Notes from building an injection molding AI. What it got wrong, and why.';
 
 export const metadata: Metadata = {
@@ -37,7 +37,7 @@ function formatDate(iso: string): string {
 export default function NotesIndexPageEn() {
   return (
     <div className="max-w-[65ch] mx-auto px-4 sm:px-6 py-10">
-      <h1 className="text-[length:var(--text-h1)] font-bold text-ink mb-8">Notes</h1>
+      <h1 className="text-[length:var(--text-h1)] font-bold text-ink mb-8">Field Notes</h1>
       <div className="space-y-6">
         {NOTES.map(note => (
           <article key={note.slug} className="ui-card ui-card-lg p-5">

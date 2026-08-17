@@ -43,7 +43,7 @@ export const ko: Record<string, string> = {
   'tools.cta_button': '무료로 추정 시작',
 
   'footer.guide': '불량 가이드',
-  'footer.notes': '기술 노트 (영문)',
+  'footer.notes': '현장 노트 (영문)',
   'footer.about': '만든 사람 (영문)',
   'footer.privacy': '개인정보처리방침',
   'footer.terms': '이용약관',
