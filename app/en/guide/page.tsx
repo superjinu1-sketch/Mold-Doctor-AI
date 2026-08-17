@@ -24,7 +24,7 @@ export const metadata: Metadata = {
   },
   openGraph: {
     title: 'Injection Molding Defect Guide | Mold Doctor',
-    description: 'Causes and solutions for 18 major injection molding defect types.',
+    description: 'Causes and solutions for 24 major injection molding defect types.',
     type: 'website',
     locale: 'en_US',
   },
@@ -47,7 +47,7 @@ export default function GuidePageEn() {
             12 Defect Types
           </div>
           <h1 className="text-[length:var(--text-h1)] font-bold text-ink mb-2">Injection Molding Defect Guide</h1>
-          <p className="text-muted text-body">Causes and solutions for 18 major injection molding defect types.</p>
+          <p className="text-muted text-body">Causes and solutions for 24 major injection molding defect types.</p>
         </div>
 
         <div className="space-y-2">

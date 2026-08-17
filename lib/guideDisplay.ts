@@ -27,6 +27,12 @@ const EN_TITLE: Record<string, string> = {
   'delamination': 'Delamination in Injection Molding: Causes and Fixes | Mold Doctor',
   'flow-mark': 'Flow Marks in Injection Molding: Causes and Fixes | Mold Doctor',
   'tiger-stripe': 'Tiger Stripes in Injection Molding: Causes and Fixes | Mold Doctor',
+  'brittleness': 'Brittleness in Injection Molded Parts: Causes and Fixes | Mold Doctor',
+  'ejector-marks': 'Ejector Pin Marks in Injection Molding: Causes and Fixes | Mold Doctor',
+  'mold-deposit': 'Mold Deposit and Plate-Out in Injection Molding: Causes and Fixes | Mold Doctor',
+  'color-streaks': 'Color Streaks in Injection Molding: Causes and Fixes | Mold Doctor',
+  'dimensional-instability': 'Dimensional Instability in Injection Molding: Causes and Fixes | Mold Doctor',
+  'sticking': 'Part Sticking in the Mold: Causes and Fixes | Mold Doctor',
 };
 
 // 메타 description 전용 가공 — 원인 문구 끝의 괄호 부연설명만 제거(예: "(high viscosity)").
