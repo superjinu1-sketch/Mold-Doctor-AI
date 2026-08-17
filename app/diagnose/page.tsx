@@ -13,7 +13,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { authHeaders } from '@/lib/supabase/authHeader';
 import { downscaleImageClient, safeLocalStorageSet } from '@/lib/clientDownscale';
 import { apiFetch } from '@/lib/apiBase';
-import { saveDiagnosisRecord, updateResolution, patchRecordFields, type HistoryRecord } from '@/lib/history-sync';
+import { saveDiagnosisRecord, updateResolution, type HistoryRecord } from '@/lib/history-sync';
 import { IconClipboard, IconCamera } from '@/components/icons';
 import { SAMPLE_CASES } from '@/lib/sampleCase';
 import { requestInAppReviewIfEligible } from '@/lib/inAppReview';
@@ -444,6 +444,7 @@ function DiagnoseContent() {
 
   // 히스토리 카운트 로드 + sessionStorage 복원 (history 페이지에서 "다시 보기" 클릭 시)
   useEffect(() => {
+    let isRecordRestore = false;
     try {
       const raw = localStorage.getItem('diagnoseHistory');
       const history = JSON.parse(raw || '[]');
@@ -454,6 +455,7 @@ function DiagnoseContent() {
       if (restore) {
         sessionStorage.removeItem('molddoctor_restore');
         const record = JSON.parse(restore);
+        isRecordRestore = true;
         setResult(record);
         setSessionId(record.session_id ?? null);
         const bi = record.beforeInput;
@@ -495,7 +497,7 @@ function DiagnoseContent() {
     // 폼 입력 복원 (리마운트/새로고침/토큰 리프레시 방어선) — 텍스트 입력만, 이미지 제외
     try {
       const savedForm = sessionStorage.getItem(FORM_SS_KEY);
-      if (savedForm) {
+      if (savedForm && !isRecordRestore) {
         const f = JSON.parse(savedForm);
         if (f.defectType) setDefectType(f.defectType);
         if (f.customDefect) setCustomDefect(f.customDefect);
@@ -990,10 +992,16 @@ function DiagnoseContent() {
       try {
         const raw = typeof window !== 'undefined' ? localStorage.getItem('diagnoseHistory') : null;
         const history = JSON.parse(raw || '[]');
+        // 썸네일을 저장 전에 생성해 record에 포함 → 로컬·클라우드 저장이 사진과 원자적.
+        // (기존: 초기 저장엔 사진 없이 올린 뒤 비동기 patch로만 클라우드에 추가 → race/이탈로 유실)
+        const beforePhoto = images.length > 0
+          ? await downscaleImageClient(images[0].base64, 400, 0.75, images[0].mediaType)
+          : null;
         const record = {
           ...data,
           timestamp: new Date().toISOString(),
           id: newId,
+          ...(beforePhoto ? { beforePhoto } : {}),
           round: diagnosisRound,
           kbVersion: data.kbVersion,
           promptVersion: data.promptVersion,
@@ -1021,24 +1029,8 @@ function DiagnoseContent() {
           trimmed.forEach((r: Record<string, unknown>) => { delete r.beforePhoto; delete r.afterPhoto; });
           safeLocalStorageSet('diagnoseHistory', JSON.stringify(trimmed));
         }
-        // 서버 동기화 (로그인 시) — localStorage는 폴백으로 유지
+        // 서버 동기화 (로그인 시) — record.beforePhoto 포함되어 before_photo가 원자적으로 저장됨. localStorage는 폴백.
         if (user) { void saveDiagnosisRecord(record as unknown as HistoryRecord, user.id); }
-        // 비동기: 첫 번째 불량 사진을 축소해 beforePhoto로 추가 저장
-        if (images.length > 0) {
-          downscaleImageClient(images[0].base64, 400).then(thumb => {
-            if (!thumb) return;  // 디코드 실패 시 썸네일 스킵(입력이 이미 jpeg라 실사례는 없음, 타입 가드)
-            try {
-              const r2 = localStorage.getItem('diagnoseHistory');
-              const h2 = JSON.parse(r2 || '[]');
-              const idx = h2.findIndex((h: { id: string }) => h.id === newId);
-              if (idx !== -1) {
-                h2[idx].beforePhoto = thumb;
-                safeLocalStorageSet('diagnoseHistory', JSON.stringify(h2));
-              }
-            } catch { /* ignore */ }
-            if (user) { void patchRecordFields(newId, user.id, { beforePhoto: thumb }); }
-          });
-        }
       } catch { /* ignore */ }
 
       setTimeout(() => resultRef.current?.scrollIntoView({ behavior: 'smooth' }), 100);
