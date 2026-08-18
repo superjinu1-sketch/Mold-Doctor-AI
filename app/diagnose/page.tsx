@@ -298,6 +298,10 @@ function DiagnoseContent() {
   const resultRef = useRef<HTMLDivElement>(null);
   const followUpFormRef = useRef<HTMLDivElement>(null);
   const errorRef = useRef<HTMLDivElement>(null);
+  // #54: 이력 복원 뷰에서는 draft 자동저장을 중단한다. 복원으로 세팅된 폼 값이
+  // FORM_SS_KEY에 재저장되어 이후 "새 추정" 진입 시 유령 로드되는 역류 오염 방지.
+  // 리마운트 시 자연 초기화. (트레이드오프: 복원 뷰에서의 수기 수정은 draft 미보호 — 허용)
+  const isRestoreViewRef = useRef(false);
   const progressCardRef = useRef<HTMLDivElement>(null);
   const customDefectInputRef = useRef<HTMLInputElement>(null);
 
@@ -456,6 +460,7 @@ function DiagnoseContent() {
         sessionStorage.removeItem('molddoctor_restore');
         const record = JSON.parse(restore);
         isRecordRestore = true;
+        isRestoreViewRef.current = true;
         setResult(record);
         setSessionId(record.session_id ?? null);
         const bi = record.beforeInput;
@@ -562,6 +567,7 @@ function DiagnoseContent() {
 
   // 폼 상태를 sessionStorage에 디바운스 저장 (내용이 있을 때만) — 소실 방어선
   useEffect(() => {
+    if (isRestoreViewRef.current) return;  // #54: 복원 뷰는 draft 저장 금지(역류 오염 방지)
     const hasContent = !!(defectType || customDefect || defectDescription || resinType);
     if (!hasContent) return;
     const handle = setTimeout(() => {
