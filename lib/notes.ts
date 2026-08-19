@@ -1,6 +1,6 @@
 // 영문 콘텐츠 축 B(/en/notes) 글 데이터 단일 소스. 본문은 진우 확정본 — 문구를 다듬지 않는다.
 // /en/about과 동일 원칙: 문법 교정·표현 개선·문장 병합 전부 금지.
-export type NoteDiagramId = 'cross-section' | 'flow' | 'weld-flow' | 'weld-section' | 'clamp-calc' | 'clamp-flow' | 'fr-paths' | 'fr-ppa-grades' | 'fr-barrel' | 'fr-levers' | 'fiber-float-fountain' | 'fiber-float-resins' | 'fiber-float-section' | 'nmt-pores' | 'nmt-families' | 'nmt-frame' | 'nmt-app-map' | 'nmt-cte' | 'nmt-resin-map' | 'nmt-freeze-race' | 'nmt-defect-tree' | 'flake-tilt' | 'metallic-split';
+export type NoteDiagramId = 'cross-section' | 'flow' | 'weld-flow' | 'weld-section' | 'clamp-calc' | 'clamp-flow' | 'fr-paths' | 'fr-ppa-grades' | 'fr-barrel' | 'fr-levers' | 'fiber-float-fountain' | 'fiber-float-resins' | 'fiber-float-section' | 'nmt-pores' | 'nmt-families' | 'nmt-frame' | 'nmt-app-map' | 'nmt-cte' | 'nmt-resin-map' | 'nmt-freeze-race' | 'nmt-defect-tree' | 'flake-tilt' | 'metallic-split' | 'shortshot-split';
 
 export type NoteBlock =
   | { type: 'p'; text: string }
@@ -10,7 +10,7 @@ export type NoteBlock =
 // lib/notesDiagramSvg.ts(node:fs 사용, 서버 전용)가 이 타입을 가져다 쓴다 — 반대 방향(이 파일이
 // notesDiagramSvg.ts에서 import)이면 lib/notes.ts를 가져다 쓰는 클라이언트 컴포넌트(app/page.tsx)가
 // 번들러 설정에 따라 fs를 함께 끌고 들어올 위험이 있어 여기서 정의한다(notes-list-thumbnail-v1).
-export type NoteThumbId = 'splay-branch' | 'weld-strength' | 'clamp-window' | 'fr-corrosion' | 'fiber-float' | 'nmt-bond' | 'nmt-frame' | 'nmt-resin' | 'nmt-troubleshoot' | 'metallic-streak';
+export type NoteThumbId = 'splay-branch' | 'weld-strength' | 'clamp-window' | 'fr-corrosion' | 'fiber-float' | 'nmt-bond' | 'nmt-frame' | 'nmt-resin' | 'nmt-troubleshoot' | 'metallic-streak' | 'shortshot';
 
 export interface Note {
   slug: string;
@@ -31,6 +31,7 @@ export const NOTES: Note[] = [
     title: "If a short shot hides the mark, it isn't the flow front",
     description: 'A faint mark by the gate on a clear PP part reads like a flow line, except a short shot makes it vanish and any hold brings it back. It grew in after a day of running and jumped to the next cavity when the core was swapped, and those three facts move the whole search off the cavity and onto the gate.',
     publishedAt: '2026-08-19',
+    thumb: 'shortshot',
     body: [
       p("A mark shows up near the gate on a small clear part and it reads, at a glance, like a flow line: a faint set of rings, a short streak running back toward the gate. So the crew treats it like one. Speed up, slow down, warm the mold, chase the front. On a translucent PP part with the mark sitting right at the gate, that is the natural first move, and on plenty of parts it is the right one."),
       p("Here is the part that should stop you. Pull the shot short, dropping the speed or the transfer position until the part is not filling out, and the mark is gone. Fill it out, or put any hold on it, and the mark is back, every time. That single observation is worth more than the photo, and it points the opposite way from where most people start looking."),
@@ -42,6 +43,7 @@ export const NOTES: Note[] = [
       p("The mark was clean for the first day of a continuous run, then started, then stayed for a week. Read that timeline carefully. A defect born from geometry or a fixed setting is there on the first shot; the tool does not know it is Tuesday. A defect that grows in over hours of running is thermal, or it is contamination. Heat soaks into the tool over a long run, and on a hot-runner tool it soaks into the manifold and the tips, so the gate steel and the melt right behind it are hotter at hour eight than at hour one. Deposit is the other slow-onset story: PP gives off a little volatile over a run, and it plates out where the gas concentrates, which is often the gate land. Either way, slow onset means look at what changes over the run, not at what was set at the start."),
       p("Then the tell that settles it. They replaced the core in the bad cavity, and the mark showed up in the cavity next door. Sit with that. If the mark were the core's fault, a scratch, a polish line running the wrong way, a tired surface, then a fresh core fixes that cavity and you are done. Instead it hopped to the neighbor. That points straight away from the individual cavity's steel and toward something the neighboring cavities share: the manifold arm and its heat, the melt they are fed, the venting along that stretch of the tool. In a twelve-cavity hot-runner tool, adjacent cavities are thermal neighbors. The defect is telling you it lives upstream of any one core."),
       p("Put the three together, near the gate, needs pressure to appear, grows in with heat over a run, indifferent to which core is in the pocket, and the center of gravity is the gate's thermal and shear condition, driven by the hot runner. Not the cavity polish. Not the core. And not the base settings alone."),
+      diagram('shortshot-split'),
       h2('Why the photo cannot close it and the behavior can'),
       p("The image is honestly ambiguous, and it is worth saying so. There are faint concentric rings, which could read as a record-groove flow mark. There is a raised spot at the gate, which could be a blister or could be nothing but the gate vestige. A still photo of a translucent part under shop light will support two or three stories at once. What it cannot do is tell you when the mark was born. The short-shot behavior does that, the onset timeline and the cavity swap do the rest, and on this kind of defect the behavior outranks the picture. A crew that can describe the behavior is further along than one with a sharper photo."),
       h2('What to try, in order'),

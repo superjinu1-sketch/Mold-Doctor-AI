@@ -1,0 +1,32 @@
+<svg viewBox="0 0 180 136" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="tss-t tss-d">
+  <title id="tss-t">The short-shot test splits a near-gate mark</title>
+  <desc id="tss-d">Run a short shot. If the mark still shows, it is a fill-phase defect written by the moving front. If it is gone and returns only under fill or hold, it is a pack-phase defect at the gate. The behavior splits it, not the photo.</desc>
+
+  <text x="90" y="16" font-size="10.5" font-weight="700" text-anchor="middle" fill="var(--ink)">The short-shot test</text>
+
+  <!-- left: fill-phase -->
+  <rect x="12" y="24" width="76" height="62" rx="5" fill="var(--brand)" opacity=".09"/>
+  <rect x="12" y="24" width="76" height="62" rx="5" fill="none" stroke="var(--brand)" stroke-width="1"/>
+  <text x="50" y="39" font-size="8.5" font-weight="700" text-anchor="middle" fill="var(--brand)">Fill-phase</text>
+  <g stroke="var(--brand)" stroke-width="2" stroke-linecap="round">
+    <line x1="24" y1="52" x2="44" y2="53"/><line x1="48" y1="53" x2="70" y2="52"/>
+    <line x1="26" y1="61" x2="46" y2="62"/><line x1="50" y1="62" x2="72" y2="61"/>
+  </g>
+  <text x="50" y="79" font-size="7" text-anchor="middle" fill="var(--muted)">still on a short shot</text>
+
+  <!-- right: pack-phase -->
+  <rect x="92" y="24" width="76" height="62" rx="5" fill="var(--danger)" opacity=".09"/>
+  <rect x="92" y="24" width="76" height="62" rx="5" fill="none" stroke="var(--danger)" stroke-width="1"/>
+  <text x="130" y="39" font-size="8.5" font-weight="700" text-anchor="middle" fill="var(--danger)">Pack-phase</text>
+  <circle cx="130" cy="58" r="5" fill="var(--danger)" opacity=".85"/>
+  <g stroke="var(--danger)" stroke-width="2" stroke-linecap="round">
+    <line x1="130" y1="47" x2="130" y2="44"/><line x1="141" y1="58" x2="144" y2="58"/>
+    <line x1="119" y1="58" x2="116" y2="58"/><line x1="138" y1="66" x2="140" y2="68"/>
+    <line x1="122" y1="66" x2="120" y2="68"/>
+  </g>
+  <text x="130" y="79" font-size="7" text-anchor="middle" fill="var(--muted)">only on fill · hold</text>
+
+  <!-- takeaway -->
+  <rect x="14" y="110" width="152" height="20" rx="5" fill="var(--ok)" opacity=".10"/>
+  <text x="90" y="124" font-size="8.5" font-weight="700" text-anchor="middle" fill="var(--ok)">behavior splits it, not the photo</text>
+</svg>

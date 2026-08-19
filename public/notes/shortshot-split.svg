@@ -1,0 +1,57 @@
+<svg viewBox="0 0 720 336" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="sst-t sst-d">
+  <title id="sst-t">The short-shot test splits a near-gate mark into a fill-phase defect and a pack-phase defect</title>
+  <desc id="sst-d">Start with a mark near the gate and run a deliberate short shot. If the mark still shows on the short shot, it is a fill-phase defect written by the moving front (jetting, record groove, flow mark) and the work is on the speed profile and the gate entry. If the mark is gone on the short shot and returns only under full fill or hold, it is a pack-phase defect written at the gate under pressure (gate blush and its thermal cousins) and the work is on the hot-runner tip and mold temperature and easing the hold. Two more clues point the same way: onset over a run means thermal or deposit, and a mark that jumps to the next cavity after a core swap points at the hot runner, not the core.</desc>
+
+  <!-- top -->
+  <rect x="272" y="10" width="176" height="32" rx="6" fill="var(--faint)" opacity=".12"/>
+  <text x="360" y="31" font-size="12.5" font-weight="600" text-anchor="middle" fill="var(--ink)">A near-gate mark</text>
+  <line x1="360" y1="42" x2="360" y2="60" stroke="var(--faint)" stroke-width="1.5"/>
+  <path d="M360 62 L356 54 L364 54 Z" fill="var(--faint)"/>
+
+  <!-- decision -->
+  <rect x="238" y="62" width="244" height="34" rx="6" fill="none" stroke="var(--faint)" stroke-width="1.5"/>
+  <text x="360" y="84" font-size="12.5" font-weight="600" text-anchor="middle" fill="var(--ink)">Run a short shot (don't fill out)</text>
+
+  <!-- branches -->
+  <line x1="238" y1="79" x2="175" y2="79" stroke="var(--faint)" stroke-width="1.5"/>
+  <line x1="175" y1="79" x2="175" y2="114" stroke="var(--faint)" stroke-width="1.5"/>
+  <path d="M175 116 L171 108 L179 108 Z" fill="var(--faint)"/>
+  <text x="206" y="74" font-size="10.5" font-weight="600" text-anchor="middle" fill="var(--faint)">still shows</text>
+
+  <line x1="482" y1="79" x2="545" y2="79" stroke="var(--faint)" stroke-width="1.5"/>
+  <line x1="545" y1="79" x2="545" y2="114" stroke="var(--faint)" stroke-width="1.5"/>
+  <path d="M545 116 L541 108 L549 108 Z" fill="var(--faint)"/>
+  <text x="514" y="74" font-size="10.5" font-weight="600" text-anchor="middle" fill="var(--faint)">gone — back under pack</text>
+
+  <!-- left column: fill-phase -->
+  <rect x="20" y="116" width="310" height="72" rx="6" fill="var(--brand)" opacity=".06"/>
+  <rect x="20" y="116" width="4" height="72" fill="var(--brand)"/>
+  <rect x="20" y="116" width="310" height="72" rx="6" fill="none" stroke="var(--brand)" stroke-width="1.2" opacity=".38"/>
+  <text x="36" y="137" font-size="13" font-weight="700" fill="var(--brand)">Fill-phase</text>
+  <text x="118" y="137" font-size="11" fill="var(--muted)">written by the moving front</text>
+  <text x="36" y="158" font-size="11" fill="var(--muted)">a short shot shows it plainly, often better</text>
+  <text x="36" y="177" font-size="11" font-weight="600" fill="var(--faint)">jetting · record groove · flow mark</text>
+  <line x1="175" y1="188" x2="175" y2="198" stroke="var(--faint)" stroke-width="1.2"/>
+  <path d="M175 200 L171 192 L179 192 Z" fill="var(--faint)"/>
+  <rect x="20" y="200" width="310" height="34" rx="6" fill="var(--ok)" opacity=".10"/>
+  <text x="36" y="221" font-size="11.5" font-weight="600" fill="var(--ok)">→ work the speed profile, gate entry, the front</text>
+
+  <!-- right column: pack-phase -->
+  <rect x="390" y="116" width="310" height="72" rx="6" fill="var(--danger)" opacity=".06"/>
+  <rect x="390" y="116" width="4" height="72" fill="var(--danger)"/>
+  <rect x="390" y="116" width="310" height="72" rx="6" fill="none" stroke="var(--danger)" stroke-width="1.2" opacity=".38"/>
+  <text x="406" y="137" font-size="13" font-weight="700" fill="var(--danger)">Pack-phase</text>
+  <text x="496" y="137" font-size="11" fill="var(--muted)">at the gate under pressure</text>
+  <text x="406" y="158" font-size="11" fill="var(--muted)">absent short, appears only on fill / hold</text>
+  <text x="406" y="177" font-size="11" font-weight="600" fill="var(--faint)">gate blush &amp; its thermal cousins</text>
+  <line x1="545" y1="188" x2="545" y2="198" stroke="var(--faint)" stroke-width="1.2"/>
+  <path d="M545 200 L541 192 L549 192 Z" fill="var(--faint)"/>
+  <rect x="390" y="200" width="310" height="34" rx="6" fill="var(--ok)" opacity=".10"/>
+  <text x="406" y="221" font-size="11" font-weight="600" fill="var(--ok)">→ measure tip + mold temp, then tip down, ease the hold</text>
+
+  <!-- bottom strip -->
+  <rect x="20" y="252" width="680" height="70" rx="6" fill="var(--faint)" opacity=".08"/>
+  <text x="36" y="274" font-size="12" font-weight="700" fill="var(--muted)">Two more clues — same direction</text>
+  <text x="36" y="296" font-size="11" fill="var(--faint)">· onset over a run  →  thermal or deposit (tip heat-soak, plate-out at the gate)</text>
+  <text x="36" y="314" font-size="11" fill="var(--faint)">· jumps to the next cavity after a core swap  →  the hot runner, not the core</text>
+</svg>
