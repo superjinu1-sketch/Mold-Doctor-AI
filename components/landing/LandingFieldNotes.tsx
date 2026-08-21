@@ -4,6 +4,8 @@
 // 상위 3건만 렌더. 링크는 /en/notes·가이드 인덱스로 크롤러 내부링크 확보(internal-links-to-notes 요건 유지).
 // 레퍼런스의 카드별 "kicker"(Splay/Gate blush 등 짧은 분류 라벨)는 목업 placeholder 전용 필드라 실제
 // Note 데이터엔 대응 값이 없다 — 제목·설명·날짜만 렌더(실데이터 우선, 없는 필드를 지어내지 않음).
+// 썸네일(v2 후속수정 1) — 기존 홈(HomeClient.tsx)과 동일하게 thumbSvg를 dangerouslySetInnerHTML로
+// 주입. 카드 본문(제목·설명·날짜)은 진우 확정대로 영어 유지 — 번역하지 않는다.
 import Link from 'next/link';
 import { useLocale } from '@/contexts/LocaleContext';
 import type { HomeNoteCard } from '@/lib/notes';
@@ -28,10 +30,19 @@ export default function LandingFieldNotes({ notes }: { notes: HomeNoteCard[] }) 
 
         <div className="grid md:grid-cols-3 gap-[22px] text-left mt-12 max-md:mt-8">
           {top3.map(n => (
-            <Link key={n.slug} href={`/en/notes/${n.slug}`} className="bg-surface border border-border rounded-[18px] p-6 hover:border-[var(--brand-border)] transition-colors">
-              <h3 className="text-[17px] font-semibold leading-snug text-ink mb-1.5">{n.title}</h3>
-              <p className="text-[14px] text-muted leading-snug mb-2.5 line-clamp-3">{n.description}</p>
-              <div className="text-[12px] text-faint">{formatDate(n.publishedAt)}</div>
+            <Link key={n.slug} href={`/en/notes/${n.slug}`} className="block bg-surface border border-border rounded-[18px] overflow-hidden hover:border-[var(--brand-border)] transition-colors">
+              {n.thumbSvg && (
+                <div
+                  aria-hidden="true"
+                  className="border-b border-border [&>svg]:block [&>svg]:w-full [&>svg]:h-auto"
+                  dangerouslySetInnerHTML={{ __html: n.thumbSvg }}
+                />
+              )}
+              <div className="p-6">
+                <h3 className="text-[17px] font-semibold leading-snug text-ink mb-1.5">{n.title}</h3>
+                <p className="text-[14px] text-muted leading-snug mb-2.5 line-clamp-3">{n.description}</p>
+                <div className="text-[12px] text-faint">{formatDate(n.publishedAt)}</div>
+              </div>
             </Link>
           ))}
         </div>
