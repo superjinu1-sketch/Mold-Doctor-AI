@@ -1,17 +1,31 @@
 'use client';
 
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { ko } from '@/messages/ko';
 import { en } from '@/messages/en';
 import { useLocale } from '@/contexts/LocaleContext';
+import { useAuth } from '@/contexts/AuthContext';
+import { isNativeApp } from '@/lib/platform';
 import StoreBadges from '@/components/StoreBadges';
+import LandingFooter from '@/components/landing/LandingFooter';
 
 // 영문 라우트(/en/*)에서는 페이지 내용이 영문이므로 푸터도 영문이어야 함(실측 확인된 한국어 잔존 수정).
 // 기존 locale 토글 상태와 무관하게 URL 경로가 표시 언어를 결정 — 크롤러가 보는 SSR HTML도 항상 정확.
 export default function Footer() {
   const pathname = usePathname();
   const { locale } = useLocale();
+  const { user } = useAuth();
+  // 웹 로그아웃 랜딩(homepage-revamp-web-v1)에서만 다단 푸터로 교체 — 다른 모든 페이지는 아래
+  // 기존 컴팩트 푸터 그대로(전역 교체는 blast radius가 커서 CC 판단으로 랜딩 한정, mandate §대상파일).
+  const [native, setNative] = useState(false);
+  useEffect(() => { setNative(isNativeApp()); }, []);
+  // loading을 조건에 넣지 않는다 — HomeClient.tsx·Navbar.tsx의 랜딩 분기와 동일 공식으로 맞춰
+  // auth 확인 중 구간에 컴포넌트별로 다른 화면이 뒤섞여 렌더되는 걸 피한다.
+  if (pathname === '/' && !user && !native) {
+    return <LandingFooter />;
+  }
   // 언어 판정 = 경로 OR 토글.
   // 경로(/en/*)는 SSR HTML을 크롤러에게 항상 영문으로 보여주기 위해 유지하고,
   // 토글은 앱 내부 화면(/tools, /tryout 등 en 변형이 없는 경로)에서 en 사용자를 커버한다.

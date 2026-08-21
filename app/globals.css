@@ -26,6 +26,18 @@
   --apple-btn: #000000;
   --apple-btn-pressed: #1A1A1A;
 
+  /* 웹 로그아웃 랜딩 전용 다크 타일(homepage-revamp-web-v1) — 규율4(라이트 단일·다크카드 금지)
+     예외는 이 랜딩 한정. 다른 화면에서 재사용 금지. 액센트는 --brand 단일 원칙 유지, 이 토큰은
+     다크 배경 위에서만 쓰는 밝힌 변형(대비 확보용)이지 별도 액센트가 아니다. */
+  --tile-dark:       #272729;
+  --tile-dark-2:     #2A2A2C;
+  --on-dark:         #F5F5F7;
+  --on-dark-muted:   #A1A1A6;
+  --accent-on-dark:  #4A9BE8;
+  /* 제품 카드 전용 그림자(디자인 규격 "그림자는 제품 카드에만 하나") — raw hex 아닌 rgba라 토큰 예외 대상 아니지만
+     "하나만" 원칙을 코드로 강제하기 위해 변수로 고정. */
+  --shadow-product: 0 6px 34px rgba(0, 0, 0, .16);
+
   /* Semantic severity */
   --ok:          #047857;
   --ok-bg:       #E1F5EE;
@@ -49,6 +61,10 @@
 
   --leading-tight: 1.2;
   --leading-body:  1.7;
+
+  /* 웹 로그아웃 랜딩 전용 폰트(homepage-revamp-web-v1) — 사이트 전역은 Pretendard가 우선 로드되므로
+     이 스택을 명시 지정해야 시스템 SF Pro로 렌더된다(애플 홈페이지 언어 재현). 전역 --font-sans는 무변경. */
+  --font-landing: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", system-ui, "Segoe UI", Roboto, sans-serif;
 
   /* ── Spacing scale ──────────────────────────────────────────────────── */
   --space-xs:  0.25rem;   /*  4px */

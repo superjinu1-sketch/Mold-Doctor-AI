@@ -1,10 +1,11 @@
 'use client';
 
 import Link from 'next/link';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { usePathname } from 'next/navigation';
 import { useLocale } from '@/contexts/LocaleContext';
 import { useAuth } from '@/contexts/AuthContext';
+import { isNativeApp } from '@/lib/platform';
 import { en as enMessages } from '@/messages/en';
 import AuthModal from './AuthModal';
 import Logo from './Logo';
@@ -44,6 +45,15 @@ export default function Navbar() {
   const { locale, setLocale, t } = useLocale();
   const { user, loading, signOut, credits } = useAuth();
   const pathname = usePathname();
+  // 웹 로그아웃 랜딩 전용 네비 variant(homepage-revamp-web-v1) — 전역 교체가 아니라 이 조건(홈·웹·
+  // 로그아웃)에서만 데스크톱 행을 프로스티드+앵커링크로 바꾼다. 모바일은 기존 햄버거 패턴 그대로
+  // 재사용(mandate 명시) — 아래 모바일 블록은 무변경.
+  const [native, setNative] = useState(false);
+  useEffect(() => { setNative(isNativeApp()); }, []);
+  // loading 상태를 조건에 넣지 않는다 — HomeClient.tsx의 랜딩 분기(!user && !native)와 동일 공식으로
+  // 맞춰야 로그인 세션 확인 중(auth loading) 구간에서 "새 히어로 + 기존 네비"처럼 뒤섞여 렌더되는
+  // 순간을 피한다. user가 나중에 확정되면 두 컴포넌트가 함께 기존 화면으로 전환된다.
+  const isLandingHero = pathname === '/' && !user && !native;
   // 영문 라우트(/en/*)는 locale 토글 상태와 무관하게 항상 영문 내비 라벨 — 실측 확인된 한국어 잔존 수정.
   // /ja/*(ja-notes-axis-v1)는 ja 전용 셸이 아직 없어 영문 셸로 폴백 — 한국어 SSR 잔존 방지가 목적이며
   // 3-way 로케일 토글 신설이 아니다(messages/*·LocaleContext 무변경).
@@ -57,7 +67,11 @@ export default function Navbar() {
 
   return (
     <>
-      <nav className="fixed top-0 w-full z-50 border-b border-border bg-canvas pt-[env(safe-area-inset-top,var(--safe-area-inset-top,0px))]">
+      <nav className={`fixed top-0 w-full z-50 pt-[env(safe-area-inset-top,var(--safe-area-inset-top,0px))] ${
+        isLandingHero
+          ? 'border-b border-black/[.06] bg-[color:var(--surface)]/[.82] backdrop-blur-xl backdrop-saturate-[1.8]'
+          : 'border-b border-border bg-canvas'
+      }`}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <div className="flex items-center justify-between h-14">
             {/* Logo */}
@@ -65,14 +79,55 @@ export default function Navbar() {
               <Logo size={28} wordClassName="text-sm" />
             </Link>
 
-            {/* Desktop Nav */}
-            <div className="hidden md:flex items-center gap-7 text-sm text-faint">
-              <Link href="/diagnose" className="hover:text-ink transition-colors">{nt('nav.estimate')}</Link>
-              <Link href="/tools" className="hover:text-ink transition-colors">{nt('nav.tools')}</Link>
-              <Link href="/pricing" className="hover:text-ink transition-colors">{nt('nav.pricing')}</Link>
-            </div>
+            {/* Desktop Nav — 랜딩 히어로(웹+로그아웃+홈)에서만 앵커링크 variant, 나머지는 기존 그대로 */}
+            {isLandingHero ? (
+              <div className="hidden md:flex items-center gap-6 text-sm text-muted" style={{ fontFamily: 'var(--font-landing)' }}>
+                <Link href="/diagnose" className="hover:text-ink transition-colors">{t('landing.web_nav_analyze')}</Link>
+                <a href="#how" className="hover:text-ink transition-colors">{t('landing.web_nav_how')}</a>
+                <a href="#tools" className="hover:text-ink transition-colors">{t('landing.web_nav_tools')}</a>
+                <a href="#notes" className="hover:text-ink transition-colors">{t('landing.web_nav_notes')}</a>
+                <Link href="/pricing" className="hover:text-ink transition-colors">{t('landing.web_nav_credits')}</Link>
+              </div>
+            ) : (
+              <div className="hidden md:flex items-center gap-7 text-sm text-faint">
+                <Link href="/diagnose" className="hover:text-ink transition-colors">{nt('nav.estimate')}</Link>
+                <Link href="/tools" className="hover:text-ink transition-colors">{nt('nav.tools')}</Link>
+                <Link href="/pricing" className="hover:text-ink transition-colors">{nt('nav.pricing')}</Link>
+              </div>
+            )}
 
             {/* Desktop right */}
+            {isLandingHero && (
+              <div className="hidden md:flex items-center gap-4" style={{ fontFamily: 'var(--font-landing)' }}>
+                <button
+                  type="button"
+                  onClick={toggleLocale}
+                  className="min-w-[44px] min-h-[44px] flex items-center justify-center gap-1 text-xs font-bold text-muted hover:text-ink bg-surface border border-border-strong hover:border-brand rounded-lg px-2.5 transition-colors"
+                  aria-label="Switch language"
+                >
+                  <svg className="w-4 h-4 shrink-0" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24" aria-hidden="true">
+                    <circle cx="12" cy="12" r="9" />
+                    <line x1="3" y1="12" x2="21" y2="12" />
+                    <ellipse cx="12" cy="12" rx="4" ry="9" />
+                  </svg>
+                  {t('nav.locale_toggle')}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setAuthModalOpen(true)}
+                  className="text-sm text-muted hover:text-ink transition-colors"
+                >
+                  {t('landing.web_nav_login')}
+                </button>
+                <Link
+                  href="/diagnose"
+                  className="inline-flex items-center justify-center text-sm font-normal rounded-full py-1.5 px-4 bg-brand text-on-brand hover:bg-brand-ink transition-colors active:scale-[.96]"
+                >
+                  {t('landing.web_nav_start')}
+                </Link>
+              </div>
+            )}
+            {!isLandingHero && (
             <div className="hidden md:flex items-center gap-2">
               {/* KO/EN toggle */}
               <button
@@ -164,6 +219,7 @@ export default function Navbar() {
                 </div>
               )}
             </div>
+            )}
 
             {/* Mobile right side */}
             <div className="md:hidden flex items-center gap-1.5">

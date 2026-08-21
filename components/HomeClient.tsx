@@ -1,11 +1,18 @@
 'use client';
 
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { useLocale } from '@/contexts/LocaleContext';
 import { useAuth } from '@/contexts/AuthContext';
+import { isNativeApp } from '@/lib/platform';
 import { IconClipboard, IconCheckSquare, IconFlask } from '@/components/icons';
 import StoreBadges from '@/components/StoreBadges';
+import LandingHero from '@/components/landing/LandingHero';
+import LandingOutputTile from '@/components/landing/LandingOutputTile';
+import LandingHowItWorks from '@/components/landing/LandingHowItWorks';
+import LandingFreeTools from '@/components/landing/LandingFreeTools';
+import LandingFieldNotes from '@/components/landing/LandingFieldNotes';
+import LandingCoverage from '@/components/landing/LandingCoverage';
 import type { HomeNoteCard } from '@/lib/notes';
 
 function formatDate(iso: string): string {
@@ -29,6 +36,11 @@ const PAGE_SIZE = 4;
 export default function HomeClient({ notes }: { notes: HomeNoteCard[] }) {
   const { t, locale } = useLocale();
   const { user } = useAuth();
+  // 웹 로그아웃 랜딩 분기(homepage-revamp-web-v1) — StoreBadges 네이티브 게이팅과 동일 패턴
+  // (정적 export 프리렌더 시점엔 네이티브 브릿지가 없어 native=false로 시작, 마운트 후 재평가).
+  // 앱 로그아웃 홈·로그인 홈은 현행 그대로(진우 확정 2) — 아래 두 분기는 무변경.
+  const [native, setNative] = useState(false);
+  useEffect(() => { setNative(isNativeApp()); }, []);
   const [page, setPage] = useState(1); // 1-indexed
   const notesSectionRef = useRef<HTMLDivElement>(null);
   const totalPages = Math.max(1, Math.ceil(notes.length / PAGE_SIZE));
@@ -50,6 +62,20 @@ export default function HomeClient({ notes }: { notes: HomeNoteCard[] }) {
     { t: t('landing.step2_t'), d: t('landing.step2_d') },
     { t: t('landing.step3_t'), d: t('landing.step3_d') },
   ];
+
+  // 웹 + 로그아웃만 새 애플식 랜딩. 로그인(웹/앱 공통)·앱 로그아웃은 아래 기존 JSX 그대로(진우 확정 2).
+  if (!user && !native) {
+    return (
+      <div className="bg-surface min-h-screen" style={{ fontFamily: 'var(--font-landing)' }}>
+        <LandingHero />
+        <LandingOutputTile />
+        <LandingHowItWorks />
+        <LandingFreeTools />
+        <LandingFieldNotes notes={notes} />
+        <LandingCoverage />
+      </div>
+    );
+  }
 
   return (
     <div className="bg-canvas min-h-screen">

@@ -12,7 +12,7 @@ import { IconDownload } from '@/components/icons';
 const PLAY_URL = 'https://play.google.com/store/apps/details?id=com.jinsimlabs.molddoctor';
 const APP_STORE_ID = '6793057343';
 
-export default function StoreBadges({ variant, locale: localeProp }: { variant: 'hero' | 'footer' | 'article'; locale?: 'ko' | 'en' }) {
+export default function StoreBadges({ variant, locale: localeProp }: { variant: 'hero' | 'footer' | 'article' | 'inline'; locale?: 'ko' | 'en' }) {
   const { locale: ctxLocale } = useLocale();
   const locale = localeProp ?? ctxLocale;
   // 네이티브 게이팅(§2, pricing-native-gate-v1 선례) — 정적 export 프리렌더 시점엔 네이티브
@@ -79,6 +79,19 @@ export default function StoreBadges({ variant, locale: localeProp }: { variant: 
         </div>
         <p className="text-[length:var(--text-label)] text-faint">{free}</p>
       </div>
+    );
+  }
+
+  if (variant === 'inline') {
+    const prefix = locale === 'en' ? 'Also on ' : '앱으로도: ';
+    const and = locale === 'en' ? ' and ' : ' · ';
+    return (
+      <p className="text-[14px] text-faint">
+        {prefix}
+        <a href={appStoreUrl} aria-label={appStoreLabel} className="text-brand hover:underline">App Store</a>
+        {and}
+        <a href={PLAY_URL} aria-label={playLabel} className="text-brand hover:underline">Google Play</a>
+      </p>
     );
   }
 
