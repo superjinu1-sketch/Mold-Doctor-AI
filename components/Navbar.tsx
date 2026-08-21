@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { useLocale } from '@/contexts/LocaleContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { isNativeApp } from '@/lib/platform';
@@ -60,7 +60,38 @@ export default function Navbar() {
   const isEnRoute = (pathname?.startsWith('/en') ?? false) || (pathname?.startsWith('/ja') ?? false);
   const nt = (key: string) => (isEnRoute ? (enMessages[key] ?? key) : t(key));
 
-  const toggleLocale = () => setLocale(locale === 'ko' ? 'en' : 'ko');
+  // 경로 인식 토글(locale-toggle-path-aware-web-v1) — /guide·/en/guide처럼 URL이 콘텐츠 언어의
+  // 정본인 라우트는 setLocale만으론 화면이 안 바뀐다(경로가 소스라 컨텍스트를 무시). 실제 /en/*
+  // 미러가 있는 루트만 이동시킨다 — 미러 없는 경로(홈·/diagnose 등)에서 이동하면 404가 난다.
+  // ⚠ mandate 원안 목록(guide·notes) 실측 결과 불일치 2건 정정:
+  //   - notes 제외: 한국어 /notes 라우트가 존재하지 않는다(app/en/notes만 있음, app/notes 없음).
+  //     포함 시 /en/notes에서 KO 토글 시 404.
+  //   - resins 추가: app/resins·app/en/resins 둘 다 실존(빌드 산출물 슬러그 수 152개로 동일 확인) —
+  //     mandate가 놓친 실제 미러라 "다른 루트에 미러가 더 있으면 추가" 지시에 따라 포함.
+  // ⚠ mandate 원안 코드는 en→ko 방향에서 LOCALIZED_ROOTS 체크 없이 '/en/' 접두사를 무조건 벗겨
+  //   /en/about·/en/notes처럼 미러가 없는 경로에서도 스트립 결과 경로(/about·/notes)로 이동해
+  //   404가 나는 비대칭 버그가 있었다 — 양방향 모두 LOCALIZED_ROOTS로 대칭 검증하도록 수정.
+  // /ja/*는 별도 축이라 이 루트들 중 어느 것과도 매칭 안 되므로 자연히 미러 없는 경로처럼 처리된다
+  // (아래 함수가 원본 pathname을 그대로 반환 → 이동 없이 setLocale만, 페이지는 경로 기반이라 무변화).
+  const LOCALIZED_ROOTS = ['/guide', '/resins'];
+  const localizedPath = (path: string, target: 'ko' | 'en'): string => {
+    const isLocalizedKoPath = (p: string) => LOCALIZED_ROOTS.some(r => p === r || p.startsWith(r + '/'));
+    if (target === 'en') {
+      if (path === '/en' || path.startsWith('/en/')) return path; // 이미 en
+      return isLocalizedKoPath(path) ? '/en' + path : path; // 미러 없으면 이동하지 않음
+    }
+    // target === 'ko'
+    if (!(path === '/en' || path.startsWith('/en/'))) return path; // 이미 ko이거나 미러 대상 아님(예: /ja/*)
+    const koPath = path === '/en' ? '/' : path.slice(3); // '/en/guide/x' → '/guide/x'
+    return isLocalizedKoPath(koPath) ? koPath : path; // 미러 없으면 이동하지 않음(404 방지)
+  };
+  const router = useRouter();
+  const toggleLocale = () => {
+    const target = locale === 'ko' ? 'en' : 'ko';
+    setLocale(target);
+    const next = localizedPath(pathname ?? '/', target);
+    if (next !== pathname) router.push(next);
+  };
   const email = user?.email ?? '';
   const shortEmail = email.length > 18 ? email.slice(0, 16) + '…' : email;
   const avatarUrl = user?.user_metadata?.avatar_url as string | undefined;
