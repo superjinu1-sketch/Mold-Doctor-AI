@@ -740,22 +740,11 @@ export const en: Record<string, string> = {
   'landing.web_cta_secondary': 'View defect guide',
   'landing.web_fineprint': '5 free estimates on signup · try in the browser, no install · reference estimate',
 
-  'landing.web_render_title': 'Estimate result',
-  'landing.web_render_id': '#MD-2481 · PA66-GF30',
-  'landing.web_render_defect': 'Short shot',
-  'landing.web_render_defect_loc': 'at the far corner.',
-  'landing.web_render_defect_tag': 'unfilled edge',
-  'landing.web_render_cause_label': 'Most likely cause',
-  'landing.web_render_cause': 'Insufficient fill: low injection pressure',
-  'landing.web_render_cause_pct': 'est. 72%',
-  'landing.web_render_th_setting': 'Setting',
-  'landing.web_render_th_current': 'Current',
-  'landing.web_render_th_recommended': 'Recommended',
+  // video-hero-web-v1: 히어로 정적 카드 삭제(영상으로 교체)로 render_* 중 delta 행 이름 3개만
+  // LandingOutputTile.tsx가 계속 쓴다 — 나머지(제목/id/결함/원인/표머리/각주)는 카드와 함께 정리.
   'landing.web_render_row1_name': 'Injection pressure',
   'landing.web_render_row2_name': 'Holding pressure',
   'landing.web_render_row3_name': 'Melt temperature',
-  'landing.web_render_row4_name': 'Injection speed',
-  'landing.web_render_footnote': 'Reference estimate. Verify on your machine before running production.',
 
   'landing.web_output_eyebrow': 'The output',
   'landing.web_output_h2': 'From a photo to a settings change.',

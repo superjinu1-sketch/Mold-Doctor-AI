@@ -37,6 +37,16 @@
   /* 제품 카드 전용 그림자(디자인 규격 "그림자는 제품 카드에만 하나") — raw hex 아닌 rgba라 토큰 예외 대상 아니지만
      "하나만" 원칙을 코드로 강제하기 위해 변수로 고정. */
   --shadow-product: 0 6px 34px rgba(0, 0, 0, .16);
+  /* 히어로 영상 스크림(video-hero-web-v1) — 파치먼트(=--canvas)에서 투명으로 가로 그라디언트,
+     왼쪽 카피 가독 확보. raw hex 없이 기존 --canvas + color-mix()로 구성(신규 색 토큰 아님). */
+  --hero-scrim: linear-gradient(
+    90deg,
+    var(--canvas) 0%,
+    var(--canvas) 29%,
+    color-mix(in srgb, var(--canvas) 78%, transparent) 42%,
+    color-mix(in srgb, var(--canvas) 30%, transparent) 54%,
+    transparent 64%
+  );
 
   /* Semantic severity */
   --ok:          #047857;

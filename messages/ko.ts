@@ -752,22 +752,11 @@ export const ko: Record<string, string> = {
   'landing.web_cta_secondary': '불량 가이드 보기',
   'landing.web_fineprint': '가입 시 5회 무료 · 설치 없이 웹에서 바로 · 참고용 추정',
 
-  'landing.web_render_title': '추정 결과',
-  'landing.web_render_id': '#MD-2481 · PA66-GF30',
-  'landing.web_render_defect': '끝단 미성형(short shot).',
-  'landing.web_render_defect_loc': '',
-  'landing.web_render_defect_tag': '미충전 엣지',
-  'landing.web_render_cause_label': '가장 가능성 높은 원인',
-  'landing.web_render_cause': '충전 부족: 사출압 낮음',
-  'landing.web_render_cause_pct': '추정 72%',
-  'landing.web_render_th_setting': '항목',
-  'landing.web_render_th_current': '현재',
-  'landing.web_render_th_recommended': '권장',
+  // video-hero-web-v1: 히어로 정적 카드 삭제(영상으로 교체)로 render_* 중 delta 행 이름 3개만
+  // LandingOutputTile.tsx가 계속 쓴다 — 나머지(제목/id/결함/원인/표머리/각주)는 카드와 함께 정리.
   'landing.web_render_row1_name': '사출압',
   'landing.web_render_row2_name': '보압',
   'landing.web_render_row3_name': '용융온도',
-  'landing.web_render_row4_name': '사출속도',
-  'landing.web_render_footnote': '참고용 추정입니다. 양산 전 현장에서 확인하세요.',
 
   'landing.web_output_eyebrow': '결과물',
   'landing.web_output_h2': '사진 한 장에서 셋팅 변경까지.',

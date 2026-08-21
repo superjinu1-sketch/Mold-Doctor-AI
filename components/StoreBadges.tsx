@@ -83,14 +83,18 @@ export default function StoreBadges({ variant, locale: localeProp }: { variant: 
   }
 
   if (variant === 'inline') {
-    const prefix = locale === 'en' ? 'Also on ' : '앱으로도: ';
-    const and = locale === 'en' ? ' and ' : ' · ';
+    // video-hero-web-v1: KO는 스토어명이 먼저 오고 "~에서도 받기 →" 접미(EN은 기존 "Also on ~" 접두 그대로).
+    // 어순이 반대라 단순 prefix/and 치환이 아니라 로케일별로 통째로 분기.
+    if (locale === 'en') {
+      return (
+        <p className="text-[14px] text-faint">
+          Also on <a href={appStoreUrl} aria-label={appStoreLabel} className="text-brand hover:underline">App Store</a> and <a href={PLAY_URL} aria-label={playLabel} className="text-brand hover:underline">Google Play</a>
+        </p>
+      );
+    }
     return (
       <p className="text-[14px] text-faint">
-        {prefix}
-        <a href={appStoreUrl} aria-label={appStoreLabel} className="text-brand hover:underline">App Store</a>
-        {and}
-        <a href={PLAY_URL} aria-label={playLabel} className="text-brand hover:underline">Google Play</a>
+        <a href={appStoreUrl} aria-label={appStoreLabel} className="text-brand hover:underline">App Store</a> · <a href={PLAY_URL} aria-label={playLabel} className="text-brand hover:underline">Google Play</a>에서도 받기 →
       </p>
     );
   }
