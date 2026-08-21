@@ -129,3 +129,54 @@ export function IconDownload({ className, size = 20 }: IconProps) {
     </svg>
   );
 }
+
+// 가이드 계열 아이콘(guide-redesign-web-v1) — 5계열 라인글리프, 단일 브랜드 액센트.
+// 충전·보압계 — 물방울(충전되는 수지)
+export function IconDrop({ className, size = 20 }: IconProps) {
+  return (
+    <svg {...base(size)} className={className}>
+      <path d="M12 3c3.5 4 6 7.4 6 10.5a6 6 0 0 1-12 0C6 10.4 8.5 7 12 3z" />
+    </svg>
+  );
+}
+
+// 표면·흐름 외관계 — 유동 물결선
+export function IconWave({ className, size = 20 }: IconProps) {
+  return (
+    <svg {...base(size)} className={className}>
+      <path d="M3 9c1.5-2 3.5-2 5 0s3.5 2 5 0 3.5-2 5 0 3.5 2 5 0" />
+      <path d="M3 15c1.5-2 3.5-2 5 0s3.5 2 5 0 3.5-2 5 0 3.5 2 5 0" />
+    </svg>
+  );
+}
+
+// 열·가스·오염계 — 온도계
+export function IconThermo({ className, size = 20 }: IconProps) {
+  return (
+    <svg {...base(size)} className={className}>
+      <path d="M12 14.5V5a2 2 0 0 0-4 0v9.5a4 4 0 1 0 4 0z" />
+      <line x1="10" y1="8" x2="12" y2="8" />
+    </svg>
+  );
+}
+
+// 강도·구조계 — 트러스 삼각형(구조 결합)
+export function IconTriangle({ className, size = 20 }: IconProps) {
+  return (
+    <svg {...base(size)} className={className}>
+      <path d="M12 4l8 15H4l8-15z" />
+      <line x1="12" y1="4" x2="12" y2="19" />
+    </svg>
+  );
+}
+
+// 금형·이형·치수계 — 코어·캐비티(금형 반쪽씩)
+export function IconMold({ className, size = 20 }: IconProps) {
+  return (
+    <svg {...base(size)} className={className}>
+      <path d="M3 6h7v12H3a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1z" />
+      <path d="M21 6h-7v12h7a1 1 0 0 0 1-1V7a1 1 0 0 0-1-1z" />
+      <line x1="12" y1="9" x2="12" y2="15" />
+    </svg>
+  );
+}
