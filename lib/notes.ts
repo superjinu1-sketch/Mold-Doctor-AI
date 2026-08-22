@@ -1,16 +1,17 @@
 // 영문 콘텐츠 축 B(/en/notes) 글 데이터 단일 소스. 본문은 진우 확정본 — 문구를 다듬지 않는다.
 // /en/about과 동일 원칙: 문법 교정·표현 개선·문장 병합 전부 금지.
-export type NoteDiagramId = 'cross-section' | 'flow' | 'weld-flow' | 'weld-section' | 'clamp-calc' | 'clamp-flow' | 'fr-paths' | 'fr-ppa-grades' | 'fr-barrel' | 'fr-levers' | 'fiber-float-fountain' | 'fiber-float-resins' | 'fiber-float-section' | 'nmt-pores' | 'nmt-families' | 'nmt-frame' | 'nmt-app-map' | 'nmt-cte' | 'nmt-resin-map' | 'nmt-freeze-race' | 'nmt-defect-tree' | 'flake-tilt' | 'metallic-split' | 'shortshot-split';
+export type NoteDiagramId = 'cross-section' | 'flow' | 'weld-flow' | 'weld-section' | 'clamp-calc' | 'clamp-flow' | 'fr-paths' | 'fr-ppa-grades' | 'fr-barrel' | 'fr-levers' | 'fiber-float-fountain' | 'fiber-float-resins' | 'fiber-float-section' | 'nmt-pores' | 'nmt-families' | 'nmt-frame' | 'nmt-app-map' | 'nmt-cte' | 'nmt-resin-map' | 'nmt-freeze-race' | 'nmt-defect-tree' | 'flake-tilt' | 'metallic-split' | 'shortshot-split' | 'gf-cross-section';
 
 export type NoteBlock =
   | { type: 'p'; text: string }
   | { type: 'h2'; text: string }
-  | { type: 'diagram'; id: NoteDiagramId };
+  | { type: 'diagram'; id: NoteDiagramId }
+  | { type: 'image'; src: string; alt: string; caption?: string };
 
 // lib/notesDiagramSvg.ts(node:fs 사용, 서버 전용)가 이 타입을 가져다 쓴다 — 반대 방향(이 파일이
 // notesDiagramSvg.ts에서 import)이면 lib/notes.ts를 가져다 쓰는 클라이언트 컴포넌트(app/page.tsx)가
 // 번들러 설정에 따라 fs를 함께 끌고 들어올 위험이 있어 여기서 정의한다(notes-list-thumbnail-v1).
-export type NoteThumbId = 'splay-branch' | 'weld-strength' | 'clamp-window' | 'fr-corrosion' | 'fiber-float' | 'nmt-bond' | 'nmt-frame' | 'nmt-resin' | 'nmt-troubleshoot' | 'metallic-streak' | 'shortshot';
+export type NoteThumbId = 'splay-branch' | 'weld-strength' | 'clamp-window' | 'fr-corrosion' | 'fiber-float' | 'nmt-bond' | 'nmt-frame' | 'nmt-resin' | 'nmt-troubleshoot' | 'metallic-streak' | 'shortshot' | 'gf-warpage';
 
 export interface Note {
   slug: string;
@@ -24,8 +25,31 @@ export interface Note {
 const p = (text: string): NoteBlock => ({ type: 'p', text });
 const h2 = (text: string): NoteBlock => ({ type: 'h2', text });
 const diagram = (id: NoteDiagramId): NoteBlock => ({ type: 'diagram', id });
+const image = (src: string, alt: string, caption?: string): NoteBlock => ({ type: 'image', src, alt, caption });
 
 export const NOTES: Note[] = [
+  {
+    slug: 'glass-filled-warpage-fiber-orientation',
+    title: "You balanced the cooling. The glass-filled part still warps.",
+    description: "A glass-filled part comes off bowed, so you balance the cooling and add pack, and nothing moves it. The warp isn't a heat story: the fibers lined up with the flow, so the part shrinks less along them and more across. The tell is that the warp follows the fill and not the cooling layout, which is also where the fix is.",
+    publishedAt: '2026-08-22',
+    thumb: 'gf-warpage',
+    body: [
+      p("A flat part comes off the tool bowed, so you do the standard thing. You even out the cooling between the two halves of the mold. You bring the mold temperatures into balance. You add a little pack to hold the geometry, and you look at whether a rib would stiffen the axis that's moving. This is the warpage playbook. Every guide teaches it in that order, and every troubleshooting AI hands it back to you in the same order. You run the shots, you check the part, and it comes back with the same bow it had before."),
+      image('/notes/gf-warpage-hero.jpg', "A warped glass-filled nylon housing cover resting on a surface plate, one side lifted off the granite.", "A glass-filled nylon cover lifting off a surface plate. Illustrative."),
+      p("And it works. On an unfilled part that warped because one side of the tool ran hotter than the other, cooling balance is the fix, and the rest of that list is the fix. That warp is a heat story: uneven cooling leaves uneven shrink, so evening out the heat evens out the part. As far as that goes, the playbook is right."),
+      p("So before you turn another knob, look at where this part is actually lifting. Set it on the surface plate and see which corners come off the granite. The lift doesn't line up with the hot side of the tool. It lines up with the way the plastic flowed in. Sight down the part from the gate and follow the fill: the warp runs with it, not with the cooling layout. That's the tell. When the warp axis follows the flow and the material is glass-filled, you're not looking at a cooling problem. You're looking at the glass."),
+      h2("What the glass is doing"),
+      p("As the melt fills, the fibers line up with the flow, most strongly in the skin where the shear is highest. A fiber doesn't draw in the way the plastic around it does; it holds its length. So along the flow, where the fibers point, the part barely shrinks. Across the flow, where nothing is holding it, the plastic shrinks the way it always wanted to. Now the part is shrinking by different amounts in two directions at once, and a flat panel can't do that and stay flat. It pulls itself into a bow, or into a twist. Which one you get depends on how the fibers lie across the part, but the driver is the same. The shape isn't coming from where you cooled it. It's coming from where the fibers ended up."),
+      diagram('gf-cross-section'),
+      h2("Why cooling can't reach it"),
+      p("That's why the cooling work didn't land. You were correcting a heat gradient, and there wasn't one driving this. The shrink difference is built into the fiber layout, and cooling symmetry doesn't reach it. Packing harder doesn't reach it either; it can pin the dimension you're watching while the imbalance sits underneath, still loaded. And this is where a nuisance turns into a field failure. If you fight the warp by running one side of the tool deliberately cold, or by clamping the part flat while it sets, you don't erase the imbalance. You lock it in as stress. The part measures flat on the bench, then walks in the heat of assembly, or splits later at the corner you forced down."),
+      h2("What actually moves it"),
+      p("The lever that actually moves this is the one that set the fiber direction in the first place: where the gate is, and the path the fill takes across the part. Move the gate, change the fill pattern, and you change how the fibers lay down and how those two shrink directions fall on the part. On a tool that's already cut, the honest move is sometimes to build the counter-shape into the steel so the part springs back to flat, instead of forcing it flat after the fact. None of these is a knob you turn between shots; they're changes to the tool or the fill, and that's the point. The cause was decided the moment the part filled, not while it cooled. What you don't do is keep turning cooling and pack harder because those are the knobs in front of you. On this defect, turning them harder is how you bury the stress instead of removing it."),
+      h2("What went into the app"),
+      p("Mold Doctor looks at the part and the flow before it reaches for a setting, so a fiber-orientation warp doesn't come back with a cooling answer. Keeping those two apart is the whole point."),
+    ],
+  },
   {
     slug: 'gate-mark-short-shot-test',
     title: "If a short shot hides the mark, it isn't the flow front",

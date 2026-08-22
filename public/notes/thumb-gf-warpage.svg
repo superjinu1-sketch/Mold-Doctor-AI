@@ -1,0 +1,24 @@
+<svg viewBox="0 0 180 136" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="tgw-t tgw-d">
+  <title id="tgw-t">Glass-filled warpage follows the flow</title>
+  <desc id="tgw-d">A glass-filled part bows off a flat reference line. The fibers align with the flow, so the warp follows the flow direction rather than the cooling layout.</desc>
+
+  <text x="14" y="21" font-size="12.5" font-weight="700" fill="var(--ink)">Glass-filled warpage</text>
+  <text x="14" y="36" font-size="9.5" fill="var(--faint)">follows the flow, not the cooling</text>
+
+  <!-- flat reference -->
+  <line x1="16" y1="94" x2="164" y2="94" stroke="var(--faint)" stroke-width="1.4" stroke-dasharray="4 3"/>
+  <text x="112" y="89" font-size="8" fill="var(--faint)">flat</text>
+
+  <!-- bowed part -->
+  <path d="M16 94 Q90 54 164 94" fill="none" stroke="var(--danger)" stroke-width="2.6" stroke-linecap="round"/>
+
+  <!-- fiber ticks near the crown -->
+  <g stroke="var(--ink)" stroke-width="2" stroke-linecap="round" opacity=".7">
+    <line x1="62" y1="65" x2="78" y2="62"/><line x1="86" y1="61" x2="102" y2="61"/><line x1="110" y1="62" x2="126" y2="65"/>
+  </g>
+
+  <!-- flow arrow -->
+  <line x1="34" y1="114" x2="140" y2="114" stroke="var(--brand-ink)" stroke-width="1.4"/>
+  <path d="M140 114 l-7 -3.5 v7 z" fill="var(--brand-ink)"/>
+  <text x="46" y="127" font-size="9" font-weight="700" fill="var(--brand-ink)">FLOW</text>
+</svg>

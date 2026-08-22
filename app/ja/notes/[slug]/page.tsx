@@ -45,6 +45,18 @@ function Diagram({ id }: { id: NoteDiagramId }) {
   );
 }
 
+// 래스터 히어로 사진(image 블록, note-gf-warpage-insert-web-v1) — en판 렌더러와 동일 규칙.
+// NOTES_JA엔 아직 image 블록을 쓰는 노트가 없지만, 두 렌더러를 동일 블록 타입 집합으로 맞춰둔다.
+function NoteImage({ src, alt, caption }: { src: string; alt: string; caption?: string }) {
+  return (
+    <figure className="w-full my-6">
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img src={src} alt={alt} loading="lazy" decoding="async" className="w-full h-auto rounded-[var(--radius-card)]" />
+      {caption && <figcaption className="text-[length:var(--text-label)] text-faint mt-2">{caption}</figcaption>}
+    </figure>
+  );
+}
+
 export default async function NoteDetailPageJa({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
   const note = getNoteJaBySlug(slug);
@@ -100,6 +112,9 @@ export default async function NoteDetailPageJa({ params }: { params: Promise<{ s
             }
             if (block.type === 'diagram') {
               return <Diagram key={i} id={block.id} />;
+            }
+            if (block.type === 'image') {
+              return <NoteImage key={i} src={block.src} alt={block.alt} caption={block.caption} />;
             }
             return (
               <p key={i} className="max-w-[65ch] text-body text-muted leading-relaxed mb-4">

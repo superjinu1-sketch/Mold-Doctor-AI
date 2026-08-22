@@ -49,6 +49,19 @@ function Diagram({ id }: { id: NoteDiagramId }) {
   );
 }
 
+// 래스터 히어로 사진(image 블록) — diagram과 달리 별도 문서 컨텍스트가 아니라 정적 <img>라
+// CSS 토큰 상속 문제가 없다(§C 참고). diagram과 동일하게 max-w-[65ch]를 걸지 않고 article
+// 전체 폭(w-full)을 채운다 — 텍스트 블록과 좌측 기준선을 맞추기 위한 기존 규칙 그대로 적용.
+function NoteImage({ src, alt, caption }: { src: string; alt: string; caption?: string }) {
+  return (
+    <figure className="w-full my-6">
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img src={src} alt={alt} loading="lazy" decoding="async" className="w-full h-auto rounded-[var(--radius-card)]" />
+      {caption && <figcaption className="text-[length:var(--text-label)] text-faint mt-2">{caption}</figcaption>}
+    </figure>
+  );
+}
+
 export default async function NoteDetailPageEn({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
   const note = getNoteBySlug(slug);
@@ -124,6 +137,9 @@ export default async function NoteDetailPageEn({ params }: { params: Promise<{ s
             }
             if (block.type === 'diagram') {
               return <Diagram key={i} id={block.id} />;
+            }
+            if (block.type === 'image') {
+              return <NoteImage key={i} src={block.src} alt={block.alt} caption={block.caption} />;
             }
             return (
               <p key={i} className="max-w-[65ch] text-body text-muted leading-relaxed mb-4">
