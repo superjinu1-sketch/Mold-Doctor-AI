@@ -21,6 +21,7 @@ const homeNotes: HomeNoteCard[] = NOTES.map(n => ({
   description: n.description,
   publishedAt: n.publishedAt,
   thumbSvg: n.thumb ? readNoteThumbSvg(n.thumb) : null,
+  thumbImage: n.thumbImage ?? null,
 }));
 
 export default function HomePage() {

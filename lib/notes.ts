@@ -19,6 +19,7 @@ export interface Note {
   description: string;
   publishedAt: string; // ISO
   thumb?: NoteThumbId;  // 목록 카드용 축약 도식. 없으면 텍스트만 렌더
+  thumbImage?: string;  // 목록 카드용 래스터 사진(있으면 렌더러가 thumb SVG보다 우선 사용)
   body: NoteBlock[];
 }
 
@@ -33,7 +34,7 @@ export const NOTES: Note[] = [
     title: "You balanced the cooling. The glass-filled part still warps.",
     description: "A glass-filled part comes off bowed, so you balance the cooling and add pack, and nothing moves it. The warp isn't a heat story: the fibers lined up with the flow, so the part shrinks less along them and more across. The tell is that the warp follows the fill and not the cooling layout, which is also where the fix is.",
     publishedAt: '2026-08-22',
-    thumb: 'gf-warpage',
+    thumbImage: '/notes/gf-warpage-thumb.jpg',
     body: [
       p("A flat part comes off the tool bowed, so you do the standard thing. You even out the cooling between the two halves of the mold. You bring the mold temperatures into balance. You add a little pack to hold the geometry, and you look at whether a rib would stiffen the axis that's moving. This is the warpage playbook. Every guide teaches it in that order, and every troubleshooting AI hands it back to you in the same order. You run the shots, you check the part, and it comes back with the same bow it had before."),
       image('/notes/gf-warpage-hero.jpg', "A warped glass-filled nylon housing cover resting on a surface plate, one side lifted off the granite.", "A glass-filled nylon cover lifting off a surface plate. Illustrative."),
@@ -486,6 +487,7 @@ export interface HomeNoteCard {
   description: string;
   publishedAt: string;
   thumbSvg: string | null; // 서버에서 읽은 인라인 SVG. thumb 없으면 null
+  thumbImage?: string | null; // 래스터 사진 경로. 있으면 렌더러가 thumbSvg보다 우선 사용
 }
 
 // ── 노트 시리즈 (en-notes-series-nav-v1) ─────────────────────────

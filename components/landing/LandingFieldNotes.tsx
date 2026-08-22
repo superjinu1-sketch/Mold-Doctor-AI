@@ -31,12 +31,13 @@ export default function LandingFieldNotes({ notes }: { notes: HomeNoteCard[] }) 
         <div className="grid md:grid-cols-3 gap-[22px] text-left mt-12 max-md:mt-8">
           {top3.map(n => (
             <Link key={n.slug} href={`/en/notes/${n.slug}`} className="block bg-surface border border-border rounded-[18px] overflow-hidden hover:border-[var(--brand-border)] transition-colors">
-              {n.thumbSvg && (
-                <div
-                  aria-hidden="true"
+              {n.thumbImage ? (
+                <img src={n.thumbImage} alt="" aria-hidden="true" loading="lazy" decoding="async"
+                  className="block w-full h-auto border-b border-border" />
+              ) : n.thumbSvg && (
+                <div aria-hidden="true"
                   className="border-b border-border [&>svg]:block [&>svg]:w-full [&>svg]:h-auto"
-                  dangerouslySetInnerHTML={{ __html: n.thumbSvg }}
-                />
+                  dangerouslySetInnerHTML={{ __html: n.thumbSvg }} />
               )}
               <div className="p-6">
                 <h3 className="text-[17px] font-semibold leading-snug text-ink mb-1.5">{n.title}</h3>

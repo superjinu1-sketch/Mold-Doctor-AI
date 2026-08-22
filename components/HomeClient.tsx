@@ -182,7 +182,10 @@ export default function HomeClient({ notes }: { notes: HomeNoteCard[] }) {
           <div className="flex flex-col gap-2.5 mb-3">
             {pageNotes.map((n, i) => (
               <Link key={n.slug} href={`/en/notes/${n.slug}`} className="ui-card p-3.5 flex gap-3.5 items-start hover:border-[var(--brand-border)] transition-colors">
-                {n.thumbSvg && (
+                {n.thumbImage ? (
+                  <img src={n.thumbImage} alt="" aria-hidden="true" loading="lazy"
+                    className="w-[104px] shrink-0 h-auto rounded-lg border border-[color:var(--border)]" />
+                ) : n.thumbSvg && (
                   <div
                     aria-hidden="true"
                     className="w-[104px] shrink-0 border border-[color:var(--border)] rounded-lg p-1 [&>svg]:block [&>svg]:w-full [&>svg]:h-auto"

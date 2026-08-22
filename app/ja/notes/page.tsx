@@ -52,7 +52,10 @@ export default function NotesIndexPageJa() {
         {NOTES_JA.map(note => (
           <article key={note.slug} className="ui-card ui-card-lg p-5">
             <div className="flex flex-col sm:flex-row sm:gap-5">
-              {note.thumb && (
+              {note.thumbImage ? (
+                <img src={note.thumbImage} alt="" aria-hidden="true" loading="lazy"
+                  className="mb-4 sm:mb-0 shrink-0 self-start w-[180px] max-w-full h-auto rounded-lg border border-[color:var(--border)]" />
+              ) : note.thumb && (
                 <div
                   aria-hidden="true"
                   className="mb-4 sm:mb-0 shrink-0 self-start w-[180px] max-w-full rounded-lg border border-[color:var(--border)] bg-[color:var(--surface-sunken,transparent)] p-2 [&>svg]:block [&>svg]:w-full [&>svg]:h-auto"
