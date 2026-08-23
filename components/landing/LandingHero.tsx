@@ -64,8 +64,9 @@ export default function LandingHero() {
             </Link>
           </div>
 
-          <div className="mt-4">
-            <StoreBadges variant="inline" locale={locale} />
+          <div className="mt-5">
+            <p className="text-[13px] font-semibold text-muted mb-2">{t('landing.web_getapp')}</p>
+            <StoreBadges variant="badges" locale={locale} />
           </div>
           <p className="text-[13px] text-faint mt-3.5">{t('landing.web_fineprint')}</p>
         </div>

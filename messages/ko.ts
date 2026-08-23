@@ -751,6 +751,7 @@ export const ko: Record<string, string> = {
   'landing.web_cta_primary': '무료로 추정 시작',
   'landing.web_cta_secondary': '불량 가이드 보기',
   'landing.web_fineprint': '가입 시 5회 무료 · 설치 없이 웹에서 바로 · 참고용 추정',
+  'landing.web_getapp': '현장에서 계속 쓰려면 앱으로 — 이력이 쌓입니다',
 
   // video-hero-web-v1: 히어로 정적 카드 삭제(영상으로 교체)로 render_* 중 delta 행 이름 3개만
   // LandingOutputTile.tsx가 계속 쓴다 — 나머지(제목/id/결함/원인/표머리/각주)는 카드와 함께 정리.

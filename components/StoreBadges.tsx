@@ -12,7 +12,7 @@ import { IconDownload } from '@/components/icons';
 const PLAY_URL = 'https://play.google.com/store/apps/details?id=com.jinsimlabs.molddoctor';
 const APP_STORE_ID = '6793057343';
 
-export default function StoreBadges({ variant, locale: localeProp }: { variant: 'hero' | 'footer' | 'article' | 'inline'; locale?: 'ko' | 'en' }) {
+export default function StoreBadges({ variant, locale: localeProp }: { variant: 'hero' | 'footer' | 'article' | 'inline' | 'badges'; locale?: 'ko' | 'en' }) {
   const { locale: ctxLocale } = useLocale();
   const locale = localeProp ?? ctxLocale;
   // 네이티브 게이팅(§2, pricing-native-gate-v1 선례) — 정적 export 프리렌더 시점엔 네이티브
@@ -78,6 +78,21 @@ export default function StoreBadges({ variant, locale: localeProp }: { variant: 
           </a>
         </div>
         <p className="text-[length:var(--text-label)] text-faint">{free}</p>
+      </div>
+    );
+  }
+
+  if (variant === 'badges') {
+    return (
+      <div className="flex flex-wrap items-center gap-3">
+        <a href={appStoreUrl} aria-label={appStoreLabel} className="inline-block transition-transform hover:scale-[1.03] active:scale-[.97]">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/media/appstore-badge.svg" alt={appStoreLabel} className="h-[50px] w-auto" />
+        </a>
+        <a href={PLAY_URL} aria-label={playLabel} className="inline-block transition-transform hover:scale-[1.03] active:scale-[.97]">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/media/googleplay-badge.svg" alt={playLabel} className="h-[50px] w-auto" />
+        </a>
       </div>
     );
   }
