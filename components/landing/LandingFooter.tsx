@@ -38,7 +38,7 @@ export default function LandingFooter() {
           </div>
           <div>
             <h4 className="text-[12px] font-semibold text-ink mb-1.5">{t('landing.web_footer_col_company')}</h4>
-            <Link href="/en/notes" className="block text-[14px] text-muted hover:text-brand leading-[2.2]">{t('landing.web_footer_company_1')}</Link>
+            <Link href={locale === 'en' ? '/en/notes' : '/notes'} className="block text-[14px] text-muted hover:text-brand leading-[2.2]">{t('landing.web_footer_company_1')}</Link>
             <Link href="/privacy" className="block text-[14px] text-muted hover:text-brand leading-[2.2]">{t('landing.web_footer_company_2')}</Link>
             <Link href="/terms" className="block text-[14px] text-muted hover:text-brand leading-[2.2]">{t('landing.web_footer_company_3')}</Link>
           </div>

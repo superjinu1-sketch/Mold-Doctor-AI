@@ -25,6 +25,8 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
       canonical: url,
       languages: {
         en: `${SITE_URL}/en/notes/${slug}`,
+        // ko는 field-notes-v2 Phase 2부터 전 슬러그 정적 생성(미번역=EN 폴백)이라 조건부 불필요.
+        ko: `${SITE_URL}/notes/${slug}`,
         ja: url,
       },
     },

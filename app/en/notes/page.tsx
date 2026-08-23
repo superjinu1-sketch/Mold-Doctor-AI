@@ -19,6 +19,7 @@ export const metadata: Metadata = {
     canonical: `${SITE_URL}/en/notes`,
     languages: {
       en: `${SITE_URL}/en/notes`,
+      ko: `${SITE_URL}/notes`,
       ja: `${SITE_URL}/ja/notes`,
     },
   },

@@ -3,22 +3,26 @@ import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { SITE_URL } from '@/lib/siteUrl';
 import { NOTES, getNoteBySlug, getSeriesForNote, type NoteDiagramId } from '@/lib/notes';
+import { getNoteKoBySlug, KO_FALLBACK_NOTICE } from '@/lib/notesKo';
 import { readNoteDiagramSvg } from '@/lib/notesDiagramSvg';
 import { getNoteJaBySlug } from '@/lib/notesJa';
 
 // Capacitor 정적 export(output:'export') 호환 — app/sitemap.ts 선례와 동일 원칙 적용.
 export const dynamic = 'force-static';
 
+// NOTES(EN) 전 슬러그 생성 — KO 미번역 슬러그도 정적 페이지가 있어야 토글이 404 없이 왕복한다
+// (미번역은 아래서 EN 폴백 + KO_FALLBACK_NOTICE 배너로 렌더).
 export function generateStaticParams() {
   return NOTES.map(n => ({ slug: n.slug }));
 }
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
-  const note = getNoteBySlug(slug);
-  if (!note) return {};
-  const url = `${SITE_URL}/en/notes/${slug}`;
-  // ja 번역이 있는 노트만 hreflang ja를 내보낸다 — 없는 slug로 내보내면 404 hreflang (en-notes-06-nmt-v1).
+  const enNote = getNoteBySlug(slug);
+  if (!enNote) return {};
+  const note = getNoteKoBySlug(slug) ?? enNote;
+  const url = `${SITE_URL}/notes/${slug}`;
+  // ja 번역이 있는 노트만 hreflang ja를 내보낸다 — 없는 slug로 내보내면 404 hreflang(en 상세와 동일 규칙).
   const hasJa = Boolean(getNoteJaBySlug(slug));
   return {
     title: note.title,
@@ -26,23 +30,19 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     alternates: {
       canonical: url,
       languages: {
-        en: url,
-        // ko는 field-notes-v2 Phase 2부터 전 슬러그 정적 생성(미번역=EN 폴백)이라 조건부 불필요.
-        ko: `${SITE_URL}/notes/${slug}`,
+        ko: url,
+        en: `${SITE_URL}/en/notes/${slug}`,
         ...(hasJa ? { ja: `${SITE_URL}/ja/notes/${slug}` } : {}),
       },
     },
-    openGraph: { title: note.title, description: note.description, type: 'article', locale: 'en_US', url },
-    // 루트 레이아웃의 twitter 메타는 한국어 고정값 — 영문 페이지에서는 페이지별 영문 title/description으로 덮어쓴다.
+    openGraph: { title: note.title, description: note.description, type: 'article', locale: 'ko_KR', url },
     twitter: { card: 'summary', title: note.title, description: note.description },
   };
 }
 
 // SVG 도식을 <img src>가 아니라 인라인으로 주입 — SVG 내부 var(--ok) 등 CSS 커스텀 프로퍼티가
 // 페이지 :root를 상속받으려면 같은 DOM 트리에 있어야 한다(별도 문서 컨텍스트로 로드되면 색이 사라짐).
-// 파일(public/notes/*.svg) 자체는 확정본 그대로 두고, 375px 대응 크기 처리만 바깥 wrapper에서 담당한다.
-// 도식은 article(max-w-[880px]) 전체 폭을 그대로 채운다 — 별도 max-width/mx-auto를 걸면
-// 텍스트 블록(max-w-[65ch], 좌측 정렬)과 중심이 달라져 좌측 기준선이 어긋난다(실측 확인됨).
+// 도식은 영문판 SVG를 그대로 재사용한다(EN/JA 상세와 동일 절충).
 function Diagram({ id }: { id: NoteDiagramId }) {
   const svg = readNoteDiagramSvg(id);
   return (
@@ -51,9 +51,6 @@ function Diagram({ id }: { id: NoteDiagramId }) {
   );
 }
 
-// 래스터 히어로 사진(image 블록) — diagram과 달리 별도 문서 컨텍스트가 아니라 정적 <img>라
-// CSS 토큰 상속 문제가 없다(§C 참고). diagram과 동일하게 max-w-[65ch]를 걸지 않고 article
-// 전체 폭(w-full)을 채운다 — 텍스트 블록과 좌측 기준선을 맞추기 위한 기존 규칙 그대로 적용.
 function NoteImage({ src, alt, caption }: { src: string; alt: string; caption?: string }) {
   return (
     <figure className="w-full my-6">
@@ -64,20 +61,25 @@ function NoteImage({ src, alt, caption }: { src: string; alt: string; caption?: 
   );
 }
 
-export default async function NoteDetailPageEn({ params }: { params: Promise<{ slug: string }> }) {
+export default async function NoteDetailPageKo({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const note = getNoteBySlug(slug);
-  if (!note) notFound();
+  const enNote = getNoteBySlug(slug);
+  if (!enNote) notFound();
+  const koNote = getNoteKoBySlug(slug);
+  const note = koNote ?? enNote;
 
   const seriesInfo = getSeriesForNote(slug);
+  // 시리즈 멤버 제목 — KO 있으면 KO, 없으면 EN(개별 노트 폴백과 동일 원칙).
+  const seriesNoteTitle = (s: string) => (getNoteKoBySlug(s) ?? getNoteBySlug(s))?.title;
 
-  const url = `${SITE_URL}/en/notes/${slug}`;
+  const url = `${SITE_URL}/notes/${slug}`;
   const jsonLd = {
     '@context': 'https://schema.org',
     '@type': 'Article',
     headline: note.title,
     description: note.description,
     datePublished: note.publishedAt,
+    inLanguage: 'ko',
     author: {
       '@type': 'Person',
       name: 'Jinwoo Park',
@@ -95,31 +97,34 @@ export default async function NoteDetailPageEn({ params }: { params: Promise<{ s
     <>
       {/* eslint-disable-next-line react/no-danger */}
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
-      {/* article 자체를 max-w-[880px] mx-auto로 페이지에서 한 번만 중앙 정렬한다. 텍스트 블록은
-          그 안에서 max-w-[65ch]로 폭만 좁히고(mx-auto 없음 — 좌측 정렬 유지) 도식은 article 전체
-          폭(w-full)을 채운다. 텍스트·도식을 각자 mx-auto로 따로 중앙 정렬하면 서로 다른 폭
-          기준으로 중심이 갈라져 좌측 기준선이 어긋난다(실측 확인됨 — h2 x≈340 vs p x≈482). */}
       <article className="max-w-[880px] mx-auto px-4 sm:px-6 py-10">
-        <Link href="/en/notes" className="max-w-[65ch] text-faint hover:text-ink text-sm mb-3 min-h-[44px] inline-flex items-center gap-1">
-          ← Notes
+        <Link href="/notes" className="max-w-[65ch] text-faint hover:text-ink text-sm mb-3 min-h-[44px] inline-flex items-center gap-1">
+          ← 노트
         </Link>
         <h1 className="max-w-[65ch] text-[length:var(--text-h1)] font-bold text-ink mb-6">{note.title}</h1>
 
+        {/* 미번역 폴백 배너 — KO 원고 없으면 EN 본문 위에 상시 노출 */}
+        {!koNote && (
+          <div className="max-w-[65ch] ui-card bg-surface-sunken p-4 mb-6">
+            <p className="text-muted text-label leading-relaxed">{KO_FALLBACK_NOTICE}</p>
+          </div>
+        )}
+
         {seriesInfo && (
-          <nav aria-label="Series" className="max-w-[65ch] bg-brand-tint border border-[var(--brand-border)] rounded-[var(--radius-card)] px-4 py-3 mb-8">
+          <nav aria-label="시리즈" className="max-w-[65ch] bg-brand-tint border border-[var(--brand-border)] rounded-[var(--radius-card)] px-4 py-3 mb-8">
             <p className="text-[length:var(--text-label)] font-bold text-brand-ink mb-2">
-              Series · {seriesInfo.series.name} — Part {seriesInfo.index + 1} of {seriesInfo.series.slugs.length}
+              시리즈 · {seriesInfo.series.name} — {seriesInfo.index + 1} / {seriesInfo.series.slugs.length}
             </p>
             <ol className="space-y-1">
               {seriesInfo.series.slugs.map((s, i) => {
-                const n = getNoteBySlug(s);
-                if (!n) return null;
+                const title = seriesNoteTitle(s);
+                if (!title) return null;
                 return (
                   <li key={s} className="text-sm leading-snug">
                     {i === seriesInfo.index ? (
-                      <span className="font-bold text-ink">{i + 1}. {n.title}</span>
+                      <span className="font-bold text-ink">{i + 1}. {title}</span>
                     ) : (
-                      <Link href={`/en/notes/${s}`} className="text-brand-ink hover:underline underline-offset-2">{i + 1}. {n.title}</Link>
+                      <Link href={`/notes/${s}`} className="text-brand-ink hover:underline underline-offset-2">{i + 1}. {title}</Link>
                     )}
                   </li>
                 );
@@ -153,30 +158,32 @@ export default async function NoteDetailPageEn({ params }: { params: Promise<{ s
 
         {seriesInfo && (() => {
           const len = seriesInfo.series.slugs.length;
-          const prev = seriesInfo.index > 0 ? getNoteBySlug(seriesInfo.series.slugs[seriesInfo.index - 1]) : undefined;
-          const next = seriesInfo.index < len - 1 ? getNoteBySlug(seriesInfo.series.slugs[seriesInfo.index + 1]) : undefined;
-          if (!prev && !next) return null;
+          const prevSlug = seriesInfo.index > 0 ? seriesInfo.series.slugs[seriesInfo.index - 1] : undefined;
+          const nextSlug = seriesInfo.index < len - 1 ? seriesInfo.series.slugs[seriesInfo.index + 1] : undefined;
+          const prevTitle = prevSlug ? seriesNoteTitle(prevSlug) : undefined;
+          const nextTitle = nextSlug ? seriesNoteTitle(nextSlug) : undefined;
+          if (!prevTitle && !nextTitle) return null;
           return (
-            <nav aria-label="Series pagination" className="max-w-[65ch] mt-10 pt-6 border-t border-border flex flex-col sm:flex-row gap-3 sm:justify-between">
-              {prev ? (
-                <Link href={`/en/notes/${prev.slug}`} className="group flex-1 border border-border hover:border-brand rounded-[var(--radius-card)] px-4 py-3 transition-colors">
-                  <span className="block text-[length:var(--text-label)] text-faint mb-1">← Previous · Part {seriesInfo.index} of {len}</span>
-                  <span className="block text-sm font-medium text-ink group-hover:text-brand-ink">{prev.title}</span>
+            <nav aria-label="시리즈 이동" className="max-w-[65ch] mt-10 pt-6 border-t border-border flex flex-col sm:flex-row gap-3 sm:justify-between">
+              {prevSlug && prevTitle ? (
+                <Link href={`/notes/${prevSlug}`} className="group flex-1 border border-border hover:border-brand rounded-[var(--radius-card)] px-4 py-3 transition-colors">
+                  <span className="block text-[length:var(--text-label)] text-faint mb-1">← 이전 · {seriesInfo.index} / {len}</span>
+                  <span className="block text-sm font-medium text-ink group-hover:text-brand-ink">{prevTitle}</span>
                 </Link>
               ) : <span className="flex-1" />}
-              {next ? (
-                <Link href={`/en/notes/${next.slug}`} className="group flex-1 border border-border hover:border-brand rounded-[var(--radius-card)] px-4 py-3 transition-colors sm:text-right">
-                  <span className="block text-[length:var(--text-label)] text-faint mb-1">Next · Part {seriesInfo.index + 2} of {len} →</span>
-                  <span className="block text-sm font-medium text-ink group-hover:text-brand-ink">{next.title}</span>
+              {nextSlug && nextTitle ? (
+                <Link href={`/notes/${nextSlug}`} className="group flex-1 border border-border hover:border-brand rounded-[var(--radius-card)] px-4 py-3 transition-colors sm:text-right">
+                  <span className="block text-[length:var(--text-label)] text-faint mb-1">다음 · {seriesInfo.index + 2} / {len} →</span>
+                  <span className="block text-sm font-medium text-ink group-hover:text-brand-ink">{nextTitle}</span>
                 </Link>
               ) : <span className="flex-1" />}
             </nav>
           );
         })()}
 
-        {/* 저자 바이라인 — /en/guide·/en/resins와 동일 스타일(author-page-en-v1) */}
+        {/* 저자 바이라인 — KO 홈 링크(ko /about 없음) */}
         <p className="max-w-[65ch] text-faint text-sm text-center mt-10">
-          <Link href="/en/about" className="hover:text-muted transition-colors">JINSIMLABS.COM</Link>
+          <Link href="/" className="hover:text-muted transition-colors">JINSIMLABS.COM</Link>
         </p>
       </article>
     </>

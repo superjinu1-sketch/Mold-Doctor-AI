@@ -43,7 +43,7 @@ export default function Footer() {
           <Link href="/tryout" className="text-faint text-xs hover:text-muted transition-colors">{m['landing.tool_tryout_title']}</Link>
           <Link href={isEn ? '/en/resins' : '/resins'} className="text-faint text-xs hover:text-muted transition-colors">{m['landing.tool_resins_title']}</Link>
           <Link href={isEn ? '/en/guide' : '/guide'} className="text-faint text-xs hover:text-muted transition-colors">{m['footer.guide']}</Link>
-          <Link href="/en/notes" className="text-faint text-xs hover:text-muted transition-colors">{m['footer.notes']}</Link>
+          <Link href={isEn ? '/en/notes' : '/notes'} className="text-faint text-xs hover:text-muted transition-colors">{m['footer.notes']}</Link>
           <Link href="/en/about" className="text-faint text-xs hover:text-muted transition-colors">{m['footer.about']}</Link>
         </nav>
         {/* 스토어 배지(store-badges-v1) — 전 페이지 공통 노출(푸터 자연 확산). 네이티브 앱에서는

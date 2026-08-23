@@ -30,7 +30,7 @@ export default function LandingFieldNotes({ notes }: { notes: HomeNoteCard[] }) 
 
         <div className="grid md:grid-cols-3 gap-[22px] text-left mt-12 max-md:mt-8">
           {top3.map(n => (
-            <Link key={n.slug} href={`/en/notes/${n.slug}`} className="block bg-surface border border-border rounded-[18px] overflow-hidden hover:border-[var(--brand-border)] transition-colors">
+            <Link key={n.slug} href={locale === 'en' ? `/en/notes/${n.slug}` : `/notes/${n.slug}`} className="block bg-surface border border-border rounded-[18px] overflow-hidden hover:border-[var(--brand-border)] transition-colors">
               {n.thumbImage ? (
                 <img src={n.thumbImage} alt="" aria-hidden="true" loading="lazy" decoding="async"
                   className="block w-full h-auto border-b border-border" />
@@ -49,7 +49,7 @@ export default function LandingFieldNotes({ notes }: { notes: HomeNoteCard[] }) 
         </div>
 
         <div className="flex gap-6 justify-start flex-wrap mt-8 text-[16px]">
-          <Link href="/en/notes" className="text-brand hover:underline">{t('landing.web_notes_see_all')} ›</Link>
+          <Link href={locale === 'en' ? '/en/notes' : '/notes'} className="text-brand hover:underline">{t('landing.web_notes_see_all')} ›</Link>
           <Link href={guideHref} className="text-brand hover:underline">{t('landing.web_notes_guide_link')} ›</Link>
         </div>
       </div>

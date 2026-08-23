@@ -43,7 +43,7 @@ export const ko: Record<string, string> = {
   'tools.cta_button': '무료로 추정 시작',
 
   'footer.guide': '불량 가이드',
-  'footer.notes': '현장 노트 (영문)',
+  'footer.notes': '현장 노트',
   'footer.about': '만든 사람 (영문)',
   'footer.privacy': '개인정보처리방침',
   'footer.terms': '이용약관',
@@ -51,6 +51,7 @@ export const ko: Record<string, string> = {
   'field_notes.search_placeholder': '노트 검색',
   'field_notes.search_empty': '검색 결과와 일치하는 노트가 없습니다.',
   'field_notes.search_count': '결과 %d건',
+  'field_notes.ko_pending': '번역 준비 중',
   'landing.stat_1': '30종+',
   'landing.stat_1_label': '불량 유형',
   'landing.stat_2': '50종+',

@@ -10,7 +10,8 @@
     "build:cap:sync": "npm run build:cap && npx cap sync",
     "start": "next start",
     "verify": "node .claude/scripts/verify.mjs",
-    "eval": "node tests/eval/run.mjs"
+    "eval": "node tests/eval/run.mjs",
+    "check:notes-ko": "node scripts/check-notes-ko-coverage.mjs"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.82.0",
