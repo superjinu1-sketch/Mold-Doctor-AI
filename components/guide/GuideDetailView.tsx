@@ -128,7 +128,7 @@ export default function GuideDetailView({
         {/* 저자 바이라인 — en 전용(author-page-en-v1) */}
         {locale === 'en' && (
           <p className="text-faint text-sm text-center">
-            <Link href="/en/about" className="hover:text-muted transition-colors">Written by Jinwoo Park</Link>
+            <Link href="/en/about" className="hover:text-muted transition-colors">JINSIMLABS.COM</Link>
           </p>
         )}
       </div>

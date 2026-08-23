@@ -126,7 +126,7 @@ export default async function NoteDetailPageJa({ params }: { params: Promise<{ s
 
         {/* 저자 바이라인 — /en/notes와 동일 스타일 */}
         <p className="max-w-[65ch] text-faint text-sm text-center mt-10">
-          <Link href="/en/about" className="hover:text-muted transition-colors">Written by Jinwoo Park</Link>
+          <Link href="/en/about" className="hover:text-muted transition-colors">JINSIMLABS.COM</Link>
         </p>
       </article>
     </>

@@ -47,6 +47,10 @@ export const ko: Record<string, string> = {
   'footer.about': '만든 사람 (영문)',
   'footer.privacy': '개인정보처리방침',
   'footer.terms': '이용약관',
+
+  'field_notes.search_placeholder': '노트 검색',
+  'field_notes.search_empty': '검색 결과와 일치하는 노트가 없습니다.',
+  'field_notes.search_count': '결과 %d건',
   'landing.stat_1': '30종+',
   'landing.stat_1_label': '불량 유형',
   'landing.stat_2': '50종+',

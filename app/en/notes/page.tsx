@@ -1,8 +1,10 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { SITE_URL } from '@/lib/siteUrl';
-import { NOTES } from '@/lib/notes';
+import { NOTES, type NoteBlock } from '@/lib/notes';
 import { readNoteThumbSvg } from '@/lib/notesDiagramSvg';
+import { SearchableNotesList, type NoteSearchItem } from '@/components/notes/SearchableNotesList';
+import { en } from '@/messages/en';
 
 // Capacitor 정적 export(output:'export') 호환 — app/sitemap.ts 선례와 동일 원칙 적용.
 export const dynamic = 'force-static';
@@ -35,34 +37,44 @@ function formatDate(iso: string): string {
 }
 
 export default function NotesIndexPageEn() {
+  const items: NoteSearchItem[] = NOTES.map(note => ({
+    slug: note.slug,
+    search: [note.title, note.description, ...note.body.filter((b): b is NoteBlock & { type: 'h2' } => b.type === 'h2').map(b => b.text)]
+      .join(' ').normalize('NFC').toLowerCase(),
+    card: (
+      <article key={note.slug} className="ui-card ui-card-lg p-5">
+        <div className="flex flex-col sm:flex-row sm:gap-5">
+          {note.thumbImage ? (
+            <img src={note.thumbImage} alt="" aria-hidden="true" loading="lazy"
+              className="mb-4 sm:mb-0 shrink-0 self-start w-[180px] max-w-full h-auto rounded-lg border border-[color:var(--border)]" />
+          ) : note.thumb && (
+            <div
+              aria-hidden="true"
+              className="mb-4 sm:mb-0 shrink-0 self-start w-[180px] max-w-full rounded-lg border border-[color:var(--border)] bg-[color:var(--surface-sunken,transparent)] p-2 [&>svg]:block [&>svg]:w-full [&>svg]:h-auto"
+              dangerouslySetInnerHTML={{ __html: readNoteThumbSvg(note.thumb) }}
+            />
+          )}
+          <div className="min-w-0">
+            <Link href={`/en/notes/${note.slug}`} className="font-bold text-ink text-body hover:text-brand-ink transition-colors">
+              {note.title}
+            </Link>
+            <p className="text-muted text-body leading-relaxed mt-2">{note.description}</p>
+            <p className="text-faint text-[length:var(--text-label)] mt-3">{formatDate(note.publishedAt)}</p>
+          </div>
+        </div>
+      </article>
+    ),
+  }));
+
   return (
     <div className="max-w-[65ch] mx-auto px-4 sm:px-6 py-10">
       <h1 className="text-[length:var(--text-h1)] font-bold text-ink mb-8">Field Notes</h1>
-      <div className="space-y-6">
-        {NOTES.map(note => (
-          <article key={note.slug} className="ui-card ui-card-lg p-5">
-            <div className="flex flex-col sm:flex-row sm:gap-5">
-              {note.thumbImage ? (
-                <img src={note.thumbImage} alt="" aria-hidden="true" loading="lazy"
-                  className="mb-4 sm:mb-0 shrink-0 self-start w-[180px] max-w-full h-auto rounded-lg border border-[color:var(--border)]" />
-              ) : note.thumb && (
-                <div
-                  aria-hidden="true"
-                  className="mb-4 sm:mb-0 shrink-0 self-start w-[180px] max-w-full rounded-lg border border-[color:var(--border)] bg-[color:var(--surface-sunken,transparent)] p-2 [&>svg]:block [&>svg]:w-full [&>svg]:h-auto"
-                  dangerouslySetInnerHTML={{ __html: readNoteThumbSvg(note.thumb) }}
-                />
-              )}
-              <div className="min-w-0">
-                <Link href={`/en/notes/${note.slug}`} className="font-bold text-ink text-body hover:text-brand-ink transition-colors">
-                  {note.title}
-                </Link>
-                <p className="text-muted text-body leading-relaxed mt-2">{note.description}</p>
-                <p className="text-faint text-[length:var(--text-label)] mt-3">{formatDate(note.publishedAt)}</p>
-              </div>
-            </div>
-          </article>
-        ))}
-      </div>
+      <SearchableNotesList
+        items={items}
+        placeholder={en['field_notes.search_placeholder']}
+        emptyText={en['field_notes.search_empty']}
+        countLabel={en['field_notes.search_count']}
+      />
     </div>
   );
 }

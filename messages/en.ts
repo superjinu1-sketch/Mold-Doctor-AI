@@ -47,6 +47,10 @@ export const en: Record<string, string> = {
   'footer.about': 'About',
   'footer.privacy': 'Privacy Policy',
   'footer.terms': 'Terms of Service',
+
+  'field_notes.search_placeholder': 'Search notes',
+  'field_notes.search_empty': 'No notes match your search.',
+  'field_notes.search_count': '%d result(s)',
   'landing.stat_1': '30+',
   'landing.stat_1_label': 'Defect Types',
   'landing.stat_2': '50+',
