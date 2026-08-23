@@ -751,8 +751,10 @@ export async function POST(request: NextRequest) {
 
       const bpN = parseFloat(s.backPressure || '0');
       const ipN = parseFloat(s.injPressure1 || '0');
-      if (bpN > 30)
-        rules.push(`- ⚠ 배압 ${bpN}MPa는 비현실적으로 높음(통상 5~20MPa). 단위 오인(bar↔MPa) 가능성 — 배압 기반 원인은 신중히 판단하고, 권고에 "화면 압력 단위(bar 여부) 확인"을 포함하라.`);
+      if (bpN > 25)
+        rules.push(`- ⚠ 배압 ${bpN}MPa는 문헌상 최대치(무발포 MuCell 계열 ~22MPa)도 초과한다. 실제 배압이 아니라 bar 또는 kgf/cm² 값을 MPa로 입력했을 가능성이 매우 높다(÷10 ≈ ${Math.round(bpN / 10)}MPa가 현실적). 배압 기반 원인은 보류하고, 권고에 "화면 압력 단위(MPa·bar·kgf/cm²) 확인"을 포함하라.`);
+      else if (bpN > 12)
+        rules.push(`- ⚠ 배압 ${bpN}MPa는 통상 범위(specific 배압 2~10MPa, 스위트스팟 3.5~7MPa)보다 높다. GF·고점도 수지나 발포(MuCell) 공정이 아니라면 단위 입력(kgf/cm²·bar를 MPa로) 오인 가능성 — 화면 단위 확인 권장.`);
       if (ipN > 350)
         rules.push(`- ⚠ 1차 사출압 ${ipN}MPa는 비정상적으로 높음. 단위 확인 필요.`);
 
@@ -781,16 +783,16 @@ export async function POST(request: NextRequest) {
       return lines.length ? `[불량유형·온도 정합성 가이드]\n${lines.join('\n')}` : '';
     })();
 
-    // 온도존 역순 입력 가드 — 노즐이 실린더 존보다 현저히 낮으면 입력 순서 역전 의심
+    // 온도존 입력 정합성 가드 — 노즐이 실린더 존보다 크게 낮으면 원인 4택(역프로파일/드룰/역입력/콜드노즐) 확인 유도
     const tempOrderGuard = (() => {
       const nozzleV = parseFloat(s.nozzleTemp || '');
       const zoneVals = [s.zone1Temp, s.zone2Temp, s.zone3Temp, s.zone4Temp]
         .map(v => parseFloat(v || '')).filter(v => isFinite(v));
       if (!isFinite(nozzleV) || zoneVals.length === 0) return '';
       const zoneMax = zoneVals.reduce((m, v) => Math.max(m, v), 0);
-      if (nozzleV < zoneMax - 15) {
+      if (nozzleV < zoneMax - 25) {
         return `[온도존 입력 정합성 가이드]
-- ⚠ 입력된 노즐온도(${nozzleV}℃)가 실린더 존 최고온도(${zoneMax}℃)보다 ${Math.round(zoneMax - nozzleV)}℃ 낮다. 통상 사출기는 노즐(전방)이 가장 뜨겁고 호퍼/피드존(후방)이 가장 낮다. 노즐이 존보다 현저히 낮은 건 물리적으로 비정상(노즐 프리즈오프·콜드슬러그)이라, 화면 온도존 순서가 역으로 입력됐을 가능성이 높다. 실제 멜트온도는 입력 노즐값이 아니라 실린더 최고값(${zoneMax}℃ 부근)으로 보고, "저(低)멜트온도"라는 결론을 성급히 내리지 마라. 멜트온도 상향(배럴 승온)을 권고하기 전에 입력 순서부터 의심하라.`;
+- ⚠ 입력된 노즐온도(${nozzleV}℃)가 실린더 존 최고온도(${zoneMax}℃)보다 ${Math.round(zoneMax - nozzleV)}℃ 낮다. 단정하지 말고 네 가지 가능성으로 봐라: (1) 의도된 역/하강 프로파일 — POM(아세탈)은 열분해 방지로 노즐을 배럴보다 25~35℃ 낮게, 나일론(PA)·경질 PVC도 후방을 더 뜨겁게 두는 것이 정상이다; (2) 드룰·스트링 방지로 노즐만 5~20℃ 낮춘 세팅; (3) 화면 온도존 순서를 역으로 입력한 오타; (4) 실제 콜드노즐·프리즈오프 결함. 단 LCP·PET·PBT·PC·ABS 등은 노즐을 전방존 이상으로 두는 게 정상이며(특히 LCP는 콜드노즐 시 프리즈오프 위험) 이들 수지에서의 큰 낙차는 (3)·(4)를 더 의심하라. 결론: "저(低)멜트온도"로 성급히 단정하거나 배럴 승온을 권하기 전에, 해당 수지의 권장 온도 프로파일과 실기 실제 세팅을 대조해 확인하라. 실제 멜트온도는 노즐 입력값이 아니라 실린더 최고값(${zoneMax}℃ 부근)일 수 있다.`;
       }
       return '';
     })();
