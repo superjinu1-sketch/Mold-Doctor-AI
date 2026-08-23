@@ -1,0 +1,19 @@
+<svg viewBox="0 0 180 136" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="tss-t tss-d">
+  <title id="tss-t">The settings sheet can be wrong</title>
+  <desc id="tss-d">Two opposite temperature profiles cross: a forward profile with the nozzle hottest, and a declining profile with the nozzle cool, plus a dashed reversed-entry that looks identical to the declining one.</desc>
+
+  <text x="14" y="21" font-size="12.5" font-weight="700" fill="var(--ink)">The settings sheet</text>
+  <text x="14" y="35" font-size="9.5" fill="var(--faint)">can be wrong before you read it</text>
+
+  <!-- forward: rising to nozzle -->
+  <polyline points="22,104 60,92 98,78 150,58" fill="none" stroke="var(--brand-ink)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="150" cy="58" r="3" fill="var(--brand-ink)"/>
+  <!-- declining: nozzle cool -->
+  <polyline points="22,58 60,70 98,84 150,104" fill="none" stroke="var(--ink)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="150" cy="104" r="3" fill="var(--ink)"/>
+  <!-- reversed entry dashed -->
+  <polyline points="22,63 60,75 98,89 150,109" fill="none" stroke="var(--danger)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="4 3"/>
+
+  <text x="14" y="128" font-size="9" fill="var(--faint)">feed</text>
+  <text x="150" y="128" font-size="9" fill="var(--faint)" text-anchor="middle">nozzle</text>
+</svg>

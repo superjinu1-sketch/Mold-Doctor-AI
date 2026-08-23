@@ -1,0 +1,41 @@
+<svg viewBox="0 0 720 326" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="ssp-t ssp-d">
+  <title id="ssp-t">The same cool-nozzle reading has three causes</title>
+  <desc id="ssp-d">A temperature profile across the barrel from feed to nozzle. A forward profile runs the nozzle hottest and is normal for LCP, PC, PBT, PET and ABS. A declining profile runs the nozzle cool on purpose and is normal for acetal, nylon and PVC; a forward profile entered in reverse looks identical to it. The resin decides which reading is a deliberate choice and which is a typo or a cold-nozzle fault.</desc>
+
+  <text x="20" y="22" font-size="13" font-weight="700" fill="var(--ink)">The same cool-nozzle reading, three causes</text>
+  <text x="20" y="40" font-size="11" fill="var(--faint)">temperature across the barrel, feed to nozzle</text>
+
+  <!-- y axis: hotter -->
+  <line x1="100" y1="64" x2="100" y2="206" stroke="var(--faint)" stroke-width="1" opacity=".4"/>
+  <path d="M100 62 l-4 8 h8 z" fill="var(--faint)"/>
+  <text x="106" y="70" font-size="9" fill="var(--faint)">hotter</text>
+
+  <!-- x axis -->
+  <line x1="100" y1="206" x2="610" y2="206" stroke="var(--faint)" stroke-width="1" opacity=".4"/>
+  <g font-size="9.5" fill="var(--faint)" text-anchor="middle">
+    <text x="130" y="222">Rear</text><text x="235" y="222">Z2</text><text x="350" y="222">Z3</text><text x="465" y="222">Front</text><text x="575" y="222">Nozzle</text>
+  </g>
+
+  <!-- forward: nozzle hottest -->
+  <polyline points="130,190 235,166 350,140 465,110 575,84" fill="none" stroke="var(--brand-ink)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="575" cy="84" r="3.5" fill="var(--brand-ink)"/>
+
+  <!-- declining: nozzle cool on purpose -->
+  <polyline points="130,86 235,106 350,134 465,164 575,188" fill="none" stroke="var(--ink)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="575" cy="188" r="3.5" fill="var(--ink)"/>
+
+  <!-- reversed entry: same shape, dashed -->
+  <polyline points="130,92 235,112 350,140 465,170 575,194" fill="none" stroke="var(--danger)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="5 4"/>
+
+  <!-- legend -->
+  <g stroke-linecap="round">
+    <line x1="110" y1="250" x2="136" y2="250" stroke="var(--brand-ink)" stroke-width="2.5"/>
+    <line x1="110" y1="268" x2="136" y2="268" stroke="var(--ink)" stroke-width="2.5"/>
+    <line x1="110" y1="286" x2="136" y2="286" stroke="var(--danger)" stroke-width="2" stroke-dasharray="5 4"/>
+  </g>
+  <text x="144" y="254" font-size="11" fill="var(--ink)">Forward — nozzle hottest. Normal for LCP, PC, PBT, PET, ABS.</text>
+  <text x="144" y="272" font-size="11" fill="var(--ink)">Declining — nozzle cool on purpose. Normal for acetal, nylon, PVC.</text>
+  <text x="144" y="290" font-size="11" fill="var(--faint)">…or a forward profile entered backwards — a typo that looks identical.</text>
+
+  <text x="110" y="314" font-size="11" font-weight="600" fill="var(--danger)">The resin decides: an LCP must run the nozzle hot, so a cool nozzle there is a flag, not a profile.</text>
+</svg>

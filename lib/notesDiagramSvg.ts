@@ -34,6 +34,7 @@ const FILES: Record<NoteDiagramId, string> = {
   'metallic-split': 'metallic-streak-split.svg',
   'shortshot-split': 'shortshot-split.svg',
   'gf-cross-section': 'gf-warpage-cross-section.svg',
+  'settings-profile': 'settings-profile.svg',
 };
 
 export function readNoteDiagramSvg(id: NoteDiagramId): string {
@@ -54,6 +55,7 @@ const THUMB_FILES: Record<NoteThumbId, string> = {
   'metallic-streak': 'thumb-metallic-streak.svg',
   'shortshot': 'thumb-shortshot.svg',
   'gf-warpage': 'thumb-gf-warpage.svg',
+  'settings-sheet': 'thumb-settings-sheet.svg',
 };
 
 export function readNoteThumbSvg(id: NoteThumbId): string {

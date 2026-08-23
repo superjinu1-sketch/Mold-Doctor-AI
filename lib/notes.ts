@@ -1,6 +1,6 @@
 // 영문 콘텐츠 축 B(/en/notes) 글 데이터 단일 소스. 본문은 진우 확정본 — 문구를 다듬지 않는다.
 // /en/about과 동일 원칙: 문법 교정·표현 개선·문장 병합 전부 금지.
-export type NoteDiagramId = 'cross-section' | 'flow' | 'weld-flow' | 'weld-section' | 'clamp-calc' | 'clamp-flow' | 'fr-paths' | 'fr-ppa-grades' | 'fr-barrel' | 'fr-levers' | 'fiber-float-fountain' | 'fiber-float-resins' | 'fiber-float-section' | 'nmt-pores' | 'nmt-families' | 'nmt-frame' | 'nmt-app-map' | 'nmt-cte' | 'nmt-resin-map' | 'nmt-freeze-race' | 'nmt-defect-tree' | 'flake-tilt' | 'metallic-split' | 'shortshot-split' | 'gf-cross-section';
+export type NoteDiagramId = 'cross-section' | 'flow' | 'weld-flow' | 'weld-section' | 'clamp-calc' | 'clamp-flow' | 'fr-paths' | 'fr-ppa-grades' | 'fr-barrel' | 'fr-levers' | 'fiber-float-fountain' | 'fiber-float-resins' | 'fiber-float-section' | 'nmt-pores' | 'nmt-families' | 'nmt-frame' | 'nmt-app-map' | 'nmt-cte' | 'nmt-resin-map' | 'nmt-freeze-race' | 'nmt-defect-tree' | 'flake-tilt' | 'metallic-split' | 'shortshot-split' | 'gf-cross-section' | 'settings-profile';
 
 export type NoteBlock =
   | { type: 'p'; text: string }
@@ -11,7 +11,7 @@ export type NoteBlock =
 // lib/notesDiagramSvg.ts(node:fs 사용, 서버 전용)가 이 타입을 가져다 쓴다 — 반대 방향(이 파일이
 // notesDiagramSvg.ts에서 import)이면 lib/notes.ts를 가져다 쓰는 클라이언트 컴포넌트(app/page.tsx)가
 // 번들러 설정에 따라 fs를 함께 끌고 들어올 위험이 있어 여기서 정의한다(notes-list-thumbnail-v1).
-export type NoteThumbId = 'splay-branch' | 'weld-strength' | 'clamp-window' | 'fr-corrosion' | 'fiber-float' | 'nmt-bond' | 'nmt-frame' | 'nmt-resin' | 'nmt-troubleshoot' | 'metallic-streak' | 'shortshot' | 'gf-warpage';
+export type NoteThumbId = 'splay-branch' | 'weld-strength' | 'clamp-window' | 'fr-corrosion' | 'fiber-float' | 'nmt-bond' | 'nmt-frame' | 'nmt-resin' | 'nmt-troubleshoot' | 'metallic-streak' | 'shortshot' | 'gf-warpage' | 'settings-sheet';
 
 export interface Note {
   slug: string;
@@ -29,6 +29,28 @@ const diagram = (id: NoteDiagramId): NoteBlock => ({ type: 'diagram', id });
 const image = (src: string, alt: string, caption?: string): NoteBlock => ({ type: 'image', src, alt, caption });
 
 export const NOTES: Note[] = [
+  {
+    slug: 'before-you-trust-the-settings-sheet',
+    title: "You diagnosed the melt. The number was never real.",
+    description: "Every diagnosis assumes the settings sheet is true, but the sheet is filled in by hand. It lies in two ways before the diagnosis even starts: a back pressure that can only be the wrong unit, and a nozzle that reads colder than the barrel, which is a deliberate profile for some resins and a typo for others. The number has to be possible before it's worth diagnosing.",
+    publishedAt: '2026-08-23',
+    thumb: 'settings-sheet',
+    body: [
+      p("A defect comes in, and the first thing anyone reaches for is the settings sheet. Melt temperature, back pressure, the zone profile, the pack. You read the numbers, compare them to what the resin wants, and build a cause. Every troubleshooting guide works this way, and so does every AI: the sheet is the ground truth, and the diagnosis is only ever as good as the sheet."),
+      p("When the sheet is right, that diagnosis is right. This isn't an argument against reading the numbers. It's a warning about the step just before, the moment the numbers land on the sheet. Somebody read them off a machine screen and wrote them down, or typed them into a form, or copied last week's sheet and changed a few. That step is where a real setting quietly becomes a wrong number, and a wrong number produces a confident, well-reasoned, completely useless answer."),
+      p("So before you trust a value, ask a smaller question first: is this number even possible for what it claims to be? A sheet lies in two ways, and both are easy to catch once you look for them."),
+      h2("The number that can't be real"),
+      p("The first is units. A back pressure comes in that no screw could ever pull, a value that would cook the melt and stall recovery if it were real. It isn't real. It's the right setting read in the wrong unit: the machine shows one thing, the sheet claims another, and the two are a factor apart. Korea and Japan make this especially easy, because one floor can carry three unit systems at once, the old gauge, the newer controller, and a training sheet written somewhere else. The moment a back pressure looks impossible, the answer isn't that the operator ran it far too high. It's which unit that number is in, and you don't diagnose off it until you know."),
+      h2("The profile that sits upside down"),
+      p("The second is the profile. The nozzle reads far colder than the barrel, and the obvious call is that the melt is too cold and the barrel should come up. Sometimes that's exactly backwards, because a cool nozzle is a setting, not a symptom. Acetal is run with the nozzle held well down on purpose, since letting it get hot degrades the material. Nylon and rigid PVC are often run with the back of the barrel hotter than the front. On any of those, a nozzle sitting below the barrel is the process working as intended, and turning the barrel up to fix the cold melt walks you away from a part that was fine."),
+      p("But the same reading wears two other faces. It's what you'd see if the zones were typed in backwards, the profile entered upside down, so the sheet says cold nozzle while the machine is set the other way. And it's what you'd see if the nozzle really had frozen off. The number alone can't separate those. What separates them is the resin. A material meant to run the nozzle hot has no business showing a cold one, and an LCP will freeze in the gate if you let the nozzle drop, so there the low reading is a real flag and not a profile choice. Read the number against what this resin actually wants, not against a generic rule that the nozzle is always the hottest thing on the barrel."),
+      diagram('settings-profile'),
+      h2("Neither reflex is safe"),
+      p("Here's the part to hold onto, because it cuts both ways. Don't harden into the idea that an odd number is always a typo, because reverse profiles and cool nozzles are real and common, and you'll start correcting settings that were never wrong. And don't harden the other way into trusting whatever the sheet says, because the sheet is the least reliable thing in the room. The discipline is narrow and a little boring: when a value is physically strange, stop and check the input, the unit, and the actual machine before you let it drive anything. The failure mode here isn't a bad diagnosis. It's a clean diagnosis of a number that was never true, which is the most convincing kind of wrong there is."),
+      h2("What went into the app"),
+      p("Mold Doctor checks the sheet before it reads it, so a back pressure that can only be the wrong unit, or a profile that sits upside down for the resin, gets held up to verify instead of quietly becoming the cause. A careful answer built on a mistyped number is still wrong, and nobody in the room is more sure of it than the person who typed it."),
+    ],
+  },
   {
     slug: 'glass-filled-warpage-fiber-orientation',
     title: "You balanced the cooling. The glass-filled part still warps.",
