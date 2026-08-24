@@ -6,7 +6,6 @@ import { useLocale } from '@/contexts/LocaleContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { isNativeApp } from '@/lib/platform';
 import { IconClipboard, IconCheckSquare, IconFlask } from '@/components/icons';
-import StoreBadges from '@/components/StoreBadges';
 import LandingHero from '@/components/landing/LandingHero';
 import LandingOutputTile from '@/components/landing/LandingOutputTile';
 import LandingHowItWorks from '@/components/landing/LandingHowItWorks';
@@ -57,12 +56,6 @@ export default function HomeClient({ notes }: { notes: HomeNoteCard[] }) {
     || user?.email?.split('@')[0]
     || '';
 
-  const steps = [
-    { t: t('landing.step1_t'), d: t('landing.step1_d') },
-    { t: t('landing.step2_t'), d: t('landing.step2_d') },
-    { t: t('landing.step3_t'), d: t('landing.step3_d') },
-  ];
-
   // 웹 + 로그아웃만 새 애플식 랜딩. 로그인(웹/앱 공통)·앱 로그아웃은 아래 기존 JSX 그대로(진우 확정 2).
   if (!user && !native) {
     return (
@@ -78,75 +71,48 @@ export default function HomeClient({ notes }: { notes: HomeNoteCard[] }) {
   }
 
   return (
-    <div className="bg-canvas min-h-screen">
-      {/* Hero — 브랜드 블루 풀블리드 */}
-      <section className="bg-brand text-on-brand px-5 pt-12 pb-14">
-        <div className="max-w-md mx-auto">
-          <p className="text-label font-semibold text-on-brand/80 mb-3">
-            {user ? t('landing.hero_eyebrow_user').replace('{name}', String(name)) : t('landing.hero_eyebrow')}
-          </p>
-          <h1 className="font-bold leading-[1.12] mb-4" style={{ fontSize: 'clamp(2rem, 8vw, var(--text-display))' }}>
-            {t('landing.hero_h1')}
-          </h1>
-          <p className="text-on-brand/85 text-body leading-relaxed mb-8">{t('landing.hero_sub')}</p>
+    <div className="bg-canvas min-h-screen" style={{ fontFamily: 'var(--font-landing)' }}>
+      {/* Hero — app-home-redesign-v1: 파란 풀블리드 → 흰/캔버스, 개편 랜딩(LandingHero) 타이포
+          재사용(토큰만). 콘텐츠는 작업 중심 유지(복귀 유저 = 바로 작업) — 작동방식·가입 trust
+          라인은 로그인 홈엔 불필요한 마케팅이라 삭제. 히어로 우측 기계사진 모티프 없음(담백, 진우 확인). */}
+      <section className="px-5 pt-12 pb-8 sm:pt-16">
+        <div className="max-w-4xl mx-auto">
+          <div className="max-w-[560px]">
+            <p className="text-[19px] font-semibold text-brand mb-1.5 tracking-[-.02em]">
+              {user ? t('landing.hero_eyebrow_user').replace('{name}', String(name)) : t('landing.hero_eyebrow')}
+            </p>
+            <h1 className="font-semibold tracking-[-.03em] text-ink" style={{ fontSize: 'clamp(2rem,7vw,3.5rem)', lineHeight: 1.07 }}>
+              {t('landing.hero_h1')}
+            </h1>
+            <p className="font-normal text-muted mt-4" style={{ fontSize: '19px', lineHeight: 1.3, letterSpacing: '-.014em', maxWidth: '34ch' }}>
+              {t('landing.hero_sub')}
+            </p>
 
-          <div className="flex flex-col gap-3">
-            {user ? (
-              <>
-                <Link href="/diagnose" className="ui-cta w-full bg-surface text-brand hover:bg-surface-sunken text-body">{t('landing.cta_primary_user')}</Link>
-                <Link href="/account" className="ui-cta w-full bg-transparent border-2 border-[var(--on-brand)] text-on-brand hover:bg-brand-ink text-body">{t('landing.cta_account')}</Link>
-                {/* 무료 도구 퀵액세스 — 마이페이지와 동급 아웃라인, 주 CTA보다 튀지 않게 */}
-                <div className="grid grid-cols-2 gap-2">
-                  <Link
-                    href="/ledger"
-                    className="min-h-[var(--touch-cta)] flex items-center justify-center gap-1.5 border-2 border-[var(--on-brand)] text-on-brand hover:bg-brand-ink rounded-full text-sm font-bold px-2 text-center transition-colors"
-                  >
-                    <IconClipboard className="shrink-0" /> {t('landing.tool_ledger_title')}
-                  </Link>
-                  <Link
-                    href="/tryout"
-                    className="min-h-[var(--touch-cta)] flex items-center justify-center gap-1.5 border-2 border-[var(--on-brand)] text-on-brand hover:bg-brand-ink rounded-full text-sm font-bold px-2 text-center transition-colors"
-                  >
-                    <IconCheckSquare className="shrink-0" /> {t('landing.tool_tryout_title')}
-                  </Link>
-                </div>
-                <Link href="/tools" className="text-on-brand/80 hover:text-on-brand text-label text-center underline underline-offset-2 min-h-[44px] flex items-center justify-center">{t('landing.tools_all_link')}</Link>
-              </>
-            ) : (
-              <>
-                <Link href="/diagnose" className="ui-cta w-full bg-surface text-brand hover:bg-surface-sunken text-body">{t('landing.cta_primary_loggedout')}</Link>
-                <Link href={locale === 'en' ? '/en/guide' : '/guide'} className="ui-cta w-full bg-transparent border-2 border-[var(--on-brand)] text-on-brand hover:bg-brand-ink text-body">{t('landing.cta_secondary')}</Link>
-              </>
-            )}
+            <div className="flex flex-col sm:flex-row gap-3 mt-6">
+              {user ? (
+                <>
+                  <Link href="/diagnose" className="ui-cta px-6 text-body">{t('landing.cta_primary_user')}</Link>
+                  <Link href="/account" className="inline-flex items-center justify-center min-h-[var(--touch-cta-lg)] rounded-[var(--radius-cta)] border-2 border-brand text-brand bg-transparent hover:bg-brand-tint font-bold px-6 text-body transition-colors active:scale-[.97]">{t('landing.cta_account')}</Link>
+                </>
+              ) : (
+                <>
+                  <Link href="/diagnose" className="ui-cta px-6 text-body">{t('landing.cta_primary_loggedout')}</Link>
+                  <Link href={locale === 'en' ? '/en/guide' : '/guide'} className="inline-flex items-center justify-center min-h-[var(--touch-cta-lg)] rounded-[var(--radius-cta)] border-2 border-brand text-brand bg-transparent hover:bg-brand-tint font-bold px-6 text-body transition-colors active:scale-[.97]">{t('landing.cta_secondary')}</Link>
+                </>
+              )}
+            </div>
+
+            {/* 축적 라인(app-home-redesign-v1 §카피) — "학습/개인화" 금지 카피 준수, 데이터가
+                쌓인다는 사실만 진술(진단 엔진이 저장 이력을 입력으로 쓰지 않음, 과장 금지). */}
+            <p className="text-muted text-label font-semibold mt-4">{t('home.accum_line')}</p>
           </div>
-
-          {/* 스토어 배지(store-badges-v1) — CTA 스택 하단, 로그인/비로그인 모두 노출. 네이티브 앱에서는
-              StoreBadges 내부 게이팅으로 DOM 자체가 생성되지 않는다. */}
-          <StoreBadges variant="hero" />
-
-          {!user && <p className="text-on-brand/70 text-label mt-4 text-center">{t('landing.hero_trust')}</p>}
         </div>
       </section>
 
-      {/* 하단 흰 영역 — 이렇게 추정해요 + 커버리지 한 줄 */}
-      <section className="px-5 py-12">
-        <div className="max-w-md mx-auto">
-          <h2 className="text-h3 font-bold text-ink mb-6">{t('landing.how_title')}</h2>
-          <ol className="space-y-3">
-            {steps.map((s, i) => (
-              <li key={i} className="ui-card flex gap-3 items-start">
-                <span className="shrink-0 w-7 h-7 rounded-full bg-brand-tint text-brand-ink font-bold text-label flex items-center justify-center tabular-nums">{i + 1}</span>
-                <div className="min-w-0">
-                  <h3 className="font-bold text-ink text-body">{s.t}</h3>
-                  <p className="text-muted text-label mt-0.5 leading-relaxed">{s.d}</p>
-                </div>
-              </li>
-            ))}
-          </ol>
-          <p className="text-center text-muted text-label mt-6">{t('landing.coverage')}</p>
-
-          {/* 무료 도구 — 작업표준 저장소 + 시사출 체크리스트 + 수지 라이브러리 */}
-          <h2 className="text-h3 font-bold text-ink mt-10 mb-4">{t('landing.free_tools_title')}</h2>
+      {/* 무료 도구 3종 + 최근 추정 — 기존 ui-card·링크 그대로, locale 인식 유지 */}
+      <section className="px-5 py-6">
+        <div className="max-w-4xl mx-auto">
+          <p className="text-[19px] font-semibold text-brand mb-4 tracking-[-.02em]">{t('landing.free_tools_title')}</p>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
             <Link href="/ledger" className="ui-card p-4 h-full flex flex-col items-start gap-1 hover:border-[var(--brand-border)] transition-colors">
               <IconClipboard size={24} className="text-brand" />
@@ -164,7 +130,15 @@ export default function HomeClient({ notes }: { notes: HomeNoteCard[] }) {
               <span className="text-muted text-label leading-snug">{t('landing.tool_resins_desc')}</span>
             </Link>
           </div>
-          <Link href="/tools" className="text-brand hover:text-brand-ink text-label font-medium mt-4 min-h-[44px] flex items-center justify-center">{t('landing.tools_all_link')}</Link>
+          <Link href="/tools" className="text-brand hover:text-brand-ink text-label font-bold mt-4 min-h-[44px] flex items-center">{t('landing.tools_all_link')}</Link>
+
+          {/* 최근 추정 → /history. 기존 "전체 기록 보기"(history.view_all) 패턴 재사용 — 단,
+              라이브 건수 표시는 이 컴포넌트에 없던 신규 데이터 페칭이 필요해(가드: 로직·데이터
+              무변경) 넣지 않음. 카운트가 꼭 필요하면 후속 mandate로 서버 컴포넌트 prop 전달 검토. */}
+          <Link href="/history" className="ui-card mt-3 flex items-center justify-between px-4 py-3.5 hover:border-[var(--brand-border)] transition-colors">
+            <span className="font-bold text-ink text-body">{t('account.history')}</span>
+            <span className="text-brand font-bold text-label">{t('history.view_all')} →</span>
+          </Link>
         </div>
 
         {/* 기술 노트 — 크롤러가 홈에서 도달 가능한 링크 확보(internal-links-to-notes-v1).
@@ -177,7 +151,7 @@ export default function HomeClient({ notes }: { notes: HomeNoteCard[] }) {
             노트가 ~25건을 넘기면 홈 payload가 무거워지니 그때는 정적 서버 페이지네이션(/en/notes/page/N)
             전환을 검토한다. */}
         <div className="max-w-2xl mx-auto" ref={notesSectionRef}>
-          <h2 className="text-h3 font-bold text-ink mt-10 mb-2">{t('landing.notes_title')}</h2>
+          <p className="text-[19px] font-semibold text-brand mt-10 mb-1.5 tracking-[-.02em]">{t('landing.notes_title')}</p>
           <p className="text-muted text-label mb-4">{t('landing.notes_sub')}</p>
           <div className="flex flex-col gap-2.5 mb-3">
             {pageNotes.map((n, i) => (
