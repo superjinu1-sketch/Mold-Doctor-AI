@@ -15,8 +15,10 @@ import LandingFieldNotes from '@/components/landing/LandingFieldNotes';
 import LandingCoverage from '@/components/landing/LandingCoverage';
 import type { HomeNoteCard } from '@/lib/notes';
 
-function formatDate(iso: string): string {
-  return new Date(iso).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+function formatDate(iso: string, locale: 'ko' | 'en'): string {
+  return locale === 'en'
+    ? new Date(iso).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })
+    : new Date(iso).toLocaleDateString('ko-KR', { year: 'numeric', month: 'long', day: 'numeric' });
 }
 
 function pageWindow(current: number, total: number): (number | 'ellipsis')[] {
@@ -35,6 +37,7 @@ const PAGE_SIZE = 4;
 
 export default function HomeClient({ notes }: { notes: HomeNoteCard[] }) {
   const { t, locale } = useLocale();
+  const isEn = locale === 'en';
   const { user } = useAuth();
   // 웹 로그아웃 랜딩 분기(homepage-revamp-web-v1) — StoreBadges 네이티브 게이팅과 동일 패턴
   // (정적 export 프리렌더 시점엔 네이티브 브릿지가 없어 native=false로 시작, 마운트 후 재평가).
@@ -158,30 +161,35 @@ export default function HomeClient({ notes }: { notes: HomeNoteCard[] }) {
           <p className="text-[19px] font-semibold text-brand mt-10 mb-1.5 tracking-[-.02em]">{t('landing.notes_title')}</p>
           <p className="text-muted text-label mb-4">{t('landing.notes_sub')}</p>
           <div className="flex flex-col gap-2.5 mb-3">
-            {pageNotes.map((n, i) => (
+            {pageNotes.map((n, i) => {
+              const title = isEn ? n.title : (n.titleKo ?? n.title);
+              const description = isEn ? n.description : (n.descriptionKo ?? n.description);
+              const thumbSvg = isEn ? n.thumbSvg : (n.thumbSvgKo ?? n.thumbSvg);
+              return (
               <Link key={n.slug} href={locale === 'en' ? `/en/notes/${n.slug}` : `/notes/${n.slug}`} className="ui-card p-3.5 flex gap-3.5 items-start hover:border-[var(--brand-border)] transition-colors">
                 {n.thumbImage ? (
                   <img src={n.thumbImage} alt="" aria-hidden="true" loading="lazy"
                     className="w-[104px] shrink-0 h-auto rounded-lg border border-[color:var(--border)]" />
-                ) : n.thumbSvg && (
+                ) : thumbSvg && (
                   <div
                     aria-hidden="true"
                     className="w-[104px] shrink-0 border border-[color:var(--border)] rounded-lg p-1 [&>svg]:block [&>svg]:w-full [&>svg]:h-auto"
-                    dangerouslySetInnerHTML={{ __html: n.thumbSvg }}
+                    dangerouslySetInnerHTML={{ __html: thumbSvg }}
                   />
                 )}
                 <div className="min-w-0 flex-1">
                   <div className="flex items-start gap-2">
-                    <span className="font-bold text-ink text-[15.5px] leading-snug">{n.title}</span>
+                    <span className="font-bold text-ink text-[15.5px] leading-snug">{title}</span>
                     {page === 1 && i === 0 && (
                       <span className="text-[10px] font-extrabold text-white bg-brand rounded-full px-2 py-0.5 shrink-0">NEW</span>
                     )}
                   </div>
-                  <p className="text-muted text-[13px] leading-relaxed mt-1 line-clamp-2">{n.description}</p>
-                  <p className="text-faint text-[11px] mt-1.5">{formatDate(n.publishedAt)}</p>
+                  <p className="text-muted text-[13px] leading-relaxed mt-1 line-clamp-2">{description}</p>
+                  <p className="text-faint text-[11px] mt-1.5">{formatDate(n.publishedAt, locale)}</p>
                 </div>
               </Link>
-            ))}
+              );
+            })}
           </div>
 
           {totalPages > 1 && (

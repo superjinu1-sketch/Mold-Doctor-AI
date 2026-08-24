@@ -1,0 +1,26 @@
+<svg viewBox="0 0 180 136" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="tms-t tms-d">
+  <title id="tms-t">기울어 굳은 플레이크가 옅은 줄무늬로 읽힌다</title>
+  <desc id="tms-d">알루미늄 플레이크가 평평하게 누우면 고르게 반사한다. 흐름이 교란된 구역에서는 플레이크가 비스듬히 굳어 그 구역이 옅은 줄무늬로 읽힌다. 줄무늬는 각도다. 수지를 말리기 전에 부품 각도부터 의심하라.</desc>
+
+  <rect x="6" y="6" width="168" height="10" fill="var(--faint)" opacity=".28"/>
+  <rect x="70" y="6" width="40" height="10" fill="var(--danger)" opacity=".20"/>
+  <rect x="6" y="16" width="168" height="58" fill="var(--faint)" opacity=".07"/>
+  <line x1="70" y1="16" x2="70" y2="74" stroke="var(--danger)" stroke-width="1" stroke-dasharray="3 2" opacity=".4"/>
+  <line x1="110" y1="16" x2="110" y2="74" stroke="var(--danger)" stroke-width="1" stroke-dasharray="3 2" opacity=".4"/>
+  <g stroke="var(--brand)" stroke-width="2.5" stroke-linecap="round">
+    <line x1="14" y1="31" x2="34" y2="32"/><line x1="42" y1="32" x2="62" y2="31"/>
+    <line x1="118" y1="31" x2="138" y2="32"/><line x1="146" y1="32" x2="166" y2="31"/>
+    <line x1="18" y1="48" x2="38" y2="49"/><line x1="46" y1="49" x2="64" y2="48"/>
+    <line x1="120" y1="49" x2="140" y2="48"/><line x1="148" y1="48" x2="167" y2="49"/>
+    <line x1="24" y1="65" x2="44" y2="64"/><line x1="126" y1="64" x2="146" y2="65"/>
+  </g>
+  <g stroke="var(--danger)" stroke-width="2.5" stroke-linecap="round">
+    <line x1="75" y1="52" x2="86" y2="32"/>
+    <line x1="90" y1="30" x2="102" y2="48"/>
+    <line x1="98" y1="66" x2="108" y2="44"/>
+  </g>
+
+  <rect x="6" y="88" width="168" height="42" rx="7" fill="var(--faint)" opacity=".10"/>
+  <text x="14" y="106" font-size="12.5" font-weight="700" fill="var(--ink)">줄무늬는 각도다</text>
+  <text x="14" y="121" font-size="9.5" fill="var(--faint)">건조를 탓하기 전에 각도를 보라</text>
+</svg>

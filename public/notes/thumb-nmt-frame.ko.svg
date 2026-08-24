@@ -1,0 +1,21 @@
+<svg viewBox="0 0 180 136" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="tnf-t tnf-d">
+  <title id="tnf-t">금속 프레임 속 안테나 라인</title>
+  <desc id="tnf-d">모서리 근처에 얇은 수지 라인을 사출로 관통시킨 금속 폰 프레임. 이 라인이 전파는 통과시키고 물은 막으며 프레임을 하나의 구조물로 되돌린다.</desc>
+
+  <text x="90" y="17" font-size="11" font-weight="700" text-anchor="middle" fill="var(--ink)">금속 프레임, 플라스틱 라인</text>
+
+  <rect x="60" y="26" width="60" height="70" rx="10" fill="var(--muted)" opacity=".3"/>
+  <rect x="70" y="36" width="40" height="50" rx="6" fill="var(--surface)"/>
+  <g fill="var(--brand)">
+    <rect x="72" y="26" width="5" height="10"/>
+    <rect x="103" y="26" width="5" height="10"/>
+    <rect x="72" y="86" width="5" height="10"/>
+    <rect x="103" y="86" width="5" height="10"/>
+    <rect x="60" y="53" width="10" height="5"/>
+    <rect x="110" y="53" width="10" height="5"/>
+  </g>
+  <text x="90" y="106" font-size="8.5" text-anchor="middle" fill="var(--faint)">전파 창 · 방수 밀봉</text>
+
+  <rect x="14" y="110" width="152" height="20" rx="5" fill="var(--ok)" opacity=".1"/>
+  <text x="90" y="124" font-size="9" font-weight="700" text-anchor="middle" fill="var(--ok)">전파는 통과, 물은 차단</text>
+</svg>

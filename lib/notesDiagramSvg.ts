@@ -58,7 +58,12 @@ const THUMB_FILES: Record<NoteThumbId, string> = {
   'settings-sheet': 'thumb-settings-sheet.svg',
 };
 
-export function readNoteThumbSvg(id: NoteThumbId): string {
-  const filePath = path.join(process.cwd(), 'public', 'notes', THUMB_FILES[id]);
+export function readNoteThumbSvg(id: NoteThumbId, locale: 'ko' | 'en' = 'en'): string {
+  const base = THUMB_FILES[id];
+  if (locale === 'ko') {
+    const koPath = path.join(process.cwd(), 'public', 'notes', base.replace(/\.svg$/, '.ko.svg'));
+    if (fs.existsSync(koPath)) return fs.readFileSync(koPath, 'utf-8');
+  }
+  const filePath = path.join(process.cwd(), 'public', 'notes', base);
   return fs.readFileSync(filePath, 'utf-8');
 }

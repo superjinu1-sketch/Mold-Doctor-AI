@@ -507,9 +507,12 @@ export interface HomeNoteCard {
   slug: string;
   title: string;
   description: string;
+  titleKo: string | null; // KO 있으면 KO 제목, 없으면 null(EN 폴백)
+  descriptionKo: string | null;
   publishedAt: string;
-  thumbSvg: string | null; // 서버에서 읽은 인라인 SVG. thumb 없으면 null
-  thumbImage?: string | null; // 래스터 사진 경로. 있으면 렌더러가 thumbSvg보다 우선 사용
+  thumbSvg: string | null; // 서버에서 읽은 인라인 SVG(EN). thumb 없으면 null
+  thumbSvgKo: string | null; // KO 인라인 SVG(.ko.svg). 없으면 null(EN 폴백)
+  thumbImage?: string | null; // 래스터 사진 경로. 있으면 렌더러가 thumbSvg보다 우선 사용(로케일 무관)
 }
 
 // ── 노트 시리즈 (en-notes-series-nav-v1) ─────────────────────────

@@ -1,0 +1,18 @@
+<svg viewBox="0 0 180 136" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="tfc-t tfc-d">
+  <title id="tfc-t">난연제가 스크류를 부식시킨다</title>
+  <desc id="tfc-d">난연 PPA에서는 열과 수분이 난연제를 산으로 바꿔 공급 스크류를 부식시킨다. 부품에 나타나는 흑점은 오염이 아니라 부식 생성물이다. 바짝 건조하고 셧다운 때 퍼지하라.</desc>
+
+  <text x="90" y="17" font-size="11.5" font-weight="700" text-anchor="middle" fill="var(--ink)">난연 PPA</text>
+
+  <rect x="10" y="26" width="160" height="30" rx="6" fill="var(--faint)" opacity=".1"/>
+  <text x="90" y="45" font-size="10.5" font-weight="600" text-anchor="middle" fill="var(--muted)">열 + 수분 → 산</text>
+
+  <path d="M90 56 v8" fill="none" stroke="var(--faint)" stroke-width="1.2"/>
+
+  <rect x="10" y="66" width="160" height="42" rx="6" fill="var(--danger)" opacity=".1"/>
+  <rect x="10" y="66" width="160" height="42" rx="6" fill="none" stroke="var(--danger)" stroke-width="1.2"/>
+  <text x="90" y="85" font-size="12" font-weight="700" text-anchor="middle" fill="var(--danger)">스크류가 부식된다</text>
+  <text x="90" y="101" font-size="9.5" text-anchor="middle" fill="var(--faint)">흑점, 오염이 아니다</text>
+
+  <text x="90" y="126" font-size="9.5" font-weight="600" text-anchor="middle" fill="var(--ok)">바짝 건조 · 셧다운 퍼지</text>
+</svg>

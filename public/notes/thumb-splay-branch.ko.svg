@@ -1,0 +1,30 @@
+<svg viewBox="0 0 180 136" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="tsb-t tsb-d">
+  <title id="tsb-t">섬유 판독으로 이어지는 세 가지 확인</title>
+  <desc id="tsb-d">닦이나: 아니오. 유리섬유 강화인가: 예. 건조가 데이터시트를 만족하나: 예. 그러면 답은 섬유 판독이고, 금형 온도가 먼저다.</desc>
+
+  <rect x="6" y="2" width="168" height="27" rx="7" fill="none" stroke="var(--faint)" stroke-width="1.2" opacity=".55"/>
+  <text x="14" y="20" font-size="12.5" font-weight="600" fill="var(--ink)">닦이나?</text>
+  <rect x="134" y="7" width="34" height="17" rx="8.5" fill="var(--faint)" opacity=".16"/>
+  <text x="151" y="19.5" font-size="10.5" font-weight="700" text-anchor="middle" fill="var(--ink)">아니오</text>
+
+  <line x1="20" y1="29" x2="20" y2="35" stroke="var(--faint)" stroke-width="1.2" opacity=".55"/>
+
+  <rect x="6" y="35" width="168" height="27" rx="7" fill="none" stroke="var(--faint)" stroke-width="1.2" opacity=".55"/>
+  <text x="14" y="53" font-size="12.5" font-weight="600" fill="var(--ink)">유리섬유 강화?</text>
+  <rect x="134" y="40" width="34" height="17" rx="8.5" fill="var(--faint)" opacity=".16"/>
+  <text x="151" y="52.5" font-size="10.5" font-weight="700" text-anchor="middle" fill="var(--ink)">예</text>
+
+  <line x1="20" y1="62" x2="20" y2="68" stroke="var(--faint)" stroke-width="1.2" opacity=".55"/>
+
+  <rect x="6" y="68" width="168" height="27" rx="7" fill="none" stroke="var(--faint)" stroke-width="1.2" opacity=".55"/>
+  <text x="14" y="86" font-size="12.5" font-weight="600" fill="var(--ink)">건조 정상?</text>
+  <rect x="134" y="73" width="34" height="17" rx="8.5" fill="var(--faint)" opacity=".16"/>
+  <text x="151" y="85.5" font-size="10.5" font-weight="700" text-anchor="middle" fill="var(--ink)">예</text>
+
+  <line x1="20" y1="95" x2="20" y2="101" stroke="var(--ok)" stroke-width="1.4"/>
+
+  <rect x="6" y="101" width="168" height="33" rx="7" fill="var(--ok)" opacity=".10"/>
+  <rect x="6" y="101" width="168" height="33" rx="7" fill="none" stroke="var(--ok)" stroke-width="1.3"/>
+  <text x="14" y="117" font-size="13" font-weight="700" fill="var(--ok)">섬유 판독</text>
+  <text x="14" y="129" font-size="9.5" fill="var(--faint)">금형 온도가 먼저다</text>
+</svg>

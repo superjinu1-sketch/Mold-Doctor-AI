@@ -1,0 +1,24 @@
+<svg viewBox="0 0 180 136" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="tws-t tws-d">
+  <title id="tws-t">웰드라인: 레버는 유리섬유 강화 여부에 달렸다</title>
+  <desc id="tws-d">무강화 수지는 용융 온도에 반응한다. 유리섬유 강화 수지는 보압에 반응한다. 어느 쪽이든 더 보기 좋은 웰드라인이 반드시 더 강한 것은 아니다.</desc>
+
+  <rect x="6" y="2" width="168" height="24" rx="7" fill="none" stroke="var(--faint)" stroke-width="1.2" opacity=".55"/>
+  <text x="90" y="18" font-size="12.5" font-weight="600" text-anchor="middle" fill="var(--ink)">웰드라인</text>
+
+  <path d="M90 26 v5 M46 31 h88 M46 31 v5 M134 31 v5" fill="none" stroke="var(--faint)" stroke-width="1.2" opacity=".55"/>
+
+  <rect x="6" y="36" width="80" height="38" rx="7" fill="none" stroke="var(--faint)" stroke-width="1.2" opacity=".55"/>
+  <text x="46" y="52" font-size="9.5" font-weight="600" text-anchor="middle" fill="var(--faint)">무강화</text>
+  <text x="46" y="66" font-size="11" font-weight="700" text-anchor="middle" fill="var(--ink)">용융 온도</text>
+
+  <rect x="94" y="36" width="80" height="38" rx="7" fill="none" stroke="var(--faint)" stroke-width="1.2" opacity=".55"/>
+  <text x="134" y="52" font-size="9.5" font-weight="600" text-anchor="middle" fill="var(--faint)">유리섬유 강화</text>
+  <text x="134" y="66" font-size="11" font-weight="700" text-anchor="middle" fill="var(--ink)">보압</text>
+
+  <path d="M46 74 v5 M46 79 h88 M134 74 v5 M90 79 v5" fill="none" stroke="var(--danger)" stroke-width="1.2" opacity=".7"/>
+
+  <rect x="6" y="84" width="168" height="46" rx="7" fill="var(--danger)" opacity=".08"/>
+  <rect x="6" y="84" width="168" height="46" rx="7" fill="none" stroke="var(--danger)" stroke-width="1.3"/>
+  <text x="90" y="104" font-size="11.5" font-weight="700" text-anchor="middle" fill="var(--danger)">덜 보인다 ≠ 더 강하다</text>
+  <text x="90" y="120" font-size="9" text-anchor="middle" fill="var(--faint)">조건은 격차를 좁히지, 없애진 못한다</text>
+</svg>

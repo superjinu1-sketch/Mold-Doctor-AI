@@ -1,0 +1,31 @@
+<svg viewBox="0 0 180 136" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="tcw-t tcw-d">
+  <title id="tcw-t">형체력은 바닥이 아니라 구간이다</title>
+  <desc id="tcw-d">형체력이 부족하면 플래시가 난다. 적정은 계산이 요구하는 값이다: 투영면적 곱하기 캐비티 압력 나누기 1000. 너무 크면 벤트를 뭉개 공기가 갇히고 탄 자국이 생긴다.</desc>
+
+  <rect x="6" y="2" width="168" height="24" rx="7" fill="none" stroke="var(--faint)" stroke-width="1.2" opacity=".55"/>
+  <text x="90" y="18" font-size="12" font-weight="600" text-anchor="middle" fill="var(--ink)">형체력</text>
+
+  <path d="M90 26 v6" fill="none" stroke="var(--faint)" stroke-width="1.2" opacity=".55"/>
+
+  <rect x="6" y="34" width="53" height="34" rx="6" fill="var(--danger)" opacity=".1"/>
+  <rect x="6" y="34" width="53" height="34" rx="6" fill="none" stroke="var(--danger)" stroke-width="1.2"/>
+  <text x="32.5" y="48" font-size="8.5" font-weight="600" text-anchor="middle" fill="var(--faint)">부족</text>
+  <text x="32.5" y="61" font-size="11" font-weight="700" text-anchor="middle" fill="var(--danger)">플래시</text>
+
+  <rect x="63.5" y="34" width="53" height="34" rx="6" fill="var(--ok)" opacity=".14"/>
+  <rect x="63.5" y="34" width="53" height="34" rx="6" fill="none" stroke="var(--ok)" stroke-width="1.2"/>
+  <text x="90" y="48" font-size="8.5" font-weight="600" text-anchor="middle" fill="var(--faint)">적정</text>
+  <text x="90" y="61" font-size="11" font-weight="700" text-anchor="middle" fill="var(--ok)">양품</text>
+
+  <rect x="121" y="34" width="53" height="34" rx="6" fill="var(--danger)" opacity=".1"/>
+  <rect x="121" y="34" width="53" height="34" rx="6" fill="none" stroke="var(--danger)" stroke-width="1.2"/>
+  <text x="147.5" y="48" font-size="8.5" font-weight="600" text-anchor="middle" fill="var(--faint)">과다</text>
+  <text x="147.5" y="61" font-size="11" font-weight="700" text-anchor="middle" fill="var(--danger)">탄 자국</text>
+
+  <path d="M90 68 v6" fill="none" stroke="var(--faint)" stroke-width="1.2" opacity=".55"/>
+
+  <rect x="6" y="76" width="168" height="54" rx="7" fill="var(--faint)" opacity=".1"/>
+  <text x="90" y="95" font-size="10" font-weight="700" text-anchor="middle" fill="var(--ink)">A (cm²) × P (kgf/cm²) ÷ 1000</text>
+  <text x="90" y="112" font-size="10.5" font-weight="700" text-anchor="middle" fill="var(--danger)">많다고 안전하지 않다</text>
+  <text x="90" y="124" font-size="8.5" text-anchor="middle" fill="var(--faint)">과형체는 벤트를 뭉갠다</text>
+</svg>

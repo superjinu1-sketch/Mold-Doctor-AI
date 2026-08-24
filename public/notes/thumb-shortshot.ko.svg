@@ -1,0 +1,29 @@
+<svg viewBox="0 0 180 136" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="tss-t tss-d">
+  <title id="tss-t">쇼트샷 테스트가 게이트 근처 자국을 가른다</title>
+  <desc id="tss-d">쇼트샷을 쳐 본다. 자국이 그대로 남으면 흐름 선단이 남긴 충전 단계 불량이고, 사라졌다가 충전이나 보압에서만 돌아오면 게이트의 보압 단계 불량이다. 사진이 아니라 거동이 가른다.</desc>
+
+  <text x="90" y="16" font-size="10.5" font-weight="700" text-anchor="middle" fill="var(--ink)">쇼트샷 테스트</text>
+
+  <rect x="12" y="24" width="76" height="62" rx="5" fill="var(--brand)" opacity=".09"/>
+  <rect x="12" y="24" width="76" height="62" rx="5" fill="none" stroke="var(--brand)" stroke-width="1"/>
+  <text x="50" y="39" font-size="8.5" font-weight="700" text-anchor="middle" fill="var(--brand)">충전 단계</text>
+  <g stroke="var(--brand)" stroke-width="2" stroke-linecap="round">
+    <line x1="24" y1="52" x2="44" y2="53"/><line x1="48" y1="53" x2="70" y2="52"/>
+    <line x1="26" y1="61" x2="46" y2="62"/><line x1="50" y1="62" x2="72" y2="61"/>
+  </g>
+  <text x="50" y="79" font-size="7" text-anchor="middle" fill="var(--muted)">쇼트샷에도 남는다</text>
+
+  <rect x="92" y="24" width="76" height="62" rx="5" fill="var(--danger)" opacity=".09"/>
+  <rect x="92" y="24" width="76" height="62" rx="5" fill="none" stroke="var(--danger)" stroke-width="1"/>
+  <text x="130" y="39" font-size="8.5" font-weight="700" text-anchor="middle" fill="var(--danger)">보압 단계</text>
+  <circle cx="130" cy="58" r="5" fill="var(--danger)" opacity=".85"/>
+  <g stroke="var(--danger)" stroke-width="2" stroke-linecap="round">
+    <line x1="130" y1="47" x2="130" y2="44"/><line x1="141" y1="58" x2="144" y2="58"/>
+    <line x1="119" y1="58" x2="116" y2="58"/><line x1="138" y1="66" x2="140" y2="68"/>
+    <line x1="122" y1="66" x2="120" y2="68"/>
+  </g>
+  <text x="130" y="79" font-size="7" text-anchor="middle" fill="var(--muted)">충전·보압에서만</text>
+
+  <rect x="14" y="110" width="152" height="20" rx="5" fill="var(--ok)" opacity=".10"/>
+  <text x="90" y="124" font-size="8.5" font-weight="700" text-anchor="middle" fill="var(--ok)">사진이 아니라 거동이 가른다</text>
+</svg>

@@ -56,7 +56,7 @@ export default function NotesIndexPageKo() {
               <div
                 aria-hidden="true"
                 className="mb-4 sm:mb-0 shrink-0 self-start w-[180px] max-w-full rounded-lg border border-[color:var(--border)] bg-[color:var(--surface-sunken,transparent)] p-2 [&>svg]:block [&>svg]:w-full [&>svg]:h-auto"
-                dangerouslySetInnerHTML={{ __html: readNoteThumbSvg(display.thumb) }}
+                dangerouslySetInnerHTML={{ __html: readNoteThumbSvg(display.thumb, 'ko') }}
               />
             )}
             <div className="min-w-0">
