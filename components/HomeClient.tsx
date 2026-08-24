@@ -6,6 +6,7 @@ import { useLocale } from '@/contexts/LocaleContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { isNativeApp } from '@/lib/platform';
 import { IconClipboard, IconCheckSquare, IconFlask } from '@/components/icons';
+import StoreBadges from '@/components/StoreBadges';
 import LandingHero from '@/components/landing/LandingHero';
 import LandingOutputTile from '@/components/landing/LandingOutputTile';
 import LandingHowItWorks from '@/components/landing/LandingHowItWorks';
@@ -105,6 +106,9 @@ export default function HomeClient({ notes }: { notes: HomeNoteCard[] }) {
             {/* 축적 라인(app-home-redesign-v1 §카피) — "학습/개인화" 금지 카피 준수, 데이터가
                 쌓인다는 사실만 진술(진단 엔진이 저장 이력을 입력으로 쓰지 않음, 과장 금지). */}
             <p className="text-muted text-label font-semibold mt-4">{t('home.accum_line')}</p>
+            <div className="mt-4">
+              <StoreBadges variant="badges" locale={locale} />
+            </div>
           </div>
         </div>
       </section>
