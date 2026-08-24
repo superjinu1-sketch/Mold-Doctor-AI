@@ -328,7 +328,7 @@ CRITICAL RULES:
 5. For GF-reinforced grades, consider fiber orientation effects.
 6. For hot runner molds, check zone temperature uniformity and dead spots.
 7. ${isEn ? 'Respond in English. The first time a specialized/academic term appears, add a short plain-language parenthetical (keep the term itself). Do not gloss common or shop-floor terms.' : 'Respond in Korean. 특수 학술용어는 처음 등장 시 괄호로 짧은 쉬운 풀이를 덧붙인다(용어 자체는 유지, STEP 3.5). 일반어·현장표준어는 풀지 않는다.'}
-8. MOLD DRAWING ANALYSIS — if mold drawings are provided, analyze: gate location vs defect, runner balance, cooling near defect area, wall thickness variation, vent locations, ejector positions. Include in 'mold_analysis' field.
+8. MOLD DRAWING ANALYSIS: if mold drawings are provided, analyze gate location vs defect, runner balance, cooling near defect area, wall thickness variation, vent locations, ejector positions. Include in 'mold_analysis' field.
 9. ${isEn ? 'In all output text, use "estimate/estimation" wording rather than "diagnosis" in user-facing field values.' : 'In all Korean output text (summary, description, notes, actions), use "추정" instead of "진단". Do not use "진단" in any output JSON field values.'}
 10. FLAME RETARDANCY & THICKNESS
 ${isEn ? `11. SEVERITY CRITERIA (use these exact definitions — do NOT over-rate):
@@ -363,6 +363,7 @@ OUTPUT LENGTH LIMITS — strictly enforce to prevent truncation:
 - mold_analysis (only if mold drawings/info provided): max 2 design_risk_factors, max 2 recommendations, each max 50 chars.
 - summary: max 35 chars.
 Be concise. ${isEn ? 'English only in all output field values.' : 'Korean only where specified.'} No extra explanation outside JSON.
+${isEn ? 'No em-dash (—) or en-dash (–) in any output field value. Use commas, colons, parentheses, or separate sentences instead. For the term glosses in STEP 3.5, use parentheses (not dashes).' : '모든 출력 필드 값에 em-dash(—)·en-dash(–)를 쓰지 않는다. 쉼표·콜론·괄호·문장 분리로 대체한다. 용어 풀이는 괄호를 쓴다.'}
 
 ${isEn ? `ACTIONABILITY TAGS (additive — classification/display only, never change the reasoning/parameters/values/order/numbers):
 - recommendations[].urgency: assign only an urgency tag to each recommendation. now=a setting to change immediately on the injection machine (temperature/pressure/speed/time). next_shot=check/fine-tune on the next shot. root=a big, time/cost-heavy root action such as mold/design/material replacement. Which parameter to recommend, its value, order, and reason stay exactly as in STEP 3 — only attach the tag.
@@ -431,7 +432,7 @@ function buildSystemBlocks(resinType: string, tier: 'simple' | 'complex' = 'simp
   const variableText = [
     `RESIN IN USE: ${resinType || 'Unknown'}`,
     `RESIN KNOWLEDGE:\n${resinNote}`,
-    locale === 'en' ? `\nOUTPUT LANGUAGE: English. ALL JSON field string values (summary, description, scientific_reasoning, evidence, elimination, verification, resin_specific_notes, drying_assessment, additional_advice, note fields, action/why fields, checklist items, gate_assessment, cooling_assessment, design_risk_factors, recommendations text) MUST be written in English. Use English technical terms. No Korean text in any output field value. Category names in English (e.g. Material, Machine, Mold, Method, Drying). TERM GLOSSING (mirror STEP 3.5): keep the same reasoning, cause order, phase, severity, and numbers — only add a short plain parenthetical the first time a specialized/academic term appears (keep the term itself). e.g., "equilibrium moisture content (moisture a resin holds at a given humidity)", "dew point (temperature at which air moisture condenses)", "hydrolysis (moisture breaks down under heat into gas)". Do NOT gloss common terms (residual moisture, drying, shrinkage) or shop-floor terms (holding pressure, gate, injection speed). Do not change anything except adding these parentheticals.` : '',
+    locale === 'en' ? `\nOUTPUT LANGUAGE: English. ALL JSON field string values (summary, description, scientific_reasoning, evidence, elimination, verification, resin_specific_notes, drying_assessment, additional_advice, note fields, action/why fields, checklist items, gate_assessment, cooling_assessment, design_risk_factors, recommendations text) MUST be written in English. Use English technical terms. No Korean text in any output field value. Category names in English (e.g. Material, Machine, Mold, Method, Drying). TERM GLOSSING (mirror STEP 3.5): keep the same reasoning, cause order, phase, severity, and numbers. Only add a short plain parenthetical the first time a specialized/academic term appears (keep the term itself). e.g., "equilibrium moisture content (moisture a resin holds at a given humidity)", "dew point (temperature at which air moisture condenses)", "hydrolysis (moisture breaks down under heat into gas)". Do NOT gloss common terms (residual moisture, drying, shrinkage) or shop-floor terms (holding pressure, gate, injection speed). Do not change anything except adding these parentheticals.` : '',
     tier === 'complex' ? (isEn ? `\nCOMPLEX CASE INSTRUCTIONS (complex-cause case):
 This case is likely to have multiple contributing causes.
 Do not conclude with a simple cause (drying, temperature) alone.

@@ -92,7 +92,7 @@ export default function ResinDetailView({
             </div>
           ) : (
             <div className="ui-card ui-card-lg p-5">
-              <p className="text-body text-muted">{L('비흡습성 수지로 별도 건조가 일반적으로 필요하지 않다.', 'Non-hygroscopic — pre-drying is generally not required.')}</p>
+              <p className="text-body text-muted">{L('비흡습성 수지로 별도 건조가 일반적으로 필요하지 않다.', 'Non-hygroscopic, pre-drying is generally not required.')}</p>
             </div>
           )}
         </section>
@@ -187,7 +187,7 @@ export default function ResinDetailView({
             href={`/diagnose?resin=${encodeURIComponent(resinKey)}`}
             className="ui-cta w-full text-body block text-center"
           >
-            {L(`${displayName}에서 불량이 났다면 — 사진과 세팅값으로 원인을 추정해 드립니다`, `Got a defect with ${displayName}? Upload a photo and settings — we'll estimate the cause`)}
+            {L(`${displayName}에서 불량이 났다면, 사진과 세팅값으로 원인을 추정해 드립니다`, `Got a defect with ${displayName}? Upload a photo and settings, we'll estimate the cause`)}
           </Link>
         </section>
 

@@ -56,7 +56,7 @@ export const HELP_KB: HelpKbItem[] = [
   },
   {
     id: 'ocr',
-    keywordsKo: ['OCR', '셋팅 사진', '조건표', '컨트롤러', '자동 입력'],
+    keywordsKo: ['OCR', '셋팅 사진', '세팅 사진', '조건표', '컨트롤러', '자동 입력'],
     keywordsEn: ['ocr', 'settings photo', 'condition sheet', 'controller', 'auto fill', 'auto-fill'],
     answerKo: '사출기 컨트롤러 화면이나 조건표를 촬영해 올리면 세팅값이 자동으로 입력됩니다(최대 5장). 인식값은 제출 전에 수정할 수 있습니다.',
     answerEn: 'Photograph the machine controller screen or a condition sheet and the values are read automatically (up to 5 images). You can edit them before submitting.',
