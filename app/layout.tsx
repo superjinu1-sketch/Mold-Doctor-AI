@@ -11,11 +11,11 @@ import { SITE_URL } from '@/lib/siteUrl';
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: 'Mold Doctor AI — 사출 불량 트러블슈팅',
-  description: '사출기 셋팅 값과 불량 사진을 입력하면 AI가 원인을 분석하고 해결 조건을 제시합니다.',
+  description: '사출기 세팅 값과 불량 사진을 입력하면 AI가 원인을 분석하고 해결 조건을 제시합니다.',
   manifest: '/manifest.json',
   openGraph: {
     title: 'Mold Doctor AI — 사출 불량 트러블슈팅',
-    description: '사출기 셋팅 값과 불량 사진을 입력하면 AI가 원인을 분석하고 해결 조건을 제시합니다.',
+    description: '사출기 세팅 값과 불량 사진을 입력하면 AI가 원인을 분석하고 해결 조건을 제시합니다.',
     type: 'website',
     locale: 'ko_KR',
     siteName: 'Mold Doctor AI',
@@ -23,7 +23,7 @@ export const metadata: Metadata = {
   twitter: {
     card: 'summary',
     title: 'Mold Doctor AI',
-    description: '사출 불량 AI 추정 — 원인 분석 + 셋팅 권장값 즉시 제공',
+    description: '사출 불량 AI 추정 — 원인 분석 + 세팅 권장값 즉시 제공',
   },
   verification: {
     google: [

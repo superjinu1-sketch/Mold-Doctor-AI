@@ -367,7 +367,7 @@ Be concise. ${isEn ? 'English only in all output field values.' : 'Korean only w
 ${isEn ? `ACTIONABILITY TAGS (additive — classification/display only, never change the reasoning/parameters/values/order/numbers):
 - recommendations[].urgency: assign only an urgency tag to each recommendation. now=a setting to change immediately on the injection machine (temperature/pressure/speed/time). next_shot=check/fine-tune on the next shot. root=a big, time/cost-heavy root action such as mold/design/material replacement. Which parameter to recommend, its value, order, and reason stay exactly as in STEP 3 — only attach the tag.
 - avoid: 0-2 actions that operators commonly take for this defect but which are counterproductive (e.g., increasing cooling time for sink marks, increasing only clamp force for flash). If unsure, leave it empty. No guessing or generic statements, and nothing that contradicts the KB/reasoning.` : `ACTIONABILITY TAGS (additive — 분류·노출만, 추론·파라미터·값·순서·수치 절대 불변):
-- recommendations[].urgency: 각 추천에 시급도 태그만 부여. now=지금 사출기에서 바로 바꾸는 셋팅(온도·압력·속도·시간). next_shot=다음 샷에서 확인·미세조정. root=금형·설계·재료 교체 등 시간·비용 큰 근본 조치. 어떤 파라미터를 추천할지·값·순서·reason은 STEP 3 그대로 두고 태그만 붙인다.
+- recommendations[].urgency: 각 추천에 시급도 태그만 부여. now=지금 사출기에서 바로 바꾸는 세팅(온도·압력·속도·시간). next_shot=다음 샷에서 확인·미세조정. root=금형·설계·재료 교체 등 시간·비용 큰 근본 조치. 어떤 파라미터를 추천할지·값·순서·reason은 STEP 3 그대로 두고 태그만 붙인다.
 - avoid: 이 불량에서 작업자가 흔히 하지만 역효과인 조치 0~2개(예: 싱크에 쿨링타임↑, 플래시에 형체력만↑). 확신 없으면 빈 배열. 추측·일반론 금지, KB·추론과 모순되는 항목 금지.`}
 
 OUTPUT FORMAT (return as JSON only, no markdown):
@@ -834,7 +834,7 @@ export async function POST(request: NextRequest) {
 - No_Defect_Detected / Image_Unreadable 로 절대 분기하지 마라 (이미지가 없으므로 해당 없음).
 - 사용자가 선택한 불량 유형(${defectType || '미선택'})을 defect_type으로 사용하고,
   공정 조건·수지 특성으로 원인과 조정안을 정상적으로 추정하라 (causes/recommendations 최소 1개).
-- 예외: 불량 유형도 미선택이고 셋팅값도 거의 없어 추정 근거가 전혀 없을 때만:
+- 예외: 불량 유형도 미선택이고 세팅값도 거의 없어 추정 근거가 전혀 없을 때만:
   defect_type.en='Insufficient_Input', severity='low',
   summary='추가 정보가 필요합니다. 불량 유형을 선택하거나 사출 조건을 입력해 주세요.',
   causes=[], recommendations=[].
@@ -943,7 +943,7 @@ ${noImageGuard}다음 사출 불량 정보를 Scientific Molding 방법론으로
 - 수지 상세: ${resinInfo?.resinDetail || '없음'}
 - 수지 Grade: ${resinInfo?.resinGrade || '없음'}
 
-## 사출기 기본 셋팅값
+## 사출기 기본 세팅값
 - 사출 온도: 노즐 ${s.nozzleTemp || '-'}℃, Z1 ${s.zone1Temp || '-'}℃, Z2 ${s.zone2Temp || '-'}℃, Z3 ${s.zone3Temp || '-'}℃, Z4 ${s.zone4Temp || '-'}℃
 - 금형 온도: 고정측 ${s.moldTempFixed || '-'}℃, 가동측 ${s.moldTempMoving || '-'}℃
 - 사출 압력: 1차 ${s.injPressure1 || '-'} MPa, 보압 ${s.holdPressure || '-'} MPa

@@ -171,7 +171,7 @@ export function ReportLayout({ record, authorName, companyName, locale }: Report
         {/* 셋팅 비교 */}
         {allKeys.length > 0 && (
           <section data-pdf-block>
-            <div style={{ fontWeight: 800, fontSize: 15, borderBottom: '2px solid #1E5FA5', paddingBottom: 4, marginBottom: 12 }}>{isEn ? '3. Settings Before → After' : '3. 셋팅값 Before → After'}</div>
+            <div style={{ fontWeight: 800, fontSize: 15, borderBottom: '2px solid #1E5FA5', paddingBottom: 4, marginBottom: 12 }}>{isEn ? '3. Settings Before → After' : '3. 세팅값 Before → After'}</div>
             <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 12 }}>
               <thead>
                 <tr style={{ background: '#EEF1F5' }}>

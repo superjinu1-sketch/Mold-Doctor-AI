@@ -52,7 +52,7 @@ export const SHARED_GATES: Record<string, SharedGate> = {
     appliesTo: ['weld_line','flow_mark','short_shot','fiber_readout','surface_gloss','tiger_stripe','record_groove','gate_blush','insert_bond_failure'],
     trigger: '금형온도 설정값 < resin-kb 권장 하한, 또는 super-engineering 수지(PPS·LCP·PEEK·PEI·PPSU 등), 또는 GF 강화 수지인 경우',
     guidance: `[금형온도 조언 — 참고용]
-- 셋팅값과 실제 금형표면 온도는 차이가 있을 수 있습니다. 배관 열손실로 실제 온도가 설정보다 최대 40°C 낮을 수 있습니다.
+- 세팅값과 실제 금형표면 온도는 차이가 있을 수 있습니다. 배관 열손실로 실제 온도가 설정보다 최대 40°C 낮을 수 있습니다.
 - 금형 개폐 시 heat sink, 웜업샷 부족(예열 10샷·15분+) 시 실제 온도가 낮을 수 있습니다.
 - GF 강화 수지: 금형온도 부족 → 섬유 표면노출·백화 가능성이 있습니다.
 - Super EP(PPS·PEEK 등): 결정화 부족 → 강도·치수 불안정 가능성이 있습니다.

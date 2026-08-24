@@ -91,7 +91,7 @@ export async function POST(request: NextRequest) {
           },
           {
             type: 'text',
-            text: `이 사진은 사출 성형기의 셋팅값 화면 또는 종이 조건표(점검표)입니다. 보이는 수치를 최대한 읽어서 JSON으로 반환하세요.
+            text: `이 사진은 사출 성형기의 세팅값 화면 또는 종이 조건표(점검표)입니다. 보이는 수치를 최대한 읽어서 JSON으로 반환하세요.
 
 값이 보이지 않거나 확인 불가한 항목은 빈 문자열("")로 두세요.
 
@@ -195,7 +195,7 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     reportError('extract-settings', error);
     return NextResponse.json(
-      { error: '셋팅값 추출 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.' },  // 일반화
+      { error: '세팅값 추출 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.' },  // 일반화
       { status: 500 }
     );
   }

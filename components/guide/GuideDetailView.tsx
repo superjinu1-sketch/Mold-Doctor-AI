@@ -113,7 +113,7 @@ export default function GuideDetailView({
             href={`/diagnose?defect=${encodeURIComponent(defect.id)}`}
             className="ui-cta w-full text-body block text-center"
           >
-            {L(`${displayName} 불량이 보이면 — 사진과 셋팅값으로 원인을 추정해 드립니다`, `Got a ${displayName.toLowerCase()} defect? Upload a photo and settings — we'll estimate the cause`)}
+            {L(`${displayName} 불량이 보이면 — 사진과 세팅값으로 원인을 추정해 드립니다`, `Got a ${displayName.toLowerCase()} defect? Upload a photo and settings — we'll estimate the cause`)}
           </Link>
         </section>
 

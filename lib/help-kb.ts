@@ -16,7 +16,7 @@ export const HELP_KB: HelpKbItem[] = [
     id: 'first_diagnosis',
     keywordsKo: ['첫 진단', '시작', '어떻게 시작', '진단 방법', '추정 시작'],
     keywordsEn: ['start', 'first diagnosis', 'how to start', 'begin', 'new estimate', 'get started'],
-    answerKo: '홈에서 \'새로 추정 시작\'을 누르세요. ① 불량 사진 업로드(선택) ② 수지·셋팅값 입력 ③ AI 추정 시작 순서입니다. 사진과 셋팅이 자세할수록 원인 후보가 정확해집니다.',
+    answerKo: '홈에서 \'새로 추정 시작\'을 누르세요. ① 불량 사진 업로드(선택) ② 수지·세팅값 입력 ③ AI 추정 시작 순서입니다. 사진과 세팅이 자세할수록 원인 후보가 정확해집니다.',
     answerEn: 'Tap \'Start new estimate\' on the home screen. ① Upload defect photos (optional) ② Enter resin and machine settings ③ Start AI analysis. More detail means better cause ranking.',
   },
   {
@@ -58,7 +58,7 @@ export const HELP_KB: HelpKbItem[] = [
     id: 'ocr',
     keywordsKo: ['OCR', '셋팅 사진', '조건표', '컨트롤러', '자동 입력'],
     keywordsEn: ['ocr', 'settings photo', 'condition sheet', 'controller', 'auto fill', 'auto-fill'],
-    answerKo: '사출기 컨트롤러 화면이나 조건표를 촬영해 올리면 셋팅값이 자동으로 입력됩니다(최대 5장). 인식값은 제출 전에 수정할 수 있습니다.',
+    answerKo: '사출기 컨트롤러 화면이나 조건표를 촬영해 올리면 세팅값이 자동으로 입력됩니다(최대 5장). 인식값은 제출 전에 수정할 수 있습니다.',
     answerEn: 'Photograph the machine controller screen or a condition sheet and the values are read automatically (up to 5 images). You can edit them before submitting.',
   },
   {
@@ -86,7 +86,7 @@ export const HELP_KB: HelpKbItem[] = [
     id: 'result_read',
     keywordsKo: ['결과 보는', '결과 해석', '퍼센트', '원인 순위'],
     keywordsEn: ['read results', 'interpret results', 'percent', 'percentage', 'cause ranking'],
-    answerKo: '결과는 원인 후보 랭킹(확률%), 현재 vs 권장 셋팅 비교표, 현장 확인 방법 순으로 나옵니다. 퍼센트는 확정이 아니라 우선순위이니 위에서부터 순서대로 확인하세요.',
+    answerKo: '결과는 원인 후보 랭킹(확률%), 현재 vs 권장 세팅 비교표, 현장 확인 방법 순으로 나옵니다. 퍼센트는 확정이 아니라 우선순위이니 위에서부터 순서대로 확인하세요.',
     answerEn: 'Results show ranked causes (%), a current-vs-recommended settings table, and how to verify each on the machine. Percentages are priorities, not verdicts — check from the top down.',
   },
   {
@@ -170,7 +170,7 @@ export const HELP_KB: HelpKbItem[] = [
     id: 'tech_question',
     keywordsKo: ['싱크마크 왜', '미성형 원인', '웰드라인 없애', '불량 해결', '어떻게 고치', '원인이 뭐'],
     keywordsEn: ['why sink mark', 'short shot cause', 'remove weld line', 'fix defect', 'how to fix', 'what is the cause', 'how do i fix'],
-    answerKo: '성형 기술 질문은 도움말보다 진단 기능이 정확합니다. 사진과 셋팅값을 넣으면 원인 랭킹과 권장 셋팅을 받을 수 있어요. 아래 버튼으로 바로 시작하세요.',
+    answerKo: '성형 기술 질문은 도움말보다 진단 기능이 정확합니다. 사진과 세팅값을 넣으면 원인 랭킹과 권장 세팅을 받을 수 있어요. 아래 버튼으로 바로 시작하세요.',
     answerEn: 'For molding questions, the diagnosis feature is the right tool — photos and settings in, ranked causes and recommended settings out. Start below.',
     cta: 'diagnose',
   },

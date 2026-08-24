@@ -743,7 +743,7 @@ export const en: Record<string, string> = {
   'landing.web_cta_primary': 'Start free estimate',
   'landing.web_cta_secondary': 'View defect guide',
   'landing.web_fineprint': '5 free estimates on signup · try in the browser, no install · reference estimate',
-  'landing.web_getapp': 'Keep it on the floor — your history builds up in the app.',
+  'landing.web_getapp': "Your plant's record builds with every estimate. It's there for the next one.",
 
   // video-hero-web-v1: 히어로 정적 카드 삭제(영상으로 교체)로 render_* 중 delta 행 이름 3개만
   // LandingOutputTile.tsx가 계속 쓴다 — 나머지(제목/id/결함/원인/표머리/각주)는 카드와 함께 정리.

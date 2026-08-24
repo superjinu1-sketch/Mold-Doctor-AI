@@ -36,7 +36,7 @@ const creditPoints = [
     en: '1 credit = 1 analysis + 2 free follow-ups (then 1 credit per 5-question bundle)',
   },
   {
-    ko: '셋팅 바꿔 다시 분석하면 새 크레딧 1개',
+    ko: '세팅 바꿔 다시 분석하면 새 크레딧 1개',
     en: 'Re-running analysis with new settings uses 1 new credit',
   },
   {
@@ -49,7 +49,7 @@ const faqs = [
   {
     qKo: '크레딧은 어떻게 쓰나요?',
     qEn: 'How do credits work?',
-    aKo: '크레딧 1개로 추정 1건을 받고, 그 결과에 대한 추가 질문을 2번까지 무료로 할 수 있어요. 이후에는 질문 5개 묶음마다 1크레딧이 차감됩니다. 셋팅을 바꿔 다시 분석하면 새 크레딧 1개가 쓰이고, 저장된 결과를 다시 보는 건 무료입니다.',
+    aKo: '크레딧 1개로 추정 1건을 받고, 그 결과에 대한 추가 질문을 2번까지 무료로 할 수 있어요. 이후에는 질문 5개 묶음마다 1크레딧이 차감됩니다. 세팅을 바꿔 다시 분석하면 새 크레딧 1개가 쓰이고, 저장된 결과를 다시 보는 건 무료입니다.',
     aEn: '1 credit gives you 1 analysis result plus 2 free follow-up questions on that result. After that, 1 credit is charged per 5-question bundle. Re-running with new settings uses 1 new credit. Viewing saved results is always free.',
   },
   {
