@@ -35,8 +35,10 @@ export const NOTES: Note[] = [
     description: "A white mark near the gate reads like a silver streak, so you dry the resin and back off the heat and the speed. Sometimes it was never in the plastic at all, it was sitting on the tool. Here is the test that tells the two apart before you burn a shift on the wrong window.",
     publishedAt: '2026-08-25',
     thumb: 'plateout-wipe',
+    thumbImage: '/notes/plateout-wipe-thumb.jpg',
     body: [
       p("A hazy white mark near the gate was another one Mold Doctor kept getting almost right. Ask about one and the read comes back the way you'd expect. Silver streak. Dry the resin. Bring the melt down. Slow the fill. So that is what we did. The dryer ran longer, the barrel came down, the injection slowed, and a shift went by with the mark sitting in the same spot, the same size it started. That was the one that kept bothering me."),
+      image('/notes/plateout-wipe-hero.jpg', "A white cloth wiping a hazy white plate-out film off a black glossy molded panel, the wiped half clean and the residue transferred to the cloth.", "A white plate-out film wiping off a black glossy part, the cloth carrying the residue. Illustrative."),
       p("That read isn't wrong. Moisture makes a silver streak. So does shear. So does too much heat in the barrel. When the mark is genuinely in the plastic, those fixes are the right ones, and they work. The only mistake is assuming the mark is in the plastic. Sometimes it never was. It was sitting on the tool the whole time."),
       h2("The wipe test"),
       p("The quick version takes a rag. Wipe the mark on the part. If the residue lifts and the surface underneath comes up clean, it was never molded in. You can check the tool the same way. Run a clean cloth across the steel at the gate and along the vents. If a film comes off on the rag, that film is what you have been printing onto every part."),
