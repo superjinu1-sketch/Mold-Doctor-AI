@@ -1,6 +1,6 @@
 // 영문 콘텐츠 축 B(/en/notes) 글 데이터 단일 소스. 본문은 진우 확정본 — 문구를 다듬지 않는다.
 // /en/about과 동일 원칙: 문법 교정·표현 개선·문장 병합 전부 금지.
-export type NoteDiagramId = 'cross-section' | 'flow' | 'weld-flow' | 'weld-section' | 'clamp-calc' | 'clamp-flow' | 'fr-paths' | 'fr-ppa-grades' | 'fr-barrel' | 'fr-levers' | 'fiber-float-fountain' | 'fiber-float-resins' | 'fiber-float-section' | 'nmt-pores' | 'nmt-families' | 'nmt-frame' | 'nmt-app-map' | 'nmt-cte' | 'nmt-resin-map' | 'nmt-freeze-race' | 'nmt-defect-tree' | 'flake-tilt' | 'metallic-split' | 'shortshot-split' | 'gf-cross-section' | 'settings-profile';
+export type NoteDiagramId = 'cross-section' | 'flow' | 'weld-flow' | 'weld-section' | 'clamp-calc' | 'clamp-flow' | 'fr-paths' | 'fr-ppa-grades' | 'fr-barrel' | 'fr-levers' | 'fiber-float-fountain' | 'fiber-float-resins' | 'fiber-float-section' | 'nmt-pores' | 'nmt-families' | 'nmt-frame' | 'nmt-app-map' | 'nmt-cte' | 'nmt-resin-map' | 'nmt-freeze-race' | 'nmt-defect-tree' | 'flake-tilt' | 'metallic-split' | 'shortshot-split' | 'gf-cross-section' | 'settings-profile' | 'plateout-wipe-branch';
 
 export type NoteBlock =
   | { type: 'p'; text: string }
@@ -11,7 +11,7 @@ export type NoteBlock =
 // lib/notesDiagramSvg.ts(node:fs 사용, 서버 전용)가 이 타입을 가져다 쓴다 — 반대 방향(이 파일이
 // notesDiagramSvg.ts에서 import)이면 lib/notes.ts를 가져다 쓰는 클라이언트 컴포넌트(app/page.tsx)가
 // 번들러 설정에 따라 fs를 함께 끌고 들어올 위험이 있어 여기서 정의한다(notes-list-thumbnail-v1).
-export type NoteThumbId = 'splay-branch' | 'weld-strength' | 'clamp-window' | 'fr-corrosion' | 'fiber-float' | 'nmt-bond' | 'nmt-frame' | 'nmt-resin' | 'nmt-troubleshoot' | 'metallic-streak' | 'shortshot' | 'gf-warpage' | 'settings-sheet';
+export type NoteThumbId = 'splay-branch' | 'weld-strength' | 'clamp-window' | 'fr-corrosion' | 'fiber-float' | 'nmt-bond' | 'nmt-frame' | 'nmt-resin' | 'nmt-troubleshoot' | 'metallic-streak' | 'shortshot' | 'gf-warpage' | 'settings-sheet' | 'plateout-wipe';
 
 export interface Note {
   slug: string;
@@ -29,6 +29,27 @@ const diagram = (id: NoteDiagramId): NoteBlock => ({ type: 'diagram', id });
 const image = (src: string, alt: string, caption?: string): NoteBlock => ({ type: 'image', src, alt, caption });
 
 export const NOTES: Note[] = [
+  {
+    slug: 'plate-out-wipe-test',
+    title: "A silver streak that wipes off was never in the plastic",
+    description: "A white mark near the gate reads like a silver streak, so you dry the resin and back off the heat and the speed. Sometimes it was never in the plastic at all, it was sitting on the tool. Here is the test that tells the two apart before you burn a shift on the wrong window.",
+    publishedAt: '2026-08-25',
+    thumb: 'plateout-wipe',
+    body: [
+      p("A hazy white mark near the gate was another one Mold Doctor kept getting almost right. Ask about one and the read comes back the way you'd expect. Silver streak. Dry the resin. Bring the melt down. Slow the fill. So that is what we did. The dryer ran longer, the barrel came down, the injection slowed, and a shift went by with the mark sitting in the same spot, the same size it started. That was the one that kept bothering me."),
+      p("That read isn't wrong. Moisture makes a silver streak. So does shear. So does too much heat in the barrel. When the mark is genuinely in the plastic, those fixes are the right ones, and they work. The only mistake is assuming the mark is in the plastic. Sometimes it never was. It was sitting on the tool the whole time."),
+      h2("The wipe test"),
+      p("The quick version takes a rag. Wipe the mark on the part. If the residue lifts and the surface underneath comes up clean, it was never molded in. You can check the tool the same way. Run a clean cloth across the steel at the gate and along the vents. If a film comes off on the rag, that film is what you have been printing onto every part."),
+      p("The stronger tell is what happens after a full cleaning. Clean the mold, run it again, and if the mark is gone on the first shot and then creeps back over the course of the run, that is plate-out. Nothing truly in the plastic behaves that way. A weld line, a flow mark, a real silver streak is there from the first shot and does not wipe off the tool. Where the mark sits tells you the same thing. Plate-out collects at the gate, at the vents, in the last place to fill, or in one particular cavity. It does not trace the flow path across the part the way a flow line or a weld line does."),
+      diagram('plateout-wipe-branch'),
+      h2("What it actually is"),
+      p("Plate-out is a deposit. The additives blended into the resin, the flame retardants, the lubricants and slip agents, the plasticizers, are lighter and more volatile than the polymer around them. Hold the melt hot, or let it sit in the barrel too long, and some of them boil off. They find the coolest surface around, which is the tool, and they condense on it. Every shot after that carries a little of the deposit back out on the part. Its close cousins reach the part a different way. Vent gas that cannot get out, because the vents are blocked or there were never enough of them, condenses at the gate or the last-fill area. And release agent oversprayed onto the steel transfers straight onto the part."),
+      p("The move is to fix the source, not the process window. Confirm it first, with the wipe and the clean-then-return test. Then go after where it comes from. Clean the tool. Clear the vents, open them up, or add more where there are not enough. Bring the melt temperature and the residence time down so less boils off to begin with. If release agent is the culprit, cut it back. What you do not do is spend the shift chasing drying, temperature, and speed on a mark that was never in the plastic."),
+      h2("Where this one goes wrong"),
+      p("A few ways to get it wrong. Do not file a wipe-off residue as a weld line, a flow mark, or a silver streak and then chase drying, temperature, and speed forever, which is the whole trap running in reverse. Do not just keep wiping, either. Wiping clears the part in front of you, but if the source stays put the deposit builds right back up every run. Go easy on the cleaning itself, because over-aggressive polishing or scrubbing wears away the tool texture you are trying to keep. And do not swing the other way and call every white mark a deposit. A whitening that will not wipe off, sits on a glass-filled part, runs in a radial pattern, and shows up with drying you have already confirmed good is more likely fiber read-out. That is a different call, not plate-out."),
+      p("So when the description says the mark wipes off, or that it clears and comes back over the run, Mold Doctor runs this reclassification first, before it chases the process window. Then it does the usual. It takes a photo of the defect along with your process settings, estimates the likely causes, and tells you what to adjust. And your shop's own history builds up as you log each run."),
+    ],
+  },
   {
     slug: 'before-you-trust-the-settings-sheet',
     title: "You diagnosed the melt. The number was never real.",

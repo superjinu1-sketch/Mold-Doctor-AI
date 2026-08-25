@@ -44,7 +44,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 // 페이지 :root를 상속받으려면 같은 DOM 트리에 있어야 한다(별도 문서 컨텍스트로 로드되면 색이 사라짐).
 // 도식은 영문판 SVG를 그대로 재사용한다(EN/JA 상세와 동일 절충).
 function Diagram({ id }: { id: NoteDiagramId }) {
-  const svg = readNoteDiagramSvg(id);
+  const svg = readNoteDiagramSvg(id, 'ko');
   return (
     // eslint-disable-next-line react/no-danger
     <div className="w-full my-6 [&>svg]:w-full [&>svg]:h-auto" dangerouslySetInnerHTML={{ __html: svg }} />

@@ -1,0 +1,36 @@
+<svg viewBox="0 0 720 380" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="pwb-t pwb-d">
+  <title id="pwb-t">와이프 테스트가 석출과 진짜 불량을 가른다</title>
+  <desc id="pwb-d">게이트 근처 흰 자국. 문지르거나 금형을 닦는다. 닦이고, 금형에서 막으로 벗겨지고, 게이트·벤트·특정 캐비티에 앉고, 세정 후 런이 돌수록 재출현하면 금형 석출이다. 안 닦이고, 1샷째부터 있고, 흐름 형상을 따르고, 매 샷 동일하면 구조적 불량이다.</desc>
+
+  <text x="24" y="30" font-size="16" font-weight="700" fill="var(--ink)">와이프 테스트가 가른다</text>
+  <text x="24" y="52" font-size="12" fill="var(--faint)">공정 세팅을 만지기 전에</text>
+
+  <rect x="262" y="72" width="196" height="48" rx="11" fill="var(--brand-tint)" stroke="var(--brand-border)" stroke-width="1.5"/>
+  <text x="360" y="94" font-size="13" font-weight="700" text-anchor="middle" fill="var(--ink)">흰 / 뿌연 자국</text>
+  <text x="360" y="111" font-size="11" text-anchor="middle" fill="var(--muted)">게이트 근처</text>
+
+  <text x="360" y="140" font-size="11" text-anchor="middle" fill="var(--faint)">문질러 본다 · 금형을 닦는다</text>
+  <path d="M360 145 V158 M190 158 H530 M190 158 V172 M530 158 V172" fill="none" stroke="var(--border-strong)" stroke-width="1.5"/>
+
+  <rect x="70" y="172" width="240" height="34" rx="17" fill="var(--ok)" opacity=".12"/>
+  <text x="190" y="194" font-size="14" font-weight="800" text-anchor="middle" fill="var(--ok)">닦인다</text>
+  <g font-size="11.5" fill="var(--muted)">
+    <text x="60" y="234">· 제품서 닦임 / 금형에 막</text>
+    <text x="60" y="258">· 게이트 · 벤트 · 특정 캐비티</text>
+    <text x="60" y="282">· 세정하면 사라졌다 재출현</text>
+  </g>
+  <rect x="60" y="300" width="260" height="64" rx="12" fill="var(--brand-tint)" stroke="var(--brand-border)" stroke-width="1.5"/>
+  <text x="190" y="326" font-size="15" font-weight="800" text-anchor="middle" fill="var(--brand-ink)">금형 석출</text>
+  <text x="190" y="348" font-size="11" text-anchor="middle" fill="var(--muted)">세정 + 소스 제거: 벤트 · 용융/체류 · 이형제</text>
+
+  <rect x="410" y="172" width="240" height="34" rx="17" fill="var(--faint)" opacity=".16"/>
+  <text x="530" y="194" font-size="14" font-weight="800" text-anchor="middle" fill="var(--muted)">안 닦인다</text>
+  <g font-size="11.5" fill="var(--muted)">
+    <text x="404" y="234">· 플라스틱 안, 1샷째부터</text>
+    <text x="404" y="258">· 흐름 형상을 따라감</text>
+    <text x="404" y="282">· 매 샷 동일</text>
+  </g>
+  <rect x="400" y="300" width="260" height="64" rx="12" fill="var(--surface)" stroke="var(--border)" stroke-width="1.5"/>
+  <text x="530" y="326" font-size="15" font-weight="800" text-anchor="middle" fill="var(--ink)">구조적 불량</text>
+  <text x="530" y="348" font-size="11" text-anchor="middle" fill="var(--muted)">은줄 / 플로우 / 웰드 : 공정·흐름</text>
+</svg>

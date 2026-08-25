@@ -1,0 +1,36 @@
+<svg viewBox="0 0 720 380" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="pwb-t pwb-d">
+  <title id="pwb-t">The wipe test splits plate-out from a real defect</title>
+  <desc id="pwb-d">A white mark near the gate. Wipe it or clean the tool. If it wipes off, lifts as a film from the tool, sits at the gate or vents or one cavity, and returns over the run after a cleaning, it is plate-out: fix the source. If it will not wipe, is there on the first shot, follows the flow path, and is the same every shot, it is a structural defect: fix it with process and flow.</desc>
+
+  <text x="24" y="30" font-size="16" font-weight="700" fill="var(--ink)">The wipe test decides it</text>
+  <text x="24" y="52" font-size="12" fill="var(--faint)">before you touch a single process setting</text>
+
+  <rect x="262" y="72" width="196" height="48" rx="11" fill="var(--brand-tint)" stroke="var(--brand-border)" stroke-width="1.5"/>
+  <text x="360" y="94" font-size="13" font-weight="700" text-anchor="middle" fill="var(--ink)">White / hazy mark</text>
+  <text x="360" y="111" font-size="11" text-anchor="middle" fill="var(--muted)">near the gate</text>
+
+  <text x="360" y="140" font-size="11" text-anchor="middle" fill="var(--faint)">wipe it · clean the tool</text>
+  <path d="M360 145 V158 M190 158 H530 M190 158 V172 M530 158 V172" fill="none" stroke="var(--border-strong)" stroke-width="1.5"/>
+
+  <rect x="70" y="172" width="240" height="34" rx="17" fill="var(--ok)" opacity=".12"/>
+  <text x="190" y="194" font-size="13.5" font-weight="800" text-anchor="middle" fill="var(--ok)">WIPES OFF</text>
+  <g font-size="11.5" fill="var(--muted)">
+    <text x="60" y="234">· lifts off the part; a film on the tool</text>
+    <text x="60" y="258">· at the gate, vents, one cavity</text>
+    <text x="60" y="282">· clean the mold: gone, then returns</text>
+  </g>
+  <rect x="60" y="300" width="260" height="64" rx="12" fill="var(--brand-tint)" stroke="var(--brand-border)" stroke-width="1.5"/>
+  <text x="190" y="326" font-size="14.5" font-weight="800" text-anchor="middle" fill="var(--brand-ink)">PLATE-OUT</text>
+  <text x="190" y="348" font-size="11" text-anchor="middle" fill="var(--muted)">clean + fix the source: vents, melt, release agent</text>
+
+  <rect x="410" y="172" width="240" height="34" rx="17" fill="var(--faint)" opacity=".16"/>
+  <text x="530" y="194" font-size="13.5" font-weight="800" text-anchor="middle" fill="var(--muted)">WON'T WIPE</text>
+  <g font-size="11.5" fill="var(--muted)">
+    <text x="404" y="234">· in the plastic, there on shot 1</text>
+    <text x="404" y="258">· follows the flow path</text>
+    <text x="404" y="282">· same every shot</text>
+  </g>
+  <rect x="400" y="300" width="260" height="64" rx="12" fill="var(--surface)" stroke="var(--border)" stroke-width="1.5"/>
+  <text x="530" y="326" font-size="14.5" font-weight="800" text-anchor="middle" fill="var(--ink)">STRUCTURAL DEFECT</text>
+  <text x="530" y="348" font-size="11" text-anchor="middle" fill="var(--muted)">silver streak / flow / weld: process &amp; flow</text>
+</svg>

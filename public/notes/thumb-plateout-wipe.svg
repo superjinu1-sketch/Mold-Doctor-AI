@@ -1,0 +1,15 @@
+<svg viewBox="0 0 180 136" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="tpw-t tpw-d">
+  <title id="tpw-t">The wipe test: deposit vs defect</title>
+  <desc id="tpw-d">A mark at the gate. Wipe it. If it wipes off it is plate-out deposit; if it will not wipe it is a structural defect.</desc>
+  <text x="90" y="18" font-size="11.5" font-weight="700" text-anchor="middle" fill="var(--ink)">The wipe test</text>
+  <rect x="58" y="26" width="64" height="22" rx="6" fill="var(--brand-tint)" stroke="var(--brand-border)" stroke-width="1"/>
+  <text x="90" y="41" font-size="9" font-weight="600" text-anchor="middle" fill="var(--brand-ink)">mark at gate</text>
+  <path d="M90 48 V58 M42 58 H138 M42 58 V66 M138 58 V66" fill="none" stroke="var(--border-strong)" stroke-width="1.2"/>
+  <rect x="10" y="66" width="64" height="52" rx="7" fill="var(--ok)" opacity=".12"/>
+  <rect x="10" y="66" width="64" height="52" rx="7" fill="none" stroke="var(--ok)" stroke-width="1.1"/>
+  <text x="42" y="87" font-size="9.5" font-weight="800" text-anchor="middle" fill="var(--ok)">wipes off</text>
+  <text x="42" y="106" font-size="10.5" font-weight="700" text-anchor="middle" fill="var(--brand-ink)">deposit</text>
+  <rect x="106" y="66" width="64" height="52" rx="7" fill="var(--surface)" stroke="var(--border)" stroke-width="1.1"/>
+  <text x="138" y="87" font-size="9.5" font-weight="800" text-anchor="middle" fill="var(--muted)">won't</text>
+  <text x="138" y="106" font-size="10.5" font-weight="700" text-anchor="middle" fill="var(--ink)">defect</text>
+</svg>

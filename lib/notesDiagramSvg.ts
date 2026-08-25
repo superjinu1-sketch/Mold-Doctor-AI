@@ -35,10 +35,16 @@ const FILES: Record<NoteDiagramId, string> = {
   'shortshot-split': 'shortshot-split.svg',
   'gf-cross-section': 'gf-warpage-cross-section.svg',
   'settings-profile': 'settings-profile.svg',
+  'plateout-wipe-branch': 'plateout-wipe-branch.svg',
 };
 
-export function readNoteDiagramSvg(id: NoteDiagramId): string {
-  const filePath = path.join(process.cwd(), 'public', 'notes', FILES[id]);
+export function readNoteDiagramSvg(id: NoteDiagramId, locale: 'ko' | 'en' = 'en'): string {
+  const base = FILES[id];
+  if (locale === 'ko') {
+    const koPath = path.join(process.cwd(), 'public', 'notes', base.replace(/\.svg$/, '.ko.svg'));
+    if (fs.existsSync(koPath)) return fs.readFileSync(koPath, 'utf-8');
+  }
+  const filePath = path.join(process.cwd(), 'public', 'notes', base);
   return fs.readFileSync(filePath, 'utf-8');
 }
 
@@ -56,6 +62,7 @@ const THUMB_FILES: Record<NoteThumbId, string> = {
   'shortshot': 'thumb-shortshot.svg',
   'gf-warpage': 'thumb-gf-warpage.svg',
   'settings-sheet': 'thumb-settings-sheet.svg',
+  'plateout-wipe': 'thumb-plateout-wipe.svg',
 };
 
 export function readNoteThumbSvg(id: NoteThumbId, locale: 'ko' | 'en' = 'en'): string {

@@ -1,0 +1,15 @@
+<svg viewBox="0 0 180 136" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="tpw-t tpw-d">
+  <title id="tpw-t">와이프 테스트: 석출 vs 불량</title>
+  <desc id="tpw-d">게이트 자국을 문지른다. 닦이면 금형 석출, 안 닦이면 구조적 불량.</desc>
+  <text x="90" y="18" font-size="11.5" font-weight="700" text-anchor="middle" fill="var(--ink)">와이프 테스트</text>
+  <rect x="58" y="26" width="64" height="22" rx="6" fill="var(--brand-tint)" stroke="var(--brand-border)" stroke-width="1"/>
+  <text x="90" y="41" font-size="9" font-weight="600" text-anchor="middle" fill="var(--brand-ink)">게이트 자국</text>
+  <path d="M90 48 V58 M42 58 H138 M42 58 V66 M138 58 V66" fill="none" stroke="var(--border-strong)" stroke-width="1.2"/>
+  <rect x="10" y="66" width="64" height="52" rx="7" fill="var(--ok)" opacity=".12"/>
+  <rect x="10" y="66" width="64" height="52" rx="7" fill="none" stroke="var(--ok)" stroke-width="1.1"/>
+  <text x="42" y="87" font-size="10" font-weight="800" text-anchor="middle" fill="var(--ok)">닦임</text>
+  <text x="42" y="106" font-size="10.5" font-weight="700" text-anchor="middle" fill="var(--brand-ink)">석출</text>
+  <rect x="106" y="66" width="64" height="52" rx="7" fill="var(--surface)" stroke="var(--border)" stroke-width="1.1"/>
+  <text x="138" y="87" font-size="10" font-weight="800" text-anchor="middle" fill="var(--muted)">안 닦임</text>
+  <text x="138" y="106" font-size="10.5" font-weight="700" text-anchor="middle" fill="var(--ink)">불량</text>
+</svg>
