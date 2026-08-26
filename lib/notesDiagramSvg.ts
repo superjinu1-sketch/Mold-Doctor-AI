@@ -36,6 +36,7 @@ const FILES: Record<NoteDiagramId, string> = {
   'gf-cross-section': 'gf-warpage-cross-section.svg',
   'settings-profile': 'settings-profile.svg',
   'plateout-wipe-branch': 'plateout-wipe-branch.svg',
+  'void-bubble-branch': 'void-bubble-branch.svg',
 };
 
 export function readNoteDiagramSvg(id: NoteDiagramId, locale: 'ko' | 'en' = 'en'): string {
@@ -63,6 +64,7 @@ const THUMB_FILES: Record<NoteThumbId, string> = {
   'gf-warpage': 'thumb-gf-warpage.svg',
   'settings-sheet': 'thumb-settings-sheet.svg',
   'plateout-wipe': 'thumb-plateout-wipe.svg',
+  'void-bubble': 'thumb-void-bubble.svg',
 };
 
 export function readNoteThumbSvg(id: NoteThumbId, locale: 'ko' | 'en' = 'en'): string {

@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 380" font-family="inherit">
+<path d="M360 74 L175 132" stroke="var(--faint)" stroke-opacity="0.55" stroke-width="2" fill="none"/>
+<path d="M360 74 L545 132" stroke="var(--faint)" stroke-opacity="0.55" stroke-width="2" fill="none"/>
+<path d="M545 196 L405 250" stroke="var(--faint)" stroke-opacity="0.55" stroke-width="2" fill="none"/>
+<path d="M545 196 L628 250" stroke="var(--faint)" stroke-opacity="0.55" stroke-width="2" fill="none"/>
+<text x="238" y="110" font-size="15" font-weight="600" fill="var(--faint)" text-anchor="middle">표면</text>
+<text x="487" y="110" font-size="15" font-weight="600" fill="var(--faint)" text-anchor="middle">내부</text>
+<text x="452" y="232" font-size="15" font-weight="600" fill="var(--faint)" text-anchor="middle">꺼짐</text>
+<text x="628" y="232" font-size="15" font-weight="600" fill="var(--faint)" text-anchor="middle">부풂</text>
+<rect x="250" y="30" width="220" height="44" rx="14" fill="var(--surface)" fill-opacity="1" stroke="var(--border)" stroke-opacity="1" stroke-width="2"/>
+<text x="360" y="58" font-size="20" font-weight="800" fill="var(--ink)" text-anchor="middle">함몰이냐, 빈 공동이냐</text>
+<rect x="65" y="132" width="210" height="66" rx="14" fill="var(--surface)" fill-opacity="1" stroke="var(--faint)" stroke-opacity="0.7" stroke-width="2"/>
+<text x="170" y="163" font-size="20" font-weight="800" fill="var(--ink)" text-anchor="middle">싱크마크</text>
+<text x="170" y="186" font-size="14" font-weight="600" fill="var(--muted)" text-anchor="middle">표면 함몰 · 보압</text>
+<rect x="430" y="132" width="230" height="64" rx="14" fill="var(--surface)" fill-opacity="1" stroke="var(--border)" stroke-opacity="1" stroke-width="2"/>
+<text x="545" y="161" font-size="19" font-weight="800" fill="var(--ink)" text-anchor="middle">내부 공동</text>
+<text x="545" y="183" font-size="14" font-weight="600" fill="var(--muted)" text-anchor="middle">가열해 본다</text>
+<rect x="305" y="250" width="196" height="96" rx="14" fill="var(--ok)" fill-opacity="0.09" stroke="var(--ok)" stroke-opacity="0.55" stroke-width="2"/>
+<text x="403" y="282" font-size="20" font-weight="800" fill="var(--ok)" text-anchor="middle">진공 보이드</text>
+<text x="403" y="306" font-size="14" font-weight="600" fill="var(--muted)" text-anchor="middle">스킨 굳고 수축</text>
+<text x="403" y="328" font-size="14" font-weight="700" fill="var(--ok)" text-anchor="middle">보압 올림 (정답)</text>
+<rect x="535" y="250" width="180" height="96" rx="14" fill="var(--brand)" fill-opacity="0.09" stroke="var(--brand)" stroke-opacity="0.55" stroke-width="2"/>
+<text x="625" y="282" font-size="20" font-weight="800" fill="var(--brand-ink)" text-anchor="middle">가스 기포</text>
+<text x="625" y="306" font-size="14" font-weight="600" fill="var(--muted)" text-anchor="middle">수분 · 공기 갇힘</text>
+<text x="625" y="328" font-size="14" font-weight="700" fill="var(--brand-ink)" text-anchor="middle">건조 · 탈기 (보압 아님)</text>
+</svg>
