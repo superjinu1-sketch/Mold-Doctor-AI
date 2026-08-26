@@ -2,6 +2,7 @@ import type { MetadataRoute } from 'next';
 import { getAllResinSlugs } from '@/lib/resinSlug';
 import { defects } from '@/lib/defectGuide';
 import { NOTES } from '@/lib/notes';
+import { NOTES_KO } from '@/lib/notesKo';
 import { NOTES_JA } from '@/lib/notesJa';
 import { SITE_URL } from '@/lib/siteUrl';
 
@@ -19,6 +20,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${SITE_URL}/guide`, lastModified: now, changeFrequency: 'monthly', priority: 0.9 },
     { url: `${SITE_URL}/en/guide`, lastModified: now, changeFrequency: 'monthly', priority: 0.9 },
     { url: `${SITE_URL}/en/about`, lastModified: now, changeFrequency: 'yearly', priority: 0.3 },
+    { url: `${SITE_URL}/notes`, lastModified: now, changeFrequency: 'monthly', priority: 0.7 },
     { url: `${SITE_URL}/en/notes`, lastModified: now, changeFrequency: 'monthly', priority: 0.6 },
     { url: `${SITE_URL}/ja/notes`, lastModified: now, changeFrequency: 'monthly', priority: 0.6 },
     { url: `${SITE_URL}/pricing`, lastModified: now, changeFrequency: 'monthly', priority: 0.5 },
@@ -39,7 +41,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${SITE_URL}/en/guide/${d.id}`, lastModified: now, changeFrequency: 'monthly' as const, priority: 0.8 },
   ]);
 
-  // 영문 콘텐츠 축 B(/en/notes) — 한국어 대응 라우트 없음(en 단독).
+  // 한국어 콘텐츠 축(/notes 기본). NOTES_KO 기준(실제 KO 콘텐츠 있는 slug만). slug는 en과 공유.
+  const noteEntriesKo: MetadataRoute.Sitemap = NOTES_KO.map(n => (
+    { url: `${SITE_URL}/notes/${n.slug}`, lastModified: new Date(n.publishedAt), changeFrequency: 'monthly' as const, priority: 0.7 }
+  ));
+
+  // 영문 콘텐츠 축(/en/notes). slug는 ko/ja와 공유. 노트는 KO(/notes 기본)·EN(/en/notes)·JA(/ja/notes) 3축.
   const noteEntries: MetadataRoute.Sitemap = NOTES.map(n => (
     { url: `${SITE_URL}/en/notes/${n.slug}`, lastModified: new Date(n.publishedAt), changeFrequency: 'monthly' as const, priority: 0.6 }
   ));
@@ -49,5 +56,5 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${SITE_URL}/ja/notes/${n.slug}`, lastModified: new Date(n.publishedAt), changeFrequency: 'monthly' as const, priority: 0.6 }
   ));
 
-  return [...staticEntries, ...resinEntries, ...guideEntries, ...noteEntries, ...noteEntriesJa];
+  return [...staticEntries, ...resinEntries, ...guideEntries, ...noteEntriesKo, ...noteEntries, ...noteEntriesJa];
 }
