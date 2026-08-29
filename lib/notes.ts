@@ -1,6 +1,6 @@
 // 영문 콘텐츠 축 B(/en/notes) 글 데이터 단일 소스. 본문은 진우 확정본 — 문구를 다듬지 않는다.
 // /en/about과 동일 원칙: 문법 교정·표현 개선·문장 병합 전부 금지.
-export type NoteDiagramId = 'cross-section' | 'flow' | 'weld-flow' | 'weld-section' | 'clamp-calc' | 'clamp-flow' | 'fr-paths' | 'fr-ppa-grades' | 'fr-barrel' | 'fr-levers' | 'fiber-float-fountain' | 'fiber-float-resins' | 'fiber-float-section' | 'nmt-pores' | 'nmt-families' | 'nmt-frame' | 'nmt-app-map' | 'nmt-cte' | 'nmt-resin-map' | 'nmt-freeze-race' | 'nmt-defect-tree' | 'flake-tilt' | 'metallic-split' | 'shortshot-split' | 'gf-cross-section' | 'settings-profile' | 'plateout-wipe-branch' | 'void-bubble-branch';
+export type NoteDiagramId = 'cross-section' | 'flow' | 'weld-flow' | 'weld-section' | 'clamp-calc' | 'clamp-flow' | 'fr-paths' | 'fr-ppa-grades' | 'fr-barrel' | 'fr-levers' | 'fiber-float-fountain' | 'fiber-float-resins' | 'fiber-float-section' | 'nmt-pores' | 'nmt-families' | 'nmt-frame' | 'nmt-app-map' | 'nmt-cte' | 'nmt-resin-map' | 'nmt-freeze-race' | 'nmt-defect-tree' | 'flake-tilt' | 'metallic-split' | 'shortshot-split' | 'gf-cross-section' | 'settings-profile' | 'plateout-wipe-branch' | 'void-bubble-branch' | 'flow-tiger-branch';
 
 export type NoteBlock =
   | { type: 'p'; text: string }
@@ -11,7 +11,7 @@ export type NoteBlock =
 // lib/notesDiagramSvg.ts(node:fs 사용, 서버 전용)가 이 타입을 가져다 쓴다 — 반대 방향(이 파일이
 // notesDiagramSvg.ts에서 import)이면 lib/notes.ts를 가져다 쓰는 클라이언트 컴포넌트(app/page.tsx)가
 // 번들러 설정에 따라 fs를 함께 끌고 들어올 위험이 있어 여기서 정의한다(notes-list-thumbnail-v1).
-export type NoteThumbId = 'splay-branch' | 'weld-strength' | 'clamp-window' | 'fr-corrosion' | 'fiber-float' | 'nmt-bond' | 'nmt-frame' | 'nmt-resin' | 'nmt-troubleshoot' | 'metallic-streak' | 'shortshot' | 'gf-warpage' | 'settings-sheet' | 'plateout-wipe' | 'void-bubble';
+export type NoteThumbId = 'splay-branch' | 'weld-strength' | 'clamp-window' | 'fr-corrosion' | 'fiber-float' | 'nmt-bond' | 'nmt-frame' | 'nmt-resin' | 'nmt-troubleshoot' | 'metallic-streak' | 'shortshot' | 'gf-warpage' | 'settings-sheet' | 'plateout-wipe' | 'void-bubble' | 'flow-tiger';
 
 export interface Note {
   slug: string;
@@ -29,6 +29,27 @@ const diagram = (id: NoteDiagramId): NoteBlock => ({ type: 'diagram', id });
 const image = (src: string, alt: string, caption?: string): NoteBlock => ({ type: 'image', src, alt, caption });
 
 export const NOTES: Note[] = [
+  {
+    slug: 'flow-mark-tiger-stripe-speed-test',
+    title: "Not every flow mark wants more speed",
+    description: "Flow marks all look like the same set of ripples in a photo. But a record groove around the gate eases when you speed up, and a tiger stripe on a PP bumper only tightens the faster you push. Same flow mark, opposite fix. Here is how to split the two before you touch the injection speed.",
+    publishedAt: '2026-08-29',
+    thumb: 'flow-tiger',
+    body: [
+      p("A run of bands or grooves shows up on the surface, and the move is automatic. Speed up. Warm it up. Push the flow through so it lays down smooth. Ask Mold Doctor and the read comes back close to that too, because most flow marks really do clear when you give the melt more room to run, and most of the time that is where the answer lives. But there was one job that kept bothering me, where the bands got worse the harder we pushed, and the reflex was walking us the wrong way."),
+      p("That read is not wrong. For a record groove, more speed and more heat is exactly the lever, because the front was hesitating and you are handing it the energy to run clean. The place it trips is quiet: it is the assumption riding underneath, that every flow mark wants more speed. Two of these marks look like the same family in a photo, the same set of ripples, but only one of them answers to speed the way you expect. The other one answers to speed by getting worse."),
+      h2("Sort the two before you touch a dial"),
+      p("The first cut happens at the bench, by geometry and by material, before anybody changes a setting. Concentric fine rings centered on the gate, close together like the grooves on a vinyl record, that is a record groove. Bands running across the flow direction, on a polypropylene part or a talc-filled or rubber-modified compound (think bumpers and interior trim), often worse the farther you get from the gate, that is a tiger-stripe suspect. Same photo at a glance, but the pattern and the resin are already telling you which family you are in. Read those two things first and you are halfway to the fix."),
+      p("The decisive test is small. Nudge the injection speed up a little and watch what the mark does. A record groove eases as you speed up, because the front that kept stalling finally gets to run. A tiger stripe does the opposite: the bands tighten and pack closer together the faster you push. That reversal is the confirmation, and the location and the resin back it up, gate-centered rings on one side, across-flow bands on filled PP on the other. When the read and the test disagree, believe the test."),
+      diagram('flow-tiger-branch'),
+      h2("Why speed helps one and hurts the other"),
+      p("Start with the record groove, because its mechanism is the friendlier one. At low speed and a cold mold, the melt front bleeds heat into the wall, stalls, then builds enough pressure to break free and jump ahead, and it does that over and over, stamping a ring every time it catches. Fast-crystallizing resins make it worse, and so does a tight gate, because both chill the front faster and give it more chances to stick. So you feed it: a warmer mold, a warmer or faster melt, a gate opened up a notch. This is a mark that clears when you add energy, which is exactly why the generic advice fits it so well."),
+      p("The tiger stripe is a different animal. This one is an instability of the flowing front itself, and it shows up when the front is moving fast, above some critical speed for that particular material. The front grips the wall, then slips, then grips again, alternating, and every cycle of that lays down a band, so pushing faster does not smooth anything, it cuts the bands finer and packs them closer. The levers here run the other way: slow the fill, or hold a steady, profiled velocity so the front never swings through that unstable range, and warm the mold so the skin sets evenly behind it. On a long-flow bumper in filled PP it can stop being a process knob at all and become a material and flow-length limit, where a higher-flow grade, a modified compound, or a change to the gate and flow path is the honest fix. Reach for more speed here and you are chasing the wrong lever, tightening the very bands you are trying to lose."),
+      h2("Where the split itself trips people"),
+      p("The split earns its keep, but it gets misused, and the misuses are worth naming. The common one is leaning on injection speed against a tiger stripe, watching the bands tighten shift after shift, and never stopping to ask whether the part is up against a material or flow-length limit that no speed setting will fix. Another is reading a metallic or pearl part wrong: an effect-pigment part can carry a fixed bright streak that looks like a stripe, but a flake mark is angle-dependent and sits in one place, not a run of periodic bands marching across the flow, so roll the part in the light, and if the streak slides and swaps places with the background it is flake orientation, a different problem entirely. Then there is the mirror mistake, slowing down on a record groove because you talked yourself into a tiger stripe, which starves a front that was already hesitating and deepens the rings. Direction is the whole game here, and getting it backward makes every mark worse. One more caution: melt temperature is the lever not to lean on for a tiger stripe, because the evidence is split on which way it helps, so treat it as something to test on your own part and your own tool, not a rule you can carry in."),
+      p("So when what comes in is a run of bands or rings, Mold Doctor runs the split before it reaches for the speed. Rings centered on the gate, or bands across the flow. Eases when you speed up, or tightens. It would rather know which of the two flow marks it is looking at than hand you a speed setting that helps one and hurts the other. Mold Doctor takes a photo of the defect along with your process settings, estimates the likely causes, and tells you what to adjust, and your shop's own history builds up as you log each run."),
+    ],
+  },
   {
     slug: 'void-bubble-sink-heat-test',
     title: "Not every void wants more pressure",

@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 136" font-family="inherit">
+<text x="90" y="22" font-size="14" font-weight="800" fill="var(--faint)" text-anchor="middle">속도 테스트</text>
+<rect x="16" y="34" width="148" height="28" rx="7" fill="var(--faint)" fill-opacity="0.09" stroke="var(--faint)" stroke-opacity="0.5" stroke-width="1.5"/>
+<rect x="16" y="34" width="5" height="28" rx="2.5" fill="var(--faint)"/>
+<text x="30" y="52" font-size="13" font-weight="700" fill="var(--ink)" text-anchor="start">둘 다 플로우마크</text>
+<rect x="16" y="66" width="148" height="28" rx="7" fill="var(--ok)" fill-opacity="0.09" stroke="var(--ok)" stroke-opacity="0.5" stroke-width="1.5"/>
+<rect x="16" y="66" width="5" height="28" rx="2.5" fill="var(--ok)"/>
+<text x="30" y="84" font-size="13" font-weight="700" fill="var(--ok)" text-anchor="start">레코드홈 = 속도↑</text>
+<rect x="16" y="98" width="148" height="28" rx="7" fill="var(--brand)" fill-opacity="0.09" stroke="var(--brand)" stroke-opacity="0.5" stroke-width="1.5"/>
+<rect x="16" y="98" width="5" height="28" rx="2.5" fill="var(--brand)"/>
+<text x="30" y="116" font-size="13" font-weight="700" fill="var(--brand-ink)" text-anchor="start">타이거 = 속도↓</text>
+</svg>
