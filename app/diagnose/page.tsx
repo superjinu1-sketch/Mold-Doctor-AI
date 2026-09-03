@@ -14,6 +14,7 @@ import { authHeaders } from '@/lib/supabase/authHeader';
 import { downscaleImageClient, safeLocalStorageSet } from '@/lib/clientDownscale';
 import { apiFetch } from '@/lib/apiBase';
 import { saveDiagnosisRecord, updateResolution, type HistoryRecord } from '@/lib/history-sync';
+import { replaceDraftPhotos, loadDraftPhotos, clearDraftPhotos } from '@/lib/draftPhotoStore';
 import { IconClipboard, IconCamera } from '@/components/icons';
 import { SAMPLE_CASES } from '@/lib/sampleCase';
 import { requestInAppReviewIfEligible } from '@/lib/inAppReview';
@@ -169,8 +170,12 @@ const RESIN_OPTIONS = [
   { group: '기타', groupKey: 'resin.group.other', options: ['기타 (직접 입력)'] },
 ];
 
-// 폼 상태 sessionStorage 방어선 — 리마운트/새로고침/토큰 리프레시로 인한 입력 소실 방지
+// 폼 상태 방어선 — 리마운트/새로고침/토큰 리프레시뿐 아니라 프로세스 킬(전화 수신 등)에도 살아남게
+// sessionStorage(v1) → localStorage(v2, call-interruption-data-loss-fix-v1 Part B)로 이관.
+// FORM_SS_KEY는 기존 세션에 남아있을 수 있는 v1 draft를 1회 승계하는 마이그레이션 전용 — 더 이상 쓰지 않는다.
 const FORM_SS_KEY = 'molddoctor_form_v1';
+const FORM_LS_KEY = 'molddoctor_diagnose_draft_v2';
+const FORM_DRAFT_TTL_MS = 24 * 60 * 60 * 1000; // 24h — 지나면 복원하지 않고 정리
 
 // 폼 섹션 아코디언 (표현 전용). 한 번에 하나 펼침 + 완료 시 ✓.
 function FormSection({ step, title, open, complete, optional = false, onToggle, children }: {
@@ -299,7 +304,7 @@ function DiagnoseContent() {
   const followUpFormRef = useRef<HTMLDivElement>(null);
   const errorRef = useRef<HTMLDivElement>(null);
   // #54: 이력 복원 뷰에서는 draft 자동저장을 중단한다. 복원으로 세팅된 폼 값이
-  // FORM_SS_KEY에 재저장되어 이후 "새 추정" 진입 시 유령 로드되는 역류 오염 방지.
+  // FORM_LS_KEY에 재저장되어 이후 "새 추정" 진입 시 유령 로드되는 역류 오염 방지.
   // 리마운트 시 자연 초기화. (트레이드오프: 복원 뷰에서의 수기 수정은 draft 미보호 — 허용)
   const isRestoreViewRef = useRef(false);
   const progressCardRef = useRef<HTMLDivElement>(null);
@@ -499,35 +504,71 @@ function DiagnoseContent() {
         setTimeout(() => resultRef.current?.scrollIntoView({ behavior: 'smooth' }), 150);
       }
     } catch { /* ignore */ }
-    // 폼 입력 복원 (리마운트/새로고침/토큰 리프레시 방어선) — 텍스트 입력만, 이미지 제외
+    // 폼 입력 복원 (리마운트/새로고침/토큰 리프레시·프로세스 킬 방어선, Part B — sessionStorage(v1)에
+    // localStorage(v2)+TTL+사진(IndexedDB)까지 확장). 옛 v1 draft가 세션에 남아있으면 1회만 승계 후 제거.
+    let restoredPhotosSkipped = isRecordRestore;
     try {
-      const savedForm = sessionStorage.getItem(FORM_SS_KEY);
-      if (savedForm && !isRecordRestore) {
+      const legacy = sessionStorage.getItem(FORM_SS_KEY);
+      if (legacy && !localStorage.getItem(FORM_LS_KEY)) {
+        const parsed = JSON.parse(legacy);
+        safeLocalStorageSet(FORM_LS_KEY, JSON.stringify({ ...parsed, savedAt: Date.now() }));
+      }
+      sessionStorage.removeItem(FORM_SS_KEY);
+    } catch { /* ignore */ }
+    try {
+      const savedForm = localStorage.getItem(FORM_LS_KEY);
+      if (savedForm) {
         const f = JSON.parse(savedForm);
-        if (f.defectType) setDefectType(f.defectType);
-        if (f.customDefect) setCustomDefect(f.customDefect);
-        if (f.defectDescription) setDefectDescription(f.defectDescription);
-        if (f.resinType) setResinType(f.resinType);
-        if (f.customResin) setCustomResin(f.customResin);
-        if (f.filler) setFiller(f.filler);
-        if (f.fillerContent) setFillerContent(f.fillerContent);
-        if (f.flameRetardant) setFlameRetardant(f.flameRetardant);
-        if (f.flameRetardantThickness) setFlameRetardantThickness(f.flameRetardantThickness);
-        if (f.flameRetardantType) setFlameRetardantType(f.flameRetardantType);
-        if (f.resinDetail) setResinDetail(f.resinDetail);
-        if (f.resinGrade) setResinGrade(f.resinGrade);
-        if (f.settings) setSettings(prev => ({ ...prev, ...f.settings }));
-        if (f.advSettings) setAdvSettings(prev => ({ ...prev, ...f.advSettings }));
-        if (f.moldType) setMoldType(f.moldType);
-        if (f.gateType) setGateType(f.gateType);
-        if (f.cavities) setCavities(f.cavities);
-        if (f.runnerType) setRunnerType(f.runnerType);
-        if (f.weight) setWeight(f.weight);
-        if (f.wallThicknessMin) setWallThicknessMin(f.wallThicknessMin);
-        if (f.wallThicknessMax) setWallThicknessMax(f.wallThicknessMax);
-        if (f.productNotes) setProductNotes(f.productNotes);
+        const isExpired = typeof f.savedAt === 'number' && (Date.now() - f.savedAt > FORM_DRAFT_TTL_MS);
+        if (isExpired) {
+          localStorage.removeItem(FORM_LS_KEY);
+          void clearDraftPhotos();
+          restoredPhotosSkipped = true;
+        } else if (!isRecordRestore) {
+          if (f.defectType) setDefectType(f.defectType);
+          if (f.customDefect) setCustomDefect(f.customDefect);
+          if (f.defectDescription) setDefectDescription(f.defectDescription);
+          if (f.resinType) setResinType(f.resinType);
+          if (f.customResin) setCustomResin(f.customResin);
+          if (f.filler) setFiller(f.filler);
+          if (f.fillerContent) setFillerContent(f.fillerContent);
+          if (f.flameRetardant) setFlameRetardant(f.flameRetardant);
+          if (f.flameRetardantThickness) setFlameRetardantThickness(f.flameRetardantThickness);
+          if (f.flameRetardantType) setFlameRetardantType(f.flameRetardantType);
+          if (f.resinDetail) setResinDetail(f.resinDetail);
+          if (f.resinGrade) setResinGrade(f.resinGrade);
+          if (f.settings) setSettings(prev => ({ ...prev, ...f.settings }));
+          if (f.advSettings) setAdvSettings(prev => ({ ...prev, ...f.advSettings }));
+          if (f.moldType) setMoldType(f.moldType);
+          if (f.gateType) setGateType(f.gateType);
+          if (f.cavities) setCavities(f.cavities);
+          if (f.runnerType) setRunnerType(f.runnerType);
+          if (f.weight) setWeight(f.weight);
+          if (f.wallThicknessMin) setWallThicknessMin(f.wallThicknessMin);
+          if (f.wallThicknessMax) setWallThicknessMax(f.wallThicknessMax);
+          if (f.productNotes) setProductNotes(f.productNotes);
+        }
       }
     } catch { /* ignore */ }
+    // 사진 draft 복원(Part B) — IndexedDB는 비동기라 별도로 처리. #54와 동일하게 복원 뷰
+    // (molddoctor_restore)·TTL 만료 시에는 건드리지 않는다. 실패(시크릿 모드 등)는 조용히 무시
+    // — 텍스트 draft만 살아있으면 된다.
+    if (!restoredPhotosSkipped) {
+      (async () => {
+        try {
+          const photos = await loadDraftPhotos();
+          const toImageFile = async (p: { id: string; blob: Blob; mediaType: string }): Promise<ImageFile> => {
+            const file = p.blob instanceof File ? p.blob : new File([p.blob], `draft-${p.id}.jpg`, { type: p.mediaType });
+            const base64 = await fileToBase64(file);
+            return { id: p.id, file, preview: `data:${p.mediaType};base64,${base64}`, base64, mediaType: p.mediaType };
+          };
+          const imgs = await Promise.all(photos.filter(p => p.kind === 'image').slice(0, 5).map(toImageFile));
+          const drawings = await Promise.all(photos.filter(p => p.kind === 'drawing').slice(0, 3).map(toImageFile));
+          if (imgs.length > 0) setImages(imgs);
+          if (drawings.length > 0) setMoldDrawings(drawings);
+        } catch { /* ignore */ }
+      })();
+    }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -565,28 +606,36 @@ function DiagnoseContent() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // 폼 상태를 sessionStorage에 디바운스 저장 (내용이 있을 때만) — 소실 방어선
+  // 폼 상태를 localStorage에 디바운스 저장 (내용이 있을 때만) — 소실 방어선(Part B: 프로세스 킬도 방어).
+  // 사진은 같은 디바운스로 IndexedDB에 통째로 스냅샷 저장(삭제된 사진이 안 남게 매번 clear 후 재기록).
   useEffect(() => {
     if (isRestoreViewRef.current) return;  // #54: 복원 뷰는 draft 저장 금지(역류 오염 방지)
-    const hasContent = !!(defectType || customDefect || defectDescription || resinType);
+    // 사진만 먼저 첨부하고 텍스트는 아직 안 쓴 경우도 저장 대상 — 사진 단독 소실을 막는다(Part B).
+    const hasContent = !!(defectType || customDefect || defectDescription || resinType || images.length > 0 || moldDrawings.length > 0);
     if (!hasContent) return;
     const handle = setTimeout(() => {
       try {
-        sessionStorage.setItem(FORM_SS_KEY, JSON.stringify({
+        safeLocalStorageSet(FORM_LS_KEY, JSON.stringify({
           defectType, customDefect, defectDescription, resinType, customResin,
           filler, fillerContent, flameRetardant, flameRetardantThickness, flameRetardantType,
           resinDetail, resinGrade, settings, advSettings,
           moldType, gateType, cavities, runnerType,
           weight, wallThicknessMin, wallThicknessMax, productNotes,
+          savedAt: Date.now(),
         }));
       } catch { /* quota/직렬화 실패 무시 */ }
+      void replaceDraftPhotos([
+        ...images.map((img, i) => ({ id: img.id, kind: 'image' as const, order: i, mediaType: img.mediaType, blob: img.file })),
+        ...moldDrawings.map((img, i) => ({ id: img.id, kind: 'drawing' as const, order: i, mediaType: img.mediaType, blob: img.file })),
+      ]);
     }, 400);
     return () => clearTimeout(handle);
   }, [defectType, customDefect, defectDescription, resinType, customResin,
       filler, fillerContent, flameRetardant, flameRetardantThickness, flameRetardantType,
       resinDetail, resinGrade, settings, advSettings,
       moldType, gateType, cavities, runnerType,
-      weight, wallThicknessMin, wallThicknessMax, productNotes]);
+      weight, wallThicknessMin, wallThicknessMax, productNotes,
+      images, moldDrawings]);
 
   // 수기 수지 필드: 저장값·복원·샘플·자동채움으로 resinType이 채워지면 펼침 (기본 접힘)
   useEffect(() => {
@@ -988,8 +1037,9 @@ function DiagnoseContent() {
       setResult(data);
       void hapticSuccess();
       setShowFollowUpForm(false);
-      // 진단 성공 → 폼 방어선 스냅샷 클리어 (다음 방문 시 stale 복원 방지)
-      try { sessionStorage.removeItem(FORM_SS_KEY); } catch { /* ignore */ }
+      // 진단 성공 → 폼 방어선 스냅샷 클리어 (다음 방문 시 stale 복원 방지, 사진도 함께)
+      try { localStorage.removeItem(FORM_LS_KEY); } catch { /* ignore */ }
+      void clearDraftPhotos();
 
       if (round > 1) {
         setFollowUpHistory(prev => [
