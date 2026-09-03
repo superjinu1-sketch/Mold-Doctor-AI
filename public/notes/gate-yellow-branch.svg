@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 380" font-family="inherit">
+<path d="M360 80 L145 150" stroke="var(--faint)" stroke-opacity="0.55" stroke-width="2" fill="none"/>
+<path d="M360 80 L545 150" stroke="var(--faint)" stroke-opacity="0.55" stroke-width="2" fill="none"/>
+<path d="M545 210 L405 268" stroke="var(--faint)" stroke-opacity="0.55" stroke-width="2" fill="none"/>
+<path d="M545 210 L619 268" stroke="var(--faint)" stroke-opacity="0.55" stroke-width="2" fill="none"/>
+<text x="232" y="120" font-size="14" font-weight="700" fill="var(--faint)" text-anchor="middle">wipes off</text>
+<text x="472" y="120" font-size="14" font-weight="700" fill="var(--faint)" text-anchor="middle">stays</text>
+<text x="452" y="246" font-size="13" font-weight="700" fill="var(--ok)" text-anchor="middle">fixed at end</text>
+<text x="628" y="246" font-size="13" font-weight="700" fill="var(--brand-ink)" text-anchor="middle">gate, on-off</text>
+<rect x="240" y="22" width="240" height="56" rx="14" fill="var(--surface)" fill-opacity="1" stroke="var(--border)" stroke-opacity="1" stroke-width="2"/>
+<text x="360" y="47" font-size="18" font-weight="800" fill="var(--ink)" text-anchor="middle">Yellow at the gate</text>
+<text x="360" y="68" font-size="13" font-weight="600" fill="var(--muted)" text-anchor="middle">wipe it, then purge</text>
+<rect x="40" y="150" width="210" height="94" rx="14" fill="var(--faint)" fill-opacity="0.09" stroke="var(--faint)" stroke-opacity="0.5" stroke-width="2"/>
+<text x="145" y="182" font-size="16" font-weight="800" fill="var(--ink)" text-anchor="middle">MOLD DEPOSIT</text>
+<text x="145" y="206" font-size="13" font-weight="600" fill="var(--muted)" text-anchor="middle">surface film</text>
+<text x="145" y="228" font-size="13" font-weight="700" fill="var(--faint)" text-anchor="middle">wipe, clean vents</text>
+<rect x="430" y="150" width="230" height="60" rx="14" fill="var(--surface)" fill-opacity="1" stroke="var(--border)" stroke-opacity="1" stroke-width="2"/>
+<text x="545" y="176" font-size="16" font-weight="800" fill="var(--ink)" text-anchor="middle">In the plastic</text>
+<text x="545" y="197" font-size="12.5" font-weight="600" fill="var(--muted)" text-anchor="middle">read location, then purge</text>
+<rect x="307" y="268" width="196" height="92" rx="14" fill="var(--ok)" fill-opacity="0.09" stroke="var(--ok)" stroke-opacity="0.55" stroke-width="2"/>
+<text x="405" y="300" font-size="16" font-weight="800" fill="var(--ok)" text-anchor="middle">VENT BURN</text>
+<text x="405" y="323" font-size="12.5" font-weight="600" fill="var(--muted)" text-anchor="middle">fixed dark, last fill</text>
+<text x="405" y="344" font-size="13" font-weight="700" fill="var(--ok)" text-anchor="middle">cut the vent</text>
+<rect x="525" y="268" width="188" height="92" rx="14" fill="var(--brand)" fill-opacity="0.09" stroke="var(--brand)" stroke-opacity="0.55" stroke-width="2"/>
+<text x="619" y="300" font-size="16" font-weight="800" fill="var(--brand-ink)" text-anchor="middle">BARREL RESIDENCE</text>
+<text x="619" y="323" font-size="12.5" font-weight="600" fill="var(--muted)" text-anchor="middle">POM, purge clears it</text>
+<text x="619" y="344" font-size="13" font-weight="700" fill="var(--brand-ink)" text-anchor="middle">residence, temp down</text>
+</svg>

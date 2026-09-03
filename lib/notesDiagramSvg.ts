@@ -38,6 +38,7 @@ const FILES: Record<NoteDiagramId, string> = {
   'plateout-wipe-branch': 'plateout-wipe-branch.svg',
   'void-bubble-branch': 'void-bubble-branch.svg',
   'flow-tiger-branch': 'flow-tiger-branch.svg',
+  'gate-yellow-branch': 'gate-yellow-branch.svg',
 };
 
 export function readNoteDiagramSvg(id: NoteDiagramId, locale: 'ko' | 'en' = 'en'): string {
@@ -67,6 +68,7 @@ const THUMB_FILES: Record<NoteThumbId, string> = {
   'plateout-wipe': 'thumb-plateout-wipe.svg',
   'void-bubble': 'thumb-void-bubble.svg',
   'flow-tiger': 'thumb-flow-tiger.svg',
+  'gate-yellow': 'thumb-gate-yellow.svg',
 };
 
 export function readNoteThumbSvg(id: NoteThumbId, locale: 'ko' | 'en' = 'en'): string {

@@ -1,6 +1,6 @@
 // 영문 콘텐츠 축 B(/en/notes) 글 데이터 단일 소스. 본문은 진우 확정본 — 문구를 다듬지 않는다.
 // /en/about과 동일 원칙: 문법 교정·표현 개선·문장 병합 전부 금지.
-export type NoteDiagramId = 'cross-section' | 'flow' | 'weld-flow' | 'weld-section' | 'clamp-calc' | 'clamp-flow' | 'fr-paths' | 'fr-ppa-grades' | 'fr-barrel' | 'fr-levers' | 'fiber-float-fountain' | 'fiber-float-resins' | 'fiber-float-section' | 'nmt-pores' | 'nmt-families' | 'nmt-frame' | 'nmt-app-map' | 'nmt-cte' | 'nmt-resin-map' | 'nmt-freeze-race' | 'nmt-defect-tree' | 'flake-tilt' | 'metallic-split' | 'shortshot-split' | 'gf-cross-section' | 'settings-profile' | 'plateout-wipe-branch' | 'void-bubble-branch' | 'flow-tiger-branch';
+export type NoteDiagramId = 'cross-section' | 'flow' | 'weld-flow' | 'weld-section' | 'clamp-calc' | 'clamp-flow' | 'fr-paths' | 'fr-ppa-grades' | 'fr-barrel' | 'fr-levers' | 'fiber-float-fountain' | 'fiber-float-resins' | 'fiber-float-section' | 'nmt-pores' | 'nmt-families' | 'nmt-frame' | 'nmt-app-map' | 'nmt-cte' | 'nmt-resin-map' | 'nmt-freeze-race' | 'nmt-defect-tree' | 'flake-tilt' | 'metallic-split' | 'shortshot-split' | 'gf-cross-section' | 'settings-profile' | 'plateout-wipe-branch' | 'void-bubble-branch' | 'flow-tiger-branch' | 'gate-yellow-branch';
 
 export type NoteBlock =
   | { type: 'p'; text: string }
@@ -11,7 +11,7 @@ export type NoteBlock =
 // lib/notesDiagramSvg.ts(node:fs 사용, 서버 전용)가 이 타입을 가져다 쓴다 — 반대 방향(이 파일이
 // notesDiagramSvg.ts에서 import)이면 lib/notes.ts를 가져다 쓰는 클라이언트 컴포넌트(app/page.tsx)가
 // 번들러 설정에 따라 fs를 함께 끌고 들어올 위험이 있어 여기서 정의한다(notes-list-thumbnail-v1).
-export type NoteThumbId = 'splay-branch' | 'weld-strength' | 'clamp-window' | 'fr-corrosion' | 'fiber-float' | 'nmt-bond' | 'nmt-frame' | 'nmt-resin' | 'nmt-troubleshoot' | 'metallic-streak' | 'shortshot' | 'gf-warpage' | 'settings-sheet' | 'plateout-wipe' | 'void-bubble' | 'flow-tiger';
+export type NoteThumbId = 'splay-branch' | 'weld-strength' | 'clamp-window' | 'fr-corrosion' | 'fiber-float' | 'nmt-bond' | 'nmt-frame' | 'nmt-resin' | 'nmt-troubleshoot' | 'metallic-streak' | 'shortshot' | 'gf-warpage' | 'settings-sheet' | 'plateout-wipe' | 'void-bubble' | 'flow-tiger' | 'gate-yellow';
 
 export interface Note {
   slug: string;
@@ -29,6 +29,27 @@ const diagram = (id: NoteDiagramId): NoteBlock => ({ type: 'diagram', id });
 const image = (src: string, alt: string, caption?: string): NoteBlock => ({ type: 'image', src, alt, caption });
 
 export const NOTES: Note[] = [
+  {
+    slug: 'pom-gate-yellowing-purge-test',
+    title: "Not every yellow gate is a bad batch",
+    description: "Yellow creeping in at the gate, and the reflex is to blame the resin lot or hunt for a venting problem. On POM that yellow is usually not a bad batch but the resin cooking in the barrel. Here is how to tell a mold deposit, a vent burn, and barrel residence degradation apart before you swap the material.",
+    publishedAt: '2026-09-03',
+    thumb: 'gate-yellow',
+    body: [
+      p("Yellow starts creeping in at the gate on an acetal part, and the hands go to the resin first. Bad lot? Then to the mold, pulling the vents, chasing trapped gas. Mold Doctor reads it that way too at first, and a lot of the time that is where it lives. But there is one move the shop keeps walking past: pull every bit of resin out, load the same resin back in, and run it. It comes out clean for a while. Hang onto that, because it is the whole thread of this one."),
+      p("That read is not wrong, and I want to be clear about that. If it really is a vent burn, you cut the vent. If it really is dirt in the material, you change the resin, and you are right to. The only place it goes sideways is when every yellow on POM gets forced into bad lot or glass sticking up out of the skin. Some of this yellow is not the resin being bad. It is the resin going bad, in the barrel, while you wait on it."),
+      h2("Sort out what you are actually looking at"),
+      p("You can do most of this at the bench before you change a setting. A whitish film or haze that wipes off on a rag is a mold deposit, release agent and low-weight stuff plating out on the steel, so wipe the face down and clean the vents and move on, because that one is not coming from inside the material. If it does not wipe and the color is down in the plastic, then read where it sits. A dark brown or black mark parked at the same spot every shot, out at the last place the cavity fills, is trapped air burning, a vent diesel. Yellow that shows up near the gate and comes and goes is pointing at the barrel."),
+      p("The test that settles it is a purge. Pull all the material out, load the same resin back in, and run a few shots. If it comes out clean for a while, the lot was never your problem, the resin was cooking in the barrel. The on and off pattern is telling you the same thing: degraded material cakes up in the dead spots, at the nozzle tip and behind the check ring, and lets go a little at a time. POM does not forgive long residence, its window is narrow, and it gives off formaldehyde as it comes apart. And since acetal takes up almost no moisture, running the dryer harder does nothing to this mark, which is a tell all by itself."),
+      diagram('gate-yellow-branch'),
+      h2("Why it cooks in the barrel"),
+      p("Here is the mechanism under it. Acetal runs in a narrow window, so when it sits too long or the barrel runs too hot, the chains start breaking, and that is what gives off the gas and pulls the color from yellow toward brown. The gate takes the highest shear and passes the last, most worked slug of the shot, so the color turns up there before anywhere else. Where the flow stalls out, at the nozzle tip and behind the check ring, the broken-down material gathers and lets go a little at a time, and that is the on and off you are chasing. And the gas coming off it is formaldehyde, which eats at the tool and is hard on the people standing next to the press, so this is not a mark you run on while you think about it."),
+      p("So the levers here are residence and heat, not the resin. Start with shot size against the barrel: a shot much too small for the barrel means every slug sits in there too long before it goes. Bring the nozzle and barrel back a little, cooler rather than hotter. Take the pauses out of the cycle, because a short stop cooks the slug sitting in the barrel and then it shows up over the next several shots after you get going again. Pull the screw and the tip and clean out the dead spots where it cakes up. When the vent checks out and the drying checks out and the mark is still there, this is the next place to go."),
+      h2("Where this one goes sideways"),
+      p("Here is where it burns people. Swapping one lot for the next and getting nowhere, because it was never the lot, and the new resin cooks in the same barrel just the same. Cutting vents over and over, when a mark that is not a fixed dark spot at the end of fill was never a vent diesel to begin with. Reading the yellow as glass floating up to the skin, when floated fiber comes up silvery and white, not yellow. Leaning on the dryer, when acetal barely takes up water and over-drying does nothing at all to this one. And running it and hoping it clears, when the formaldehyde coming off degrading POM is eating your tool and hanging in the air the operator breathes, which is not something you wait out."),
+      p("So when the description that comes in is yellow at the gate, Mold Doctor runs the split before it starts doubting the resin. Does it wipe off. Is it a fixed dark spot at the end of fill, or an on and off yellow back at the gate. Does a purge clear it. It would rather know which of the three it has in front of it than hand you a temperature to chase that only helps one of them. Mold Doctor takes a photo of the defect along with your process settings, estimates the likely causes, and tells you what to adjust, and it leaves the call with you while your shop's own history builds up as you log each run."),
+    ],
+  },
   {
     slug: 'flow-mark-tiger-stripe-speed-test',
     title: "Not every flow mark wants more speed",
