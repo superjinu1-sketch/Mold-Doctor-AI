@@ -928,8 +928,13 @@ function DiagnoseContent() {
     void hapticImpactLight();
 
     try {
+      // 요청 전 id 선발급(call-interruption-data-loss-fix-v1 Part A) — 서버가 정상 성공 시
+      // 이 id로 diagnosis_records를 선제 upsert하므로, 응답 수신 후 클라가 만드는 record.id도
+      // 동일 값을 써야 onConflict(user_id, client_id)로 자연 병합된다(중복 0).
+      const clientId = crypto.randomUUID();
       const isFollowUp = round > 1 && previousDiagnosis !== null;
       const payload = {
+        client_id: clientId,
         defectType: defectType === '기타 (직접 입력)' ? customDefect : defectType,
         defectDescription,
         resinInfo: {
@@ -993,8 +998,7 @@ function DiagnoseContent() {
         ]);
       }
 
-      const newId = String(Date.now());
-      setDiagnosisId(newId);
+      setDiagnosisId(clientId);
       try {
         const raw = typeof window !== 'undefined' ? localStorage.getItem('diagnoseHistory') : null;
         const history = JSON.parse(raw || '[]');
@@ -1006,7 +1010,7 @@ function DiagnoseContent() {
         const record = {
           ...data,
           timestamp: new Date().toISOString(),
-          id: newId,
+          id: clientId,
           ...(beforePhoto ? { beforePhoto } : {}),
           round: diagnosisRound,
           kbVersion: data.kbVersion,

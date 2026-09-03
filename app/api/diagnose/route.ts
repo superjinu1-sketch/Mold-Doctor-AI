@@ -198,6 +198,10 @@ export const HYGROSCOPICITY_GUARD = `[흡습성 정확성 — 반드시 준수]
 // "어느 프롬프트로 나온 답인가"를 사후 추적하는 근거가 된다.
 export const PROMPT_VERSION = 'v19';
 
+// client_id·session_id 형식 검증(call-interruption-data-loss-fix-v1 Part A) —
+// lib/history-sync.ts의 동명 정규식과 동일 패턴 유지.
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
 function buildFixedFramework(locale: string): string {
   const isEn = locale === 'en';
   return `You are an expert injection molding troubleshooter trained in Scientific Molding methodology (RJG/Paulson approach, Decoupled Molding II/III). You have 15+ years of hands-on experience and apply systematic, data-driven analysis rather than trial-and-error.
@@ -487,6 +491,10 @@ export async function POST(request: NextRequest) {
   if (gate) return gate;
   // 진단 throw 시 환불에 쓸 컨텍스트 (start_session 성공 후 채워짐)
   let refundCtx: { sessionId: string; userId: string } | null = null;
+  // 성공 시 서버측 결과 저장(call-interruption-data-loss-fix-v1 Part A)에 쓸 userId.
+  // refundCtx는 크레딧 차감 경로(isRetestFree=false)에서만 채워지지만, 결과 저장은 로그인
+  // 여부만 있으면 되므로(무료 재시도 화이트리스트 포함) 별도로 둔다.
+  let userId: string | null = null;
   try {
     const MAX_PAYLOAD = 4.4 * 1024 * 1024;  // Vercel 함수 페이로드 한도(~4.5MB) 안전선
     if (Number(request.headers.get('content-length') || 0) > MAX_PAYLOAD) {
@@ -557,7 +565,7 @@ export async function POST(request: NextRequest) {
       if (userErr || !userData?.user) {
         return NextResponse.json({ error: '로그인이 필요합니다.', code: 'AUTH_REQUIRED' }, { status: 401 });
       }
-      const userId = userData.user.id;
+      userId = userData.user.id;
 
       // ── isRetest dev 화이트리스트 검증 (크레딧 스킵) ──────────
       const devEmails = (process.env.DEV_EMAILS || '').split(',').map(e => e.trim().toLowerCase()).filter(Boolean);
@@ -1093,6 +1101,59 @@ CRITICAL: Your entire response must be ONLY the JSON object. No text before or a
         finalBalance = rf?.ok && typeof rf.credit_balance === 'number' ? rf.credit_balance : creditBalance + 1;
       } catch {
         finalBalance = creditBalance + 1;
+      }
+    }
+
+    // 서버측 결과 저장(call-interruption-data-loss-fix-v1 Part A) — 요청 처리 중 클라가
+    // 죽어도(전화 수신·프로세스 킬 등) 결과가 이력에 남고 크레딧이 헛소모되지 않게, 정상 성공
+    // 경로(파싱 폴백 아님)에서만 응답 반환 직전에 선제 저장한다. client_id는 클라가 요청 전에
+    // 미리 발급해 보낸 id(app/diagnose/page.tsx clientId)와 동일 값 — 클라가 정상 수신 후 저장하는
+    // record.id도 같은 값을 쓰므로 onConflict(user_id, client_id)로 자연 병합되어 중복이 생기지 않는다.
+    // 실패는 삼켜서 진단 응답 자체엔 영향 없게 한다(저장 실패가 진단 실패로 번지면 안 됨).
+    if (!parseFallback && userId && typeof body.client_id === 'string' && UUID_RE.test(body.client_id)) {
+      try {
+        // ⚠ lib/history-sync.ts의 recordToRow와 동일 스키마 유지 — 컬럼을 늘리거나 이름을
+        // 바꾸면 두 곳(클라 upsert·서버 upsert)을 함께 고칠 것. 드리프트 시 병합 시 필드 유실.
+        const sessionIdForRow = UUID_RE.test(sessionId) ? sessionId : null;
+        const row = {
+          user_id: userId,
+          client_id: body.client_id,
+          session_id: sessionIdForRow,
+          round,
+          defect_type: result.defect_type ?? null,
+          severity: result.severity ?? null,
+          summary: result.summary ?? null,
+          causes: result.causes ?? null,
+          recommendations: result.recommendations ?? null,
+          before_resin: resinInfo?.resinType ?? null,
+          before_settings: settings ?? null,
+          after_settings: null,
+          // 클라 썸네일(400px)과 동일 자산은 아니지만(서버는 AI 입력용 1024px 다운스케일본만 보유),
+          // 크래시 세이프넷 목적상 사진 있는 편이 없는 것보다 낫다. 클라가 정상 수신하면 자기
+          // 썸네일로 다시 upsert해 곧 대체된다.
+          before_photo: safeImages[0]?.data ?? null,
+          after_photo: null,
+          before_input: {
+            defectType: defectType ?? null,
+            defectDescription: defectDescription ?? null,
+            resinInfo: resinInfo ?? null,
+            settings: settings ?? null,
+            advSettings: advSettings ?? null,
+            pressureUnit: pressureUnit ?? null,
+            moldInfo: moldInfo ?? null,
+            productInfo: productInfo ?? null,
+            locale: locale ?? null,
+          },
+          kb_version: result.kbVersion ?? null,
+          prompt_version: result.promptVersion ?? null,
+          resolved: null,
+          resolved_at: null,
+          resolved_memo: null,
+          created_at: new Date().toISOString(),
+        };
+        await supabaseAdmin.from('diagnosis_records').upsert(row, { onConflict: 'user_id,client_id' });
+      } catch (e) {
+        reportError('diagnose.saveRecord', e);
       }
     }
 
