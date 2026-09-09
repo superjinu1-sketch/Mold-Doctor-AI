@@ -103,6 +103,7 @@ export const ko: Record<string, string> = {
 
   /* ── Common ─────────────────────────────────── */
   'common.none': '없음',
+  'common.example': '예시',
 
   /* ── Filler options ──────────────────────────── */
   'filler.none': '없음',
@@ -621,6 +622,7 @@ export const ko: Record<string, string> = {
   'ledger.title': '사출기별 작업표준 저장소',
   'ledger.subtitle': '사출기별 조건 표준을 저장하고 현장 부착용 PDF로 출력하세요',
   'ledger.login_prompt': '로그인하면 설비별 조건 표준을 저장하고 관리할 수 있어요.',
+  'ledger.preview_example': '사출기 1호 · PA6-GF30 · 노즐 250℃ / 보압 55MPa 조건 저장',
   'ledger.select_mode': '선택',
   'ledger.add_machine': '설비 추가',
   'ledger.machine_name': '설비 이름',
@@ -675,6 +677,7 @@ export const ko: Record<string, string> = {
   'tryout.title': '시사출 체크리스트',
   'tryout.subtitle': '신규 금형 시사출 점검을 표준 템플릿으로 기록하고 리포트로 출력하세요.',
   'tryout.login_prompt': '로그인하면 시사출 기록을 저장하고 관리할 수 있어요.',
+  'tryout.preview_example': '커넥터 하우징 · 3샷 점검 기록 · 리포트 PDF 출력',
   'tryout.new_tryout': '새 시사출',
   'tryout.mold_name': '금형명',
   'tryout.starting': '시작하는 중…',

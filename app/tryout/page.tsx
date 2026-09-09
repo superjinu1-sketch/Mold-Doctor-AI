@@ -61,7 +61,13 @@ export default function TryoutListPage() {
       <div className="max-w-3xl mx-auto px-4 py-8">
         <h1 className="text-[length:var(--text-h2)] font-bold text-ink mb-6">{t('tryout.title')}</h1>
         <div className="ui-card ui-card-lg p-8 text-center">
-          <p className="text-muted text-body mb-5">{t('tryout.login_prompt')}</p>
+          <p className="text-muted text-body mb-4">{t('tryout.login_prompt')}</p>
+          {/* 로그인 전에 무엇이 쌓이는지 한 줄로 보여준다(UX audit B3). 실제 데이터로 오인되지
+              않게 "예시" 라벨을 반드시 함께 노출한다. */}
+          <div className="mb-5 rounded-xl border border-dashed border-border bg-surface-sunken px-4 py-3 text-left">
+            <p className="text-label text-faint mb-1">{t('common.example')}</p>
+            <p className="text-body text-ink">{t('tryout.preview_example')}</p>
+          </div>
           <button type="button" onClick={() => setAuthOpen(true)} className="ui-cta px-6 text-body">{t('auth.login')}</button>
         </div>
         <AuthModal open={authOpen} onClose={() => setAuthOpen(false)} />

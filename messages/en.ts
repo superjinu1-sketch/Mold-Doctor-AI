@@ -102,6 +102,7 @@ export const en: Record<string, string> = {
 
   /* ── Common ─────────────────────────────────── */
   'common.none': 'None',
+  'common.example': 'Example',
 
   /* ── Filler options ──────────────────────────── */
   'filler.none': 'None',
@@ -609,6 +610,7 @@ export const en: Record<string, string> = {
   'ledger.title': 'Work Standards by Machine',
   'ledger.subtitle': 'Save condition standards per machine and print a shop-floor-ready sheet.',
   'ledger.login_prompt': 'Log in to save and manage condition standards per machine.',
+  'ledger.preview_example': 'Press #1 · PA6-GF30 · nozzle 250C / hold 55MPa saved',
   'ledger.select_mode': 'Select',
   'ledger.add_machine': 'Add machine',
   'ledger.machine_name': 'Machine name',
@@ -663,6 +665,7 @@ export const en: Record<string, string> = {
   'tryout.title': 'Tryout Checklist',
   'tryout.subtitle': 'Record new-mold tryout inspections with a standard template and export a report.',
   'tryout.login_prompt': 'Log in to save and manage tryout records.',
+  'tryout.preview_example': 'Connector housing · 3-shot check log · PDF report',
   'tryout.new_tryout': 'New Tryout',
   'tryout.mold_name': 'Mold Name',
   'tryout.starting': 'Starting…',
