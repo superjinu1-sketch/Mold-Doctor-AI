@@ -823,7 +823,7 @@ export const ko: Record<string, string> = {
 
   'landing.web_footer_desc': '사출성형 불량 트러블슈팅. 사진으로 원인을 추정하고, 우리 공장 조건을 한곳에.',
   'landing.web_footer_col_product': '제품',
-  'landing.web_footer_product_1': '불량 분석',
+  'landing.web_footer_product_1': '불량 원인 추정',
   'landing.web_footer_product_2': '크레딧·가격',
   'landing.web_footer_col_tools': '무료 도구',
   'landing.web_footer_tools_1': '작업표준 저장소',

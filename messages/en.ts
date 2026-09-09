@@ -25,7 +25,7 @@ export const en: Record<string, string> = {
   'landing.tool_tryout_title': 'Tryout Checklist',
   'landing.tool_tryout_desc': 'Standard template inspection, printable report',
   'landing.tool_resins_title': 'Resin Library',
-  'landing.tool_resins_desc': 'Drying, melt temp, shrinkage — field reference',
+  'landing.tool_resins_desc': 'Drying, melt temp, shrinkage: field reference',
   'landing.tools_all_link': 'View all free tools →',
   'landing.notes_title': 'Field Notes',
   'landing.notes_sub': 'What came out of building the diagnosis, and correcting it.',
@@ -39,10 +39,10 @@ export const en: Record<string, string> = {
   'tools.tryout_title': 'Trial-Run Checklist',
   'tools.tryout_desc': 'Standard template, shot log, PDF report',
   'tools.resins_title': 'Resin Library',
-  'tools.resins_desc': '52 resins — drying, temperature, shrinkage reference',
+  'tools.resins_desc': '52 resins: drying, temperature, shrinkage reference',
   'tools.guide_title': 'Defect Guide',
   'tools.guide_desc': 'Causes and fixes by defect type',
-  'tools.cta_title': 'Curious about the cause? — AI estimate',
+  'tools.cta_title': 'Curious about the cause? AI estimate',
   'tools.cta_button': 'Start free estimate',
 
   'footer.guide': 'Defect Guide',
@@ -61,7 +61,7 @@ export const en: Record<string, string> = {
   'landing.stat_3': 'Commodity→Super EP',
   'landing.stat_3_label': 'Coverage',
   'landing.defects_h2': 'Any resin. Any defect.',
-  'landing.defects_sub': 'Commodity (PP, ABS, etc.) / Engineering (PA, PC, POM, etc.) / Super EP (PEEK, PPA, LCP, etc.) — all covered',
+  'landing.defects_sub': 'Commodity (PP, ABS, etc.) / Engineering (PA, PC, POM, etc.) / Super EP (PEEK, PPA, LCP, etc.). All covered',
   'landing.defects_safety': 'Not on the list? AI identifies it from the photo and symptoms.',
   'landing.credits_banner': '5 free credits on sign-up · 5 free estimates',
   'landing.how_h2': 'How It Works',
@@ -152,7 +152,7 @@ export const en: Record<string, string> = {
   'credit.insufficient': 'You’ve used all your credits. Redirecting to the top-up page.',
 
   /* ── Navbar ─────────────────────────────────── */
-  'nav.estimate': 'Analyze',
+  'nav.estimate': 'Estimate',
   'nav.tools': 'Free Tools',
   'nav.pricing': 'Credits',
   'nav.free': 'Free Trial',
@@ -192,7 +192,7 @@ export const en: Record<string, string> = {
 
   /* ── Page: /diagnose ─────────────────────────── */
   'diagnose.title': 'Injection Defect AI Analysis',
-  'diagnose.subtitle': 'Enter defect info and process settings — AI identifies root cause and solutions.',
+  'diagnose.subtitle': 'Enter defect info and process settings. AI identifies root cause and solutions.',
   'diagnose.sample_title': 'Try with an Example',
 
   /* STEP 1 */
@@ -215,7 +215,7 @@ export const en: Record<string, string> = {
   'step1.type_custom': 'Enter defect type manually',
   'step1.type_custom_required': 'Enter a defect type to start the analysis',
   'step1.classifying': 'AI is analyzing the defect type…',
-  'step1.ai_suggested': 'AI suggestion — keep if correct, or pick below',
+  'step1.ai_suggested': 'AI suggestion: keep if correct, or pick below',
   'step1.classify_error': 'AI auto-detect is temporarily unavailable. Please select the defect type manually.',
   'step1.defect_required_gate': 'Please confirm the defect type (AI suggests one when you upload a photo)',
   'step1.desc_label': 'Defect Description (optional)',
@@ -245,7 +245,7 @@ export const en: Record<string, string> = {
   'grade.autofill': 'Auto-fill',
   'grade.busy': 'Looking up...',
   'grade.manual_toggle': "No grade name? Enter manually (pilot, compound, etc.)",
-  'grade.filled': 'Auto-filled (estimated) from grade — please review and adjust.',
+  'grade.filled': 'Auto-filled (estimated) from grade. Please review and adjust.',
   'grade.warn_low': 'Low confidence on the auto-fill. Please verify resin type and filler content.',
   'grade.err_unknown': "Couldn't identify this grade. Check for typos or enter the details manually below.",
   'grade.err_unauth': 'Auto-fill requires login. You can still enter the details manually.',
@@ -271,8 +271,8 @@ export const en: Record<string, string> = {
   /* STEP 2b: Machine Settings */
   'step3.title': 'Machine Settings',
   'step3.camera_btn': 'Scan Machine Screen to Auto-Fill',
-  'step3.camera_btn_count': '— 19 fields',
-  'step3.camera_hint': 'Click · drag · Ctrl+V · camera — auto-fills 19 fields',
+  'step3.camera_btn_count': '· 19 fields',
+  'step3.camera_hint': 'Click · drag · Ctrl+V · camera · auto-fills 19 fields',
   'step3.camera_hint_mobile': 'Snap the settings sheet or pick from your album · auto-fills 19 fields',
   'step3.camera_loading': 'Reading settings...',
   'step3.extracted_hint': 'Green border = auto-filled · Edit to clear highlight',
@@ -413,7 +413,7 @@ export const en: Record<string, string> = {
   'followup.settings_hint': 'If you changed settings, update the machine settings form above before starting follow-up analysis.',
 
   /* Error/status */
-  'err.defect_required': 'Enter at least one of: defect type, description, or photo. (Inputs are empty — cannot start the analysis)',
+  'err.defect_required': 'Enter at least one of: defect type, description, or photo. (Inputs are empty, cannot start the analysis)',
   'err.resin_required': 'Please select a resin type. (Required)',
   'err.estimate_fail': 'Analysis failed',
   'err.estimate_error': 'An error occurred during analysis.',
@@ -424,7 +424,7 @@ export const en: Record<string, string> = {
   'err.extract_422': 'Could not read values from the photo. Try a sharper screen photo.',
   'step3.photo_remove': 'Remove photo',
   'msg.resolved': 'Recorded as resolved case.',
-  'msg.extracted': ' fields auto-filled — please verify.',
+  'msg.extracted': ' fields auto-filled. Please verify.',
 
   /* DiagnosisResultPanel */
   'result.ai_guide_disclaimer': 'This is AI guidance. It does not guarantee a fix and may contain mistakes. Final judgment must be verified by the on-site engineer.',
@@ -460,8 +460,8 @@ export const en: Record<string, string> = {
   'demo.notice': 'This is a sample preview. Run a real analysis with your own photo and settings to ask follow-up questions.',
   'chat.error': 'An error occurred while getting a chat response.',
   'chat.send': 'Send',
-  'chat.q1': ' — how does changing to  affect cycle time?',
-  'chat.q2': ' — how do I verify this first, step by step?',
+  'chat.q1': ': how does changing to  affect cycle time?',
+  'chat.q2': ': how do I verify this first, step by step?',
   'chat.q3': 'What changes if I switch to a different resin under these conditions?',
 
   'fallback.unreadable_title': 'Image Unreadable',
@@ -498,7 +498,7 @@ export const en: Record<string, string> = {
   'summary.pw_pack': 'Hold Pressure',
   'summary.pw_dry': 'Drying',
 
-  'rec.title': 'Recommendations — Settings Comparison',
+  'rec.title': 'Recommendations: Settings Comparison',
   'rec.col_param': 'Parameter',
   'rec.col_current': 'Current',
   'rec.col_recommended': 'Recommended',
@@ -547,7 +547,7 @@ export const en: Record<string, string> = {
   'history.cancel': 'Cancel',
   'history.resolved_detail': 'How it was resolved',
   'history.before_settings': 'Settings at time of analysis',
-  'history.similar_placeholder': 'Similar cases — coming soon',
+  'history.similar_placeholder': 'Similar cases: coming soon',
   'history.back': 'Back to analysis',
   'history.after_photo_label': 'Resolution photo (optional)',
   'history.after_photo_help': 'Adding a photo lets the report show before/after comparison clearly',
@@ -572,7 +572,7 @@ export const en: Record<string, string> = {
   'history.save_ledger_no_machine': 'Work standards are managed per machine. Please register a machine first.',
   'history.save_ledger_no_machine_cta': 'Register a machine',
   'history.save_ledger_add_machine': '+ Add new machine',
-  'action.followup': 'Not resolved — Follow-up',
+  'action.followup': 'Not resolved: Follow-up',
   'action.prompt': 'How did the action go?',
 
   /* Defect types (display in English mode) */
@@ -596,18 +596,18 @@ export const en: Record<string, string> = {
   'progress.stage3': 'Analyzing settings in detail (resin properties applied)',
   'progress.stage4': 'Calculating recommended settings',
   'progress.stage5': 'Writing diagnosis report',
-  'progress.tip1': 'Short shot often has multiple causes — resin temperature, injection speed, gate size — so comparing settings closely matters.',
+  'progress.tip1': 'Short shot often has multiple causes (resin temperature, injection speed, gate size), so comparing settings closely matters.',
   'progress.tip2': 'Sink marks tend to form where cooling shrinkage concentrates in thick sections.',
-  'progress.tip3': "Flash isn't just from insufficient clamping force — mold wear or debris on the parting line can cause it too.",
+  'progress.tip3': "Flash isn't just from insufficient clamping force. Mold wear or debris on the parting line can cause it too.",
   'progress.tip4': 'Weld lines form where molten resin streams merge; raising resin or mold temperature often helps.',
   'progress.tip5': 'Highly hygroscopic resins like PA (nylon) are prone to silver streaks when drying is insufficient.',
-  'progress.tip6': 'V/P transfer timing is key to holding-pressure quality — too late causes overpacking, too early risks short shots.',
+  'progress.tip6': 'V/P transfer timing is key to holding-pressure quality: too late causes overpacking, too early risks short shots.',
   'progress.tip7': 'Mold temperature strongly affects appearance quality like gloss and weld lines.',
   'progress.tip8': 'Higher back pressure improves plasticizing uniformity, but too much increases residence time and degradation risk.',
   'progress.tip9': "Even the same defect can have different causes depending on whether it's near the gate or at the flow end.",
   'progress.tip10': 'Changing recommended settings one at a time makes it easier to pin down the actual cause.',
   'progress.tip11': 'Keeping a diagnosis history lets you quickly reference past fixes when a similar defect recurs.',
-  'progress.tip12': 'Sharper photos of the defect area improve diagnostic accuracy — check focus and lighting.',
+  'progress.tip12': 'Sharper photos of the defect area improve diagnostic accuracy, so check focus and lighting.',
 
   /* ── Work Standards by Machine (/ledger) ───────────────────────────── */
   'ledger.title': 'Work Standards by Machine',
@@ -686,7 +686,7 @@ export const en: Record<string, string> = {
   'tryout.no_machines': 'No machines registered.',
   'tryout.machine_none_placeholder': 'Select machine',
   'tryout.machine_freeform_placeholder': 'e.g. Rental machine A',
-  'tryout.checklist_notice': 'Standard template — mark items that don’t apply on-site as "N/A." Feedback welcome.',
+  'tryout.checklist_notice': 'Standard template. Mark items that don’t apply on-site as "N/A." Feedback welcome.',
   'tryout.drying_reference': 'Resin Library reference',
   'tryout.state_ok': 'OK',
   'tryout.state_ng': 'NG',
@@ -718,7 +718,7 @@ export const en: Record<string, string> = {
   'tryout.pdf_export': 'Tryout Report PDF',
   'tryout.pdf_generating': 'Generating PDF…',
   'tryout.pdf_error': 'Something went wrong generating the PDF. Please try again shortly.',
-  'tryout.ai_estimate_cta': 'Got a defect? Upload a photo and settings — we’ll estimate the cause',
+  'tryout.ai_estimate_cta': 'Got a defect? Upload a photo and settings. We’ll estimate the cause',
   'tryout.deleting': 'Deleting…',
   'tryout.confirm_delete': 'Tap again to delete',
   'tryout.delete_record': 'Delete tryout record',
@@ -727,7 +727,7 @@ export const en: Record<string, string> = {
   'help.fab': 'Help',
   'help.title': 'Help',
   'help.subtitle': 'AI-powered answers',
-  'help.greeting': 'Ask me how to use the app — starting a diagnosis, credits, free tools, anything.',
+  'help.greeting': 'Ask me how to use the app: starting a diagnosis, credits, free tools, anything.',
   'help.chip1': 'Start my first diagnosis',
   'help.chip2': 'Can I diagnose without a photo?',
   'help.chip3': 'What are credits?',
@@ -810,7 +810,7 @@ export const en: Record<string, string> = {
 
   'landing.web_footer_desc': "Injection molding defect troubleshooting. Estimate the cause from a photo, keep your shop's conditions in one place.",
   'landing.web_footer_col_product': 'Product',
-  'landing.web_footer_product_1': 'Analyze a defect',
+  'landing.web_footer_product_1': 'Estimate the cause',
   'landing.web_footer_product_2': 'Credits & pricing',
   'landing.web_footer_col_tools': 'Free tools',
   'landing.web_footer_tools_1': 'Work Standards',
