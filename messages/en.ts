@@ -761,6 +761,7 @@ export const en: Record<string, string> = {
   'landing.web_output_h2': 'From a photo to a settings change.',
   'landing.web_output_tagline': 'Current versus recommended, side by side. Take it to the machine.',
   'landing.web_output_link': 'See a sample report',
+  'landing.web_output_try': 'Try it yourself',
 
   'landing.web_how_eyebrow': 'How it works',
   'landing.web_how_h2': 'Three steps.',

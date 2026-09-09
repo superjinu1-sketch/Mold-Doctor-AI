@@ -774,6 +774,7 @@ export const ko: Record<string, string> = {
   'landing.web_output_h2': '사진 한 장에서 세팅 변경까지.',
   'landing.web_output_tagline': '현재값과 권장값을 나란히. 그대로 사출기에 반영하세요.',
   'landing.web_output_link': '샘플 리포트 보기',
+  'landing.web_output_try': '직접 추정해보기',
 
   'landing.web_how_eyebrow': '사용법',
   'landing.web_how_h2': '3단계.',

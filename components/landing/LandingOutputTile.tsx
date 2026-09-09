@@ -33,7 +33,7 @@ export default function LandingOutputTile() {
               className="inline-block mt-5 hover:underline"
               style={{ color: 'var(--accent-on-dark)' }}
             >
-              {t('landing.web_output_link')} ›
+              {t('landing.web_output_try')} ›
             </Link>
           </div>
           <div className="rounded-2xl p-1" style={{ background: 'var(--tile-dark-2)' }}>
