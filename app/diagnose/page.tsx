@@ -17,6 +17,7 @@ import { saveDiagnosisRecord, updateResolution, type HistoryRecord } from '@/lib
 import { replaceDraftPhotos, loadDraftPhotos, clearDraftPhotos } from '@/lib/draftPhotoStore';
 import { IconClipboard, IconCamera } from '@/components/icons';
 import { SAMPLE_CASES } from '@/lib/sampleCase';
+import { useCoarsePointer } from '@/lib/useCoarsePointer';
 import { requestInAppReviewIfEligible } from '@/lib/inAppReview';
 
 // --- Types ---
@@ -212,6 +213,8 @@ function DiagnoseContent() {
   const { t, locale } = useLocale();
   const { user, signInWithGoogle, setCredits, credits } = useAuth();
   const router = useRouter();
+  // 휴대폰에선 "드래그"·"Ctrl+V" 안내를 카메라/앨범 카피로 바꾼다(UX audit C4).
+  const coarse = useCoarsePointer();
 
   const [images, setImages] = useState<ImageFile[]>([]);
   const [defectType, setDefectType] = useState('');
@@ -1316,8 +1319,8 @@ function DiagnoseContent() {
               <svg className="w-10 h-10 mx-auto mb-3 text-faint" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
               </svg>
-              <p className="text-faint font-medium">{t('step1.photo_drop')}</p>
-              <p className="text-faint text-sm mt-1">{t('step1.photo_hint')}</p>
+              <p className="text-faint font-medium">{coarse ? t('step1.photo_drop_mobile') : t('step1.photo_drop')}</p>
+              <p className="text-faint text-sm mt-1">{coarse ? t('step1.photo_hint_mobile') : t('step1.photo_hint')}</p>
               <PhotoInputTrigger
                 ref={fileInputRef}
                 accept="image/*"
@@ -1606,7 +1609,7 @@ function DiagnoseContent() {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/>
                   </svg>
                   <p className="text-brand-ink font-bold text-base">{t('step3.camera_btn')}</p>
-                  <p className="text-faint text-[length:var(--text-label)] mt-1">{t('step3.camera_hint')}</p>
+                  <p className="text-faint text-[length:var(--text-label)] mt-1">{coarse ? t('step3.camera_hint_mobile') : t('step3.camera_hint')}</p>
                 </>
               )}
             </div>

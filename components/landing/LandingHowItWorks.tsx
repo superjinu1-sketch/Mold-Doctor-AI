@@ -3,11 +3,14 @@
 // 파치먼트 타일(how it works) — var(--canvas)가 레퍼런스의 parchment(#f5f5f7)와 사실상 동일값이라
 // 별도 토큰 신설 없이 기존 --canvas 재사용(homepage-revamp-web-v1).
 import { useLocale } from '@/contexts/LocaleContext';
+import { useCoarsePointer } from '@/lib/useCoarsePointer';
 
 export default function LandingHowItWorks() {
   const { t } = useLocale();
+  // 휴대폰에선 "드래그·클립보드" 대신 카메라/앨범 카피로 바꾼다(UX audit C4).
+  const coarse = useCoarsePointer();
   const steps = [
-    { n: '01', t: t('landing.web_how_1_t'), d: t('landing.web_how_1_d') },
+    { n: '01', t: t('landing.web_how_1_t'), d: coarse ? t('landing.web_how_1_d_mobile') : t('landing.web_how_1_d') },
     { n: '02', t: t('landing.web_how_2_t'), d: t('landing.web_how_2_d') },
     { n: '03', t: t('landing.web_how_3_t'), d: t('landing.web_how_3_d') },
   ];
