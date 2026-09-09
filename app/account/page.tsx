@@ -76,8 +76,8 @@ export default function AccountPage() {
         setRecords(server ?? loadLocalHistory());
         setLedger(led);
       } else {
-        // 비로그인: localStorage 폴백 (회귀 0)
-        setRecords(loadLocalHistory());
+        // 비로그인: 로컬 진단 기록 표시 안 함(신뢰/프라이버시, 공용 기기)
+        setRecords([]);
         setLedger([]);
       }
     })();
@@ -218,19 +218,24 @@ export default function AccountPage() {
         </div>
       )}
 
-      {/* ③ 진단 히스토리 — 섹션 접기(button-in-heading 아코디언 패턴) */}
-      <h2 className="mt-6 mb-3">
-        <button
-          type="button"
-          aria-expanded={historyOpen}
-          onClick={() => setHistoryOpen(v => !v)}
-          className="w-full flex items-center justify-between gap-2 min-h-[var(--touch-min)] text-left text-[length:var(--text-h3)] font-bold text-ink"
-        >
-          <span>{t('account.history')} ({records.length})</span>
-          <span className="text-faint text-sm font-normal shrink-0">{historyOpen ? '▲' : '▼'}</span>
-        </button>
-      </h2>
-      {historyOpen && <HistoryList records={records} />}
+      {/* ③ 진단 히스토리 — 섹션 접기(button-in-heading 아코디언 패턴).
+          로그인 상태에서만 섹션 자체를 렌더한다(공용 기기 프라이버시, ② 크레딧 카드와 동일 게이트) */}
+      {!loading && user && (
+        <>
+          <h2 className="mt-6 mb-3">
+            <button
+              type="button"
+              aria-expanded={historyOpen}
+              onClick={() => setHistoryOpen(v => !v)}
+              className="w-full flex items-center justify-between gap-2 min-h-[var(--touch-min)] text-left text-[length:var(--text-h3)] font-bold text-ink"
+            >
+              <span>{t('account.history')} ({records.length})</span>
+              <span className="text-faint text-sm font-normal shrink-0">{historyOpen ? '▲' : '▼'}</span>
+            </button>
+          </h2>
+          {historyOpen && <HistoryList records={records} />}
+        </>
+      )}
 
       {/* 하단 sticky — 새로 추정 */}
       <div className="sticky bottom-0 -mx-4 mt-6 px-4 py-3 bg-surface border-t border-border pb-[calc(0.75rem+env(safe-area-inset-bottom,var(--safe-area-inset-bottom,0px)))]">

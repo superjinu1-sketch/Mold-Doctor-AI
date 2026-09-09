@@ -454,14 +454,21 @@ function DiagnoseContent() {
     }
   }, [searchParams]);
 
-  // 히스토리 카운트 로드 + sessionStorage 복원 (history 페이지에서 "다시 보기" 클릭 시)
+  // 히스토리 카운트 — 로그인 상태에서만 읽고 노출한다(공용 기기 프라이버시). 로컬 사본은
+  // 로그아웃 후에도 남으므로 user가 없으면 아예 0으로 둔다. user 확정 시 재평가되도록
+  // 아래 마운트 effect와 분리했다 — 그쪽은 폼 draft 복원이 들어 있어 재실행되면 안 된다.
   useEffect(() => {
-    let isRecordRestore = false;
+    if (!user) { setHistoryCount(0); return; }
     try {
       const raw = localStorage.getItem('diagnoseHistory');
       const history = JSON.parse(raw || '[]');
       setHistoryCount(history.length);
     } catch { /* ignore */ }
+  }, [user]);
+
+  // sessionStorage 복원 (history 페이지에서 "다시 보기" 클릭 시) + 폼 draft 복원(Part B)
+  useEffect(() => {
+    let isRecordRestore = false;
     try {
       const restore = sessionStorage.getItem('molddoctor_restore');
       if (restore) {
@@ -1262,8 +1269,8 @@ function DiagnoseContent() {
         </div>
       </div>
 
-      {/* 지난 기록 진입점 — 1건 이상 있을 때만 노출 */}
-      {historyCount > 0 && (
+      {/* 지난 기록 진입점 — 로그인 상태에서 1건 이상 있을 때만 노출(공용 기기 프라이버시) */}
+      {user && historyCount > 0 && (
         <div className="mb-4 flex items-center justify-between bg-brand-tint border border-[var(--brand-border)] rounded-xl px-4 py-3">
           <span className="text-brand-ink text-sm font-semibold flex items-center gap-1.5">
             <IconClipboard size={16} className="shrink-0" /> {t('history.recent_n')} {historyCount}{locale === 'en' ? '' : '건'}
