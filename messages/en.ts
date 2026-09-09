@@ -90,6 +90,7 @@ export const en: Record<string, string> = {
   'pricing.badge': 'Simple, Transparent Pricing',
   'pricing.h1': 'Buy Credits',
   'pricing.sub': 'Pay only for what you need. 5 free credits on sign-up.',
+  'pricing.web_status': 'Web checkout is coming soon. For now, buy credits in the app.',
   'pricing.recommended_badge': 'Recommended',
   'pricing.faq_h2': 'Frequently Asked Questions',
   'pricing.cta_h2': 'Start for Free Right Now',

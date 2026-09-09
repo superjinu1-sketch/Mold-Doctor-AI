@@ -91,6 +91,7 @@ export const ko: Record<string, string> = {
   'pricing.badge': '간단하고 투명한 가격',
   'pricing.h1': '크레딧 충전',
   'pricing.sub': '필요한 만큼만. 가입하면 5크레딧 무료.',
+  'pricing.web_status': '웹 결제는 준비 중입니다. 지금은 앱에서 크레딧을 구매할 수 있어요.',
   'pricing.recommended_badge': '추천 플랜',
   'pricing.faq_h2': '자주 묻는 질문',
   'pricing.cta_h2': '지금 바로 무료로 시작하세요',

@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useLocale } from '@/contexts/LocaleContext';
 import { useAuth } from '@/contexts/AuthContext';
 import AuthModal from '@/components/AuthModal';
+import StoreBadges from '@/components/StoreBadges';
 import { isNativeApp } from '@/lib/platform';
 import { purchaseCredits, isPurchaseCancelled, getStorePrices } from '@/lib/purchases';
 import { hapticSuccess } from '@/lib/haptics';
@@ -158,6 +159,18 @@ export default function PricingPage() {
           </p>
         </div>
 
+        {/* 웹 결제 상태 배너(UX audit A1) — 살 수 없는 버튼을 팩마다 만나기 전에, 어디서 살 수
+            있는지를 먼저 알린다. native는 IAP로 바로 사므로 렌더하지 않는다(StoreBadges 자체도
+            native면 null이라 이중 안전). */}
+        {!native && (
+          <div className="mb-8 rounded-2xl border border-border bg-surface p-5 text-center max-w-2xl mx-auto">
+            <p className="text-body text-ink font-semibold mb-3">{t('pricing.web_status')}</p>
+            <div className="flex justify-center">
+              <StoreBadges variant="badges" locale={locale} />
+            </div>
+          </div>
+        )}
+
         {/* 크레딧 팩 그리드 — 페이지 최상단(구매 동선 노출 개선) */}
         <div className="mb-12">
           <h2 className="text-lg font-bold text-ink text-center mb-6">
@@ -214,13 +227,9 @@ export default function PricingPage() {
                           : (locale === 'en' ? 'Buy' : '구매하기')}
                     </button>
                   ) : (
-                    <button
-                      type="button"
-                      disabled
-                      className="w-full py-3 rounded-xl font-bold text-sm border border-border text-faint bg-surface-sunken disabled:opacity-60 cursor-not-allowed min-h-[var(--touch-min)]"
-                    >
-                      {locale === 'en' ? 'Coming soon' : '구매 준비 중'}
-                    </button>
+                    <p className="w-full py-2 text-center text-xs text-faint">
+                      {locale === 'en' ? 'Available in the app' : '앱에서 구매'}
+                    </p>
                   )}
                 </div>
               </div>
