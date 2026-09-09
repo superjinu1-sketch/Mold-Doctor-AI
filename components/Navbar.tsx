@@ -180,10 +180,10 @@ export default function Navbar() {
                 <Link
                   href="/pricing"
                   className="min-h-[44px] flex items-center gap-1.5 px-3 rounded-full bg-brand-tint text-xs font-bold border border-[var(--brand-border)] hover:bg-brand-tint/70 transition-colors"
-                  aria-label={`${t('nav.credits')} ${credits ?? 5} · ${t('nav.topup')}`}
+                  aria-label={`${t('nav.credits')} ${credits ?? '–'} · ${t('nav.topup')}`}
                 >
                   <span className="text-brand-ink">{t('nav.credits')}</span>
-                  <span className="text-brand-ink tabular-nums">{credits ?? 5}</span>
+                  <span className="text-brand-ink tabular-nums">{credits ?? '–'}</span>
                   <span className="text-brand-ink/40">·</span>
                   <span className="text-brand-ink font-extrabold">{t('nav.topup')}</span>
                 </Link>
@@ -283,9 +283,9 @@ export default function Navbar() {
                 <Link
                   href="/pricing"
                   className="min-h-[44px] flex items-center gap-1 px-2.5 rounded-full bg-brand-tint text-xs font-bold shrink-0"
-                  aria-label={`${t('nav.credits')} ${credits ?? 5} · ${t('nav.topup')}`}
+                  aria-label={`${t('nav.credits')} ${credits ?? '–'} · ${t('nav.topup')}`}
                 >
-                  <span className="text-brand-ink tabular-nums">{credits ?? 5}</span>
+                  <span className="text-brand-ink tabular-nums">{credits ?? '–'}</span>
                   <span className="text-brand-ink/40">·</span>
                   <span className="text-brand-ink font-extrabold">{t('nav.topup')}</span>
                 </Link>
@@ -362,7 +362,7 @@ export default function Navbar() {
                     />
                     <span className="text-faint text-xs truncate flex-1">{email}</span>
                   </div>
-                  <div className="text-sm text-muted px-2">{t('nav.credits')}: {credits ?? 5}</div>
+                  <div className="text-sm text-muted px-2">{t('nav.credits')}: {credits ?? '–'}</div>
                   <Link
                     href="/account"
                     onClick={() => setMenuOpen(false)}
