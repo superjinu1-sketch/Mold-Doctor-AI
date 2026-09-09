@@ -6,6 +6,7 @@ import { App } from '@capacitor/app';
 import { Browser } from '@capacitor/browser';
 import { supabase } from '@/lib/supabase/client';
 import { migrateLocalHistory } from '@/lib/history-sync';
+import { clearDraftPhotos } from '@/lib/draftPhotoStore';
 import { isNativeApp, AUTH_DEEPLINK } from '@/lib/platform';
 import { configurePurchases, logOutPurchases } from '@/lib/purchases';
 import { logBreadcrumb } from '@/lib/observability/client';
@@ -206,7 +207,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return { error: error?.message ?? null, needsConfirm: !error && !data.session };
   };
 
+  // 로그아웃 시 로컬 진단 기록 + 작성 중 폼 초안(입력·사진)을 지운다(공용 기기 신뢰 —
+  // 기록 키는 계정 삭제와 동일 처리). 서버 기록은 그대로라 /account는 재로그인 시
+  // fetchServerHistory로 복원된다. 초안은 원래 24h TTL·같은 사람의 세션 복구용이라
+  // 로그아웃이라는 명시적 행동에서 삭제가 맞다.
   const signOut = async () => {
+    try {
+      localStorage.removeItem('diagnoseHistory');
+      localStorage.removeItem('historyMigratedV1');
+      localStorage.removeItem('molddoctor_diagnose_draft_v2');
+    } catch { /* ignore */ }
+    clearDraftPhotos().catch(() => {});
     await supabase.auth.signOut();
   };
 
