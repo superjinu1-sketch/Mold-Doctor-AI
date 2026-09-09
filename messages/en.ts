@@ -63,7 +63,7 @@ export const en: Record<string, string> = {
   'landing.defects_h2': 'Any resin. Any defect.',
   'landing.defects_sub': 'Commodity (PP, ABS, etc.) / Engineering (PA, PC, POM, etc.) / Super EP (PEEK, PPA, LCP, etc.) — all covered',
   'landing.defects_safety': 'Not on the list? AI identifies it from the photo and symptoms.',
-  'landing.credits_banner': '5 free credits on sign-up · 5 free analyses',
+  'landing.credits_banner': '5 free credits on sign-up · 5 free estimates',
   'landing.how_h2': 'How It Works',
   'landing.step1_t': 'Upload Photo',
   'landing.step1_d': 'Capture the defect area or upload an existing photo. Drag-and-drop and clipboard paste both supported.',
@@ -73,7 +73,7 @@ export const en: Record<string, string> = {
   'landing.step3_d': 'AI analyzes root causes and presents a current-vs-recommended settings comparison.',
   'landing.cta_h2_1': 'Analyze Now.',
   'landing.cta_h2_2': "It's Free.",
-  'landing.cta_sub': 'Try a sample without sign-up. Full analysis: sign up for 5 free credits.',
+  'landing.cta_sub': 'Try a sample without sign-up. Full estimate: sign up for 5 free credits.',
   'landing.cta_btn': 'Start Free Analysis',
 
   /* ── Guide page ──────────────────────────────── */

@@ -64,7 +64,7 @@ export const ko: Record<string, string> = {
   'landing.defects_h2': '어떤 수지, 어떤 불량이든',
   'landing.defects_sub': '범용(PP, ABS 등) / EP(PA, PC, POM 등) / Super EP(PEEK, PPA, LCP 등등) 전부 커버',
   'landing.defects_safety': '목록에 없어도 사진·증상으로 AI가 판별',
-  'landing.credits_banner': '가입하면 5크레딧 무료 · 5번 무료 분석',
+  'landing.credits_banner': '가입하면 5크레딧 무료 · 5번 무료 추정',
   'landing.how_h2': '작동 방식',
   'landing.step1_t': '사진 업로드',
   'landing.step1_d': '불량 부위를 촬영하거나 기존 사진을 업로드하세요. 드래그앤드롭, 클립보드 붙여넣기 모두 지원.',
@@ -74,7 +74,7 @@ export const ko: Record<string, string> = {
   'landing.step3_d': 'AI가 원인을 분석하고 현재 vs 권장 세팅을 비교하여 해결책을 제시합니다.',
   'landing.cta_h2_1': '지금 바로 추정해보세요.',
   'landing.cta_h2_2': '무료입니다.',
-  'landing.cta_sub': '샘플은 가입 없이 체험, 분석은 가입 후 5크레딧 무료',
+  'landing.cta_sub': '샘플은 가입 없이 체험, 추정은 가입 후 5크레딧 무료',
   'landing.cta_btn': '무료로 추정 시작하기',
 
   /* ── Guide page ──────────────────────────────── */

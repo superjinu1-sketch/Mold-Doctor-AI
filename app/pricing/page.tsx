@@ -33,12 +33,12 @@ async function pollForCreditIncrease(userId: string, previousBalance: number | n
 
 const creditPoints = [
   {
-    ko: '1크레딧 = 분석 1건 + 추가 질문 2회 무료(이후 5회 묶음당 1크레딧)',
-    en: '1 credit = 1 analysis + 2 free follow-ups (then 1 credit per 5-question bundle)',
+    ko: '1크레딧 = 추정 1건 + 추가 질문 2회 무료(이후 5회 묶음당 1크레딧)',
+    en: '1 credit = 1 estimate + 2 free follow-ups (then 1 credit per 5-question bundle)',
   },
   {
-    ko: '세팅 바꿔 다시 분석하면 새 크레딧 1개',
-    en: 'Re-running analysis with new settings uses 1 new credit',
+    ko: '세팅 바꿔 다시 추정하면 새 크레딧 1개',
+    en: 'Re-running an estimate with new settings uses 1 new credit',
   },
   {
     ko: '저장된 결과 다시 보기는 무료',
@@ -50,8 +50,8 @@ const faqs = [
   {
     qKo: '크레딧은 어떻게 쓰나요?',
     qEn: 'How do credits work?',
-    aKo: '크레딧 1개로 추정 1건을 받고, 그 결과에 대한 추가 질문을 2번까지 무료로 할 수 있어요. 이후에는 질문 5개 묶음마다 1크레딧이 차감됩니다. 세팅을 바꿔 다시 분석하면 새 크레딧 1개가 쓰이고, 저장된 결과를 다시 보는 건 무료입니다.',
-    aEn: '1 credit gives you 1 analysis result plus 2 free follow-up questions on that result. After that, 1 credit is charged per 5-question bundle. Re-running with new settings uses 1 new credit. Viewing saved results is always free.',
+    aKo: '크레딧 1개로 추정 1건을 받고, 그 결과에 대한 추가 질문을 2번까지 무료로 할 수 있어요. 이후에는 질문 5개 묶음마다 1크레딧이 차감됩니다. 세팅을 바꿔 다시 추정하면 새 크레딧 1개가 쓰이고, 저장된 결과를 다시 보는 건 무료입니다.',
+    aEn: '1 credit gives you 1 estimate plus 2 free follow-up questions on that result. After that, 1 credit is charged per 5-question bundle. Re-running an estimate with new settings uses 1 new credit. Viewing saved results is always free.',
   },
   {
     qKo: '가입하면 뭘 받나요?',
@@ -67,9 +67,9 @@ const faqs = [
   },
   {
     qKo: '추정 정확도는 어느 정도인가요?',
-    qEn: 'How accurate is the analysis?',
+    qEn: 'How accurate is the estimate?',
     aKo: 'Mold Doctor AI는 AI 보조 도구입니다. 10년 이상의 사출 엔지니어링 지식을 기반으로 하지만, 최종 판단과 조치는 현장 엔지니어가 해야 합니다. 추정 결과를 참고 자료로 활용하세요.',
-    aEn: 'Mold Doctor AI is an AI-assisted tool based on 10+ years of injection engineering knowledge. Final judgment and actions must be taken by the on-site engineer. Use the analysis results as reference material.',
+    aEn: 'Mold Doctor AI is an AI-assisted tool based on 10+ years of injection engineering knowledge. Final judgment and actions must be taken by the on-site engineer. Use the estimate results as reference material.',
   },
   {
     qKo: '모바일에서도 사용 가능한가요?',
@@ -81,7 +81,7 @@ const faqs = [
     qKo: '우리 회사 수지 데이터를 등록할 수 있나요?',
     qEn: 'Can we register our proprietary resin data?',
     aKo: 'Enterprise 문의를 통해 자사 수지 DB 등록 및 맞춤형 추정을 지원합니다. 특수 Grade나 자체 배합 수지에 대한 커스텀 지원을 제공합니다.',
-    aEn: 'Contact us for Enterprise to register your custom resin DB for tailored analysis. We support special grades and in-house compound resins.',
+    aEn: 'Contact us for Enterprise to register your custom resin DB for tailored estimates. We support special grades and in-house compound resins.',
   },
 ];
 
@@ -155,7 +155,7 @@ export default function PricingPage() {
           <h1 className="text-4xl font-bold text-ink mb-4">{t('pricing.h1')}</h1>
           <p className="text-muted text-base">{t('pricing.sub')}</p>
           <p className="text-muted text-base mt-1">
-            {locale === 'en' ? 'Expert-grade AI analysis, from ₩700 per credit' : '전문 지식이 얹힌 AI 추정, 크레딧당 ₩700부터'}
+            {locale === 'en' ? 'Expert-grade AI estimates, from ₩700 per credit' : '전문 지식이 얹힌 AI 추정, 크레딧당 ₩700부터'}
           </p>
         </div>
 
@@ -254,15 +254,10 @@ export default function PricingPage() {
             )
           ) : (
             <>
-              <p className="text-center text-faint text-sm mt-4">
-                {locale === 'en'
-                  ? 'Credit purchases are coming soon. For now, try it with your 5 free sign-up credits.'
-                  : '추가 크레딧 구매는 곧 제공됩니다. 지금은 가입 5크레딧으로 체험하세요.'}
-              </p>
               <div className="mt-6 bg-surface border border-border rounded-2xl p-6 text-center max-w-2xl mx-auto">
                 <p className="text-muted text-base leading-relaxed mb-4">
                   {locale === 'en'
-                    ? 'You can purchase credits in the app. Web purchases are coming soon — if you need more credits right now, email us with what you’re working on.'
+                    ? 'You can purchase credits in the app. Web purchases are coming soon. If you need more credits right now, email us with what you’re working on.'
                     : '앱에서 크레딧을 구매할 수 있습니다. 웹 구매는 준비 중이며, 지금 크레딧이 필요하시면 어떤 작업 중인지 적어 이메일 주세요.'}
                 </p>
                 <a
