@@ -56,19 +56,22 @@ export default function LandingHero() {
             >
               {t('landing.web_cta_primary')}
             </Link>
-            <Link
-              href={locale === 'en' ? '/en/guide' : '/guide'}
+            {/* 2차 CTA는 같은 페이지의 샘플 리포트로(UX audit B1) — 불량 가이드는 네비에 이미 있어
+                히어로에서 뺀다. 첫 화면 행동을 추정 시작·샘플 보기 둘로 좁히는 게 목적. */}
+            <a
+              href="#sample-report"
               className="inline-flex items-center justify-center gap-1.5 text-[17px] font-normal tracking-[-.02em] rounded-full py-2.5 px-5 min-h-[44px] w-full min-[835px]:w-auto bg-transparent text-brand border border-brand hover:bg-brand-tint transition-colors active:scale-[.96]"
             >
-              {t('landing.web_cta_secondary')}
-            </Link>
+              {t('landing.web_output_link')}
+            </a>
           </div>
 
+          <p className="text-[13px] text-faint mt-3.5">{t('landing.web_fineprint')}</p>
+          {/* 앱 설치 경로는 유지하되 fineprint 아래로 — 첫 화면 행동 수를 늘리지 않기 위해서다. */}
           <div className="mt-5">
             <p className="text-[13px] font-semibold text-muted mb-2">{t('landing.web_getapp')}</p>
             <StoreBadges variant="badges" locale={locale} />
           </div>
-          <p className="text-[13px] text-faint mt-3.5">{t('landing.web_fineprint')}</p>
         </div>
       </div>
 

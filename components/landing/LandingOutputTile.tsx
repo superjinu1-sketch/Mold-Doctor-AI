@@ -15,7 +15,11 @@ export default function LandingOutputTile() {
   ];
 
   return (
-    <section className="py-24 max-md:py-[60px] text-[color:var(--on-dark)]" style={{ background: 'var(--tile-dark)', fontFamily: 'var(--font-landing)' }}>
+    <section
+      id="sample-report"
+      className="py-24 max-md:py-[60px] text-[color:var(--on-dark)] scroll-mt-[calc(3.5rem+env(safe-area-inset-top,var(--safe-area-inset-top,0px)))]"
+      style={{ background: 'var(--tile-dark)', fontFamily: 'var(--font-landing)' }}
+    >
       <div className="max-w-[1120px] mx-auto px-[22px]">
         <div className="grid md:grid-cols-2 gap-11 items-center text-left">
           <div>
