@@ -760,6 +760,7 @@ export const ko: Record<string, string> = {
   'landing.web_h1_2': '원인을 추정합니다.',
   'landing.web_tagline': '불량 사진과 사출기 세팅값을 올리면, 가능성 높은 원인과 현장에서 바로 바꿀 세팅을 알려드립니다.',
   'landing.web_cta_primary': '무료로 추정 시작',
+  'landing.sticky_sub': '사진이나 세팅값 한 장이면 됩니다',
   'landing.web_cta_secondary': '불량 가이드 보기',
   'landing.web_fineprint': '가입 시 5회 무료 · 설치 없이 웹에서 바로 · 참고용 추정',
   'landing.web_getapp': '쓸수록 우리 공장 이력이 쌓입니다. 다음 진단의 참고가 됩니다.',

@@ -747,6 +747,7 @@ export const en: Record<string, string> = {
   'landing.web_h1_2': 'We estimate the cause.',
   'landing.web_tagline': 'Upload a photo and your machine settings. Get the likely cause and a settings change you can make at the machine.',
   'landing.web_cta_primary': 'Start free estimate',
+  'landing.sticky_sub': 'A photo or your settings is enough to start',
   'landing.web_cta_secondary': 'View defect guide',
   'landing.web_fineprint': '5 free estimates on signup · try in the browser, no install · reference estimate',
   'landing.web_getapp': "Your plant's record builds with every estimate. It's there for the next one.",

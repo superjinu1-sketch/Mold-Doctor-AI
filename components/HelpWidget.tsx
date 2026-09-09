@@ -7,6 +7,7 @@ import { useState, useRef, useEffect, useCallback } from 'react';
 import { usePathname } from 'next/navigation';
 import { useLocale } from '@/contexts/LocaleContext';
 import { useAuth } from '@/contexts/AuthContext';
+import { isNativeApp } from '@/lib/platform';
 import { apiFetch } from '@/lib/apiBase';
 import { authHeaders } from '@/lib/supabase/authHeader';
 
@@ -27,6 +28,12 @@ export default function HelpWidget() {
   const [loading, setLoading] = useState(false);
   const [status, setStatus] = useState<'idle' | 'error' | 'limit'>('idle');
   const listRef = useRef<HTMLDivElement>(null);
+  // 로그아웃 웹 홈에만 하단 스티키 CTA가 깔린다(HomeClient의 !user && !native 분기, UX audit B2).
+  // 그 경우에만 FAB를 바 위로 올린다 — 로그인 홈·네이티브 홈·다른 페이지는 기존 bottom-5 유지.
+  // 정적 export 프리렌더 시점엔 네이티브 브릿지가 없어 false로 시작하고 마운트 후 재평가한다.
+  const [native, setNative] = useState(false);
+  useEffect(() => { setNative(isNativeApp()); }, []);
+  const liftForStickyCta = pathname === '/' && !user && !native;
 
   useEffect(() => {
     listRef.current?.scrollTo({ top: listRef.current.scrollHeight, behavior: 'smooth' });
@@ -74,7 +81,7 @@ export default function HelpWidget() {
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="fixed right-4 bottom-5 z-40 flex items-center gap-2 min-h-[var(--touch-cta)] px-4 rounded-full bg-brand text-on-brand font-semibold text-body shadow-lg hover:bg-brand-ink transition-colors"
+        className={`fixed right-4 z-40 flex items-center gap-2 min-h-[var(--touch-cta)] px-4 rounded-full bg-brand text-on-brand font-semibold text-body shadow-lg hover:bg-brand-ink transition-colors ${liftForStickyCta ? 'bottom-24' : 'bottom-5'}`}
         aria-label={t('help.fab')}
       >
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">

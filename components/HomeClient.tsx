@@ -44,6 +44,15 @@ export default function HomeClient({ notes }: { notes: HomeNoteCard[] }) {
   // 앱 로그아웃 홈·로그인 홈은 현행 그대로(진우 확정 2) — 아래 두 분기는 무변경.
   const [native, setNative] = useState(false);
   useEffect(() => { setNative(isNativeApp()); }, []);
+  // 로그아웃 랜딩 하단 스티키 CTA(UX audit B2) — 히어로를 가리지 않게 일정 스크롤 이후에만 노출.
+  // setState는 같은 값이면 리렌더를 건너뛰므로 스크롤마다 호출해도 부담 없다.
+  const [showStickyCta, setShowStickyCta] = useState(false);
+  useEffect(() => {
+    const onScroll = () => setShowStickyCta(window.scrollY > 600);
+    onScroll();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
   const [page, setPage] = useState(1); // 1-indexed
   const notesSectionRef = useRef<HTMLDivElement>(null);
   const totalPages = Math.max(1, Math.ceil(notes.length / PAGE_SIZE));
@@ -70,6 +79,16 @@ export default function HomeClient({ notes }: { notes: HomeNoteCard[] }) {
         <LandingFreeTools />
         <LandingFieldNotes notes={notes} />
         <LandingCoverage />
+        {/* 하단 스티키 CTA — /diagnose·/ledger의 기존 스티키 바와 같은 계열(토큰·ui-cta).
+            겹침 방지를 위해 HelpWidget FAB가 같은 조건(로그아웃 웹 홈)에서 위로 올라간다. */}
+        {showStickyCta && (
+          <div className="fixed bottom-0 inset-x-0 z-40 border-t border-border bg-surface pb-[env(safe-area-inset-bottom,var(--safe-area-inset-bottom,0px))]">
+            <div className="max-w-5xl mx-auto px-4 py-3 flex items-center gap-3">
+              <span className="flex-1 min-w-0 text-sm text-faint truncate">{t('landing.sticky_sub')}</span>
+              <Link href="/diagnose" className="ui-cta shrink-0 px-6 text-body">{t('landing.web_cta_primary')}</Link>
+            </div>
+          </div>
+        )}
       </div>
     );
   }
