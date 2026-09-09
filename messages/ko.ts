@@ -196,12 +196,13 @@ export const ko: Record<string, string> = {
 
   /* STEP 1: Defect Info */
   'step1.title': '불량 정보 입력',
-  'step1.photo_label': '불량 사진 업로드 (최대 5장)',
+  'step1.photo_label': '불량 사진 (선택, 최대 5장)',
+  'step1.photo_optional_note': '사진이 없어도 세팅값과 증상 설명만으로 추정합니다.',
   'step1.photo_drop': '클릭하거나 드래그하여 업로드',
   'step1.photo_hint': '또는 Ctrl+V로 붙여넣기 · 카메라로 직접 촬영',
   'step1.photo_alt': '불량 사진',
   'step1.photo_del': '사진 삭제',
-  'step1.type_label': '불량 유형 선택 (선택, AI가 사진으로 판단)',
+  'step1.type_label': '불량 유형 (선택, 사진이 있으면 AI가 함께 판단)',
   'sticky.login_hint': '로그인하면 무료로 추정할 수 있어요',
   'step1.type_select': '불량유형 직접 선택',
   'step1.type_optional': '(선택)',

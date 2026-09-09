@@ -195,12 +195,13 @@ export const en: Record<string, string> = {
 
   /* STEP 1 */
   'step1.title': 'Defect Information',
-  'step1.photo_label': 'Upload Defect Photos (max 5)',
+  'step1.photo_label': 'Defect photos (optional, up to 5)',
+  'step1.photo_optional_note': 'No photo needed. Settings and a symptom description are enough to get an estimate.',
   'step1.photo_drop': 'Click or drag to upload',
   'step1.photo_hint': 'Or paste with Ctrl+V · Take photo with camera',
   'step1.photo_alt': 'Defect photo',
   'step1.photo_del': 'Delete photo',
-  'step1.type_label': 'Defect Type (optional — AI detects it from the photo)',
+  'step1.type_label': 'Defect type (optional, AI reads it too if a photo is attached)',
   'sticky.login_hint': 'Log in to run a free analysis',
   'step1.type_select': 'Choose defect type',
   'step1.type_optional': '(optional)',

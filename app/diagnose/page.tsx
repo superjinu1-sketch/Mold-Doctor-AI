@@ -1303,6 +1303,7 @@ function DiagnoseContent() {
           {/* Image upload */}
           <div className="mb-5">
             <label className={labelCls}>{t('step1.photo_label')}</label>
+            <p className="text-faint text-sm mb-2">{t('step1.photo_optional_note')}</p>
             <div
               className={`border-2 border-dashed rounded-xl p-5 sm:p-8 text-center cursor-pointer transition-colors ${
                 isDragging ? 'border-[var(--brand-border)] bg-brand-tint' : 'border-border hover:border-[var(--brand-border)]'
