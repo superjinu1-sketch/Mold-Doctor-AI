@@ -358,6 +358,7 @@ export default function DiagnosisResultPanel({ result, onSavePDF, round = 1, fol
   const [afterPhoto, setAfterPhoto] = useState<string | undefined>(undefined);
   const afterPhotoRef = useRef<HTMLInputElement>(null);
   const chatBottomRef = useRef<HTMLDivElement>(null);
+  const resolveFormRef = useRef<HTMLDivElement>(null); // A3 가이드 2번 → 해결 기록 폼으로 스크롤
 
   useEffect(() => {
     setIsDebug(new URLSearchParams(window.location.search).get('debug') === '1');
@@ -710,6 +711,21 @@ export default function DiagnosisResultPanel({ result, onSavePDF, round = 1, fol
         )}
       </div>
 
+      {/* A3 다음 단계 가이드 · 기존 핸들러로 스크롤·안내만, 새 로직 없음.
+          data-pdf-block이 아니라 PDF에는 담기지 않는다(화면 안내 전용).
+          데모(샘플)에는 해결 기록 폼 자체가 없어 2번이 무동작이고, 기록·저장을 권할 자리도
+          아니라 제외한다. */}
+      {!result.is_demo && (
+        <div className="mb-4 rounded-xl border border-[var(--brand-border)] bg-brand-tint px-4 py-3">
+          <p className="text-label font-bold text-brand-ink mb-2">{t('result.next_title')}</p>
+          <ol className="space-y-1.5 text-sm text-ink">
+            <li>1. {t('result.next_1')} <span className="text-muted">{t('result.next_1_sub')}</span></li>
+            <li>2. <button type="button" onClick={() => resolveFormRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' })} className="underline underline-offset-2 font-semibold">{t('result.next_2')}</button> <span className="text-muted">{t('result.next_2_sub')}</span></li>
+            <li>3. {t('result.next_3')} <span className="text-muted">{t('result.next_3_sub')}</span></li>
+          </ol>
+        </div>
+      )}
+
       {/* Causes */}
       {causes.length > 0 && (
         <Collapsible title={t('causes.title')} defaultOpen>
@@ -973,7 +989,7 @@ export default function DiagnosisResultPanel({ result, onSavePDF, round = 1, fol
       ) : (
         <>
           {/* Follow-up Actions */}
-          <div className="bg-surface rounded-2xl p-4 sm:p-6 border border-border">
+          <div ref={resolveFormRef} className="bg-surface rounded-2xl p-4 sm:p-6 border border-border">
             <div className="text-base font-bold text-muted mb-3">{t('action.prompt')}</div>
             {showResolvedForm ? (
               <div className="space-y-3">

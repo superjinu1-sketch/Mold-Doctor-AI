@@ -511,6 +511,13 @@ export const en: Record<string, string> = {
   'urgency.next_shot': 'Next shot',
   'urgency.root': 'Root fix',
   'result.avoid_title': "Don't do this",
+  'result.next_title': 'Finish with these 3 steps',
+  'result.next_1': 'Apply the recommended settings on your machine',
+  'result.next_1_sub': 'Change one value at a time and check',
+  'result.next_2': 'Record the outcome (solved / not yet)',
+  'result.next_2_sub': 'Note below whether it improved after applying',
+  'result.next_3': 'If solved, save these as this machine work standard',
+  'result.next_3_sub': 'Saved conditions build up as your shop history for the next estimate',
   'cause.tell_prefix': 'Tell: ',
 
   'checklist.title': 'Field Checklist',

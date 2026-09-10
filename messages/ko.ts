@@ -519,6 +519,13 @@ export const ko: Record<string, string> = {
   'urgency.next_shot': '다음 샷',
   'urgency.root': '근본 개선',
   'result.avoid_title': '이건 하지 마세요',
+  'result.next_title': '다음 3가지로 마무리하세요',
+  'result.next_1': '권장 세팅을 사출기에 적용',
+  'result.next_1_sub': '한 값씩 바꿔가며 확인',
+  'result.next_2': '결과 기록 (해결 / 아직)',
+  'result.next_2_sub': '적용 후 좋아졌는지 아래에 남기기',
+  'result.next_3': '해결되면 이 조건을 설비 작업표준으로 저장',
+  'result.next_3_sub': '저장한 조건은 우리 공장 이력으로 쌓여 다음 추정에 이어집니다',
   'cause.tell_prefix': '확인법: ',
 
   /* Checklist */
