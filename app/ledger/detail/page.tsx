@@ -231,7 +231,7 @@ function LedgerMachineDetailContent() {
   };
 
   const handleAiEstimate = async () => {
-    if (!current || prefilling) return;
+    if (!current || !machine || prefilling) return;
     setPrefilling(true);
     try {
       const s = current.settings || {};
@@ -263,6 +263,11 @@ function LedgerMachineDetailContent() {
         settings: basicSettings,
         advSettings,
         photo,
+        // D1 무마이그레이션: 이 경로에서만 설비 컨텍스트를 정직하게 알 수 있어 프리필로 넘긴다.
+        // diagnosis_records에는 저장하지 않는다(스키마 무변경).
+        machineId: machine.id,
+        machineLabel: machine.name,
+        standardCount: standards.length,
       }));
       router.push('/diagnose');
     } catch (e) {
@@ -391,6 +396,11 @@ function LedgerMachineDetailContent() {
       {/* 조건 표준 입력 */}
       <div className="ui-card ui-card-lg p-5 mb-6">
         <h2 className="text-body font-bold text-ink mb-4">{t('ledger.new_standard')}</h2>
+        {/* D1: 작업표준이 0건이면 AI 추정 CTA 카드 자체가 없다(current = standards[0]).
+            없는 이력을 있는 척하지 않고, 여기 저장하면 무엇이 열리는지만 한 줄로 안내한다. */}
+        {standards.length === 0 && (
+          <p className="text-faint text-label mb-4">{t('ledger.accum_hint_zero')}</p>
+        )}
 
         {/* 사진 → OCR */}
         <div className="mb-5">

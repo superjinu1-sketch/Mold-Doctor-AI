@@ -526,6 +526,7 @@ export const ko: Record<string, string> = {
   'result.next_2_sub': '적용 후 좋아졌는지 아래에 남기기',
   'result.next_3': '해결되면 이 조건을 설비 작업표준으로 저장',
   'result.next_3_sub': '저장한 조건은 우리 공장 이력으로 쌓여 다음 추정에 이어집니다',
+  'result.machine_ref': '{label} 작업표준 {n}건 기준 추정',
   'cause.tell_prefix': '확인법: ',
 
   /* Checklist */
@@ -659,6 +660,7 @@ export const ko: Record<string, string> = {
   'ledger.current_standard': '현행 표준',
   'ledger.view_original': '원본 사진 보기',
   'ledger.ai_estimate_cta': '이 조건으로 AI 추정',
+  'ledger.accum_hint_zero': '여기에 저장하면 다음 추정부터 이 설비 이력을 참고합니다.',
   'ledger.preparing': '준비 중…',
   'ledger.pdf_export_single': 'PDF 출력',
   'ledger.revision_history': '개정 이력',

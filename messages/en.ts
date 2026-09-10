@@ -518,6 +518,7 @@ export const en: Record<string, string> = {
   'result.next_2_sub': 'Note below whether it improved after applying',
   'result.next_3': 'If solved, save these as this machine work standard',
   'result.next_3_sub': 'Saved conditions build up as your shop history for the next estimate',
+  'result.machine_ref': 'Estimated from {n} work standard(s) for {label}',
   'cause.tell_prefix': 'Tell: ',
 
   'checklist.title': 'Field Checklist',
@@ -647,6 +648,7 @@ export const en: Record<string, string> = {
   'ledger.current_standard': 'Current standard',
   'ledger.view_original': 'View original photo',
   'ledger.ai_estimate_cta': 'Run AI estimate with this condition',
+  'ledger.accum_hint_zero': 'Save here and your next estimate can reference this machine.',
   'ledger.preparing': 'Preparing…',
   'ledger.pdf_export_single': 'Export PDF',
   'ledger.revision_history': 'Revision history',

@@ -6,7 +6,7 @@ import { useLocale } from '@/contexts/LocaleContext';
 import { authHeaders } from '@/lib/supabase/authHeader';
 import { downscaleImageClient } from '@/lib/clientDownscale';
 import { apiFetch } from '@/lib/apiBase';
-import { IconMessage, IconCamera, IconCheckSquare, IconNote } from '@/components/icons';
+import { IconMessage, IconCamera, IconCheckSquare, IconNote, IconClipboard } from '@/components/icons';
 
 interface DiagnosisResult {
   defect_type: { ko: string; en: string };
@@ -336,9 +336,11 @@ interface Props {
   sessionId?: string | null;
   defectPhotos?: string[];   // 분석한 불량 사진 (신선=업로드 base64 / 복원=beforePhoto 1장)
   pdfExporting?: boolean;    // PDF 저장 중: 모든 섹션 강제 펼침
+  // D1: 설비 상세 → "이 조건으로 AI 추정" 경로에서만 전달되는 설비 컨텍스트(무마이그레이션).
+  machineContext?: { label: string; count: number } | null;
 }
 
-export default function DiagnosisResultPanel({ result, onSavePDF, round = 1, followUpHistory = [], onResolved, onResolvedWithStatus, onStartFollowUp, resinType, machineSettings, sessionId, defectPhotos = [], pdfExporting = false }: Props) {
+export default function DiagnosisResultPanel({ result, onSavePDF, round = 1, followUpHistory = [], onResolved, onResolvedWithStatus, onStartFollowUp, resinType, machineSettings, sessionId, defectPhotos = [], pdfExporting = false, machineContext = null }: Props) {
   const { t, locale } = useLocale();
   const [checkedItems, setCheckedItems] = useState<Set<number>>(new Set());
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
@@ -710,6 +712,15 @@ export default function DiagnosisResultPanel({ result, onSavePDF, round = 1, fol
           </div>
         )}
       </div>
+
+      {/* D1 설비 이력 참고 배지 — 설비 상세에서 넘어온 추정에만, 작업표준 건수를 아는 경우에만.
+          DB에 저장하지 않는 화면 컨텍스트라 PDF 블록에도 넣지 않는다. */}
+      {machineContext && machineContext.count > 0 && (
+        <div className="mb-3 inline-flex items-center gap-1.5 rounded-full bg-surface-sunken border border-border px-3 py-1 text-label text-muted">
+          <IconClipboard size={14} className="text-brand" />
+          {t('result.machine_ref').replace('{label}', machineContext.label).replace('{n}', String(machineContext.count))}
+        </div>
+      )}
 
       {/* A3 다음 단계 가이드 · 기존 핸들러로 스크롤·안내만, 새 로직 없음.
           data-pdf-block이 아니라 PDF에는 담기지 않는다(화면 안내 전용).

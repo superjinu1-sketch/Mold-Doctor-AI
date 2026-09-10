@@ -265,6 +265,13 @@ function DiagnoseContent() {
   const [result, setResult] = useState<DiagnosisResult | null>(null);
   const [sessionId, setSessionId] = useState<string | null>(null);
   const [demoSnapshot, setDemoSnapshot] = useState<string | null>(null);
+  // D1: /ledger 설비 상세 → "이 조건으로 AI 추정" 경로에서만 채워지는 설비 컨텍스트.
+  // 이 경로가 아니면 null이라 결과에 배지가 뜨지 않는다(없는 이력 주장 금지). DB 저장 없음.
+  const [estimateContext, setEstimateContext] = useState<{ label: string; count: number } | null>(null);
+  // D1 하드닝: 배지는 "프리필로 만들어진 바로 그 결과 1건"에만 붙어야 한다. 제출 성공 시점에
+  // 위 pending 컨텍스트를 이쪽으로 옮기고 pending은 비운다 → 이후 손수정 재제출·신규 추정에는
+  // 스테일 배지가 남지 않는다.
+  const [resultMachineContext, setResultMachineContext] = useState<{ label: string; count: number } | null>(null);
   const [historyCount, setHistoryCount] = useState(0);
   const [error, setError] = useState('');
 
@@ -591,6 +598,9 @@ function DiagnoseContent() {
       if (!raw) return;
       sessionStorage.removeItem('molddoctor_ledger_prefill');
       const data = JSON.parse(raw);
+      if (data.machineId) {
+        setEstimateContext({ label: data.machineLabel || '', count: Number(data.standardCount) || 0 });
+      }
       if (data.resinType) {
         const isPresetResin = RESIN_OPTIONS.some(g => g.options.includes(data.resinType));
         if (isPresetResin) setResinType(data.resinType);
@@ -936,6 +946,8 @@ function DiagnoseContent() {
     // imageIdentity에 넘기면 리셋 전 값을 읽으므로, 기준값은 imageIdentity([])로 명시한다.
     setImages([]);
     setMoldDrawings([]);
+    // 샘플 로드는 폼을 통째로 갈아엎으므로 설비에서 넘어온 컨텍스트는 더 이상 유효하지 않다(D1).
+    setEstimateContext(null);
     setDemoSnapshot(JSON.stringify({
       defectType: d.defectType, resinType: d.resinType,
       nozzleTemp: d.nozzleTemp, zone1Temp: d.zone1Temp, zone2Temp: d.zone2Temp,
@@ -1045,6 +1057,8 @@ function DiagnoseContent() {
       data.round = diagnosisRound;
       if (newSessionId) data.session_id = newSessionId;
       setResult(data);
+      setResultMachineContext(estimateContext);   // D1: 이 결과 1건에만 배지 고정
+      setEstimateContext(null);                   // pending 소진 → 다음 제출엔 안 따라붙음
       void hapticSuccess();
       setShowFollowUpForm(false);
       // 진단 성공 → 폼 방어선 스냅샷 클리어 (다음 방문 시 stale 복원 방지, 사진도 함께)
@@ -2015,6 +2029,7 @@ function DiagnoseContent() {
               sessionId={sessionId}
               defectPhotos={result.beforePhoto ? [result.beforePhoto] : images.map(img => img.base64)}
               pdfExporting={pdfExporting}
+              machineContext={resultMachineContext}
             />
           </div>
         )}
