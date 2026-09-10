@@ -549,6 +549,7 @@ export const en: Record<string, string> = {
   'history.partial': 'Partially improved',
   'history.unsolved': 'Unresolved',
   'history.unrecorded': 'Not recorded',
+  'history.record_outcome_cta': 'Record the outcome (30s)',
   'history.resolved_form_title': 'Record outcome',
   'history.memo_placeholder': 'How did you resolve it? (optional)',
   'history.save_record': 'Save record',

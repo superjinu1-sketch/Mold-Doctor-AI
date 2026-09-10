@@ -563,6 +563,7 @@ export const ko: Record<string, string> = {
   'history.partial': '부분 개선',
   'history.unsolved': '미해결',
   'history.unrecorded': '미기록',
+  'history.record_outcome_cta': '조치 결과 남기기 (30초)',
   'history.resolved_form_title': '조치 결과 기록',
   'history.memo_placeholder': '어떻게 해결했나요? (선택)',
   'history.save_record': '기록 저장',

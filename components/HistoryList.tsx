@@ -135,6 +135,10 @@ export default function HistoryList({ records }: { records: HistoryRecord[] }) {
                 <span className="text-body font-bold text-ink truncate">{defectLabel(r)}</span>
                 <SeverityBadge severity={r.severity} />
                 <ResolvedBadge resolved={r.resolved} t={t} />
+                {/* D2: 조치 결과가 안 남은 건을 눈에 띄게 — 기존 history.unrecorded 키를 처음으로 렌더 */}
+                {!r.resolved && (
+                  <span className="shrink-0 text-[length:var(--text-label)] font-bold px-2 py-0.5 rounded-full bg-[var(--warn-bg)] text-warn border border-[var(--warn-border)]">{t('history.unrecorded')}</span>
+                )}
               </div>
               <div className="text-faint text-sm">
                 {r.beforeResin && <span className="mr-2">{r.beforeResin}</span>}
@@ -148,7 +152,7 @@ export default function HistoryList({ records }: { records: HistoryRecord[] }) {
 
           {expanded === r.id && (
             <div className="border-t border-border px-4 pb-4 pt-3 space-y-4">
-              {(r.resolved === true || typeof r.resolved === 'string') && (
+              {(r.resolved === true || typeof r.resolved === 'string') ? (
                 <div className="bg-[var(--ok-bg)] border border-[var(--ok-border)] rounded-xl p-3">
                   <div className="text-sm font-bold text-ok mb-1 flex items-center gap-1.5">
                     <IconCheckSquare size={16} /> {t('history.resolved_detail')}
@@ -158,6 +162,16 @@ export default function HistoryList({ records }: { records: HistoryRecord[] }) {
                     {r.resolvedMemo && <span className="ml-2">{r.resolvedMemo}</span>}
                   </div>
                 </div>
+              ) : (
+                /* D2: 기록 계기 제공 — 해결 상세 블록과 배타적으로, 기존 복원 흐름(handleRestore)을
+                   그대로 재사용해 그 추정을 결과 화면으로 다시 연다. 새 저장 경로 없음. */
+                <button
+                  type="button"
+                  onClick={() => handleRestore(r)}
+                  className="w-full min-h-[var(--touch-min)] rounded-xl border border-[var(--warn-border)] bg-[var(--warn-bg)] text-warn font-semibold text-body transition-colors"
+                >
+                  {t('history.record_outcome_cta')}
+                </button>
               )}
 
               {user && canSaveAsWorkStandard(r) && (
