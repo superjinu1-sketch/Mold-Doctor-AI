@@ -273,10 +273,6 @@ export default function HistoryList({ records }: { records: HistoryRecord[] }) {
                 </div>
               )}
 
-              <div className="border border-dashed border-border rounded-xl px-4 py-3 text-center">
-                <span className="text-faint text-sm">{t('history.similar_placeholder')}</span>
-              </div>
-
               <div className="flex gap-2">
                 <button
                   type="button"

@@ -28,7 +28,7 @@ export const ko: Record<string, string> = {
   'landing.tool_resins_desc': '건조·사출온도·수축률 현장 요약',
   'landing.tools_all_link': '무료 도구 전체 보기 →',
   'landing.notes_title': '현장 노트',
-  'landing.notes_sub': 'AI 진단을 만들면서 정리한 기록입니다.',
+  'landing.notes_sub': 'AI 추정을 만들면서 정리한 기록입니다.',
   'landing.notes_all': '전체 보기',
 
   /* ── 무료 도구 허브(/tools) ───────────────────────────── */
@@ -165,7 +165,7 @@ export const ko: Record<string, string> = {
   'account.signed_in_as': '로그인 계정',
   'account.login_prompt': '로그인하면 크레딧과 추정 기록을 어느 기기에서나 볼 수 있어요.',
   'account.credit_balance': '크레딧 잔액',
-  'account.credit_new_hint': '첫 진단 시 지급',
+  'account.credit_new_hint': '첫 추정 시 지급',
   'account.recharge': '충전',
   'account.ledger': '거래내역',
   'account.ledger_empty': '거래내역이 없습니다.',
@@ -173,9 +173,9 @@ export const ko: Record<string, string> = {
   'account.new_diagnosis': '새로 추정 시작',
   'account.danger_zone': '위험 구역',
   'account.delete_account': '계정 삭제',
-  'account.delete_desc': '계정과 모든 진단 기록을 영구 삭제합니다.',
+  'account.delete_desc': '계정과 모든 추정 기록을 영구 삭제합니다.',
   'account.delete_confirm_title': '정말 삭제하시겠어요?',
-  'account.delete_confirm_desc': '계정·진단 기록·크레딧이 모두 즉시 삭제되며 복구할 수 없습니다. 계속하려면 아래에 "삭제"를 입력하세요.',
+  'account.delete_confirm_desc': '계정·추정 기록·크레딧이 모두 즉시 삭제되며 복구할 수 없습니다. 계속하려면 아래에 "삭제"를 입력하세요.',
   'account.delete_confirm_placeholder': '삭제',
   'account.delete_permanent': '영구 삭제',
   'account.deleting': '삭제 중…',
@@ -527,8 +527,8 @@ export const ko: Record<string, string> = {
   'result.next_2': '결과 기록 (해결 / 아직)',
   'result.next_2_sub': '적용 후 좋아졌는지 아래에 남기기',
   'result.next_3': '해결되면 이 조건을 설비 작업표준으로 저장',
-  'result.next_3_sub': '저장한 조건은 우리 공장 이력으로 쌓여 다음 추정에 이어집니다',
-  'result.machine_ref': '{label} 작업표준 {n}건 기준 추정',
+  'result.next_3_sub': '저장한 조건은 설비별 이력으로 쌓이고, 다음엔 이 조건으로 바로 추정을 시작할 수 있습니다',
+  'result.machine_ref': '{label} 현행 작업표준 조건으로 시작한 추정',
   'cause.tell_prefix': '확인법: ',
 
   /* Checklist */
@@ -622,7 +622,7 @@ export const ko: Record<string, string> = {
   'progress.stage2': '12종 불량 패턴 대조 중',
   'progress.stage3': '세팅값 정밀 분석 중 (수지 특성 반영)',
   'progress.stage4': '권장 세팅 계산 중',
-  'progress.stage5': '진단 보고서 작성 중',
+  'progress.stage5': '추정 보고서 작성 중',
   'progress.tip1': '미성형(Short shot)은 수지 온도·사출 속도·게이트 크기 등 복합 원인이 흔해 세팅값 대조가 중요합니다.',
   'progress.tip2': '수축(Sink mark)은 살이 두꺼운 부위에 냉각 수축이 집중될 때 잘 생깁니다.',
   'progress.tip3': '플래시(Flash)는 형체력 부족뿐 아니라 금형 마모·파팅면 이물에서도 발생합니다.',
@@ -633,8 +633,8 @@ export const ko: Record<string, string> = {
   'progress.tip8': '배압을 높이면 가소화 균일성이 좋아지지만, 과도하면 체류 시간이 늘어 수지 열화 위험이 있습니다.',
   'progress.tip9': '같은 불량이라도 게이트 근처인지 말단인지에 따라 원인이 달라질 수 있습니다.',
   'progress.tip10': '권장 세팅은 한 번에 하나씩 바꿔 확인하는 것이 원인 확정에 유리합니다.',
-  'progress.tip11': '진단 기록을 쌓아두면 유사 불량이 재발했을 때 과거 해결 이력을 바로 참조할 수 있습니다.',
-  'progress.tip12': '불량 부위가 선명한 사진일수록 진단 정확도가 올라갑니다. 초점과 조명을 확인해 보세요.',
+  'progress.tip11': '추정 기록을 쌓아두면 유사 불량이 재발했을 때 과거 해결 이력을 바로 참조할 수 있습니다.',
+  'progress.tip12': '불량 부위가 선명한 사진일수록 추정 정확도가 올라갑니다. 초점과 조명을 확인해 보세요.',
 
   /* ── 작업표준 저장소(/ledger) ───────────────────────────── */
   'ledger.title': '사출기별 작업표준 저장소',
@@ -667,7 +667,7 @@ export const ko: Record<string, string> = {
   'ledger.current_standard': '현행 표준',
   'ledger.view_original': '원본 사진 보기',
   'ledger.ai_estimate_cta': '이 조건으로 AI 추정',
-  'ledger.accum_hint_zero': '여기에 저장하면 다음 추정부터 이 설비 이력을 참고합니다.',
+  'ledger.accum_hint_zero': '여기에 저장하면 다음부터 이 설비 조건으로 바로 추정을 시작할 수 있습니다.',
   'ledger.preparing': '준비 중…',
   'ledger.pdf_export_single': 'PDF 출력',
   'ledger.revision_history': '개정 이력',
@@ -755,8 +755,8 @@ export const ko: Record<string, string> = {
   'help.fab': '도움말',
   'help.title': '도움말',
   'help.subtitle': 'AI 자동 응답',
-  'help.greeting': '앱 사용법을 물어보세요. 진단 시작, 크레딧, 무료 도구 등 무엇이든요.',
-  'help.chip1': '첫 진단 시작하기',
+  'help.greeting': '앱 사용법을 물어보세요. 추정 시작, 크레딧, 무료 도구 등 무엇이든요.',
+  'help.chip1': '첫 추정 시작하기',
   'help.chip2': '사진 없이도 되나요?',
   'help.chip3': '크레딧이 뭔가요?',
   'help.chip4': '무료 도구 사용법',
@@ -785,7 +785,7 @@ export const ko: Record<string, string> = {
   'landing.sticky_sub': '사진이나 세팅값 한 장이면 됩니다',
   'landing.web_cta_secondary': '불량 가이드 보기',
   'landing.web_fineprint': '가입 시 5회 무료 · 설치 없이 웹에서 바로 · 참고용 추정',
-  'landing.web_getapp': '쓸수록 우리 공장 이력이 쌓입니다. 다음 진단의 참고가 됩니다.',
+  'landing.web_getapp': '쓸수록 우리 공장 조건이 설비별로 쌓입니다.',
 
   // video-hero-web-v1: 히어로 정적 카드 삭제(영상으로 교체)로 render_* 중 delta 행 이름 3개만
   // LandingOutputTile.tsx가 계속 쓴다 — 나머지(제목/id/결함/원인/표머리/각주)는 카드와 함께 정리.

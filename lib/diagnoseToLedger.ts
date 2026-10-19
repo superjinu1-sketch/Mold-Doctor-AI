@@ -46,7 +46,7 @@ export async function saveDiagnosisAsLedgerStandard(input: SaveInput): Promise<L
     itemName,
     resin: record.beforeResin ?? '',
     settings: record.afterSettings ?? {}, // ★ afterSettings — 권장값(recommendations) 아님
-    memo: `진단 해결 조건 (${defectKo}, ${resolvedDate})`,
+    memo: `추정 해결 조건 (${defectKo}, ${resolvedDate})`,
   });
 }
 

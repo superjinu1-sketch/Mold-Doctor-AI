@@ -519,8 +519,8 @@ export const en: Record<string, string> = {
   'result.next_2': 'Record the outcome (solved / not yet)',
   'result.next_2_sub': 'Note below whether it improved after applying',
   'result.next_3': 'If solved, save these as this machine work standard',
-  'result.next_3_sub': 'Saved conditions build up as your shop history for the next estimate',
-  'result.machine_ref': 'Estimated from {n} work standard(s) for {label}',
+  'result.next_3_sub': 'Saved conditions build up as per-machine history, and you can start the next estimate from them',
+  'result.machine_ref': 'Started from the current work standard of {label}',
   'cause.tell_prefix': 'Tell: ',
 
   'checklist.title': 'Field Checklist',
@@ -655,7 +655,7 @@ export const en: Record<string, string> = {
   'ledger.current_standard': 'Current standard',
   'ledger.view_original': 'View original photo',
   'ledger.ai_estimate_cta': 'Run AI estimate with this condition',
-  'ledger.accum_hint_zero': 'Save here and your next estimate can reference this machine.',
+  'ledger.accum_hint_zero': "Save here and you can start your next estimate from this machine's settings.",
   'ledger.preparing': 'Preparing…',
   'ledger.pdf_export_single': 'Export PDF',
   'ledger.revision_history': 'Revision history',
@@ -772,7 +772,7 @@ export const en: Record<string, string> = {
   'landing.sticky_sub': 'A photo or your settings is enough to start',
   'landing.web_cta_secondary': 'View defect guide',
   'landing.web_fineprint': '5 free estimates on signup · try in the browser, no install · reference estimate',
-  'landing.web_getapp': "Your plant's record builds with every estimate. It's there for the next one.",
+  'landing.web_getapp': "Your plant's settings build up machine by machine.",
 
   // video-hero-web-v1: 히어로 정적 카드 삭제(영상으로 교체)로 render_* 중 delta 행 이름 3개만
   // LandingOutputTile.tsx가 계속 쓴다 — 나머지(제목/id/결함/원인/표머리/각주)는 카드와 함께 정리.
