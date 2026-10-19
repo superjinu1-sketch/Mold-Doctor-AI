@@ -285,6 +285,12 @@ function DiagnoseContent() {
   const [result, setResult] = useState<DiagnosisResult | null>(null);
   const [sessionId, setSessionId] = useState<string | null>(null);
   const [demoSnapshot, setDemoSnapshot] = useState<string | null>(null);
+  // 유료 추정 직전 입력 점검(estimate-reliability-audit): 예시 세팅값이 그대로 남았거나(실측 21건 중 4건),
+  // 세팅값이 하나도 없으면(21건 중 6건) 크레딧을 쓰기 전에 화면 안에서 한 번 알린다.
+  const [sampleSettingsSnap, setSampleSettingsSnap] = useState<string | null>(null);
+  const [preflightWarn, setPreflightWarn] = useState<'sample' | 'empty' | null>(null);
+  const preflightAcceptedRef = useRef(false);
+  const preflightRef = useRef<HTMLDivElement>(null);
   // D1: /ledger 설비 상세 → "이 조건으로 AI 추정" 경로에서만 채워지는 설비 컨텍스트.
   // 이 경로가 아니면 null이라 결과에 배지가 뜨지 않는다(없는 이력 주장 금지). DB 저장 없음.
   const [estimateContext, setEstimateContext] = useState<{ label: string; count: number } | null>(null);
@@ -989,6 +995,8 @@ function DiagnoseContent() {
     setMoldDrawings([]);
     // 샘플 로드는 폼을 통째로 갈아엎으므로 설비에서 넘어온 컨텍스트는 더 이상 유효하지 않다(D1).
     setEstimateContext(null);
+    setSampleSettingsSnap(JSON.stringify({ nozzleTemp: d.nozzleTemp, zone1Temp: d.zone1Temp, zone2Temp: d.zone2Temp, moldTempFixed: d.moldTempFixed, injPressure1: d.injPressure1, holdPressure: d.holdPressure, injSpeed1: d.injSpeed1, holdTime: d.holdTime, coolTime: d.coolTime }));
+    setPreflightWarn(null);
     setDemoSnapshot(JSON.stringify({
       defectType: d.defectType, resinType: d.resinType,
       nozzleTemp: d.nozzleTemp, zone1Temp: d.zone1Temp, zone2Temp: d.zone2Temp,
@@ -1036,6 +1044,19 @@ function DiagnoseContent() {
       openLogin();
       return;
     }
+    // 유료 첫 추정에서만 점검(데모·후속 라운드 제외). "그대로 추정"을 누르면 한 번 통과시킨다.
+    if (!isDemo && round === 1 && !preflightAcceptedRef.current) {
+      const currentSettingsSnap = JSON.stringify({ nozzleTemp: settings.nozzleTemp, zone1Temp: settings.zone1Temp, zone2Temp: settings.zone2Temp, moldTempFixed: settings.moldTempFixed, injPressure1: settings.injPressure1, holdPressure: settings.holdPressure, injSpeed1: settings.injSpeed1, holdTime: settings.holdTime, coolTime: settings.coolTime });
+      const hasAnySetting = Object.entries(settings).some(([k, v]) => k !== 'pressureUnit' && String(v).trim() !== '');
+      const warn = sampleSettingsSnap !== null && currentSettingsSnap === sampleSettingsSnap ? 'sample' : (!hasAnySetting ? 'empty' : null);
+      if (warn) {
+        setPreflightWarn(warn);
+        setTimeout(() => preflightRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' }), 50);
+        return;
+      }
+    }
+    preflightAcceptedRef.current = false;
+    setPreflightWarn(null);
     setIsLoading(true);
     setError('');
     setResult(null);
@@ -2049,6 +2070,37 @@ function DiagnoseContent() {
             </div>
           </div>
         </FormSection>
+
+        {preflightWarn && (
+          <div ref={preflightRef} className="bg-[var(--warn-bg)] border border-[var(--warn-border)] rounded-xl p-4 space-y-3">
+            <p className="text-warn font-bold text-base">{t(preflightWarn === 'sample' ? 'preflight.sample_title' : 'preflight.empty_title')}</p>
+            <p className="text-muted text-body">{t(preflightWarn === 'sample' ? 'preflight.sample_body' : 'preflight.empty_body')}</p>
+            <div className="flex flex-col sm:flex-row gap-2">
+              <button
+                type="button"
+                onClick={() => {
+                  if (preflightWarn === 'sample') {
+                    // 예시 세팅값만 비운다(압력 단위는 유지). 불량·수지 등 사용자가 바꾼 값은 그대로.
+                    setSettings(prev => ({ ...Object.fromEntries(Object.keys(prev).map(k => [k, ''])), pressureUnit: prev.pressureUnit } as typeof prev));
+                    setSampleSettingsSnap(null);
+                  }
+                  setPreflightWarn(null);
+                  setOpenSection(3);
+                }}
+                className="ui-cta flex-1 text-body"
+              >
+                {t(preflightWarn === 'sample' ? 'preflight.sample_clear' : 'preflight.empty_fill')}
+              </button>
+              <button
+                type="button"
+                onClick={() => { preflightAcceptedRef.current = true; setPreflightWarn(null); void handleDiagnose(); }}
+                className="flex-1 min-h-[var(--touch-cta)] px-4 rounded-[var(--radius-cta)] border border-border-strong text-muted hover:text-ink font-semibold text-body transition-colors"
+              >
+                {t('preflight.continue')}
+              </button>
+            </div>
+          </div>
+        )}
 
         {error && (
           <div ref={errorRef} className="bg-[var(--danger-bg)] border border-[var(--danger-border)] text-danger rounded-xl p-4 text-base">
