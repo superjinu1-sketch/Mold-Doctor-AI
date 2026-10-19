@@ -554,7 +554,7 @@ export const ko: Record<string, string> = {
 
   /* Action buttons */
   'action.resolved': '해결됨',
-  'action.followup': '해결 안 됨, 후속 추정',
+  'action.followup': '해결 안 됨, 후속 추정 (1크레딧)',
   'action.prompt': '조치 결과가 어떻게 됐나요?',
   'history.title': '추정 기록',
   'history.empty': '아직 기록이 없어요. 첫 추정을 시작해보세요.',

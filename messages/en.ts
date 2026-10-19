@@ -587,7 +587,7 @@ export const en: Record<string, string> = {
   'history.save_ledger_no_machine': 'Work standards are managed per machine. Please register a machine first.',
   'history.save_ledger_no_machine_cta': 'Register a machine',
   'history.save_ledger_add_machine': '+ Add new machine',
-  'action.followup': 'Not resolved: Follow-up',
+  'action.followup': 'Not resolved: Follow-up (1 credit)',
   'action.prompt': 'How did the action go?',
 
   /* Defect types (display in English mode) */
