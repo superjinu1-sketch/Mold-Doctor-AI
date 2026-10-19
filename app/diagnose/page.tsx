@@ -19,6 +19,7 @@ import { IconClipboard, IconCamera } from '@/components/icons';
 import { SAMPLE_CASES } from '@/lib/sampleCase';
 import { useCoarsePointer } from '@/lib/useCoarsePointer';
 import { requestInAppReviewIfEligible } from '@/lib/inAppReview';
+import { getGuideDefectById } from '@/lib/defectGuide';
 
 // --- Types ---
 interface ImageFile {
@@ -136,6 +137,21 @@ const DEFECT_TYPES = [
   '버닝/가스마크 (Burn Mark)', '은줄 (Silver Streak)', '변색 (Discoloration)', '크랙 (Crack)',
   '휨/변형 (Warpage)', '기포 (Void/Bubble)', '젯팅 (Jetting)', '기타 (직접 입력)',
 ];
+
+// 불량 가이드 slug(lib/defectGuide.ts id) → 폼 불량 유형. 폼 목록에 있는 11종만 직접 매핑한다.
+const GUIDE_SLUG_TO_DEFECT: Record<string, string> = {
+  'short-shot': '미성형 (Short Shot)',
+  'flash': '플래시 (Flash)',
+  'sink-mark': '싱크마크 (Sink Mark)',
+  'weld-line': '웰드라인 (Weld Line)',
+  'burn-mark': '버닝/가스마크 (Burn Mark)',
+  'silver-streak': '은줄 (Silver Streak)',
+  'discoloration': '변색 (Discoloration)',
+  'crack': '크랙 (Crack)',
+  'warpage': '휨/변형 (Warpage)',
+  'void': '기포 (Void/Bubble)',
+  'jetting': '젯팅 (Jetting)',
+};
 
 const DEFECT_KEY_MAP: Record<string, string> = {
   '미성형 (Short Shot)': 'defect.short_shot',
@@ -444,10 +460,21 @@ function DiagnoseContent() {
 
   // Pre-select defect type from URL param
   useEffect(() => {
+    // 가이드 CTA는 영문 slug(?defect=short-shot)로 넘어온다. 예전엔 한글로 시작하는 목록과 startsWith로
+    // 비교해 24종 모두 프리필이 실패했다. 폼 목록에 있는 11종은 직접, 나머지는 "기타"+가이드 표시명.
     const defectParam = searchParams.get('defect');
     if (defectParam) {
-      const matched = DEFECT_TYPES.find(d => d.startsWith(defectParam));
-      if (matched) setDefectType(matched);
+      const direct = GUIDE_SLUG_TO_DEFECT[defectParam];
+      const guide = getGuideDefectById(defectParam);
+      if (direct) {
+        setDefectType(direct);
+      } else if (guide) {
+        setDefectType('기타 (직접 입력)');
+        setCustomDefect(`${guide.nameKo} (${guide.nameEn})`);
+      } else {
+        const matched = DEFECT_TYPES.find(d => d.startsWith(defectParam));
+        if (matched) setDefectType(matched);
+      }
     }
   }, [searchParams]);
 
