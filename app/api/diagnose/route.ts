@@ -1090,8 +1090,12 @@ CRITICAL: Your entire response must be ONLY the JSON object. No text before or a
     result.promptVersion = PROMPT_VERSION;
 
     // 부분성공(파싱 폴백)이면 크레딧 환불(멱등). throw 아니라 200 경로라 여기서 처리.
+    // 판독 불가·불량 미검출·정보 부족도 원인·권장이 비어 있는 "결과 없음"이라 같은 기준으로 환불한다
+    // (estimate-reliability-audit: 기존엔 차감만 되고 환불이 없었다). refund_session RPC 자체는 무변경.
+    const NO_RESULT_TYPES = ['Image_Unreadable', 'No_Defect_Detected', 'Insufficient_Input'];
+    const noResult = NO_RESULT_TYPES.includes(String(result?.defect_type?.en ?? ''));
     let finalBalance = creditBalance;
-    if (parseFallback && refundCtx) {
+    if ((parseFallback || noResult) && refundCtx) {
       try {
         const { data: rfRaw } = await supabaseAdmin.rpc('refund_session', {
           p_session_id: refundCtx.sessionId,
