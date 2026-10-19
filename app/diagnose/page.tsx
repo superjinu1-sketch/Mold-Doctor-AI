@@ -1206,7 +1206,9 @@ function DiagnoseContent() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  const handleResolvedWithStatus = (status: string, memo: string, afterPhoto?: string) => {
+  // afterSettings는 결과 패널에서 사용자가 "지금 사출기 조건"으로 확인한 값만 들어온다(growth P0).
+  // 예전에는 조치 전 입력 폼(settings)을 그대로 복사해, 불량을 만든 조건이 작업표준이 될 수 있었다.
+  const handleResolvedWithStatus = (status: string, memo: string, afterPhoto?: string, afterSettings?: Record<string, string>) => {
     if (!diagnosisId) return;
     const resolvedAt = new Date().toISOString();
     try {
@@ -1217,8 +1219,7 @@ function DiagnoseContent() {
         history[idx].resolved = status;
         history[idx].resolvedAt = resolvedAt;
         if (memo) history[idx].resolvedMemo = memo;
-        // after-settings: 현재 settings 캡처
-        history[idx].afterSettings = { ...settings };
+        if (afterSettings) history[idx].afterSettings = afterSettings;
         if (afterPhoto) history[idx].afterPhoto = afterPhoto;
         if (!safeLocalStorageSet('diagnoseHistory', JSON.stringify(history))) {
           // QuotaExceeded: 사진 없이 재시도
@@ -1235,7 +1236,7 @@ function DiagnoseContent() {
         resolved: status,
         resolvedAt,
         ...(memo ? { resolvedMemo: memo } : {}),
-        afterSettings: { ...settings },
+        ...(afterSettings ? { afterSettings } : {}),
         ...(afterPhoto ? { afterPhoto } : {}),
       });
     }

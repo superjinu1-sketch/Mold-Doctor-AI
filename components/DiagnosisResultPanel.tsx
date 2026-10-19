@@ -7,6 +7,13 @@ import { authHeaders } from '@/lib/supabase/authHeader';
 import { downscaleImageClient } from '@/lib/clientDownscale';
 import { apiFetch } from '@/lib/apiBase';
 import { IconMessage, IconCamera, IconCheckSquare, IconNote, IconClipboard } from '@/components/icons';
+import { useAuth } from '@/contexts/AuthContext';
+import SaveAsWorkStandardModal from '@/components/SaveAsWorkStandardModal';
+import { canSaveAsWorkStandard } from '@/lib/diagnoseToLedger';
+import { TEMP_FIELDS, MOLD_TEMP_FIELDS, MACHINE_PARAM_FIELDS, ADV_FIELD_GROUPS, type SettingField } from '@/lib/machineSettingsFields';
+
+// 조치 후 조건 확인 폼이 다루는 세팅 항목(조치 전 입력 폼과 같은 키·같은 라벨).
+const AFTER_FIELDS: SettingField[] = [...TEMP_FIELDS, ...MOLD_TEMP_FIELDS, ...MACHINE_PARAM_FIELDS, ...ADV_FIELD_GROUPS.flatMap(g => g.fields)];
 
 interface DiagnosisResult {
   defect_type: { ko: string; en: string };
@@ -329,7 +336,7 @@ interface Props {
   round?: number;
   followUpHistory?: FollowUpHistoryItem[];
   onResolved?: () => void;
-  onResolvedWithStatus?: (status: string, memo: string, afterPhoto?: string) => void;
+  onResolvedWithStatus?: (status: string, memo: string, afterPhoto?: string, afterSettings?: Record<string, string>) => void;
   onStartFollowUp?: () => void;
   resinType?: string;
   machineSettings?: Record<string, unknown>;
@@ -358,6 +365,20 @@ export default function DiagnosisResultPanel({ result, onSavePDF, round = 1, fol
   const [resolvedStatus, setResolvedStatus] = useState('solved');
   const [resolvedMemo, setResolvedMemo] = useState('');
   const [afterPhoto, setAfterPhoto] = useState<string | undefined>(undefined);
+  // 조치 후 조건 확인(growth P0): 사용자가 "지금 사출기 조건"이라고 확인한 값만 afterSettings가 된다.
+  // AI 권장값은 어디에도 미리 채우지 않는다 — 초기값은 사용자가 처음 입력한 조치 전 값.
+  const { user } = useAuth();
+  const [afterOpen, setAfterOpen] = useState(false);
+  const [afterValues, setAfterValues] = useState<Record<string, string>>({});
+  const [afterConfirmed, setAfterConfirmed] = useState(false);
+  const [standardCandidate, setStandardCandidate] = useState<{ status: string; afterSettings: Record<string, string>; resolvedAt: string } | null>(null);
+  const [standardModalOpen, setStandardModalOpen] = useState(false);
+  const [standardSaved, setStandardSaved] = useState(false);
+  // 사용자가 조치 전에 실제로 값을 넣었던 항목만 확인 대상(빈 항목은 표시하지 않음).
+  const filledAfterFields = AFTER_FIELDS.filter(f => {
+    const v = machineSettings?.[f.key];
+    return typeof v === 'string' ? v.trim() !== '' : v !== undefined && v !== null && v !== '';
+  });
   const afterPhotoRef = useRef<HTMLInputElement>(null);
   const chatBottomRef = useRef<HTMLDivElement>(null);
   const resolveFormRef = useRef<HTMLDivElement>(null); // A3 가이드 2번 → 해결 기록 폼으로 스크롤
@@ -1002,6 +1023,39 @@ export default function DiagnosisResultPanel({ result, onSavePDF, round = 1, fol
           {/* Follow-up Actions */}
           <div ref={resolveFormRef} className="bg-surface rounded-2xl p-4 sm:p-6 border border-border">
             <div className="text-base font-bold text-muted mb-3">{t('action.prompt')}</div>
+            {/* 확인된 조치 후 조건으로 "해결" 기록된 직후 — 결과 화면에서 바로 설비 작업표준 저장(기존 모달 재사용). */}
+            {!showResolvedForm && standardCandidate && (
+              <div className="mb-3 rounded-xl border border-[var(--ok-border)] bg-[var(--ok-bg)] p-3">
+                {standardSaved ? (
+                  <div className="flex items-center justify-between gap-2 min-h-[var(--touch-min)]">
+                    <span className="text-sm font-semibold text-ok">✓ {t('history.save_ledger_saved_badge')}</span>
+                    <Link href="/ledger" className="text-sm font-semibold text-brand-ink shrink-0">{t('history.save_ledger_go_ledger')}</Link>
+                  </div>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => setStandardModalOpen(true)}
+                    className="ui-cta w-full text-body"
+                  >
+                    {t('resolve.save_standard_cta')}
+                  </button>
+                )}
+              </div>
+            )}
+            {standardModalOpen && standardCandidate && user && (
+              <SaveAsWorkStandardModal
+                record={{
+                  resolved: standardCandidate.status,
+                  afterSettings: standardCandidate.afterSettings,
+                  defect_type: result.defect_type,
+                  beforeResin: resinType,
+                  resolvedAt: standardCandidate.resolvedAt,
+                }}
+                userId={user.id}
+                onClose={() => setStandardModalOpen(false)}
+                onSaved={() => { setStandardModalOpen(false); setStandardSaved(true); }}
+              />
+            )}
             {showResolvedForm ? (
               <div className="space-y-3">
                 <div className="flex flex-col gap-2">
@@ -1020,6 +1074,57 @@ export default function DiagnosisResultPanel({ result, onSavePDF, round = 1, fol
                     </button>
                   ))}
                 </div>
+                {/* 조치 후 조건 확인(growth P0) — "해결"일 때만. 확인 체크한 값만 저장되고, 체크 없이 저장하면
+                    afterSettings가 붙지 않아 작업표준 저장 게이트가 정직하게 닫힌다. */}
+                {resolvedStatus === 'solved' && filledAfterFields.length > 0 && (
+                  <div className="rounded-xl border border-border">
+                    <button
+                      type="button"
+                      aria-expanded={afterOpen}
+                      onClick={() => {
+                        if (!afterOpen && Object.keys(afterValues).length === 0) {
+                          setAfterValues(Object.fromEntries(filledAfterFields.map(f => [f.key, String(machineSettings?.[f.key] ?? '')])));
+                        }
+                        setAfterOpen(v => !v);
+                      }}
+                      className="w-full flex items-center justify-between gap-2 px-3 min-h-[var(--touch-min)] text-left text-sm font-semibold text-ink"
+                    >
+                      <span>{t('resolve.after_title')}</span>
+                      <span className="text-faint shrink-0">{afterOpen ? '▲' : '▼'}</span>
+                    </button>
+                    {afterOpen && (
+                      <div className="px-3 pb-3 space-y-3">
+                        <p className="text-faint text-[length:var(--text-label)]">{t('resolve.after_hint')}</p>
+                        <div className="grid grid-cols-2 gap-2">
+                          {filledAfterFields.map(f => (
+                            <label key={f.key} className="block min-w-0">
+                              <span className="block text-[length:var(--text-label)] text-muted mb-1 truncate">{t(f.labelKey)}</span>
+                              <input
+                                id={`after-${f.key}`}
+                                type="text"
+                                inputMode="decimal"
+                                value={afterValues[f.key] ?? ''}
+                                placeholder={f.placeholder}
+                                onChange={(e) => setAfterValues(prev => ({ ...prev, [f.key]: e.target.value }))}
+                                className="ui-input w-full"
+                              />
+                            </label>
+                          ))}
+                        </div>
+                        <label className="flex items-center gap-2 text-sm text-ink min-h-[var(--touch-min)] cursor-pointer">
+                          <input
+                            id="after-confirm"
+                            type="checkbox"
+                            checked={afterConfirmed}
+                            onChange={(e) => setAfterConfirmed(e.target.checked)}
+                            className="w-5 h-5 shrink-0"
+                          />
+                          <span>{t('resolve.after_confirm')}</span>
+                        </label>
+                      </div>
+                    )}
+                  </div>
+                )}
                 <textarea
                   className="w-full bg-surface-sunken border border-border rounded-xl px-3 py-3 text-base text-ink placeholder:text-faint focus:outline-none focus:ring-2 focus:ring-brand resize-none"
                   rows={2}
@@ -1069,11 +1174,33 @@ export default function DiagnosisResultPanel({ result, onSavePDF, round = 1, fol
                   <button
                     type="button"
                     onClick={() => {
-                      onResolvedWithStatus?.(resolvedStatus, resolvedMemo, afterPhoto);
-                      onResolved?.();
+                      // 확인 체크한 "해결" 기록만 조치 후 조건을 싣는다. 단위(pressureUnit)는 실제 값이 하나라도
+                      // 있을 때만 덧붙인다(단위만으로 게이트가 열리면 안 됨).
+                      let afterArg: Record<string, string> | undefined;
+                      if (resolvedStatus === 'solved' && afterConfirmed) {
+                        const vals = Object.fromEntries(
+                          Object.entries(afterValues).map(([k, v]) => [k, v.trim()] as const).filter(([, v]) => v !== ''),
+                        );
+                        if (Object.keys(vals).length > 0) {
+                          const unit = machineSettings?.pressureUnit;
+                          afterArg = typeof unit === 'string' && unit ? { ...vals, pressureUnit: unit } : vals;
+                        }
+                      }
+                      onResolvedWithStatus?.(resolvedStatus, resolvedMemo, afterPhoto, afterArg);
+                      const canStandard = !!user && canSaveAsWorkStandard({ resolved: resolvedStatus, afterSettings: afterArg });
+                      if (canStandard && afterArg) {
+                        // 결과 화면에서 바로 작업표준 저장을 열 수 있게 후보를 남긴다(맨 위로 스크롤하지 않음).
+                        setStandardCandidate({ status: resolvedStatus, afterSettings: afterArg, resolvedAt: new Date().toISOString() });
+                        setStandardSaved(false);
+                      } else {
+                        onResolved?.();
+                      }
                       setShowResolvedForm(false);
                       setAfterPhoto(undefined);
                       setResolvedMemo('');
+                      setAfterOpen(false);
+                      setAfterValues({});
+                      setAfterConfirmed(false);
                     }}
                     className="flex-1 bg-brand text-on-brand py-3 rounded-xl font-bold text-base hover:bg-brand-ink transition-colors min-h-[var(--touch-cta)]"
                   >
