@@ -7,6 +7,7 @@ import { Browser } from '@capacitor/browser';
 import { supabase } from '@/lib/supabase/client';
 import { migrateLocalHistory } from '@/lib/history-sync';
 import { clearDraftPhotos } from '@/lib/draftPhotoStore';
+import { consumeAuthReturn } from '@/lib/authReturn';
 import { isNativeApp, AUTH_DEEPLINK } from '@/lib/platform';
 import { configurePurchases, logOutPurchases } from '@/lib/purchases';
 import { logBreadcrumb } from '@/lib/observability/client';
@@ -90,7 +91,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         .exchangeCodeForSession(code)
         .finally(() => {
           Browser.close().catch(() => {}); // 이미 닫혀있을 수 있음 — 무해 실패 허용
-          window.location.replace('/');
+          window.location.replace(consumeAuthReturn('/'));
         });
     };
 

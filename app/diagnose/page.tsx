@@ -20,6 +20,7 @@ import { SAMPLE_CASES } from '@/lib/sampleCase';
 import { useCoarsePointer } from '@/lib/useCoarsePointer';
 import { requestInAppReviewIfEligible } from '@/lib/inAppReview';
 import { getGuideDefectById } from '@/lib/defectGuide';
+import { setAuthReturn } from '@/lib/authReturn';
 
 // --- Types ---
 interface ImageFile {
@@ -227,7 +228,7 @@ const imageIdentity = (imgs: ImageFile[]) =>
 function DiagnoseContent() {
   const searchParams = useSearchParams();
   const { t, locale } = useLocale();
-  const { user, signInWithGoogle, setCredits, credits } = useAuth();
+  const { user, setCredits, credits } = useAuth();
   const router = useRouter();
   // 휴대폰에선 "드래그"·"Ctrl+V" 안내를 카메라/앨범 카피로 바꾼다(UX audit C4).
   const coarse = useCoarsePointer();
@@ -258,6 +259,8 @@ function DiagnoseContent() {
   const [defectGridOpen, setDefectGridOpen] = useState(false);
   const [openSection, setOpenSection] = useState<number | null>(1);
   const [authOpen, setAuthOpen] = useState(false);
+  // 이 화면에서 로그인 창을 열 때는 항상 복귀 경로를 함께 기억한다(로그인 후 홈이 아닌 이 화면으로).
+  const openLogin = () => { setAuthReturn('/diagnose'); setAuthOpen(true); };
   const [settings, setSettings] = useState({
     nozzleTemp: '', zone1Temp: '', zone2Temp: '', zone3Temp: '', zone4Temp: '',
     moldTempFixed: '', moldTempMoving: '',
@@ -719,7 +722,7 @@ function DiagnoseContent() {
         body: JSON.stringify({ grade }),
       });
       if (res.status === 401) {
-        setAuthOpen(true);
+        openLogin();
         setManualResinOpen(true);
         setGradeStatus({ tone: 'warn', text: t('grade.err_unauth') });
         return;
@@ -782,7 +785,7 @@ function DiagnoseContent() {
         headers: { 'Content-Type': 'application/json', ...(await authHeaders()) },
         body: JSON.stringify({ image: { data: base64, mediaType: file.type } }),
       });
-      if (res.status === 401) { setAuthOpen(true); setManualResinOpen(true); setGradeStatus({ tone: 'warn', text: t('grade.err_unauth') }); return; }
+      if (res.status === 401) { openLogin(); setManualResinOpen(true); setGradeStatus({ tone: 'warn', text: t('grade.err_unauth') }); return; }
       if (res.status === 429) { setManualResinOpen(true); setGradeStatus({ tone: 'warn', text: t('grade.err_rate') }); return; }
       if (res.status === 413 || res.status === 415) { setGradeStatus({ tone: 'warn', text: t('grade.err_image') }); return; }
       if (!res.ok) { setGradeStatus({ tone: 'warn', text: t('grade.err_fail') }); return; }
@@ -1019,8 +1022,10 @@ function DiagnoseContent() {
     const isDemo = demoSnapshot !== null && currentSnapshot === demoSnapshot;
 
     if (!user && !isDemo) {
+      // 구글로 바로 보내지 않고 로그인 창(구글·애플·이메일)을 연다. 로그인 후엔 이 화면으로 돌아오고,
+      // 입력하던 내용은 폼 임시저장(Part B)이 복원한다.
       setError(t('auth.login_required'));
-      await signInWithGoogle();
+      openLogin();
       return;
     }
     setIsLoading(true);
@@ -1066,7 +1071,7 @@ function DiagnoseContent() {
       });
 
       if (!isDemo) {
-        if (res.status === 401) { setError(t('auth.login_required')); await signInWithGoogle(); return; }
+        if (res.status === 401) { setError(t('auth.login_required')); openLogin(); return; }
         if (res.status === 402) { setError(t('credit.insufficient')); router.push('/pricing'); return; }
       }
       if (!res.ok) {

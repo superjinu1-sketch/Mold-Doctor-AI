@@ -4,6 +4,7 @@ import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase/client';
 import { useLocale } from '@/contexts/LocaleContext';
+import { consumeAuthReturn } from '@/lib/authReturn';
 
 export default function AuthCallbackPage() {
   const router = useRouter();
@@ -11,12 +12,13 @@ export default function AuthCallbackPage() {
 
   useEffect(() => {
     const code = new URLSearchParams(window.location.search).get('code');
+    const target = consumeAuthReturn('/');
     if (code) {
       supabase.auth
         .exchangeCodeForSession(code)
-        .finally(() => router.replace('/'));
+        .finally(() => router.replace(target));
     } else {
-      router.replace('/');
+      router.replace(target);
     }
   }, [router]);
 
