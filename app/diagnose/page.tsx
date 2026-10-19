@@ -240,6 +240,7 @@ function DiagnoseContent() {
   const [aiSuggested, setAiSuggested] = useState(false);   // 불량유형 AI 제안 배지
   const [isClassifying, setIsClassifying] = useState(false);
   const [classifyError, setClassifyError] = useState(false);   // AI 자동추정 시스템 오류(키 한도/네트워크 등) 표시
+  const [classifyNeedsLogin, setClassifyNeedsLogin] = useState(false);   // 비로그인 401 — 오류가 아니라 로그인 안내
   // 진단 필수 게이트용 — 확정된 불량유형(기타는 직접 입력값)
   const effectiveDefectType = (defectType === '기타 (직접 입력)' ? customDefect.trim() : defectType);
   const [resinType, setResinType] = useState('');
@@ -453,6 +454,7 @@ function DiagnoseContent() {
     else if (decodeFailed) setExtractMsg(t('img.decode_failed'));
     else if (lastErrStatus === 413) setExtractMsg(t('err.extract_413'));
     else if (lastErrStatus === 422) setExtractMsg(t('err.extract_422'));
+    else if (lastErrStatus === 401) { setExtractMsg(t('err.extract_login')); openLogin(); }  // 사진 탓이 아니라 로그인 필요
     else if (lastErrStatus) setExtractMsg(t('err.extract_fail'));
   };
 
@@ -874,12 +876,18 @@ function DiagnoseContent() {
   const classifyDefect = useCallback(async (img: ImageFile) => {
     setIsClassifying(true);
     setClassifyError(false);
+    setClassifyNeedsLogin(false);
     try {
       const res = await apiFetch('/api/classify-defect', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', ...(await authHeaders()) },
         body: JSON.stringify({ image: { data: img.base64, mediaType: img.mediaType } }),
       });
+      if (res.status === 401) {
+        // 비로그인 — 시스템 오류가 아니므로 "일시적으로 할 수 없다"가 아니라 로그인 안내를 띄운다.
+        setClassifyNeedsLogin(true);
+        return;
+      }
       if (!res.ok) {
         // 시스템 오류(예: 400 usage limit, 429, 5xx) — 조용히 삼키지 말고 표시
         console.warn('[classify-defect] non-ok status:', res.status);
@@ -1427,6 +1435,14 @@ function DiagnoseContent() {
             {classifyError && (
               <div className="mb-2 text-[length:var(--text-label)] font-medium text-warn bg-[var(--warn-bg)] border border-[var(--warn-border)] rounded-lg px-3 py-1.5">
                 {t('step1.classify_error')}
+              </div>
+            )}
+            {classifyNeedsLogin && (
+              <div className="mb-2 flex flex-wrap items-center justify-between gap-x-3 text-[length:var(--text-label)] font-medium text-brand-ink bg-brand-tint border border-[var(--brand-border)] rounded-lg px-3 py-1">
+                <span className="py-1.5">{t('step1.classify_login')}</span>
+                <button type="button" onClick={openLogin} className="font-bold underline underline-offset-2 min-h-[var(--touch-min)] shrink-0">
+                  {t('auth.login')}
+                </button>
               </div>
             )}
 
