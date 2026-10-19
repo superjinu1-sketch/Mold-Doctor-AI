@@ -522,7 +522,7 @@ export async function POST(request: NextRequest) {
           return NextResponse.json({ error: '지원하지 않는 이미지 형식 (허용: jpeg/png/webp/gif)' }, { status: 415 });
         }
         if (img.data && Buffer.byteLength(img.data, 'base64') > MAX_IMG) {
-          return NextResponse.json({ error: `이미지가 너무 큽니다. 최대 8 MB` }, { status: 413 });
+          return NextResponse.json({ error: `이미지가 너무 큽니다. 최대 4 MB` }, { status: 413 });
         }
       }
       for (const d of bodyDrawings) {

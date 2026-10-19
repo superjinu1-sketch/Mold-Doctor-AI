@@ -1081,7 +1081,8 @@ function DiagnoseContent() {
         pressureUnit: settings.pressureUnit,
         moldInfo: { moldType, gateType, cavities, runnerType },
         productInfo: { weight, wallThicknessMin, wallThicknessMax, notes: productNotes },
-        images: [...images, ...followUpImages].map(img => ({ data: img.base64, mediaType: img.mediaType })),
+        // 서버 한도는 5장(초과 시 413). 후속 라운드에서 기존+새 사진이 5장을 넘으면 가장 오래된 것부터 뺀다.
+        images: [...images, ...followUpImages].slice(-5).map(img => ({ data: img.base64, mediaType: img.mediaType })),
         moldDrawings: moldDrawings.map(img => ({ data: img.base64, mediaType: img.mediaType })),
         locale,
         ...(isFollowUp && {
