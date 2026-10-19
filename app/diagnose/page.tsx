@@ -485,6 +485,9 @@ function DiagnoseContent() {
         isRestoreViewRef.current = true;
         setResult(record);
         setSessionId(record.session_id ?? null);
+        // 복원한 기록에 조치 결과를 남길 수 있도록 기록 id(= diagnosis_records.client_id)를 잡아둔다.
+        // 이게 비어 있으면 handleResolvedWithStatus가 대상을 못 찾아 "저장"이 조용히 버려졌다.
+        if (record.id) setDiagnosisId(String(record.id));
         const bi = record.beforeInput;
         if (bi) {
           if (bi.defectType) {
@@ -1204,13 +1207,15 @@ function DiagnoseContent() {
   };
 
   const handleResolvedWithStatus = (status: string, memo: string, afterPhoto?: string) => {
+    if (!diagnosisId) return;
+    const resolvedAt = new Date().toISOString();
     try {
       const raw = typeof window !== 'undefined' ? localStorage.getItem('diagnoseHistory') : null;
       const history = JSON.parse(raw || '[]');
       const idx = history.findIndex((h: { id: string }) => h.id === diagnosisId);
       if (idx !== -1) {
         history[idx].resolved = status;
-        history[idx].resolvedAt = new Date().toISOString();
+        history[idx].resolvedAt = resolvedAt;
         if (memo) history[idx].resolvedMemo = memo;
         // after-settings: 현재 settings 캡처
         history[idx].afterSettings = { ...settings };
@@ -1221,18 +1226,19 @@ function DiagnoseContent() {
           safeLocalStorageSet('diagnoseHistory', JSON.stringify(history));
         }
         setHistoryCount(history.length);
-        // 서버 동기화 (로그인 시)
-        if (user) {
-          void updateResolution(diagnosisId, user.id, {
-            resolved: status,
-            resolvedAt: new Date().toISOString(),
-            ...(memo ? { resolvedMemo: memo } : {}),
-            afterSettings: { ...settings },
-            ...(afterPhoto ? { afterPhoto } : {}),
-          });
-        }
       }
     } catch { /* ignore */ }
+    // 서버 동기화(로그인 시)는 로컬 사본 유무와 무관하게 한다. 다른 기기·로그아웃 후 복원한 기록은
+    // 로컬에 없지만 서버에는 있으므로, 로컬 조건에 묶여 있으면 기록이 서버에도 남지 않았다.
+    if (user) {
+      void updateResolution(diagnosisId, user.id, {
+        resolved: status,
+        resolvedAt,
+        ...(memo ? { resolvedMemo: memo } : {}),
+        afterSettings: { ...settings },
+        ...(afterPhoto ? { afterPhoto } : {}),
+      });
+    }
     // 인앱 리뷰 요청(in-app-review-v1) — 작업표준 저장 등 위 로직 완료 후, "완전 해결"(만족 확인)일 때만.
     // 부분개선·미해결에서는 호출하지 않는다(불만족 사용자에게 리뷰 요청은 역효과). 웹·30일 가드·실패
     // 무시는 requestInAppReviewIfEligible 내부에서 처리 — 실패해도 이 흐름에 영향 없음.
