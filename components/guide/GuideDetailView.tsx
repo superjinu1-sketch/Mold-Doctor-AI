@@ -33,6 +33,13 @@ export default function GuideDetailView({
         <h1 className="text-[length:var(--text-h1)] font-bold text-ink mb-2">{displayName}</h1>
         {locale === 'ko' && <p className="text-faint text-label mb-3">{defect.nameEn}</p>}
         <p className="text-muted text-body leading-relaxed">{description}</p>
+        {/* 첫 화면 보조 CTA(growth-content-cta-above-fold-v1) — 하단 CTA와 같은 딥링크. 하단 CTA는 유지. */}
+        <Link
+          href={`/diagnose?defect=${encodeURIComponent(defect.id)}`}
+          className="mt-4 inline-flex items-center gap-1 min-h-[var(--touch-min)] px-4 rounded-full bg-brand-tint text-brand-ink border border-[var(--brand-border)] font-semibold text-body hover:bg-[var(--brand-border)] transition-colors"
+        >
+          {L(`사진으로 ${displayName} 원인 추정하기`, `Estimate your ${displayName.toLowerCase()} cause from a photo`)} <span aria-hidden="true">›</span>
+        </Link>
       </div>
 
       <div className="space-y-8">

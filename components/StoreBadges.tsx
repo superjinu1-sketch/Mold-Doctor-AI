@@ -53,9 +53,9 @@ export default function StoreBadges({ variant, locale: localeProp }: { variant: 
 
   if (variant === 'article') {
     const blurb = locale === 'en'
-      ? 'Keep using it on the floor — your diagnosis history and machine conditions accumulate in the app.'
+      ? 'Keep using it on the floor. Your estimate history and machine conditions build up in the app.'
       : '현장에서 계속 쓰려면 앱으로. 추정 이력과 설비 조건이 앱에 쌓입니다.';
-    const free = locale === 'en' ? 'Free 5 diagnoses when you sign up' : '가입하면 5회 무료 추정';
+    const free = locale === 'en' ? '5 free estimates when you sign up' : '가입하면 5회 무료 추정';
     return (
       <div className="ui-card ui-card-lg p-5 flex flex-col items-center gap-3 text-center">
         <p className="text-body text-muted">{blurb}</p>

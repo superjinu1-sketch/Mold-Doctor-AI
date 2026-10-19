@@ -5,6 +5,7 @@ import { SITE_URL } from '@/lib/siteUrl';
 import { NOTES, getNoteBySlug, getSeriesForNote, type NoteDiagramId } from '@/lib/notes';
 import { readNoteDiagramSvg } from '@/lib/notesDiagramSvg';
 import { getNoteJaBySlug } from '@/lib/notesJa';
+import NoteCta from '@/components/notes/NoteCta';
 
 // Capacitor 정적 export(output:'export') 호환 — app/sitemap.ts 선례와 동일 원칙 적용.
 export const dynamic = 'force-static';
@@ -150,6 +151,8 @@ export default async function NoteDetailPageEn({ params }: { params: Promise<{ s
             );
           })}
         </div>
+
+        <NoteCta locale="en" />
 
         {seriesInfo && (() => {
           const len = seriesInfo.series.slugs.length;

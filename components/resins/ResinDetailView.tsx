@@ -62,6 +62,13 @@ export default function ResinDetailView({
             {spec.confidence === 'verified' ? L('검증됨', 'Verified') : L('실무 추정치', 'Field Estimate')}
           </span>
         </div>
+        {/* 첫 화면 보조 CTA(growth-content-cta-above-fold-v1) — 하단 CTA와 같은 딥링크. 하단 CTA는 유지. */}
+        <Link
+          href={`/diagnose?resin=${encodeURIComponent(resinKey)}`}
+          className="mt-4 inline-flex items-center gap-1 min-h-[var(--touch-min)] px-4 rounded-full bg-brand-tint text-brand-ink border border-[var(--brand-border)] font-semibold text-body hover:bg-[var(--brand-border)] transition-colors"
+        >
+          {L(`${displayName} 불량, 사진으로 원인 추정하기`, `Estimate a ${displayName} defect cause from a photo`)} <span aria-hidden="true">›</span>
+        </Link>
       </div>
 
       <div className="space-y-8">
