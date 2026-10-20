@@ -1970,5 +1970,434 @@
       "severity": "medium",
       "trap": "①Repeating only fine-tuning of molding conditions (back pressure, metering position, suck-back, nozzle temperature) is the trap — all of these are already exhausted, and multiple experts agree 'conditions alone have hit their limit' → the real axis is environment/equipment/mold hardware. ②Attributing it solely to moisture/drying is also a trap (the main cause is ambient temperature drift + hardware). ③Recommending only keeping/fine-tuning the barrel temperature near 220 is a trap (too low for a large-machine PMMA job; 240-250 is required)."
     }
+  },
+  {
+    "id": "en-pc-esc-ipa-overpack",
+    "source": "en-locale-eval-v2 — pc-esc-ipa-overpack 미러링 (2026-10-20, 미국 iOS 유입 대응)",
+    "title": "[EN locale] PC 하우징 IPA 세척 후 시간차 크랙",
+    "difficulty": "hard",
+    "input": {
+      "defect_type": "크랙 (Crack)",
+      "resin_type": "PC",
+      "machine_settings": {
+        "nozzle_temp": 295,
+        "zone1_temp": 290,
+        "zone2_temp": 285,
+        "zone3_temp": 275,
+        "zone4_temp": 265,
+        "mold_temp_fixed": 85,
+        "mold_temp_moving": 85,
+        "injection_pressure": 115,
+        "holding_pressure": 110,
+        "injection_speed_1": 50,
+        "back_pressure": 10,
+        "screw_rpm": 75,
+        "drying_temp": 120,
+        "drying_time": 4,
+        "dryer_type": "제습식"
+      },
+      "defect_description": "All parts pass inspection at molding and shipping. On the assembly line the surface is wiped with IPA (isopropyl alcohol), and 1-2 days later fine radial cracks appear around the gate. Under a polarizer there are rainbow stress patterns around the gate.",
+      "resin_detail": "PC housing",
+      "locale": "en"
+    },
+    "expected": {
+      "root_cause": "Overpacking (hold pressure 110 = 96% of injection pressure) leaves high residual stress around the gate, and IPA (a stress-cracking agent for PC) triggers environmental stress cracking (ESC). It is the interaction of molded-in stress and the solvent; blaming only one side is half an answer.",
+      "key_recommendations": [
+        "Lower hold pressure substantially toward the resin supplier range (PC roughly 50-75% of injection pressure); reducing residual stress is the molding-side root fix",
+        "Confirm improvement with polarized stress patterns after lowering hold pressure",
+        "Change the cleaning agent (IPA to a PC-safe cleaner) or review the cleaning step",
+        "Annealing if needed, as a supplement; the root fix is hold pressure"
+      ],
+      "expected_phase": "packing",
+      "severity": "high",
+      "trap": "Double trap: (1) parts pass at shipping, so concluding \"not a molding issue, only the cleaning step\"; (2) ignoring IPA and blaming only molding. The answer is residual stress x solvent interaction. Phase is packing (overpacking origin), not cooling."
+    }
+  },
+  {
+    "id": "en-gf-readout-trap-silverstreak",
+    "source": "en-locale-eval-v2 — gf-readout-trap-silverstreak 미러링 (2026-10-20, 미국 iOS 유입 대응)",
+    "title": "[EN locale] PBT-GF30 흰 줄무늬 — 유저는 은줄 선택(건조 정상)",
+    "difficulty": "hard",
+    "input": {
+      "defect_type": "은줄 (Silver Streak)",
+      "resin_type": "PBT",
+      "resin_detail": "PBT GF30%",
+      "machine_settings": {
+        "nozzle_temp": 255,
+        "zone1_temp": 250,
+        "zone2_temp": 245,
+        "zone3_temp": 240,
+        "zone4_temp": 230,
+        "mold_temp_fixed": 50,
+        "mold_temp_moving": 50,
+        "injection_pressure": 120,
+        "holding_pressure": 65,
+        "injection_speed_1": 55,
+        "back_pressure": 8,
+        "screw_rpm": 110,
+        "drying_temp": 140,
+        "drying_time": 4,
+        "dryer_type": "제습식"
+      },
+      "defect_description": "White radial streaks and rough surface on a black PBT-GF30 housing. Does not wipe off with a dry cloth. Drying 140°C 4h in a desiccant dryer, dew point OK. Mold temperature 50°C.",
+      "locale": "en"
+    },
+    "expected": {
+      "root_cause": "Reclassify: not silver streak (moisture/gas splay). This is glass fiber read-out: mold temperature too low (50°C, below the PBT-GF recommendation) so fibers are not encapsulated. Drying is normal, which rules out moisture splay. GF resin + black color + radial whitening that does not wipe off are the read-out clues.",
+      "key_recommendations": [
+        "Reclassify the defect: silver streak to fiber read-out",
+        "Raise mold temperature (50 to about 80-100°C)",
+        "Slight barrel temperature increase within the supplier range",
+        "No moisture countermeasure needed since drying is normal"
+      ],
+      "expected_phase": "cooling",
+      "phase_also_accept": [
+        "filling"
+      ],
+      "severity": "medium",
+      "trap": "Concluding \"silver streak = moisture\" despite normal drying is a misjudgment. GF resin, black part, radial whitening that does not wipe off = fiber read-out. Reclassification + mold temperature is the key."
+    }
+  },
+  {
+    "id": "en-abs-molddeposit-wipeable",
+    "source": "en-locale-eval-v2 — abs-molddeposit-wipeable 미러링 (2026-10-20, 미국 iOS 유입 대응)",
+    "title": "[EN locale] ABS 텍스처면 뿌연 백화 — 닦으면 지워짐 (유저는 흐름자국 선택)",
+    "difficulty": "hard",
+    "input": {
+      "defect_type": "흐름자국 (Flow Mark)",
+      "resin_type": "ABS",
+      "resin_detail": "ABS flame-retardant grade",
+      "machine_settings": {
+        "nozzle_temp": 240,
+        "zone1_temp": 235,
+        "zone2_temp": 230,
+        "zone3_temp": 220,
+        "zone4_temp": 210,
+        "mold_temp_fixed": 60,
+        "mold_temp_moving": 60,
+        "injection_pressure": 95,
+        "holding_pressure": 55,
+        "injection_speed_1": 55,
+        "back_pressure": 8,
+        "screw_rpm": 90,
+        "drying_temp": 80,
+        "drying_time": 3,
+        "dryer_type": "열풍식"
+      },
+      "defect_description": "Cloudy white haze on the textured surface. Rubbing with a dry cloth makes it fade and almost disappear. Clean right after mold cleaning, then it comes back after about 2000 shots. Worst near the vents and at the end of fill.",
+      "locale": "en"
+    },
+    "expected": {
+      "root_cause": "Mold deposit (plate-out): additives and volatiles from flame-retardant ABS build up on the mold surface, plus gas condensing near the vents. \"Wipes off + disappears after cleaning and returns + concentrated near vents\" is decisive. Not a flow mark (a structural defect that does not wipe off); reclassification needed.",
+      "key_recommendations": [
+        "Reclassify: not a flow mark, a mold deposit / surface residue",
+        "Shorten the mold cleaning interval and clean / open the vents",
+        "Lower melt temperature (less volatile generation) and shorten barrel residence time",
+        "Review the additive package / grade, such as the flame retardant (material, root cause)"
+      ],
+      "expected_phase": "material",
+      "severity": "medium",
+      "trap": "Accepting the user-selected \"flow mark\" and only adjusting mold temperature or speed is a misjudgment. \"Wipes off = surface residue\" is the branching clue."
+    }
+  },
+  {
+    "id": "en-pp-weldline-unreinforced-melttemp",
+    "source": "en-locale-eval-v2 — pp-weldline-unreinforced-melttemp 미러링 (2026-10-20, 미국 iOS 유입 대응)",
+    "title": "[EN locale] PP 비강화 웰드라인 강도 부족 — 멜트온도 지배 분기",
+    "difficulty": "hard",
+    "input": {
+      "defect_type": "웰드라인 (Weld Line)",
+      "resin_type": "PP",
+      "resin_detail": "PP homopolymer, unfilled",
+      "machine_settings": {
+        "nozzle_temp": 200,
+        "zone1_temp": 200,
+        "zone2_temp": 195,
+        "zone3_temp": 190,
+        "zone4_temp": 180,
+        "mold_temp_fixed": 25,
+        "mold_temp_moving": 25,
+        "injection_pressure": 90,
+        "holding_pressure": 65,
+        "injection_speed_1": 35,
+        "back_pressure": 4,
+        "screw_rpm": 90
+      },
+      "mold_info": {
+        "mold_type": "2판",
+        "gate_type": "사이드",
+        "cavity_count": 1
+      },
+      "product_info": {
+        "wall_thickness_min": 2,
+        "wall_thickness_max": 2.5
+      },
+      "defect_description": "Parts break at the knit line downstream of a through-hole in a drop test. The weld line is faint and is not rejected as a cosmetic defect. Barrel temperatures are running below the low end of the resin recommendation (210-250°C).",
+      "locale": "en"
+    },
+    "expected": {
+      "root_cause": "For an unreinforced resin, melt temperature governs weld strength. 200°C is below the PP recommended range, so molecular diffusion (healing) at the meeting front is insufficient. Slow injection (35%) and a cold mold (25°C) further drop the flow-front temperature at the meeting point.",
+      "key_recommendations": [
+        "Raise melt temperature 200 to 220-240°C (top priority)",
+        "Increase injection speed to keep the flow front hot",
+        "Raise mold temperature 25 to 40-50°C",
+        "Conditions cannot fully restore base-material strength; if it remains, consider moving the gate or adding an overflow tab"
+      ],
+      "expected_phase": "filling",
+      "severity": "high",
+      "trap": "Carrying over the glass-filled logic and putting \"raise hold pressure\" or \"fiber orientation\" first is a misjudgment. Hold pressure dominance is the GF branch."
+    }
+  },
+  {
+    "id": "en-pp-flash-clamp-tonnage-calc",
+    "source": "en-locale-eval-v2 — pp-flash-clamp-tonnage-calc 미러링 (2026-10-20, 미국 iOS 유입 대응)",
+    "title": "[EN locale] PP 컨테이너 전둘레 플래시 — 형체력 부족 판정·계산",
+    "difficulty": "hard",
+    "input": {
+      "defect_type": "플래시 (Flash)",
+      "resin_type": "PP",
+      "resin_detail": "PP homopolymer, general injection",
+      "machine_settings": {
+        "nozzle_temp": 230,
+        "zone1_temp": 230,
+        "zone2_temp": 225,
+        "zone3_temp": 215,
+        "zone4_temp": 200,
+        "mold_temp_fixed": 40,
+        "mold_temp_moving": 40,
+        "injection_pressure": 110,
+        "holding_pressure": 85,
+        "injection_speed_1": 60,
+        "back_pressure": 4,
+        "screw_rpm": 120
+      },
+      "product_info": {
+        "wall_thickness_min": 1.5,
+        "wall_thickness_max": 2.5
+      },
+      "defect_description": "Food container. Thin flash around the entire parting line every shot. Not a repeating local spot, uniform all around. Projected area about 450 cm², running on a 120-ton machine. The mold is new (no parting line wear).",
+      "locale": "en"
+    },
+    "expected": {
+      "root_cause": "Insufficient clamp force. For 450 cm² projected area the required clamp is about 450 x 300-500 kgf/cm² / 1000 = 135-225 tons, but the machine is 120 tons. Uniform flash all around + a new mold point to the clamp / overpressure axis.",
+      "key_recommendations": [
+        "Move to a larger machine (about 135-225 tons required)",
+        "Temporary relief: lower hold pressure and transfer earlier at V/P (lower cavity pressure)",
+        "Review lowering injection pressure and speed"
+      ],
+      "expected_phase": "packing",
+      "severity": "medium",
+      "trap": "The key is showing the clamp force calculation. Only saying \"raise clamp force\" loses points; a number in the thousands of tons is a failure."
+    }
+  },
+  {
+    "id": "en-pbt-sink-gate-freeze-fast-crystallization",
+    "source": "en-locale-eval-v2 — pbt-sink-gate-freeze-fast-crystallization 미러링 (2026-10-20, 미국 iOS 유입 대응)",
+    "title": "[EN locale] PBT 싱크마크 — 보압 상향 무효, 게이트 동결 선검토",
+    "difficulty": "hard",
+    "input": {
+      "defect_type": "싱크마크 (Sink Mark)",
+      "resin_type": "PBT",
+      "resin_detail": "PBT GF15",
+      "machine_settings": {
+        "nozzle_temp": 255,
+        "zone1_temp": 250,
+        "zone2_temp": 245,
+        "zone3_temp": 240,
+        "zone4_temp": 230,
+        "mold_temp_fixed": 40,
+        "mold_temp_moving": 40,
+        "injection_pressure": 110,
+        "holding_pressure": 75,
+        "injection_speed_1": 55,
+        "back_pressure": 5,
+        "screw_rpm": 90,
+        "drying_temp": 120,
+        "drying_time": 4
+      },
+      "product_info": {
+        "wall_thickness_min": 1.2,
+        "wall_thickness_max": 3
+      },
+      "defect_description": "Sink mark on the back of a boss on a PBT connector. Raised hold pressure from 75 to 90 and hold time from 2 s to 5 s, but sink depth barely changes. Pin-point gate 0.8 mm. Drying done per spec.",
+      "locale": "en"
+    },
+    "expected": {
+      "root_cause": "Early gate freeze. PBT crystallizes very fast, so with a cold mold (40°C) and a 0.8 mm pin-point gate the packing window closes first. \"Raising hold pressure changes nothing\" is the classic sign that the gate seals early.",
+      "key_recommendations": [
+        "Measure gate seal time (part weight vs hold time steps); if weight stops increasing, the gate is already frozen",
+        "Enlarge the gate or shorten the gate land",
+        "Raise mold temperature into the PBT recommended range to keep the packing window open longer",
+        "Further hold pressure increases are ineffective (the path is closed)"
+      ],
+      "expected_phase": "packing",
+      "severity": "medium",
+      "trap": "The gate is moving from \"hold pressure does not help\" to gate freeze (crystallization speed). Repeating hold pressure fine-tuning is a failure."
+    }
+  },
+  {
+    "id": "en-abs-sticking-overpack",
+    "source": "en-locale-eval-v2 — abs-sticking-overpack 미러링 (2026-10-20, 미국 iOS 유입 대응)",
+    "title": "[EN locale] ABS 케이스 고정측 부착 + 이젝터 자국 백화",
+    "difficulty": "basic",
+    "input": {
+      "defect_type": "기타 (이형 불량)",
+      "resin_type": "ABS",
+      "machine_settings": {
+        "nozzle_temp": 240,
+        "zone1_temp": 235,
+        "zone2_temp": 230,
+        "zone3_temp": 220,
+        "zone4_temp": 210,
+        "mold_temp_fixed": 55,
+        "mold_temp_moving": 55,
+        "injection_pressure": 100,
+        "holding_pressure": 90,
+        "injection_speed_1": 55,
+        "back_pressure": 8,
+        "screw_rpm": 90,
+        "drying_temp": 80,
+        "drying_time": 3,
+        "dryer_type": "열풍식"
+      },
+      "defect_description": "On ejection the part sticks in the cavity; when the ejector pushes, the area around the pin marks turns white and deforms, sometimes dents. Got worse after we raised hold pressure. Cooling time 8 s.",
+      "resin_detail": "ABS case",
+      "locale": "en"
+    },
+    "expected": {
+      "root_cause": "Overpacking (hold pressure 90 = 90% of injection pressure) overfills the part, so it does not shrink away from the cavity wall (sticking) and ejection resistance rises, loading the ejectors and causing whitening and deformation. \"Worse after raising hold pressure\" is the direct clue.",
+      "key_recommendations": [
+        "Lower hold pressure (about 50-80% of injection pressure), first priority",
+        "Readjust hold time and cooling time to allow enough shrinkage",
+        "If release resistance remains, check draft angle and polish (mold)",
+        "Slow the ejector and consider larger ejector area (reduce whitening)"
+      ],
+      "expected_phase": "ejection",
+      "severity": "medium",
+      "trap": "Treating it only as an ejector pin (machine) problem is half the answer; the root is overpacking. Phase is ejection."
+    }
+  },
+  {
+    "id": "en-pom-jetting-gatespeed",
+    "source": "en-locale-eval-v2 — pom-jetting-gatespeed 미러링 (2026-10-20, 미국 iOS 유입 대응)",
+    "title": "[EN locale] POM 기어 게이트부 뱀모양 줄무늬",
+    "difficulty": "basic",
+    "input": {
+      "defect_type": "제팅 (Jetting)",
+      "resin_type": "POM(아세탈)",
+      "resin_detail": "POM copolymer",
+      "machine_settings": {
+        "nozzle_temp": 200,
+        "zone1_temp": 195,
+        "zone2_temp": 190,
+        "zone3_temp": 185,
+        "zone4_temp": 175,
+        "mold_temp_fixed": 85,
+        "mold_temp_moving": 85,
+        "injection_pressure": 90,
+        "holding_pressure": 50,
+        "injection_speed_1": 85,
+        "back_pressure": 8,
+        "screw_rpm": 100
+      },
+      "defect_description": "Snake-like wavy streak starting right at the gate and running into the cavity. The side gate faces the thick section head-on and shoots straight into open space.",
+      "locale": "en"
+    },
+    "expected": {
+      "root_cause": "First-stage injection speed too high (85%) + a gate that shoots straight into open space, so the melt squirts ahead as a rope (jetting). Temperatures are in the normal range.",
+      "key_recommendations": [
+        "Multi-stage profile: slow first stage through the gate, then speed up",
+        "Relocate the gate so the melt impinges on a wall, or use an overlap gate (root fix, mold)",
+        "Consider enlarging the gate",
+        "Melt and mold temperatures are normal, so raising temperature is only secondary"
+      ],
+      "expected_phase": "filling",
+      "severity": "medium",
+      "trap": null
+    }
+  },
+  {
+    "id": "en-pc-silverstreak-moisture-amorphous",
+    "source": "en-locale-eval-v2 — pc-silverstreak-moisture-amorphous 미러링 (2026-10-20, 미국 iOS 유입 대응)",
+    "title": "[EN locale] PC 투명 하우징 은줄(수분 splay) — 비결정성 흡습 오개념 가드",
+    "difficulty": "hard",
+    "input": {
+      "defect_type": "은줄 (Silver Streak)",
+      "resin_type": "PC",
+      "resin_detail": "PC clear grade",
+      "machine_settings": {
+        "nozzle_temp": 300,
+        "zone1_temp": 295,
+        "zone2_temp": 290,
+        "zone3_temp": 285,
+        "zone4_temp": 270,
+        "mold_temp_fixed": 90,
+        "mold_temp_moving": 90,
+        "injection_pressure": 110,
+        "holding_pressure": 60,
+        "injection_speed_1": 50,
+        "back_pressure": 8,
+        "screw_rpm": 80,
+        "drying_temp": 100,
+        "drying_time": 2,
+        "dryer_type": "열풍식"
+      },
+      "defect_description": "Clear PC housing, radial silver streaks from the gate in the flow direction. Does not wipe off. Drying in a hot-air dryer 100°C 2h. Nozzle 300°C, mold 90°C.",
+      "locale": "en"
+    },
+    "expected": {
+      "root_cause": "Splay from hydrolysis of residual moisture in PC. PC absorbs moisture due to carbonate polarity, but the amount is lower than PA (~0.2%); the problem is that at 300°C even a small residual moisture hydrolyzes the carbonate (CO2 / steam, molecular weight loss). A hot-air dryer at 100°C 2h cannot control dew point, so moisture remains. Re-dry in a desiccant dryer at 120°C 4h.",
+      "key_recommendations": [
+        "Re-dry in a desiccant dryer at 120°C 4h (dew point -30°C or lower)",
+        "Measure moisture right before the hopper (target 0.02% or less)",
+        "Check melt temperature (300°C is at the PC upper end; long residence worsens hydrolysis)",
+        "State clearly that drying is required because of high-temperature hydrolysis sensitivity, not high moisture uptake"
+      ],
+      "expected_phase": "material",
+      "severity": "high",
+      "trap": "The wrong causal claim \"amorphous so it absorbs a lot of moisture\" is the direct target. PC absorbs less than crystalline PA. Citing crystallinity as the cause of moisture uptake is a misjudgment."
+    }
+  },
+  {
+    "id": "en-brittleness-trap-overdry",
+    "source": "en-locale-eval-v2 — brittleness-trap-overdry 미러링 (2026-10-20, 미국 iOS 유입 대응)",
+    "title": "[EN locale] PA66 취성 — 건조 과도가 원인(120℃ 12h)",
+    "difficulty": "hard",
+    "input": {
+      "defect_type": "취성 (Brittleness)",
+      "resin_type": "PA66",
+      "machine_settings": {
+        "nozzle_temp": 290,
+        "zone1_temp": 285,
+        "zone2_temp": 280,
+        "zone3_temp": 270,
+        "zone4_temp": 260,
+        "mold_temp_fixed": 80,
+        "mold_temp_moving": 80,
+        "injection_pressure": 115,
+        "holding_pressure": 65,
+        "injection_speed_1": 55,
+        "back_pressure": 8,
+        "screw_rpm": 110,
+        "drying_temp": 120,
+        "drying_time": 12,
+        "dryer_type": "제습식"
+      },
+      "defect_description": "PA66 parts break easily. Almost no discoloration. Virgin material, no regrind. To be \"sure\", we dried at 120°C for 12 hours (recommended 80°C 4-6h).",
+      "resin_detail": "PA66 virgin",
+      "locale": "en"
+    },
+    "expected": {
+      "root_cause": "Overdrying: drying PA66 at 120°C for 12h (beyond the recommended 80°C 4-6h) causes thermal-oxidative degradation, lower molecular weight, and brittleness. The cause is too much drying, not too little.",
+      "key_recommendations": [
+        "Return drying to normal (80°C 4-6h, no excess temperature or time)",
+        "Confirm with a fresh lot",
+        "Check actual dryer temperature and residence",
+        "Moisture (underdrying) countermeasures are not needed; that is the opposite direction"
+      ],
+      "expected_phase": "material",
+      "severity": "high",
+      "trap": "It is easy to stop at \"not moisture\" or, the other way, to misjudge it as underdrying. PA also becomes brittle when overdried. Overdrying must be named as the cause."
+    }
   }
 ]
