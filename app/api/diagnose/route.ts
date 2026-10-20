@@ -32,8 +32,8 @@ function getApiKey(): string {
 
 // Resin-specific knowledge — only the selected resin is injected into the prompt
 const resinKnowledge: Record<string, string> = {
-  'PA6': 'PA6: semi-crystalline, hygroscopic. Drying: 80°C 4-6hrs, target moisture <0.1%. Melt: 230-260°C. Mold: 60-90°C. Crystallization rate moderate. GF grades: higher mold temp 80-100°C, fiber orientation causes warpage. Common defects: silver streak(moisture #1), sink mark(crystallization shrinkage 1.5-2.2%), warpage(fiber orientation). Key: always check drying first.',
-  'PA66': 'PA66: semi-crystalline, very hygroscopic. Drying: 80°C 4-8hrs, target moisture <0.08%. Melt: 260-290°C, narrow window, degrades above 300°C. Mold: 70-100°C. Shrinkage 1.2-2.0%. GF grades: mold temp 80-120°C. Common defects: silver streak(moisture #1 cause, >40% of all defects), burn mark(narrow processing window), warpage(GF orientation). Key: moisture is almost always the first suspect.',
+  'PA6': 'PA6: semi-crystalline, hygroscopic. Drying: 80°C 4-6hrs, target moisture <0.1%. Melt: 240-270°C. Mold: 60-90°C. Crystallization rate moderate. GF grades: higher mold temp 80-100°C, fiber orientation causes warpage. Common defects: silver streak(moisture #1), sink mark(crystallization shrinkage 1.5-2.2%), warpage(fiber orientation). Key: always check drying first.',
+  'PA66': 'PA66: semi-crystalline, very hygroscopic. Drying: 80°C 4-8hrs, target moisture <0.08%. Melt: 275-300°C, narrow window, degrades above 310°C. Mold: 70-100°C. Shrinkage 1.2-2.0%. GF grades: mold temp 80-120°C. Common defects: silver streak(moisture #1 cause, >40% of all defects), burn mark(narrow processing window), warpage(GF orientation). Key: moisture is almost always the first suspect.',
   'PA46': 'PA46: semi-crystalline, extremely hygroscopic, very high Tm 295°C. Drying: 80°C 16-24hrs minimum(3-4x longer than PA66), target moisture <0.05%, dehumidifying dryer mandatory. Melt: 310-330°C. Mold: 120-150°C. Very fast crystallization rate — shortest cycle times among PAs but requires high mold temp. Shrinkage 1.5-2.5%. Common defects: silver streak/blistering(moisture #1 — 16hr+ drying absolutely critical, hot air dryers NOT sufficient), flash(high fluidity at process temp), thermal degradation(narrow window above 330°C). Blistering after reflow soldering is PA46-specific issue: residual moisture expands at 260°C+ reflow temp. Key: drying time is 3-4x longer than PA66 — this is the single most common mistake. Always use dehumidifying dryer. For SMT parts, moisture level must be <0.05%.',
   'PA410': 'PA410(bio-based PA): semi-crystalline, bio-based(castor oil). Tm 250°C, similar to PA66. Drying: 80°C 4-6hrs, target moisture <0.08%. 30% lower moisture uptake than PA66. Melt: 270-310°C(wide processing window). Mold: 80-120°C. Fast crystallization — up to 20% shorter cycles than PA66. Shrinkage 1.5-2.5%. Common defects: sink marks(high crystallization shrinkage, especially at thick sections — mold temp critical for balancing surface quality vs shrinkage), warpage(crystallization-induced, manage with uniform mold temp). Key: processes very similarly to PA66 but crystallizes faster — gate seal time may be shorter than expected. Mold temp below 80°C gives amorphous surface with poor gloss. For sink marks at bosses, increase mold temp 80→100°C + optimize gate size for better packing.',
   'PA4T': 'PA4T: semi-aromatic PPA, very high Tm 325°C, Tg 125°C. Drying: 120°C 4-6hrs, target moisture <0.05%. Low moisture absorption(better than PA66/PA46). Melt: 340-360°C. Mold: 130-160°C. Excellent flow — enables ultra-thin walls 0.3mm+. Common defects: flash(extremely good flow like LCP, flashes into micro-gaps — PL face precision is critical), blistering after reflow(residual moisture at 260-288°C reflow — drying is critical even though moisture absorption is low), thermal degradation(above 360°C). For SMT connectors: JEDEC MSL rating depends on wall thickness and moisture level. Key: despite low moisture uptake, PA4T still needs thorough drying for reflow applications. Flash control requires PL face precision + optimized VP transfer — not just clamp force. Multi-cavity molds(32-64 cav) need balanced hot runner temp for consistent quality.',
@@ -47,7 +47,7 @@ const resinKnowledge: Record<string, string> = {
   'PA1010': 'PA1010: bio-based, semi-crystalline. Drying: 80°C 4hrs. Melt: 200-220°C. Mold: 60-80°C. Low moisture absorption, excellent chemical resistance. Key: sustainable option, process similar to PA12.',
   'PA6/66': 'PA6/66 copolymer: semi-crystalline. Drying: 80°C 4-6hrs. Melt: 240-270°C. Mold: 60-90°C. Intermediate properties between PA6 and PA66. Key: broader processing window than PA66.',
   'MXD6': 'MXD6: semi-crystalline, high Tg, high barrier. Drying: 120°C 4-6hrs. Melt: 240-270°C. Mold: 100-140°C. Used in barrier applications. Key: higher mold temp needed for good crystallinity.',
-  'PBT': 'PBT: semi-crystalline, fast crystallization. Drying: 120°C 4hrs, target moisture <0.03%. Melt: 230-270°C. Mold: 60-80°C(amorphous surface)/80-100°C(crystalline surface). Shrinkage 1.5-2.2%. Common defects: warpage(fast uneven crystallization), sink mark, flash(good fluidity). Key: mold temp dramatically affects surface quality and crystallinity.',
+  'PBT': 'PBT: semi-crystalline, fast crystallization. Drying: 120°C 4hrs, target moisture <0.03%. Melt: 250-270°C. Mold: 60-80°C(amorphous surface)/80-100°C(crystalline surface). Shrinkage 1.5-2.2%. Common defects: warpage(fast uneven crystallization), sink mark, flash(good fluidity). Key: mold temp dramatically affects surface quality and crystallinity.',
   'PET': 'PET: semi-crystalline, slow crystallization. Drying: 120-140°C 4-6hrs, target moisture <0.02%. Melt: 260-290°C. Mold: 130-140°C(crystalline)/20-30°C(amorphous/transparent). Shrinkage varies with crystallinity. Common defects: moisture defects, acetaldehyde generation(overheating). Key: mold temp controls crystalline vs amorphous state.',
   'PCT': 'PCT: semi-crystalline, higher heat than PBT/PET. Drying: 120°C 4hrs. Melt: 280-310°C. Mold: 100-130°C. Better heat resistance than PBT. Key: similar to PBT but higher processing temperatures.',
   'PEN': 'PEN: semi-crystalline, high barrier, high Tg. Drying: 120°C 4hrs. Melt: 270-290°C. Mold: 80-120°C. Key: higher performance than PET, used in specialty applications.',
@@ -73,7 +73,7 @@ const resinKnowledge: Record<string, string> = {
   'PE(LDPE)': 'LDPE: semi-crystalline, flexible. Drying: not required. Melt: 160-210°C. Mold: 20-50°C. Common defects: sink mark, warpage. Key: very flexible, low melting point.',
   'PE(LLDPE)': 'LLDPE: semi-crystalline. Drying: not required. Melt: 180-240°C. Mold: 20-60°C. Key: better impact than HDPE, used in film/flexible parts.',
   'PS': 'PS: amorphous, brittle. Drying: usually not required. Melt: 180-240°C. Mold: 20-50°C. Low shrinkage 0.3-0.6%. Common defects: cracking(brittle), flow lines, burn marks(poor venting). Key: easy to process but very brittle.',
-  'ABS': 'ABS: amorphous. Drying: 80°C 2-4hrs. Melt: 210-250°C, degrades above 260°C. Mold: 40-80°C. Low shrinkage 0.4-0.7%. Common defects: splay/silver(moisture or degradation), gloss variation(mold temp), weld line visibility. Key: prone to thermal degradation at high temps, turn yellow/brown if overheated.',
+  'ABS': 'ABS: amorphous. Drying: 80°C 2-4hrs. Melt: 220-260°C, degrades above 260°C. Mold: 40-80°C. Low shrinkage 0.4-0.7%. Common defects: splay/silver(moisture or degradation), gloss variation(mold temp), weld line visibility. Key: prone to thermal degradation at high temps, turn yellow/brown if overheated.',
   'SAN': 'SAN: amorphous, transparent. Drying: 80°C 2-4hrs. Melt: 200-260°C. Mold: 40-80°C. Key: similar to ABS but transparent, more brittle.',
   'ASA': 'ASA: amorphous, UV resistant. Drying: 80°C 2-4hrs. Melt: 220-260°C. Mold: 50-80°C. Key: outdoor UV stability better than ABS, similar processing.',
   'PMMA(아크릴)': 'PMMA: amorphous, transparent(acrylic). Drying: 80°C 3-4hrs. Melt: 220-260°C. Mold: 50-80°C. Common defects: silver streak(moisture), crazing, bubbles, haze. Key: optical clarity requires careful drying and clean processing.',
@@ -196,7 +196,7 @@ export const HYGROSCOPICITY_GUARD = `[흡습성 정확성 — 반드시 준수]
 // 프롬프트 버전 — FIXED_FRAMEWORK·VISUAL_DIFFERENTIAL·HYGROSCOPICITY_GUARD 등
 // 모델 입력에 들어가는 지시문이 바뀔 때마다 bump한다. 진단 레코드에 기록되어
 // "어느 프롬프트로 나온 답인가"를 사후 추적하는 근거가 된다.
-export const PROMPT_VERSION = 'v19';
+export const PROMPT_VERSION = 'v20';
 
 // client_id·session_id 형식 검증(call-interruption-data-loss-fix-v1 Part A) —
 // lib/history-sync.ts의 동명 정규식과 동일 패턴 유지.
@@ -238,17 +238,17 @@ Each cause must include the following 4 elements:
 
 1. MECHANISM (scientific_reasoning) — the physicochemical mechanism of why this defect occurs under these settings
    Bad example: "insufficient drying causes silver streak"
-   Good example: "PA66's equilibrium moisture content (the moisture it holds at a given humidity) is 2.5% at RH50%. Hot-air drying at 80°C/8hr cannot control the dew point (the temperature at which airborne moisture condenses) → 0.1%+ moisture remains. At 280°C+ during injection, amide-bond hydrolysis (moisture breaks down under heat into gas) → CO2/NH3 gas → silver streak"
+   Good example: "PA66's equilibrium moisture content (the moisture it holds at a given humidity) is 2.5% at RH50%. Hot-air drying at 80°C/8hr cannot control the dew point (the temperature at which airborne moisture condenses) → 0.1%+ moisture remains. At 280°C+ during injection the residual water turns to steam that is dragged to the surface (silver streak), and amide-bond hydrolysis (moisture breaks polymer chains under heat) also lowers molecular weight → silver streak plus brittleness risk"
 
 2. EVIDENCE (evidence) — directly cite the specific numbers the user entered to support this cause
    Bad example: "the temperature is high"
-   Good example: "Input nozzle 310°C > PA66 GF33% recommended 280-300°C upper limit exceeded. Zone1(305)→Zone2(300) forward-gradient setting increases residence time in the back of the barrel → thermal degradation risk"
+   Good example: "Input nozzle 310°C > PA66 GF33% supplier general range 280-300°C, upper limit exceeded → thermal degradation risk"
 
 3. ELIMINATION (elimination) — why this cause ranks #1 and is more likely than the others
    Good example: "Injection speed 60% is within PA66's proper range, mold temperature 80°C is also within PA66's recommended range → low likelihood of shear heating/condensation. Drying condition is the only process-window deviation, so ranked #1"
 
 4. VERIFICATION (verification) — how to immediately confirm this cause on the shop floor (including numeric criteria)
-   Good example: "Measure resin moisture right before hopper feed. ≤0.05% → not the drying cause, check #2. ≥0.1% → switch to a desiccant dryer, redry at 80°C for 4hr and retry. If the silver streak disappears immediately, confirmed"
+   Good example: "Measure resin moisture right before hopper feed. ≤0.05% → not the drying cause, check #2. ≥0.1% → switch to a desiccant dryer, redry at 80°C for 4hr and retry. If the silver streak disappears right after redrying, this cause is highly likely"
 
 Additional rules:
 - Must cite the numbers the user entered ("310°C", "60%", etc. — "the temperature is high" is strictly forbidden)
@@ -259,7 +259,7 @@ Additional rules:
 
 STEP 3.5: TERM GLOSSING RULES — keep the reasoning as is, only gloss difficult terms (accuracy, phase, severity, numbers, mechanism, and cause order stay exactly as in STEP 3 — never change them)
 - In every output field, the first time a "specialized academic/theoretical term" appears, immediately add a short, easy parenthetical gloss. Keep the term itself unchanged (not a deletion/substitution — only add parentheses).
-  e.g., "equilibrium moisture content (the moisture it holds at a given humidity)", "dew point (the temperature at which airborne moisture condenses)", "hydrolysis (moisture breaks down under heat into gas)", "shear heating (friction heat generated when material is pushed rapidly)", "anisotropy (shrinkage differs by direction)".
+  e.g., "equilibrium moisture content (the moisture it holds at a given humidity)", "dew point (the temperature at which airborne moisture condenses)", "hydrolysis (moisture breaks polymer chains under heat)", "shear heating (friction heat generated when material is pushed rapidly)", "anisotropy (shrinkage differs by direction)".
 - Gloss only specialized terms: equilibrium moisture content, dew point, amide bond, post-crystallization, degree of crystallinity, amorphous, anisotropy, shear heating, hydrolysis, residual stress, encapsulation, etc.
 - Do not gloss common words (residual moisture, drying, shrinkage, pressure, gas, crack) or shop-floor standard terms (holding pressure, gate, injection speed, mold temperature, V/P transfer, runner, cavity) — no over-explaining.
 - At most 1-2 glosses per field (to avoid exceeding length limits). Keep sentence structure, cause order, phase, severity, and numbers identical to before — this only adds parenthetical glosses.` : `STEP 3: ROOT CAUSE ANALYSIS — 분석 깊이 규칙
@@ -270,17 +270,17 @@ STEP 3.5: TERM GLOSSING RULES — keep the reasoning as is, only gloss difficult
 
 1. MECHANISM (scientific_reasoning) — 왜 이 설정에서 이 불량이 발생하는지 물리화학적 메커니즘
    나쁜 예: "건조 부족으로 은줄 발생"
-   좋은 예: "PA66의 평형수분율(특정 습도에서 머금는 수분량)은 RH50%에서 2.5%. 열풍식 80°C/8hr는 노점(공기 중 수분이 응결하는 온도) 관리 불가 → 수분율 0.1%+ 잔류. 사출 시 280°C+에서 아미드 결합 가수분해(수분이 열에 분해돼 가스 발생) → CO2/NH3 가스 → 은줄"
+   좋은 예: "PA66의 평형수분율(특정 습도에서 머금는 수분량)은 RH50%에서 2.5%. 열풍식 80°C/8hr는 노점(공기 중 수분이 응결하는 온도) 관리 불가 → 수분율 0.1%+ 잔류. 사출 시 280°C+에서 잔류 수분이 수증기가 되어 표면으로 끌려나오고(은줄), 아미드 결합 가수분해(수분이 열에 고분자 사슬을 끊는 반응)로 분자량도 떨어짐 → 은줄 + 취성 위험"
 
 2. EVIDENCE (evidence) — 사용자가 입력한 구체적 수치를 직접 인용해 이 원인을 뒷받침
    나쁜 예: "온도가 높다"
-   좋은 예: "입력 노즐 310°C > PA66 GF33% 권장 280-300°C 상한 초과. Zone1(305)→Zone2(300) 순구배 설정으로 배럴 후반 체류시간 증가 → 열분해 위험"
+   좋은 예: "입력 노즐 310°C > PA66 GF33% 공급사 일반 권장 280-300°C 상한 초과 → 열분해 위험"
 
 3. ELIMINATION (elimination) — 왜 이 원인이 1순위이고 다른 원인보다 가능성이 높은지
    좋은 예: "사출속도 60%는 PA66 적정 범위, 금형온도 80°C도 PA66 권장 범위 내 → 전단발열/결로 가능성 낮음. 건조 조건이 유일한 프로세스 윈도우 이탈 항목이므로 1순위"
 
 4. VERIFICATION (verification) — 현장에서 즉시 이 원인이 맞는지 확인하는 방법 (수치 기준 포함)
-   좋은 예: "호퍼 투입 직전 수지 수분 측정. 0.05% 이하 → 건조 원인 아님, 2순위 확인. 0.1% 이상 → 제습식 건조기로 교체, 80°C 4hr 재건조 후 재시도. 은줄 즉시 사라지면 확진"
+   좋은 예: "호퍼 투입 직전 수지 수분 측정. 0.05% 이하 → 건조 원인 아님, 2순위 확인. 0.1% 이상 → 제습식 건조기로 교체, 80°C 4hr 재건조 후 재시도. 재건조 직후 은줄이 사라지면 이 원인일 가능성이 높다"
 
 추가 규칙:
 - 사용자가 입력한 수치를 반드시 인용 ("310°C", "60%" 등 — "온도가 높다" 절대 금지)
@@ -291,7 +291,7 @@ STEP 3.5: TERM GLOSSING RULES — keep the reasoning as is, only gloss difficult
 
 STEP 3.5: 용어 풀이 규칙 — 추론은 그대로, 어려운 용어만 풀어준다 (정확도·phase·severity·수치·메커니즘·원인 순서는 STEP 3 그대로, 절대 변경 금지)
 - 모든 출력 필드에서, "특수 학술/이론 용어"가 처음 나오면 즉시 괄호로 짧고 쉬운 풀이를 덧붙인다. 용어 자체는 그대로 둔다(삭제·치환 아님, 괄호만 추가).
-  예: "평형수분율(특정 습도에서 머금는 수분량)", "노점(공기 중 수분이 응결하는 온도)", "가수분해(수분이 열에 분해돼 가스가 됨)", "전단발열(재료가 빠르게 밀릴 때 생기는 마찰열)", "이방성(방향마다 수축이 다른 성질)".
+  예: "평형수분율(특정 습도에서 머금는 수분량)", "노점(공기 중 수분이 응결하는 온도)", "가수분해(수분이 열에 고분자 사슬을 끊는 반응)", "전단발열(재료가 빠르게 밀릴 때 생기는 마찰열)", "이방성(방향마다 수축이 다른 성질)".
 - 풀이 대상은 특수 용어만: 평형수분율·노점·아미드결합·후결정화·결정화도·비결정질·이방성·전단발열·가수분해·잔류응력·캡슐화 등.
 - 일반어(잔류 수분·건조·수축·압력·가스·균열)와 현장표준어(보압·게이트·사출속도·금형온도·V/P전환·런너·캐비티)는 풀지 말 것(과잉설명 금지).
 - 풀이는 한 필드당 1~2개만(길이 초과 방지). 문장 구조·원인 순서·phase·severity·수치는 기존과 동일하게 유지 — 괄호 풀이만 덧붙이는 변경이다.`}
@@ -300,19 +300,42 @@ ${HYGROSCOPICITY_GUARD}
 
 ${isEn ? `PATTERN-BASED INFERENCE RULES (MANDATORY — when there is a clue in defect_description):
 If defect_description contains the following keywords/patterns, prioritize the hidden cause the pattern points to over the obvious first-order cause (drying/temperature):
-- "morning/afternoon/specific time of day/after some time" → suspect heat accumulation: screw shear-heat buildup, heater degradation, barrel temperature drift. Normal in the morning, occurring in the afternoon = a time effect where heat accumulation exceeds a threshold
+- "morning/afternoon/specific time of day/after some time" → suspect a condition that drifts over time: cooling water / chiller temperature, hydraulic oil temperature, mold temperature creep, barrel heater or thermocouple, shop temperature and humidity, hopper material (lot change, regrind added, dryer running low). Heat buildup is only one of these. Check that the drift you name actually pushes THIS defect in the observed direction (e.g., heat buildup raises melt/mold temperature and lowers viscosity, which usually REDUCES short shots; an afternoon rise in short shots points first to cooling-water/hydraulic-oil change, material/drying change, or check-ring wear)
 - "intermittent/1 in N shots/irregularly" → mechanical wear (check-ring slipping, screw wear), cycle consistency issues, partial hot-runner blockage
 - "only a specific cavity/cavity #N" → individual hot-runner nozzle/heater failure, cavity-to-cavity balance deviation, cooling deviation
 - "same even after changing conditions/not resolved/even raising pressure" → means the molding condition itself is not the direct cause. In this case, you must find and present a cause from the next layer: mold structure (gate/cooling/vent/parting-line design), machine degradation (check ring, screw, heater), material (lot, grade, contamination), mold design change (gate location, runner). "Cannot be solved by conditions" does not mean "no cause" or "unknown" — always present a higher-layer cause and countermeasure.
 Rule: if the drying time/temperature is within the resin's recommended range, do not name drying as the #1 cause. A defect occurring under normal drying conditions must be attributed to another cause.
 - Even if structured input (mold info cavity count, runner type) is empty, if the defect description text contains clues about cavity count, a specific cavity, or hot runner/valve gate, you must reflect that clue in the cause analysis (treat text clues the same as structured input).` : `패턴 기반 추론 규칙 (MANDATORY — defect_description 단서 있을 때):
 defect_description에 다음 키워드/패턴이 있으면, 뻔한 1차 원인(건조/온도)보다 그 패턴이 가리키는 숨은 원인을 우선 검토하라:
-- "오전/오후/특정 시간대/시간이 지나면" → 열 축적 의심: 스크류 전단발열 누적, 히터 열화, 배럴 온도 드리프트. 오전 정상·오후 발생 = 열 축적이 임계치 초과하는 시간 효과
+- "오전/오후/특정 시간대/시간이 지나면" → 시간에 따라 변하는 조건(드리프트)을 의심: 냉각수·칠러 온도, 유압유 온도, 금형 온도 상승, 배럴 히터·열전대, 실내 온습도, 호퍼 재료(로트 변경·재생재 투입·건조기 잔량). 열 축적은 그중 하나일 뿐이다. 지목한 드리프트가 이 불량을 실제로 그 방향으로 악화시키는지 물리적으로 맞춰라(예: 열이 쌓여 멜트·금형 온도가 오르면 점도가 낮아져 미성형은 보통 줄어든다. 오후에 미성형이 늘면 냉각수·유압유 변화, 재료·건조 변화, 체크링 마모를 먼저 본다)
 - "간헐적/N샷 중 1번/불규칙하게" → 기계적 마모(체크링 슬리핑, 스크류 마모), 사이클 일관성 문제, 핫러너 부분 막힘
 - "특정 캐비티만/N번 캐비티" → 핫러너 개별 노즐/히터 불량, 캐비티간 밸런스 편차, 냉각 편차
 - "조건 변경해도 동일/해결 안 됨/압력 올려도" → 성형 조건이 직접 원인이 아님을 의미한다. 이때는 다음 계층에서 원인을 찾아 반드시 제시하라: 금형 구조(게이트/냉각/벤트/PL면 설계), 기계 열화(체크링·스크류·히터), 소재(로트·등급·오염), 금형 설계 변경(게이트 위치·러너). "조건으로 해결 불가"는 "원인 없음"이나 "모르겠음"이 아니다 — 항상 상위 계층 원인과 대책을 제시하라.
 규칙: 건조 시간·온도가 해당 수지 권장 범위 내에 있으면, 건조를 1순위 원인으로 지목하지 마라. 정상 건조 조건에서 발생하는 불량은 다른 원인을 찾아야 한다.
 - 구조화 입력(금형정보 캐비티수·러너타입)이 비어 있어도, 불량 설명 텍스트에 캐비티 수·특정 캐비티·핫러너/밸브게이트 단서가 있으면 반드시 그 단서를 원인 분석에 반영하라(텍스트 단서를 구조화 입력과 동등하게 취급).`}
+${isEn ? `
+USER TRIALS, WORDING, AND UNITS (MANDATORY):
+- If the user says a change was already tried with no effect ("already tried", "no difference", "did not help"), do NOT recommend that same change again. Use it as evidence to re-rank causes, and either drop it from recommendations or state "already tried, no effect".
+- If the user reports a controlled comparison (e.g., the old lot ran N shots defect-free under the same settings), respect it when ranking causes. If the sample is too small for the defect frequency (e.g., 1 in 40 shots but only 20 shots tested), say so with numbers instead of ignoring it.
+- No overclaiming: never write "confirmed", "definitely", "100%", or "validated range". Write "highly likely" or "strongly suggests". A resin's recommended range is the supplier's general range, not this process's validated window.
+- One variable at a time: order recommendations so the operator changes one value at a time. Never tell them to change two values in the same step. Put the pass/fail check before moving to the next value in interaction_note.
+- First action: priority 1 must be what to actually do first. If that is a check rather than a setting change (purge, vent cleaning, measurement, unit check), keep it priority 1 with direction "same" and urgency "next_shot", and start the summary with that action.
+- Units: temperatures arrive as °C. A nozzle/barrel value of 400+ (e.g., 480-650) or a mold temperature that makes no sense for the resin was very likely typed in °F: convert with °C = (°F - 32) / 1.8, analyze with the converted value, put "confirm units" as priority 1, and write recommended values in both °C and °F. Such a value cannot be real °C (the resin would be burned black and smoking), so do NOT list °C overheating as a cause and do NOT recommend lowering the temperature, not even conditionally. Pressures may be HYDRAULIC (oil) pressure read off the machine screen; plastic pressure ≈ hydraulic × intensification ratio (typically 8-15). If injection pressure looks implausible as plastic pressure (below 30 MPa or above 300 MPa), say it may be hydraulic or a unit mix-up and judge only the hold/injection ratio, not the absolute value. Very small cushion/metering values for the machine size (e.g., cushion 0.25, metering 2.1) may be inches; say so.
+- Barrel zones: machines number zones differently (Zone1 may be at the nozzle or at the hopper). Do not infer a "reverse" or "forward" barrel profile from zone numbers alone; if the profile matters, list it as a check.
+- Glass-filled grades: supplier melt ranges for GF grades usually sit about 10-20°C above the unfilled grade. Below the degradation temperature, do not recommend lowering the melt of a GF grade just because it exceeds the unfilled upper limit.
+- If resin numbers differ between the resin note and the process-window cross-check ("가공윈도우 사전 대조"), use the cross-check values.
+` : `
+사용자 시도 이력·표현·단위 규칙 (MANDATORY):
+- 사용자가 "이미 해봤다·바꿔도 차이 없었다·효과 없었다"고 적은 조치는 다시 권하지 마라. 그 사실을 근거로 원인 순위를 조정하고, 권고에서 빼거나 "이미 시도, 효과 없음"이라고 명시하라.
+- 사용자가 대조 시험(예: 구 로트로 같은 조건에서 N샷 무불량)을 적었으면 원인 순위에 반영하라. 표본이 불량 빈도에 비해 작아 결론이 약하면(예: 40샷에 1개꼴인데 20샷 시험) 무시하지 말고 그 한계를 수치로 지적하라.
+- 단정 금지: "확진", "확정", "100%", "검증된 범위" 같은 말을 쓰지 마라. "가능성이 높다", "강하게 시사한다"로 쓴다. 수지 권장 범위는 공급사 일반 권장 범위이지 이 공정의 검증된 범위가 아니다.
+- 한 번에 하나: 추천은 한 번에 한 값만 바꾸도록 순서를 매겨라. 같은 단계에서 두 값을 동시에 바꾸라고 하지 마라. 다음 값으로 넘어가기 전 판정 기준을 interaction_note에 적어라.
+- 첫 행동: priority 1은 실제로 가장 먼저 할 일이다. 값 변경이 아니라 점검(퍼지·벤트 청소·측정·단위 확인)이면 priority 1, direction "same", urgency "next_shot"으로 두고 summary 첫머리에 그 행동을 적어라.
+- 단위: 온도는 °C로 받는다. 노즐·실린더 값이 400 이상(예 480~650)이거나 금형온도가 수지에 맞지 않게 높으면 °F 입력일 가능성이 높다. °C = (°F - 32) / 1.8로 환산해 분석하고, "단위 확인"을 priority 1로 두고, 권장값은 °C와 °F를 함께 적어라. 그런 값은 실제 °C일 수 없다(수지가 검게 타고 연기가 난다). °C 과열을 원인으로 올리지 말고, 조건부로라도 온도 하향을 권하지 마라. 압력은 사출기 화면의 유압(작동유) 압력일 수 있다. 수지압 ≈ 유압 × 증압비(보통 8~15배). 사출압이 수지압으로 보기에 비현실적이면(30 MPa 미만 또는 300 MPa 초과) 유압값이거나 단위 착오일 수 있다고 적고, 절대값이 아니라 보압/사출압 비율로만 판단하라. 쿠션·계량값이 사출기 규모에 비해 지나치게 작으면(예: 쿠션 0.25, 계량 2.1) 인치 입력 가능성을 적어라.
+- 배럴 존: 존 번호 방향은 기계마다 다르다(Zone1이 노즐 쪽일 수도 호퍼 쪽일 수도 있다). 존 번호만으로 "역구배·순구배"를 단정하지 마라. 온도 구배가 중요하면 확인 항목으로 제시하라.
+- 유리섬유(GF) 강화 등급: 공급사 용융 권장 범위는 보통 비강화 등급보다 10~20°C 높다. 열분해 온도 미만이면, 비강화 상한을 넘었다는 이유만으로 GF 등급의 멜트 하향을 권하지 마라.
+- 수지 수치가 수지 노트와 "가공윈도우 사전 대조"에서 다르면 가공윈도우 사전 대조 값을 따른다.
+`}
 
 STEP 4: SPECIFIC RECOMMENDATIONS
 - EXACT numerical changes (e.g. 'increase Zone 2 from 275 to 285°C', not vague)
@@ -436,7 +459,7 @@ function buildSystemBlocks(resinType: string, tier: 'simple' | 'complex' = 'simp
   const variableText = [
     `RESIN IN USE: ${resinType || 'Unknown'}`,
     `RESIN KNOWLEDGE:\n${resinNote}`,
-    locale === 'en' ? `\nOUTPUT LANGUAGE: English. ALL JSON field string values (summary, description, scientific_reasoning, evidence, elimination, verification, resin_specific_notes, drying_assessment, additional_advice, note fields, action/why fields, checklist items, gate_assessment, cooling_assessment, design_risk_factors, recommendations text) MUST be written in English. Use English technical terms. No Korean text in any output field value. Category names in English (e.g. Material, Machine, Mold, Method, Drying). TERM GLOSSING (mirror STEP 3.5): keep the same reasoning, cause order, phase, severity, and numbers. Only add a short plain parenthetical the first time a specialized/academic term appears (keep the term itself). e.g., "equilibrium moisture content (moisture a resin holds at a given humidity)", "dew point (temperature at which air moisture condenses)", "hydrolysis (moisture breaks down under heat into gas)". Do NOT gloss common terms (residual moisture, drying, shrinkage) or shop-floor terms (holding pressure, gate, injection speed). Do not change anything except adding these parentheticals.` : '',
+    locale === 'en' ? `\nOUTPUT LANGUAGE: English. ALL JSON field string values (summary, description, scientific_reasoning, evidence, elimination, verification, resin_specific_notes, drying_assessment, additional_advice, note fields, action/why fields, checklist items, gate_assessment, cooling_assessment, design_risk_factors, recommendations text) MUST be written in English. Use English technical terms. No Korean text in any output field value. Category names in English (e.g. Material, Machine, Mold, Method, Drying). TERM GLOSSING (mirror STEP 3.5): keep the same reasoning, cause order, phase, severity, and numbers. Only add a short plain parenthetical the first time a specialized/academic term appears (keep the term itself). e.g., "equilibrium moisture content (moisture a resin holds at a given humidity)", "dew point (temperature at which air moisture condenses)", "hydrolysis (moisture breaks polymer chains under heat)". Do NOT gloss common terms (residual moisture, drying, shrinkage) or shop-floor terms (holding pressure, gate, injection speed). Do not change anything except adding these parentheticals.` : '',
     tier === 'complex' ? (isEn ? `\nCOMPLEX CASE INSTRUCTIONS (complex-cause case):
 This case is likely to have multiple contributing causes.
 Do not conclude with a simple cause (drying, temperature) alone.
@@ -486,7 +509,35 @@ Present a root-cause resolution, not "try adjusting the conditions more."` : `\n
   ];
 }
 
+// 영어 프롬프트용: 앱이 선택지 값을 내부적으로 한국어로 보낸다(예: 건조기 '열풍식', 필러 '없음').
+// 원문 그대로 넣으면 모델이 영어 결과에 한국어를 섞어 쓴다(eval korean_leak). 알려진 값만 영어로 바꾼다.
+const OPTION_EN: [string, string][] = ([
+  ['제습건조기', 'desiccant dryer'], ['제습식', 'desiccant (dehumidifying) dryer'], ['열풍식', 'hot-air dryer'], ['진공', 'vacuum'],
+  ['유리섬유', 'glass fiber'], ['탄소섬유', 'carbon fiber'], ['유리비드', 'glass beads'], ['미네랄', 'mineral'], ['탈크', 'talc'],
+  ['마스터배치', 'masterbatch'], ['액상컬러', 'liquid color'], ['분체컬러', 'powder color'],
+  ['핫러너', 'hot runner'], ['콜드러너', 'cold runner'], ['콜드 러너', 'cold runner'], ['핀포인트', 'pin-point'], ['사이드', 'side'],
+  ['서브마린', 'submarine'], ['다이렉트', 'direct'], ['필름', 'film'], ['게이트', 'gate'], ['두께', 'thickness'],
+  ['3판', '3-plate'], ['2판', '2-plate'], ['2단 금형', '2-plate mold'], ['3단 금형', '3-plate mold'], ['금형', 'mold'],
+  ['아크릴', 'acrylic'], ['아세탈', 'acetal'], ['기타', 'other'], ['있음', 'yes'], ['없음', 'none'], ['핫', 'hot'], ['콜드', 'cold'],
+] as [string, string][]).sort((x, y) => y[0].length - x[0].length);
+function optEn(v?: string): string {
+  if (!v) return '';
+  let out = v;
+  for (const [ko, en] of OPTION_EN) out = out.split(ko).join(en);
+  return out;
+}
+// '미성형 (Short Shot)' 같은 불량 유형 라벨은 괄호 안 영문만 쓴다.
+function defectTypeEn(v?: string): string {
+  if (!v) return '';
+  const m = v.match(/\(([^()]*[A-Za-z][^()]*)\)/);
+  return m ? m[1] : optEn(v);
+}
+
 export async function POST(request: NextRequest) {
+  // 앱이 error 문자열을 그대로 보여주므로 영어 사용자에게는 영어 문구를 보낸다.
+  // 본문 파싱 전에는 Accept-Language, 파싱 후에는 body.locale을 따른다.
+  let reqEn = /^en\b/i.test(request.headers.get('accept-language') || '');
+  const msg = (ko: string, en: string) => (reqEn ? en : ko);
   const gate = await checkMinVersion(request);
   if (gate) return gate;
   // 진단 throw 시 환불에 쓸 컨텍스트 (start_session 성공 후 채워짐)
@@ -498,9 +549,10 @@ export async function POST(request: NextRequest) {
   try {
     const MAX_PAYLOAD = 4.4 * 1024 * 1024;  // Vercel 함수 페이로드 한도(~4.5MB) 안전선
     if (Number(request.headers.get('content-length') || 0) > MAX_PAYLOAD) {
-      return NextResponse.json({ error: '요청 용량이 너무 큽니다. 사진을 줄여 다시 시도해주세요.' }, { status: 413 });
+      return NextResponse.json({ error: msg('요청 용량이 너무 큽니다. 사진을 줄여 다시 시도해주세요.', 'The request is too large. Use fewer or smaller photos and try again.') }, { status: 413 });
     }
     const body = await request.json();
+    if (body?.locale === 'en') reqEn = true; else if (body?.locale === 'ko') reqEn = false;
     const mock = tryMock(body); if (mock) return mock;
 
     // ── 파일 크기·MIME 검증 (크레딧 차감 전) ─────────────
@@ -512,14 +564,14 @@ export async function POST(request: NextRequest) {
       const bodyImgs: { mediaType?: string; data?: string }[] = Array.isArray(body.images) ? body.images : [];
       const bodyDrawings: { mediaType?: string; data?: string }[] = Array.isArray(body.moldDrawings) ? body.moldDrawings : [];
       if (bodyImgs.length > 5) {
-        return NextResponse.json({ error: '이미지는 최대 5개까지 허용됩니다.' }, { status: 413 });
+        return NextResponse.json({ error: msg('이미지는 최대 5개까지 허용됩니다.', 'Up to 5 photos are allowed.') }, { status: 413 });
       }
       if (bodyDrawings.length > 3) {
-        return NextResponse.json({ error: '도면은 최대 3개까지 허용됩니다.' }, { status: 413 });
+        return NextResponse.json({ error: msg('도면은 최대 3개까지 허용됩니다.', 'Up to 3 drawings are allowed.') }, { status: 413 });
       }
       for (const img of bodyImgs) {
         if (!img.mediaType || !ALLOWED_IMG.has(img.mediaType)) {
-          return NextResponse.json({ error: '지원하지 않는 이미지 형식 (허용: jpeg/png/webp/gif)' }, { status: 415 });
+          return NextResponse.json({ error: msg('지원하지 않는 이미지 형식 (허용: jpeg/png/webp/gif)', 'Unsupported image format (allowed: jpeg/png/webp/gif)') }, { status: 415 });
         }
         if (img.data && Buffer.byteLength(img.data, 'base64') > MAX_IMG) {
           return NextResponse.json({ error: `이미지가 너무 큽니다. 최대 4 MB` }, { status: 413 });
@@ -527,13 +579,13 @@ export async function POST(request: NextRequest) {
       }
       for (const d of bodyDrawings) {
         if (!d.mediaType || !ALLOWED_ALL.has(d.mediaType)) {
-          return NextResponse.json({ error: '지원하지 않는 파일 형식 (허용: jpeg/png/webp/gif/pdf)' }, { status: 415 });
+          return NextResponse.json({ error: msg('지원하지 않는 파일 형식 (허용: jpeg/png/webp/gif/pdf)', 'Unsupported file format (allowed: jpeg/png/webp/gif/pdf)') }, { status: 415 });
         }
         if (d.data) {
           const bytes = Buffer.byteLength(d.data, 'base64');
           const maxBytes = d.mediaType === 'application/pdf' ? MAX_PDF : MAX_IMG;
           if (bytes > maxBytes) {
-            return NextResponse.json({ error: '파일이 너무 큽니다. 이미지 8 MB / PDF 20 MB 초과' }, { status: 413 });
+            return NextResponse.json({ error: msg('파일이 너무 큽니다. 이미지 8 MB / PDF 20 MB 초과', 'File too large (limit: 8 MB per image, 20 MB per PDF)') }, { status: 413 });
           }
         }
       }
@@ -559,11 +611,11 @@ export async function POST(request: NextRequest) {
       const authHeader = request.headers.get('authorization') || '';
       const token = authHeader.startsWith('Bearer ') ? authHeader.slice(7) : '';
       if (!token) {
-        return NextResponse.json({ error: '로그인이 필요합니다.', code: 'AUTH_REQUIRED' }, { status: 401 });
+        return NextResponse.json({ error: msg('로그인이 필요합니다.', 'Please sign in.'), code: 'AUTH_REQUIRED' }, { status: 401 });
       }
       const { data: userData, error: userErr } = await supabaseAdmin.auth.getUser(token);
       if (userErr || !userData?.user) {
-        return NextResponse.json({ error: '로그인이 필요합니다.', code: 'AUTH_REQUIRED' }, { status: 401 });
+        return NextResponse.json({ error: msg('로그인이 필요합니다.', 'Please sign in.'), code: 'AUTH_REQUIRED' }, { status: 401 });
       }
       userId = userData.user.id;
 
@@ -576,7 +628,7 @@ export async function POST(request: NextRequest) {
         // 진단 본 호출 전 크레딧 원자 차감(신규는 lazy 5크레딧 grant 후 1 차감)
         const { data: sessRaw, error: sessErr } = await supabaseAdmin.rpc('start_session', { p_user_id: userId });
         if (sessErr) {
-          return NextResponse.json({ error: '크레딧 처리 중 오류가 발생했습니다.', code: 'CREDIT_ERROR' }, { status: 500 });
+          return NextResponse.json({ error: msg('크레딧 처리 중 오류가 발생했습니다.', 'Something went wrong while processing credits.'), code: 'CREDIT_ERROR' }, { status: 500 });
         }
         const sess = sessRaw as { ok: boolean; code?: string; session_id?: string; credit_balance?: number };
         if (!sess?.ok) {
@@ -775,7 +827,7 @@ export async function POST(request: NextRequest) {
     const defectTempGuard = (() => {
       if (!resinSpec) return '';
       const dt = defectType || '';
-      const isBurnLike = /탄화|흑점|번\s*마크|burn|black\s*spot|디젤|변색|scorch/i.test(dt);
+      const isBurnLike = /탄화|흑점|검은\s*점|검정\s*점|번\s*마크|burn|black\s*(spot|speck|dot)|디젤|변색|scorch/i.test(dt);
       const tempVals = [s.nozzleTemp, s.zone1Temp, s.zone2Temp, s.zone3Temp, s.zone4Temp]
         .map(v => parseFloat(v || '')).filter(v => isFinite(v));
       const nozzle = parseFloat(s.nozzleTemp || '');
@@ -816,7 +868,7 @@ export async function POST(request: NextRequest) {
         return `[표면 잔류물 텍스처 가이드]
 - ⚠ "닦으면 옅어진다/지워진다" 단서가 있다. 이는 표면 부착물(금형 석출 plate-out·가스 응축물·이형제 전사)이다. 닦아도 안 지워지는 구조적 불량(웰드라인·플로우마크·은선 지속형·표면 요철)을 1순위에서 배제하라.
 - 우선 검토: (1) 금형 석출/plate-out(수지 휘발분·첨가제가 금형 표면에 응축 누적 → 제품 전사. 고멜트온도·장체류·세정주기 부족), (2) 벤트 부족·막힘에 의한 가스 응축(게이트·충전말단 집중), (3) 이형제 과다 전사.
-- 검증: 금형 해당 부위 표면을 닦아낸 뒤 N샷 후 재출현 여부 확인. 세정 직후 소멸→재누적이면 표면 석출 확진(plate-out·벤트 가스 응축 모두 해당하므로 이 테스트로 둘을 가르지 말 것).
+- 검증: 금형 해당 부위 표면을 닦아낸 뒤 N샷 후 재출현 여부 확인. 세정 직후 소멸→재누적이면 표면 석출 가능성이 높다(plate-out·벤트 가스 응축 모두 해당하므로 이 테스트로 둘을 가르지 말 것).
 - 특정 캐비티만 + 핫러너 청소·밸브교환에도 지속이면, 원인은 핫러너 내부가 아니라 그 캐비티 표면·벤트일 가능성이 높다(그 캐비티 표면 세정·벤트 점검 우선).`;
       }
       return '';
@@ -855,13 +907,13 @@ export async function POST(request: NextRequest) {
 ${noImageGuard}Please systematically analyze the following injection molding defect information using the Scientific Molding methodology.
 
 ## Defect Information
-- Defect type: ${defectType || 'Photo analysis required'}
+- Defect type: ${defectTypeEn(defectType) || 'Photo analysis required'}
 - Defect description: ${defectDescription || 'None'}
 
 ## Resin Information
-- Resin type: ${resinInfo?.resinType || 'Not entered'}
-- Filler: ${resinInfo?.filler || 'None'}${resinInfo?.fillerContent ? ` ${resinInfo.fillerContent}%` : ''}
-- Flame retardant grade: ${resinInfo?.flameRetardant || 'None'}${resinInfo?.flameRetardantThickness ? ` @ ${resinInfo.flameRetardantThickness}mm certified thickness` : ''}
+- Resin type: ${optEn(resinInfo?.resinType) || 'Not entered'}
+- Filler: ${optEn(resinInfo?.filler) || 'None'}${resinInfo?.fillerContent ? ` ${resinInfo.fillerContent}%` : ''}
+- Flame retardant grade: ${optEn(resinInfo?.flameRetardant) || 'None'}${resinInfo?.flameRetardantThickness ? ` @ ${resinInfo.flameRetardantThickness}mm certified thickness` : ''}
 - Resin detail: ${resinInfo?.resinDetail || 'None'}
 - Resin grade: ${resinInfo?.resinGrade || 'None'}
 
@@ -889,17 +941,17 @@ ${(a.actualFillTime || a.actualPeakPressure || a.actualCushion || a.actualCycleT
 ` : ''}
 ${(a.dryTemp || a.dryTime || a.dryerType !== '없음') ? `## Drying Conditions
 - Drying temperature: ${a.dryTemp || '-'}℃, Drying time: ${a.dryTime || '-'}hr
-- Dryer type: ${a.dryerType || '-'}
+- Dryer type: ${optEn(a.dryerType) || '-'}
 - Measured moisture content: ${a.moistureContent || 'Not measured'}%
 ` : ''}
 ${(moldInfo?.runnerType === '핫' && (a.hrManifoldTemp || a.hrNozzle1Temp)) ? `## Hot Runner Settings
 - Manifold: ${a.hrManifoldTemp || '-'}℃
 - Nozzle 1: ${a.hrNozzle1Temp || '-'}℃, Nozzle 2: ${a.hrNozzle2Temp || '-'}℃, Nozzle 3: ${a.hrNozzle3Temp || '-'}℃, Nozzle 4: ${a.hrNozzle4Temp || '-'}℃
-- Valve gate: ${a.valveGate || 'None'}
+- Valve gate: ${optEn(a.valveGate) || 'None'}
 ` : ''}
 ${(a.regrindRatio || a.colorType !== '없음') ? `## Regrind & Color
 - Regrind mix ratio: ${a.regrindRatio || '0'}%
-- Color type: ${a.colorType || 'None'}${a.mbRatio ? `, mix ratio: ${a.mbRatio}%` : ''}
+- Color type: ${optEn(a.colorType) || 'None'}${a.mbRatio ? `, mix ratio: ${a.mbRatio}%` : ''}
 ` : ''}
 ${(a.machineModel || a.screwDiameter || a.maxClampForce || a.maxInjPressure) ? `## Injection Machine Spec
 - Model: ${a.machineModel || '-'}
@@ -907,10 +959,10 @@ ${(a.machineModel || a.screwDiameter || a.maxClampForce || a.maxInjPressure) ? `
 - Max clamp force: ${a.maxClampForce || '-'}ton, Max injection pressure: ${a.maxInjPressure || '-'} MPa
 ` : ''}
 ${(moldInfo?.moldType || moldInfo?.gateType || moldInfo?.cavities || moldInfo?.runnerType) ? `## Mold Information
-- Mold type: ${moldInfo?.moldType || '-'} (2-plate/3-plate/hot runner)
-- Gate type: ${moldInfo?.gateType || '-'}
+- Mold type: ${optEn(moldInfo?.moldType) || '-'} (2-plate/3-plate/hot runner)
+- Gate type: ${optEn(moldInfo?.gateType) || '-'}
 - Cavity count: ${moldInfo?.cavities || '-'}
-- Runner type: ${moldInfo?.runnerType || '-'}
+- Runner type: ${optEn(moldInfo?.runnerType) || '-'}
 ` : ''}
 ${(productInfo?.weight || productInfo?.wallThicknessMin || productInfo?.wallThicknessMax || productInfo?.notes) ? `## Product Information
 - Product weight: ${productInfo?.weight || '-'}g
@@ -1187,7 +1239,7 @@ CRITICAL: Your entire response must be ONLY the JSON object. No text before or a
       } catch { /* 환불 실패는 무시(로그만) */ }
     }
     return NextResponse.json(
-      { error: '분석 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.' },  // 일반화(상세는 위 console.error)
+      { error: msg('분석 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.', 'Something went wrong during the estimate. Your credit was returned if one was used. Please try again shortly.') },  // 일반화(상세는 위 console.error)
       { status: 500 }
     );
   }

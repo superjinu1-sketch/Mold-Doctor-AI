@@ -2399,5 +2399,148 @@
       "severity": "high",
       "trap": "It is easy to stop at \"not moisture\" or, the other way, to misjudge it as underdrying. PA also becomes brittle when overdried. Overdrying must be named as the cause."
     }
+  },
+  {
+    "id": "pmma-void-holdtime-tried",
+    "source": "persona-eval-2026-10-20 정 공장장 — 이미 시도한 조치 재권고 회귀",
+    "title": "PMMA 화장품 캡 후육부 진공 보이드 — 보압 시간 연장은 이미 효과 없음",
+    "difficulty": "hard",
+    "input": {
+      "defect_type": "기포 (Void/Bubble)",
+      "resin_type": "PMMA(아크릴)",
+      "resin_detail": "PMMA 투명 사출 그레이드 (화장품 캡용), 신재 100%",
+      "machine_settings": {
+        "nozzle_temp": 245,
+        "zone1_temp": 240,
+        "zone2_temp": 235,
+        "zone3_temp": 225,
+        "zone4_temp": 210,
+        "mold_temp_fixed": 60,
+        "mold_temp_moving": 60,
+        "injection_pressure": 110,
+        "holding_pressure": 50,
+        "injection_speed_1": 60,
+        "injection_speed_2": 30,
+        "holding_time": 4,
+        "cooling_time": 25,
+        "metering": 55,
+        "cushion": 2,
+        "back_pressure": 5,
+        "screw_rpm": 80,
+        "clamp_force": 120,
+        "drying_temp": 80,
+        "drying_time": 3,
+        "dryer_type": "제습건조기"
+      },
+      "mold_info": {
+        "mold_type": "2단 금형",
+        "gate_type": "사이드 게이트 (게이트 두께 1.0mm)",
+        "cavity_count": 4,
+        "runner_type": "콜드 러너"
+      },
+      "product_info": {
+        "product_weight": 18,
+        "wall_thickness_min": 2,
+        "wall_thickness_max": 6.5
+      },
+      "defect_description": "PMMA 투명 화장품 캡. 천면 중앙 두꺼운 부위(6.5mm) 내부에 기포(보이드)가 보임. 4캐비 모두 비슷한 위치, 게이트에서 먼 쪽 두꺼운 부위. 표면 싱크는 거의 없음. 절단해서 라이터로 가열해보니 기포가 꺼지면서 함몰됨. 건조 80도 3시간 제습식. 쿠션 2mm 안정적으로 남음. 보압 시간을 늘려도 별 차이 없었음.",
+      "locale": "ko"
+    },
+    "expected": {
+      "root_cause": "후육부(6.5mm) 수축이 보충되지 못한 진공 보이드(가열 시 꺼지며 함몰 = 가스가 아닌 진공). 1.0mm 사이드 게이트가 두꺼운 부위보다 먼저 굳어 보압이 전달되지 않는다. \"보압 시간을 늘려도 차이 없음\"이 게이트 선행 고화의 신호다.",
+      "key_recommendations": [
+        "보압 시간 추가 연장은 권하지 않음(이미 효과 없음 확인) — 게이트 선행 고화로 판단",
+        "게이트 확대 또는 두꺼운 부위 쪽으로 게이트 위치 변경 검토(근본)",
+        "게이트 실링 확인: 보압 시간 단계별 부품 중량 측정",
+        "보압 압력값 상향(사출압 대비 약 45%→55~65%) 또는 금형온도 상향(60→70~80℃)으로 표층 고화 지연, 한 번에 하나씩"
+      ],
+      "expected_phase": "packing",
+      "severity": "medium",
+      "trap": "사용자가 이미 해본 \"보압 시간 연장\"을 다시 1순위 대책으로 내면 실패. 가열 테스트 결과(꺼지며 함몰)를 무시하고 수분·가스 기포로 보면 오진."
+    }
+  },
+  {
+    "id": "en-pc-splay-fahrenheit-entry",
+    "source": "persona-eval-2026-10-20 Mike — US user types °F/psi/inch into °C/MPa/mm fields",
+    "title": "[EN locale] PC 렌즈 은줄 — 미국 사용자가 °F·psi·inch 값을 그대로 입력",
+    "difficulty": "hard",
+    "input": {
+      "defect_type": "은줄 (Silver Streak)",
+      "resin_type": "PC",
+      "resin_detail": "Lexan type clear PC lens",
+      "machine_settings": {
+        "nozzle_temp": 580,
+        "zone1_temp": 590,
+        "zone2_temp": 580,
+        "zone3_temp": 570,
+        "zone4_temp": 550,
+        "mold_temp_fixed": 190,
+        "mold_temp_moving": 190,
+        "injection_pressure": 1800,
+        "holding_pressure": 900,
+        "back_pressure": 75,
+        "injection_speed_1": 2.5,
+        "injection_speed_2": 1.2,
+        "holding_time": 6,
+        "cooling_time": 20,
+        "metering": 2.1,
+        "cushion": 0.25,
+        "screw_rpm": 90,
+        "clamp_force": 220,
+        "drying_temp": 250,
+        "drying_time": 4,
+        "dryer_type": "제습식"
+      },
+      "defect_description": "Splay near the gate on a clear PC lens, roughly 1 out of 10 shots. Started this morning after the dryer got refilled. Didn't touch the process.",
+      "locale": "en"
+    },
+    "expected": {
+      "root_cause": "Moisture splay after the dryer refill (fresh pellets did not get enough residence time at temperature, or dew point not reached). The entered values are US units typed into metric fields: 580/590 is °F (about 304-310°C, normal for PC), mold 190 is °F (about 88°C), drying 250 is °F (about 121°C), pressures 1800/900 look like psi, cushion 0.25 and metering 2.1 look like inches. The melt is not overheated.",
+      "key_recommendations": [
+        "Confirm units first and analyze with converted values (°C = (°F - 32) / 1.8)",
+        "Check dryer residence time after the refill and dew point (about -40°F / -40°C); measure moisture at the hopper, target 0.02% or less",
+        "Quarantine and impact-test lenses molded since the refill (PC hydrolysis does not recover by redrying)",
+        "Do not lower barrel or mold temperature based on the misread values"
+      ],
+      "expected_phase": "material",
+      "severity": "medium",
+      "trap": "Treating 580 as °C (thermal degradation) and recommending a large temperature drop is a failure. Treating 0.25 cushion / 2.1 metering as mm and telling him to increase metering is also wrong."
+    }
+  },
+  {
+    "id": "abs-shortshot-afternoon-drift",
+    "source": "persona-eval-2026-10-20 김 반장 — 시간대 패턴을 열 축적으로 단정한 회귀",
+    "title": "ABS 리모컨 케이스 끝단 간헐 쇼트 — 오전 정상, 오후 악화",
+    "difficulty": "hard",
+    "input": {
+      "defect_type": "미성형 (Short Shot)",
+      "resin_type": "ABS",
+      "resin_detail": "",
+      "machine_settings": {
+        "nozzle_temp": 230,
+        "zone1_temp": 230,
+        "zone2_temp": 220,
+        "zone3_temp": 210,
+        "mold_temp_fixed": 50,
+        "injection_pressure": 100,
+        "holding_pressure": 60,
+        "injection_speed_1": 60,
+        "cooling_time": 15
+      },
+      "defect_description": "리모컨 케이스 끝단 쇼트 남. 10샷에 1~2개 간헐적. 오전엔 괜찮은데 오후 되면 심해짐",
+      "locale": "ko"
+    },
+    "expected": {
+      "root_cause": "시간에 따라 변하는 조건과 샷간 편차의 조합. 유력 후보: 충전 말단 벤트가 교대 중 점점 막혀 가스가 갇힘, 체크링 마모로 쿠션·충전량이 샷마다 흔들림(10샷에 1~2개 간헐), 오후 냉각수·유압유 온도 변화로 사출 속도·압력 전달이 달라짐, 피크압이 상한에 닿는 압력 제한 충전. \"열이 쌓여 점도가 불안정해져 쇼트\"는 물리 방향이 맞지 않는다(온도가 오르면 점도는 내려가 쇼트는 보통 줄어든다).",
+      "key_recommendations": [
+        "충전 말단 벤트 청소·깊이 확인",
+        "쿠션의 샷간 편차 확인(체크링 마모 판단), 피크압이 설정 상한에 닿는지 확인",
+        "오전·오후 냉각수와 유압유 온도, 재료(호퍼·재생재) 변화 비교",
+        "압력만 올리지 말 것, 한 번에 한 값씩 조정"
+      ],
+      "expected_phase": "filling",
+      "severity": "medium",
+      "trap": "\"오후 열 축적으로 점도 불안정 → 쇼트\"를 1순위로 내면 실패. 원인 확인 없이 사출압만 올리라는 권고도 감점."
+    }
   }
 ]

@@ -518,9 +518,13 @@ export function checkSettings(
   const nozzle = toNum(s.nozzleTemp);
   if (nozzle !== null) {
     const { min, max, degradeAbove } = spec.meltC;
-    let status: CheckStatus = nozzle < min ? 'low' : nozzle > max ? 'high' : 'ok';
+    // GF 등급은 공급사 용융 범위가 비강화보다 보통 10~20℃ 높다. resin-kb에는 비강화 범위만 있으므로
+    // 비강화 상한+20℃ 이내이고 열분해 미만이면 '높음'으로 판정하지 않는다(멜트 하향 권고로 뒤집히는 것 방지).
+    const glassFilled = !!filler && filler !== '없음' && filler.toLowerCase() !== 'none' && /gf|glass|유리/i.test(filler);
+    const gfMeltUnknown = glassFilled && nozzle > max && nozzle <= max + 20 && (degradeAbove === undefined || nozzle < degradeAbove);
+    let status: CheckStatus = nozzle < min ? 'low' : gfMeltUnknown ? 'na' : nozzle > max ? 'high' : 'ok';
     if (degradeAbove !== undefined && nozzle >= degradeAbove) status = 'degrade';
-    const range = `${min}-${max}℃${degradeAbove !== undefined ? `, ${degradeAbove}℃+ 열분해` : ''}`;
+    const range = `${min}-${max}℃${gfMeltUnknown ? '(비강화 기준, GF 등급 범위 미수록)' : ''}${degradeAbove !== undefined ? `, ${degradeAbove}℃+ 열분해` : ''}`;
     out.push({ label: '노즐 온도', value: nozzle, unit: '℃', rangeText: range, status });
   }
 
@@ -608,7 +612,7 @@ const STATUS_MARK: Record<CheckStatus, string> = {
   low: '낮음 ⚠',
   high: '높음 ⚠',
   degrade: '상한 초과·열분해 위험 ⚠',
-  na: '판정 보류(GF 등급 상한 미수록, 이 값을 금형온도 하향 근거로 쓰지 말 것)',
+  na: '판정 보류(GF 등급 범위 미수록, 이 값을 하향 근거로 쓰지 말 것)',
 };
 
 // 대조 결과 → 프롬프트 주입용 텍스트(가이드레일). 면책 포함.

@@ -4,7 +4,7 @@
 // 수정 순서: taxonomy.md → 이 파일 → KB_VERSION bump → eval 회귀.
 import type { ResinSpec } from './resin-kb';
 
-export const KB_VERSION = 'defect-kb-v1.19';
+export const KB_VERSION = 'defect-kb-v1.20';
 
 export type Cause = {
   rank: number;
@@ -343,13 +343,13 @@ export const DEFECT_KB: Record<string, DefectNode> = {
         baseProbability: 40,
         trigger: '결정성 수지(PP·PA·POM·PBT) + 두꺼운 단면 + 보압↓',
         evidence: '수지 종류·벽두께·보압.',
-        verification: '가열테스트(진공=꺼짐). 보압↑후 소멸=보압부족 확진.',
+        verification: '가열테스트(진공=꺼짐). 보압↑후 소멸=보압부족 가능성 높음.',
         adjustment: '보압↑, 보압시간↑, 게이트 두꺼운부위 배치.' },
       { rank: 2, cause: '수분 미건조(가스포켓)', category: 'Material',
         baseProbability: 25,
         trigger: '흡습성 수지(PA·PC·PBT·PET) + 건조 미흡. 가열 시 부풂.',
         evidence: '건조조건 입력값. resin-kb drying 권장 대비.',
-        verification: '건조 강화 후 소멸=수분 확진.',
+        verification: '건조 강화 후 소멸=수분 가능성 높음.',
         adjustment: '건조 규정 엄수, 배압 0.5~1MPa씩↑(가스 압축 배출).' },
       { rank: 3, cause: '배압 부족으로 탈기 불충분', category: 'Machine',
         baseProbability: 15,
@@ -465,8 +465,8 @@ export const DEFECT_KB: Record<string, DefectNode> = {
       { rank: 1, cause: '잔류 수분에 의한 가스 발생 (moisture splay)', category: 'Material',
         baseProbability: 55,
         trigger: '흡습성 수지(PA·PC·PBT·PET·ABS) + 건조 조건 미달 또는 미입력',
-        evidence: '수지 흡습성(resin-kb hygroscopic 참조). 건조 온도·시간·이슬점. 허용수분: PA66≤0.20%(무충전 기준 — GF·미네랄 충전 시 충전율에 비례해 임계 축소), PC·PBT≤0.02%, ABS≤0.10%(0.05% 이하 권장, 0.05~0.10%는 경계 → 건조 강화 재시험으로 확진).',
-        verification: '건조 강화 후 소멸=수분 확진. 수분계 측정. 이슬점 −29~−40°C 확인. 노즐 퍼지 용융물이 발포·기포 다수면 수분 유력.',
+        evidence: '수지 흡습성(resin-kb hygroscopic 참조). 건조 온도·시간·이슬점. 허용수분: PA66≤0.20%(무충전 기준 — GF·미네랄 충전 시 충전율에 비례해 임계 축소), PC·PBT≤0.02%, ABS≤0.10%(0.05% 이하 권장, 0.05~0.10%는 경계 → 건조 강화 재시험으로 가능성 높음).',
+        verification: '건조 강화 후 소멸=수분 가능성 높음. 수분계 측정. 이슬점 −29~−40°C 확인. 노즐 퍼지 용융물이 발포·기포 다수면 수분 유력.',
         adjustment: '건조 시간·온도↑, 제습식 건조기 전환. resin-kb drying 참조.' },
       { rank: 2, cause: '열분해에 의한 가스 발생 (thermal splay)', category: 'Machine',
         baseProbability: 20,
@@ -490,11 +490,11 @@ export const DEFECT_KB: Record<string, DefectNode> = {
         baseProbability: 3,
         trigger: '재생재 비율 >20% 또는 이종수지·마스터배치 오염.',
         evidence: '재생재 비율 입력값. 원료 로트 이력.',
-        verification: '버진 수지 단독 런 후 소멸=오염 확진.',
+        verification: '버진 수지 단독 런 후 소멸=오염 가능성 높음.',
         adjustment: '재생재 비율↓(<20%), 원료 검사, 완전 퍼지.' },
     ],
     patternHints: {
-      '건조후 소멸': '1순위(수분) 확진 경로',
+      '건조후 소멸': '1순위(수분) 가능성 높음',
       '황변동반': '2순위(열분해) 강점 분기',
       '게이트주변 지속': '3순위(전단) 강점 분기',
       'PP|PE|PS|비흡습': '즉시 3~4순위(전단/공기) 분기. 수분 원인 아님.',
@@ -549,7 +549,7 @@ export const DEFECT_KB: Record<string, DefectNode> = {
         adjustment: '벤트 재가공, 핫러너 프로파일 최적화.' },
     ],
     patternHints: {
-      '사이클 재개후 개선': '1순위(체류) 거의 확진',
+      '사이클 재개후 개선': '1순위(체류) 가능성 높음',
       '퍼지후 개선': '잔류탄화(스크루 마모·데드존)',
       '위치 고정': '벤팅 diesel 또는 핫러너 과열',
       '색불균일|분산 줄무늬|마스터배치 분산': '안료·MB 분산 불량(전체 열변색 아님 — 분산 줄무늬는 color_streaks 계열). 배압 상향은 소폭이 아니라 단계적 대폭(현재 대비 2배 수준 목표) + 스크루 RPM 하향 병행(혼련 확보). 단 황변·흑줄이 함께 보이면 이 처방 보류(1순위 체류·열분해 레버와 반대). GF 수지는 섬유 파손 주의.',
@@ -688,13 +688,13 @@ export const DEFECT_KB: Record<string, DefectNode> = {
   flake_orientation: {
     id: 'flake_orientation', nameKo: '메탈릭 플레이크 배향 자국', nameEn: 'Flake Orientation Mark', phase: '충전',
     typicalSeverity: 'medium (외관)',
-    discriminators: '메탈릭/펄/MIC(알루미늄 플레이크·효과안료) 그레이드 한정. 시야각 의존(부품을 굴리면 어두워지고 밝아지고 배경과 자리를 바꿈) + 샷간 위치·형상 고정(유동 교란 지점 하류). 은줄 수분(위치 랜덤, 전 각도 동일한 은빛 패치)·은줄 전단(게이트 인접 고정이지만 각도 무반응)·색줄(분산 불량, 배압 반응)·타이거스트라이프(유동 수직 주기 밴드)·게이트블러시(게이트 직후 흐림, 각도 무반응)·석출(닦임)과 감별. 솔리드/내추럴 컬러로 같은 금형을 돌려 그 줄이 사라지면 확진.',
+    discriminators: '메탈릭/펄/MIC(알루미늄 플레이크·효과안료) 그레이드 한정. 시야각 의존(부품을 굴리면 어두워지고 밝아지고 배경과 자리를 바꿈) + 샷간 위치·형상 고정(유동 교란 지점 하류). 은줄 수분(위치 랜덤, 전 각도 동일한 은빛 패치)·은줄 전단(게이트 인접 고정이지만 각도 무반응)·색줄(분산 불량, 배압 반응)·타이거스트라이프(유동 수직 주기 밴드)·게이트블러시(게이트 직후 흐림, 각도 무반응)·석출(닦임)과 감별. 솔리드/내추럴 컬러로 같은 금형을 돌려 그 줄이 사라지면 가능성 높음.',
     causes: [
       { rank: 1, cause: '유동 교란 기하에서 플레이크 배향 이탈', category: 'Mold',
         baseProbability: 55,
         trigger: '러너/게이트 단차·급전환, 게이트 직후 난류·스월, 리브/홀 후방 재합류부. 가시면 고정 위치에 출현.',
         evidence: '게이트 타입·위치. 러너/게이트 단차 여부. 줄 위치와 유동 경로 형상의 대응.',
-        verification: '샷 10회 위치 고정 확인 + 부품을 굴려 명암 변화 확인. 솔리드 컬러 런에서 소멸=확진.',
+        verification: '샷 10회 위치 고정 확인 + 부품을 굴려 명암 변화 확인. 솔리드 컬러 런에서 소멸=가능성 높음.',
         adjustment: '러너·게이트 단차 제거, 전이 라운드 처리, 게이트 확대, 게이트 이설(교란이 가시면 밖에 떨어지게). 조건 조정만으로는 기하 기인 교란이 제거되지 않음을 명시.' },
       { rank: 2, cause: '충전 프로파일 불안정 (감속-가속·헤지테이션·압력리밋 충돌)', category: 'Machine',
         baseProbability: 30,
@@ -712,7 +712,7 @@ export const DEFECT_KB: Record<string, DefectNode> = {
     patternHints: {
       '기울이면|굴리면|보는 각도|각도에 따라': '시야각 의존 = 이 노드 확정 단서. 가스(splay) 아님.',
       '메탈릭|펄|MIC|알루미늄 플레이크|은분': '효과안료 그레이드 + 줄무늬 → 이 노드 감별 우선.',
-      '내추럴은 깨끗|검정은 깨끗|솔리드는 안 남': '배향 확진 — 유동 교란은 원래 있었고 효과안료가 드러낸 것.',
+      '내추럴은 깨끗|검정은 깨끗|솔리드는 안 남': '배향 가능성 높음 — 유동 교란은 원래 있었고 효과안료가 드러낸 것.',
       '건조 미달|건조 안 함': 'silver_streak(수분) 우선 유지 — 건조 정상화 후 이 노드 재감별.',
     },
     priorityLogic: `★ 효과안료(메탈릭/펄) 부품에 배압 대폭 상향을 권고하지 마라 — 플레이크 파단으로 전체 광택 저하·회색화된다(색줄 노드의 배압 처방은 효과안료에 적용 금지).
@@ -784,12 +784,12 @@ export const DEFECT_KB: Record<string, DefectNode> = {
         baseProbability: 15,
         trigger: '재료교체 이력. 리그라인드 오염.',
         evidence: '원료 로트 이력. 리그라인드 비율.',
-        verification: '버진 수지+마스터배치 단독 런 후 소멸=오염 확진.',
+        verification: '버진 수지+마스터배치 단독 런 후 소멸=오염 가능성 높음.',
         adjustment: '완전 퍼지·원료검사·리그라인드 배제.' },
     ],
     patternHints: {
       '내추럴 컬러서 없음': '1~2순위(배압·혼련) 분기. 마스터배치 관련.',
-      '배압↑후 개선': '1순위(배압) 확진',
+      '배압↑후 개선': '1순위(배압) 가능성 높음',
       '재료교체 후 발생': '3순위(오염) 강점 분기',
     },
     priorityLogic: '★ 메탈릭/펄/효과안료 마스터배치면 1순위(배압 대폭 상향) 처방 금지 — 알루미늄 플레이크 파단으로 광택 저하·회색화된다. 먼저 flake_orientation(배향 자국) 감별: 각도 의존·위치 고정이면 분산 문제가 아니다.',
@@ -926,7 +926,7 @@ export const DEFECT_KB: Record<string, DefectNode> = {
       { rank: 2, cause: '밸브게이트 핀 마모 또는 핀 타이밍/스트로크 불량', category: 'Mold',
         trigger: '밸브게이트 사용 + 게이트 주변 국한 + 간헐 + 성형조건 무효.',
         evidence: '밸브게이트 여부. 간헐성·게이트 국한.',
-        verification: '금형 열고 밸브핀 선단 마모·스트로크 실측(설계 대비 ±0.1mm 이상=이상). 핀 교체 후 동일 조건 소멸=확진.',
+        verification: '금형 열고 밸브핀 선단 마모·스트로크 실측(설계 대비 ±0.1mm 이상=이상). 핀 교체 후 동일 조건 소멸=가능성 높음.',
         adjustment: '밸브핀 선단 점검·스트로크 조정·필요 시 교체.' },
       { rank: 3, cause: '핫러너 게이트 온도 과저 또는 노즐 데드스팟 정체', category: 'Mold',
         trigger: '핫러너 게이트온도가 수지 권장 하한 근처(내열ABS·PC 등) 또는 노즐 데드스팟 정체. 간헐.',
@@ -956,7 +956,7 @@ export const DEFECT_KB: Record<string, DefectNode> = {
         baseProbability: 45,
         trigger: '고멜트온도·장시간 체류. 저분자 첨가제·난연제·활제 휘발. 금형 세정 직후 소멸 후 재누적.',
         evidence: '멜트온도·체류(사이클)시간. 세정주기 대비 재발.',
-        verification: '금형 게이트·벤트 주변 표면 닦아내고 N샷 후 재출현 확인. 소멸→재누적이면 plate-out 확진.',
+        verification: '금형 게이트·벤트 주변 표면 닦아내고 N샷 후 재출현 확인. 소멸→재누적이면 plate-out 가능성 높음.',
         adjustment: '멜트온도↓·사이클(체류)단축·금형 표면 주기 세정·벤트 추가/청소.' },
       { rank: 2, cause: '벤트 부족·막힘 → 가스 응축', category: 'Mold',
         baseProbability: 30,
@@ -978,7 +978,7 @@ export const DEFECT_KB: Record<string, DefectNode> = {
       '핫러너 청소·밸브교환에도 지속': '핫러너 내부 아닌 캐비티 표면·벤트 원인 가중. 그 캐비티 표면 세정·벤트 점검.',
     },
     sharedGates: [],
-    priorityLogic: '"닦임=표면 부착물"이 분류 결정 단서. 금형 세정 후 일시 소멸·재누적이면 표면 석출 확진(plate-out 1순위와 벤트 가스 응축 2순위가 모두 이 반응을 보이므로 이 테스트로 둘을 가르지 마라. 벤트·충전말단·게이트 국소 집중이면 2순위 가중). 닦이는 잔류물을 웰드/플로우로 분류하지 마라.',
+    priorityLogic: '"닦임=표면 부착물"이 분류 결정 단서. 금형 세정 후 일시 소멸·재누적이면 표면 석출 가능성 높음(plate-out 1순위와 벤트 가스 응축 2순위가 모두 이 반응을 보이므로 이 테스트로 둘을 가르지 마라. 벤트·충전말단·게이트 국소 집중이면 2순위 가중). 닦이는 잔류물을 웰드/플로우로 분류하지 마라.',
     source: 'synthesis,taxonomy-31', confidence: 'estimated',
   },
 
@@ -1044,8 +1044,16 @@ export function getDefect(defectType: string): DefectNode | undefined {
       return node;
     }
   }
+  // 현장에서 쓰는 다른 이름(정식 이름 매칭에 안 걸리는 표현만)
+  for (const [id, aliases] of Object.entries(DEFECT_ALIASES)) {
+    if (aliases.some(a => lower.includes(a))) return DEFECT_KB[id];
+  }
   return undefined;
 }
+
+const DEFECT_ALIASES: Record<string, string[]> = {
+  black_specks: ['검은 점', '검은점', '검정 점', '검정점', '까만 점', '까만점', 'black spot', 'black dot', 'black speck'],
+};
 
 export function getGate(gateId: string): SharedGate | undefined {
   return SHARED_GATES[gateId];
