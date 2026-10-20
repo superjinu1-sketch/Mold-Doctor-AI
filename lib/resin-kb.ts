@@ -492,7 +492,7 @@ export function getResinSpec(resinType: string): ResinSpec | null {
 
 // ── 수치 대조 (입력 셋팅값 vs KB 권장범위) ──
 // 철학 A: 코드는 객관적 앵커만 제공(가이드레일). 최종 판단은 모델이 맥락 종합.
-export type CheckStatus = 'ok' | 'low' | 'high' | 'degrade';
+export type CheckStatus = 'ok' | 'low' | 'high' | 'degrade' | 'na';
 export interface SettingCheck {
   label: string;
   value: number;
@@ -530,11 +530,18 @@ export function checkSettings(
   if (moldVals.length > 0) {
     const mold = moldVals.reduce((x, y) => x + y, 0) / moldVals.length;
     const hasFiller = !!filler && filler !== '없음' && filler.toLowerCase() !== 'none';
+    const isGlass = hasFiller && /gf|glass|유리/i.test(filler!);
     const useGf = hasFiller && spec.moldC.gf !== undefined;
     const lo = useGf ? spec.moldC.gf![0] : spec.moldC.min;
     const hi = useGf ? spec.moldC.gf![1] : spec.moldC.max;
-    const status: CheckStatus = mold < lo ? 'low' : mold > hi ? 'high' : 'ok';
-    out.push({ label: '금형 온도', value: Math.round(mold), unit: '℃', rangeText: `${lo}-${hi}℃${useGf ? '(GF)' : ''}`, status });
+    // GF 등급인데 resin-kb에 gf 범위가 없으면 비강화 상한으로 '높음' 판정하지 않는다.
+    // GF 표면백화의 1순위 처방은 금형온도↑(taxonomy §3 Fiber Read-out). 비강화 상한 플래그가 하향 권고로 뒤집는 것을 막는다.
+    const gfUpperUnknown = isGlass && !useGf && mold > hi;
+    const status: CheckStatus = mold < lo ? 'low' : gfUpperUnknown ? 'na' : mold > hi ? 'high' : 'ok';
+    const rangeText = gfUpperUnknown
+      ? `${lo}-${hi}℃(비강화 기준, GF 등급 범위 미수록)`
+      : `${lo}-${hi}℃${useGf ? '(GF)' : ''}`;
+    out.push({ label: '금형 온도', value: Math.round(mold), unit: '℃', rangeText, status });
   }
 
   if (spec.drying !== null) {
@@ -601,6 +608,7 @@ const STATUS_MARK: Record<CheckStatus, string> = {
   low: '낮음 ⚠',
   high: '높음 ⚠',
   degrade: '상한 초과·열분해 위험 ⚠',
+  na: '판정 보류(GF 등급 상한 미수록, 이 값을 금형온도 하향 근거로 쓰지 말 것)',
 };
 
 // 대조 결과 → 프롬프트 주입용 텍스트(가이드레일). 면책 포함.
@@ -609,7 +617,7 @@ export function formatKbCompare(spec: ResinSpec, checks: SettingCheck[]): string
   const lines = checks
     .map(c => `- ${c.label} ${c.value}${c.unit}: ${spec.id} 권장 ${c.rangeText} → ${STATUS_MARK[c.status]}`)
     .join('\n');
-  const hasFlag = checks.some(c => c.status !== 'ok');
+  const hasFlag = checks.some(c => c.status !== 'ok' && c.status !== 'na');
   const flagNote = hasFlag
     ? '\n※ 위 ⚠ 항목은 가공윈도우 이탈이다. 외관·치수 불량의 직접 원인일 수 있으니 원인 후보에서 우선 검토하라.'
     : '';
