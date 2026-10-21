@@ -1249,6 +1249,8 @@ export default function DiagnosisResultPanel({ result, onSavePDF, round = 1, fol
                         if (Object.keys(vals).length > 0) {
                           const unit = machineSettings?.pressureUnit;
                           afterArg = typeof unit === 'string' && unit ? { ...vals, pressureUnit: unit } : vals;
+                          // °F로 입력한 사용자의 값이 작업표준에 ℃로 찍히지 않게 온도 단위도 싣는다(재평가 Mike).
+                          if (machineSettings?.tempUnit === 'F') afterArg = { ...afterArg, tempUnit: 'F' };
                         }
                       }
                       setRecordSaving(true);

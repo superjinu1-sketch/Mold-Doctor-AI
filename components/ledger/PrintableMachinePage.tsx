@@ -59,7 +59,7 @@ export default function PrintableMachinePage({
           {/* 온도 */}
           <div style={{ marginBottom: '5mm' }}>
             <div style={{ fontSize: '5mm', fontWeight: 800, marginBottom: '2mm', borderBottom: `1px solid ${BORDER}`, paddingBottom: '1mm' }}>
-              {L('사출 온도 (℃) / 금형 온도 (℃)', 'Barrel Temp (℃) / Mold Temp (℃)')}
+              {(() => { const u = s.tempUnit === 'F' ? '℉' : '℃'; return L(`사출 온도 (${u}) / 금형 온도 (${u})`, `Barrel Temp (${u}) / Mold Temp (${u})`); })()}
             </div>
             <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '5.5mm' }}>
               <tbody>
