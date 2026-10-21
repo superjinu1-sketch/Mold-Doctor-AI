@@ -1128,9 +1128,14 @@ function DiagnoseContent() {
       setEstimateContext(null);                   // pending 소진 → 다음 제출엔 안 따라붙음
       void hapticSuccess();
       setShowFollowUpForm(false);
-      // 진단 성공 → 폼 방어선 스냅샷 클리어 (다음 방문 시 stale 복원 방지, 사진도 함께)
-      try { localStorage.removeItem(FORM_LS_KEY); } catch { /* ignore */ }
-      void clearDraftPhotos();
+      // 추정 성공 → 폼 방어선 스냅샷 클리어 (다음 방문 시 stale 복원 방지, 사진도 함께).
+      // 결과 없음(판독 불가·불량 미검출·정보 부족)·파싱 실패 응답이면 지우지 않는다. 재시도할 때
+      // 입력이 남아 있어야 하는데, 예전엔 여기서 지워져 "다시 추정하기"가 빈 폼이 됐다.
+      const noResultType = ['Image_Unreadable', 'No_Defect_Detected', 'Insufficient_Input'].includes(data?.defect_type?.en);
+      if (!noResultType && !data?.raw_response) {
+        try { localStorage.removeItem(FORM_LS_KEY); } catch { /* ignore */ }
+        void clearDraftPhotos();
+      }
 
       if (round > 1) {
         setFollowUpHistory(prev => [
@@ -1272,8 +1277,9 @@ function DiagnoseContent() {
 
   // afterSettings는 결과 패널에서 사용자가 "지금 사출기 조건"으로 확인한 값만 들어온다(growth P0).
   // 예전에는 조치 전 입력 폼(settings)을 그대로 복사해, 불량을 만든 조건이 작업표준이 될 수 있었다.
-  const handleResolvedWithStatus = (status: string, memo: string, afterPhoto?: string, afterSettings?: Record<string, string>) => {
-    if (!diagnosisId) return;
+  const handleResolvedWithStatus = async (status: string, memo: string, afterPhoto?: string, afterSettings?: Record<string, string>): Promise<boolean> => {
+    if (!diagnosisId) return false;
+    let savedLocally = false;
     const resolvedAt = new Date().toISOString();
     try {
       const raw = typeof window !== 'undefined' ? localStorage.getItem('diagnoseHistory') : null;
@@ -1291,12 +1297,14 @@ function DiagnoseContent() {
           safeLocalStorageSet('diagnoseHistory', JSON.stringify(history));
         }
         setHistoryCount(history.length);
+        savedLocally = true;
       }
     } catch { /* ignore */ }
     // 서버 동기화(로그인 시)는 로컬 사본 유무와 무관하게 한다. 다른 기기·로그아웃 후 복원한 기록은
     // 로컬에 없지만 서버에는 있으므로, 로컬 조건에 묶여 있으면 기록이 서버에도 남지 않았다.
+    let savedServer = false;
     if (user) {
-      void updateResolution(diagnosisId, user.id, {
+      savedServer = await updateResolution(diagnosisId, user.id, {
         resolved: status,
         resolvedAt,
         ...(memo ? { resolvedMemo: memo } : {}),
@@ -1308,6 +1316,23 @@ function DiagnoseContent() {
     // 부분개선·미해결에서는 호출하지 않는다(불만족 사용자에게 리뷰 요청은 역효과). 웹·30일 가드·실패
     // 무시는 requestInAppReviewIfEligible 내부에서 처리 — 실패해도 이 흐름에 영향 없음.
     if (status === 'solved') void requestInAppReviewIfEligible();
+    return user ? savedServer : savedLocally;
+  };
+
+  // 결과 없음 화면에서 "다시 입력": 결과를 비우고 해당 입력 섹션을 연다(하단 제출 바가 다시 보인다).
+  const handleRetryInput = (section: number) => {
+    setResult(null);
+    setOpenSection(section);
+    setTimeout(() => window.scrollTo({ top: 0, behavior: 'smooth' }), 50);
+  };
+
+  // 결과·샘플 끝 "새 불량으로 추정": 입력을 비운 새 폼으로 시작한다.
+  const handleNewEstimate = () => {
+    try { localStorage.removeItem(FORM_LS_KEY); } catch { /* ignore */ }
+    void clearDraftPhotos().finally(() => {
+      // 같은 페이지를 쿼리 없이 다시 연다(복원·딥링크 프리필이 다시 걸리지 않게). 앱 로컬 번들 경로도 유지된다.
+      window.location.replace(window.location.pathname);
+    });
   };
 
   const handleStartFollowUp = () => {
@@ -2135,6 +2160,8 @@ function DiagnoseContent() {
               onResolved={handleResolved}
               onResolvedWithStatus={handleResolvedWithStatus}
               onStartFollowUp={handleStartFollowUp}
+              onRetryInput={handleRetryInput}
+              onNewEstimate={handleNewEstimate}
               resinType={resinType === '기타 (직접 입력)' ? customResin : resinType}
               machineSettings={{ ...settings, ...advSettings }}
               sessionId={sessionId}

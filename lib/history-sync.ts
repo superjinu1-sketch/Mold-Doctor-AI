@@ -114,7 +114,7 @@ export async function updateResolution(
   clientId: string,
   userId: string,
   patch: { resolved?: string; resolvedAt?: string; resolvedMemo?: string; afterSettings?: Record<string, string>; afterPhoto?: string },
-): Promise<void> {
+): Promise<boolean> {
   try {
     const row: Row = {};
     if (patch.resolved !== undefined) row.resolved = coerceResolved(patch.resolved);
@@ -122,8 +122,10 @@ export async function updateResolution(
     if (patch.resolvedMemo !== undefined) row.resolved_memo = patch.resolvedMemo;
     if (patch.afterSettings !== undefined) row.after_settings = patch.afterSettings;
     if (patch.afterPhoto !== undefined) row.after_photo = patch.afterPhoto;
-    await supabase.from('diagnosis_records').update(row).eq('user_id', userId).eq('client_id', clientId);
-  } catch (e) { reportClientError('history-sync.updateResolution', e); /* 폴백 무시 */ }
+    const { error } = await supabase.from('diagnosis_records').update(row).eq('user_id', userId).eq('client_id', clientId);
+    if (error) { reportClientError('history-sync.updateResolution', error); return false; }
+    return true;
+  } catch (e) { reportClientError('history-sync.updateResolution', e); return false; }
 }
 
 /** 사진 등 비동기로 채워진 필드 보강용 (upsert 재호출). */

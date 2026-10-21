@@ -336,8 +336,10 @@ interface Props {
   round?: number;
   followUpHistory?: FollowUpHistoryItem[];
   onResolved?: () => void;
-  onResolvedWithStatus?: (status: string, memo: string, afterPhoto?: string, afterSettings?: Record<string, string>) => void;
+  onResolvedWithStatus?: (status: string, memo: string, afterPhoto?: string, afterSettings?: Record<string, string>) => Promise<boolean> | void;
   onStartFollowUp?: () => void;
+  onRetryInput?: (section: number) => void;   // 결과 없음 화면: 결과를 비우고 해당 입력 섹션 열기
+  onNewEstimate?: () => void;                 // 결과·샘플 끝: 새 불량으로 추정
   resinType?: string;
   machineSettings?: Record<string, unknown>;
   sessionId?: string | null;
@@ -347,7 +349,7 @@ interface Props {
   machineContext?: { label: string; count: number } | null;
 }
 
-export default function DiagnosisResultPanel({ result, onSavePDF, round = 1, followUpHistory = [], onResolved, onResolvedWithStatus, onStartFollowUp, resinType, machineSettings, sessionId, defectPhotos = [], pdfExporting = false, machineContext = null }: Props) {
+export default function DiagnosisResultPanel({ result, onSavePDF, round = 1, followUpHistory = [], onResolved, onResolvedWithStatus, onStartFollowUp, onRetryInput, onNewEstimate, resinType, machineSettings, sessionId, defectPhotos = [], pdfExporting = false, machineContext = null }: Props) {
   const { t, locale } = useLocale();
   const [checkedItems, setCheckedItems] = useState<Set<number>>(new Set());
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
@@ -364,6 +366,10 @@ export default function DiagnosisResultPanel({ result, onSavePDF, round = 1, fol
   const [showResolvedForm, setShowResolvedForm] = useState(false);
   const [resolvedStatus, setResolvedStatus] = useState('solved');
   const [resolvedMemo, setResolvedMemo] = useState('');
+  // 기록 저장 결과: 저장되면 상태를 남겨 보여주고(예전엔 같은 버튼이 다시 나와 저장 여부를 알 수 없었다), 실패하면 알린다.
+  const [recordedStatus, setRecordedStatus] = useState<string | null>(null);
+  const [recordSaving, setRecordSaving] = useState(false);
+  const [recordError, setRecordError] = useState(false);
   const [afterPhoto, setAfterPhoto] = useState<string | undefined>(undefined);
   // 조치 후 조건 확인(growth P0): 사용자가 "지금 사출기 조건"이라고 확인한 값만 afterSettings가 된다.
   // AI 권장값은 어디에도 미리 채우지 않는다 — 초기값은 사용자가 처음 입력한 조치 전 값.
@@ -495,7 +501,7 @@ export default function DiagnosisResultPanel({ result, onSavePDF, round = 1, fol
           {t('fallback.unreadable_detail')}
         </p>
         <p className="text-faint text-[length:var(--text-body)]">{summary}</p>
-        <button type="button" onClick={onResolved}
+        <button type="button" onClick={() => (onRetryInput ? onRetryInput(1) : onResolved?.())}
           className="mx-auto mt-2 flex items-center gap-2 bg-[var(--warn-bg)] hover:bg-[var(--warn-bg)] text-warn border border-[var(--warn-border)] px-5 py-3 rounded-xl text-base font-bold transition-colors min-h-[var(--touch-cta)]">
           {t('fallback.unreadable_btn')}
         </button>
@@ -513,7 +519,7 @@ export default function DiagnosisResultPanel({ result, onSavePDF, round = 1, fol
           {t('fallback.nodefect_body')}
         </p>
         <p className="text-faint text-[length:var(--text-body)]">{summary}</p>
-        <button type="button" onClick={onResolved}
+        <button type="button" onClick={() => (onRetryInput ? onRetryInput(1) : onResolved?.())}
           className="mx-auto mt-2 flex items-center gap-2 bg-brand-tint hover:bg-brand-tint text-brand-ink border border-[var(--brand-border)] px-5 py-3 rounded-xl text-base font-bold transition-colors min-h-[var(--touch-cta)]">
           {t('fallback.nodefect_btn')}
         </button>
@@ -532,7 +538,7 @@ export default function DiagnosisResultPanel({ result, onSavePDF, round = 1, fol
         <p className="text-muted text-base leading-relaxed">{summary}</p>
         <button
           type="button"
-          onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+          onClick={() => (onRetryInput ? onRetryInput(3) : window.scrollTo({ top: 0, behavior: 'smooth' }))}
           className="mx-auto mt-2 flex items-center gap-2 bg-brand hover:brightness-90 text-on-brand px-5 py-3 rounded-xl text-base font-bold transition-colors min-h-[var(--touch-cta)]"
         >
           {locale === 'en' ? 'Add Information & Retry' : '정보 입력 후 재시도'}
@@ -1033,6 +1039,9 @@ export default function DiagnosisResultPanel({ result, onSavePDF, round = 1, fol
       {result.is_demo ? (
         <div className="rounded-xl border border-[var(--brand-border)] bg-brand-tint p-4 text-center">
           <p className="text-muted text-base">{t('demo.notice')}</p>
+          {onNewEstimate && (
+            <button type="button" onClick={onNewEstimate} className="ui-cta mt-3 w-full text-body">{t('result.new_estimate')}</button>
+          )}
         </div>
       ) : (
         <>
@@ -1189,7 +1198,8 @@ export default function DiagnosisResultPanel({ result, onSavePDF, round = 1, fol
                 <div className="flex gap-2">
                   <button
                     type="button"
-                    onClick={() => {
+                    disabled={recordSaving}
+                    onClick={async () => {
                       // 확인 체크한 "해결" 기록만 조치 후 조건을 싣는다. 단위(pressureUnit)는 실제 값이 하나라도
                       // 있을 때만 덧붙인다(단위만으로 게이트가 열리면 안 됨).
                       let afterArg: Record<string, string> | undefined;
@@ -1202,14 +1212,17 @@ export default function DiagnosisResultPanel({ result, onSavePDF, round = 1, fol
                           afterArg = typeof unit === 'string' && unit ? { ...vals, pressureUnit: unit } : vals;
                         }
                       }
-                      onResolvedWithStatus?.(resolvedStatus, resolvedMemo, afterPhoto, afterArg);
+                      setRecordSaving(true);
+                      setRecordError(false);
+                      const ok = await onResolvedWithStatus?.(resolvedStatus, resolvedMemo, afterPhoto, afterArg);
+                      setRecordSaving(false);
+                      if (ok === false) { setRecordError(true); return; }
+                      setRecordedStatus(resolvedStatus);
                       const canStandard = !!user && canSaveAsWorkStandard({ resolved: resolvedStatus, afterSettings: afterArg });
                       if (canStandard && afterArg) {
                         // 결과 화면에서 바로 작업표준 저장을 열 수 있게 후보를 남긴다(맨 위로 스크롤하지 않음).
                         setStandardCandidate({ status: resolvedStatus, afterSettings: afterArg, resolvedAt: new Date().toISOString() });
                         setStandardSaved(false);
-                      } else {
-                        onResolved?.();
                       }
                       setShowResolvedForm(false);
                       setAfterPhoto(undefined);
@@ -1220,7 +1233,7 @@ export default function DiagnosisResultPanel({ result, onSavePDF, round = 1, fol
                     }}
                     className="flex-1 bg-brand text-on-brand py-3 rounded-xl font-bold text-base hover:bg-brand-ink transition-colors min-h-[var(--touch-cta)]"
                   >
-                    {t('history.save_record')}
+                    {recordSaving ? t('history.saving') : t('history.save_record')}
                   </button>
                   <button
                     type="button"
@@ -1230,8 +1243,18 @@ export default function DiagnosisResultPanel({ result, onSavePDF, round = 1, fol
                     {t('history.cancel')}
                   </button>
                 </div>
+                {recordError && (
+                  <p role="alert" className="text-[length:var(--text-body)] text-danger bg-[var(--danger-bg)] border border-[var(--danger-border)] rounded-lg px-3 py-2">{t('history.save_failed')}</p>
+                )}
               </div>
             ) : (
+              <>
+              {recordedStatus && (
+                <div role="status" className="mb-3 flex items-center gap-2 rounded-xl border border-[var(--ok-border)] bg-[var(--ok-bg)] px-3 py-2.5">
+                  <span className="text-ok font-bold">✓</span>
+                  <span className="text-[length:var(--text-body)] text-ink">{t('history.recorded_as').replace('{status}', t(`history.${recordedStatus}`))}</span>
+                </div>
+              )}
               <div className="flex flex-col sm:flex-row gap-3">
                 <button
                   type="button"
@@ -1250,8 +1273,14 @@ export default function DiagnosisResultPanel({ result, onSavePDF, round = 1, fol
                   {t('action.followup')}
                 </button>
               </div>
+              </>
             )}
           </div>
+          {onNewEstimate && (
+            <button type="button" onClick={onNewEstimate} className="w-full min-h-[var(--touch-cta)] rounded-[var(--radius-cta)] border border-border-strong bg-surface text-ink font-semibold text-[length:var(--text-body)] hover:bg-surface-sunken transition-colors">
+              {t('result.new_estimate')}
+            </button>
+          )}
         </>
       )}
       {isDebug && result._debug && (() => {
