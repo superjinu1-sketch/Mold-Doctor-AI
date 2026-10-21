@@ -272,6 +272,11 @@ function DiagnoseContent() {
   const [tempUnit, setTempUnitState] = useState<'C' | 'F'>('C');
   useEffect(() => {
     try { if (localStorage.getItem('molddoctor_temp_unit') === 'F') setTempUnitState('F'); } catch { /* ignore */ }
+    // 압력 단위도 기억한다. 잊고 기본값(bar)으로 두면 1800 psi가 1800 bar로 들어간다(재평가 Mike).
+    try {
+      const pu = localStorage.getItem('molddoctor_pressure_unit');
+      if (pu === 'bar' || pu === 'MPa' || pu === 'psi') setSettings(prev => (prev.pressureUnit ? { ...prev, pressureUnit: pu } : prev));
+    } catch { /* ignore */ }
   }, []);
   const setTempUnit = (u: 'C' | 'F') => {
     setTempUnitState(u);
@@ -1843,7 +1848,7 @@ function DiagnoseContent() {
               <span className="text-faint text-sm">{t('step3.pressure_unit')}</span>
               {(['bar', 'MPa', 'psi'] as const).map(u => (
                 <button key={u} type="button"
-                  onClick={() => setSettings(prev => ({ ...prev, pressureUnit: u }))}
+                  onClick={() => { setSettings(prev => ({ ...prev, pressureUnit: u })); try { localStorage.setItem('molddoctor_pressure_unit', u); } catch { /* ignore */ } }}
                   className={`min-h-[44px] px-4 rounded-lg border text-sm font-bold transition-colors ${
                     settings.pressureUnit === u
                       ? 'bg-brand-tint text-brand-ink border-[var(--brand-border)]'
