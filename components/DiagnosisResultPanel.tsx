@@ -85,8 +85,9 @@ function SeverityBadge({ severity }: { severity: string }) {
 }
 
 function DirectionArrow({ direction }: { direction?: string }) {
-  if (direction === 'up') return <span className="text-danger font-bold">↑</span>;
-  if (direction === 'down') return <span className="text-brand font-bold">↓</span>;
+  // 방향 화살표는 위험 신호가 아니므로 심각도 색(빨강)을 쓰지 않는다.
+  if (direction === 'up') return <span className="text-brand-ink font-bold">↑</span>;
+  if (direction === 'down') return <span className="text-brand-ink font-bold">↓</span>;
   return <span className="text-ok font-bold">✓</span>;
 }
 
@@ -136,11 +137,13 @@ function CauseCard({ cause, defaultOpen = false }: { cause: CauseItem; defaultOp
   const isOpen = open || forceOpen;
 
   const rank = cause.rank;
+  // 원인 순위는 위험도가 아니라 가능성 순서다. 빨강·주황(심각도 색)을 쓰면 초보가 겁먹고 의미도 뒤섞여서
+  // (재평가 박 사원, 규율 5 의미 역전 금지) 브랜드 색 농도로만 순위를 구분한다.
   const accent =
     rank === 1
-      ? { num: 'bg-danger text-on-brand', pct: 'text-danger', bar: 'bg-danger', edge: 'border-l-4 border-[var(--danger-border)]' }
+      ? { num: 'bg-brand text-on-brand', pct: 'text-brand-ink', bar: 'bg-brand', edge: 'border-l-4 border-[var(--brand)]' }
       : rank === 2
-      ? { num: 'bg-warn text-on-brand', pct: 'text-warn', bar: 'bg-warn', edge: 'border-l-4 border-[var(--warn-border)]' }
+      ? { num: 'bg-brand-tint text-brand-ink', pct: 'text-brand-ink', bar: 'bg-[var(--brand-border)]', edge: 'border-l-4 border-[var(--brand-border)]' }
       : { num: 'bg-[var(--border-strong)] text-ink', pct: 'text-muted', bar: 'bg-[var(--border-strong)]', edge: 'border-l-4 border-border' };
 
   const why = cause.scientific_reasoning || cause.detail;
@@ -911,7 +914,7 @@ export default function DiagnosisResultPanel({ result, onSavePDF, round = 1, fol
             {[
               { key: 'before_changes', label: t('checklist.before'), color: 'text-brand-ink', bg: 'bg-brand-tint', border: 'border-[var(--brand-border)]' },
               { key: 'after_changes', label: t('checklist.after'), color: 'text-brand-ink', bg: 'bg-brand-tint', border: 'border-[var(--brand-border)]' },
-              { key: 'escalation', label: t('checklist.escalation'), color: 'text-danger', bg: 'bg-[var(--danger-bg)]', border: 'border-[var(--danger-border)]' },
+              { key: 'escalation', label: t('checklist.escalation'), color: 'text-warn', bg: 'bg-[var(--warn-bg)]', border: 'border-[var(--warn-border)]' },
             ].map(({ key, label, color, bg, border }) => {
               const items = (checklist as Record<string, string[]>)[key] ?? [];
               if (!items.length) return null;

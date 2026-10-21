@@ -566,7 +566,7 @@ export const ko: Record<string, string> = {
   'checklist.title': '현장 체크리스트',
   'checklist.before': '변경 전 확인',
   'checklist.after': '변경 후 모니터링',
-  'checklist.escalation': '에스컬레이션 기준',
+  'checklist.escalation': '이럴 땐 반장·보전팀에 알리세요',
 
   /* Mold analysis */
   'mold.title': '금형 도면 분석',

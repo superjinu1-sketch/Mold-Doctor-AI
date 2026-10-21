@@ -557,7 +557,7 @@ export const en: Record<string, string> = {
   'checklist.title': 'Field Checklist',
   'checklist.before': 'Before Changes',
   'checklist.after': 'After Changes Monitor',
-  'checklist.escalation': 'Escalation',
+  'checklist.escalation': 'When to call your lead or maintenance',
 
   'mold.title': 'Mold Drawing Analysis',
   'mold.gate': 'Gate Assessment',
