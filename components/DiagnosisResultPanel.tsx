@@ -609,13 +609,13 @@ export default function DiagnosisResultPanel({ result, onSavePDF, round = 1, fol
     drying: t('summary.pw_dry'),
   };
 
-  // 결론 카드용: "지금 할 일" 1~3개. 1순위 권고는 점검(direction 'same': 퍼지·벤트 청소·단위 확인 등)이어도
-  // 항상 맨 앞에 둔다. 예전엔 값이 바뀌는 권고만 골라서 진짜 첫 행동이 빠지고 근거 약한 값만 남았다
-  // (페르소나 평가 2026-10-20: 김 반장·박 사원·Mike). 나머지 자리는 값이 바뀌는 권고로 채운다.
+  // 결론 카드용: "지금 할 일" 1~3개를 AI가 정한 priority 순서 그대로 보여준다. 점검(direction 'same':
+  // 퍼지·벤트 청소·단위 확인 등)도 포함한다. 예전엔 값이 바뀌는 권고만 골라서 진짜 첫 행동이 빠졌고
+  // (페르소나 평가 2026-10-20), 1순위 뒤를 값 변경으로만 채우니 2순위 벤트 청소가 빠졌다(재평가 2026-10-21 김 반장).
+  // 금형 수정·재료 교체 같은 근본 조치(urgency 'root')는 "지금 할 일"이 아니라서 뺀다.
   const orderedRecs = [...recommendations].sort((a, b) => (a.priority ?? 99) - (b.priority ?? 99));
-  const firstRec = orderedRecs[0];
-  const changedRecs = orderedRecs.filter(r => r !== firstRec && r.current !== r.recommended && r.direction !== 'same');
-  const topActions = firstRec ? [firstRec, ...changedRecs].slice(0, 3) : [];
+  const nowRecs = orderedRecs.filter(r => r.urgency !== 'root');
+  const topActions = (nowRecs.length > 0 ? nowRecs : orderedRecs).slice(0, 3);
   const pdfSettingsLine = (() => {
     const ms = machineSettings ?? {};
     const tU = ms.tempUnit === 'F' ? '℉' : '℃';

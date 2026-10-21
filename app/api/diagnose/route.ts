@@ -196,7 +196,7 @@ export const HYGROSCOPICITY_GUARD = `[흡습성 정확성 — 반드시 준수]
 // 프롬프트 버전 — FIXED_FRAMEWORK·VISUAL_DIFFERENTIAL·HYGROSCOPICITY_GUARD 등
 // 모델 입력에 들어가는 지시문이 바뀔 때마다 bump한다. 진단 레코드에 기록되어
 // "어느 프롬프트로 나온 답인가"를 사후 추적하는 근거가 된다.
-export const PROMPT_VERSION = 'v20';
+export const PROMPT_VERSION = 'v21';
 
 // client_id·session_id 형식 검증(call-interruption-data-loss-fix-v1 Part A) —
 // lib/history-sync.ts의 동명 정규식과 동일 패턴 유지.
@@ -324,6 +324,12 @@ USER TRIALS, WORDING, AND UNITS (MANDATORY):
 - Barrel zones: machines number zones differently (Zone1 may be at the nozzle or at the hopper). Do not infer a "reverse" or "forward" barrel profile from zone numbers alone; if the profile matters, list it as a check.
 - Glass-filled grades: supplier melt ranges for GF grades usually sit about 10-20°C above the unfilled grade. Below the degradation temperature, do not recommend lowering the melt of a GF grade just because it exceeds the unfilled upper limit.
 - If resin numbers differ between the resin note and the process-window cross-check ("가공윈도우 사전 대조"), use the cross-check values.
+- Priority 1 must be something the operator can do now at the machine (a check, a purge, a measurement, or one setting). Disassembly, part replacement and mold rework go to escalation or the last priority.
+- Intermittent defects (1 in N shots): ask for at least 3 x N shots before judging a change.
+- Never invent baseline values that are not in the input (for example a previous lot's peak pressure); write "not measured" instead.
+- urgency follows the priority order: priority 1 is now or next_shot; root actions come last.
+- Warpage direction: a flat part bows toward the hotter mold side (that side cools later and shrinks more).
+- Plain English: keep sentences under 20 words, scientific_reasoning at most 3 short sentences, everyday words in glosses, and write °C after every temperature.
 ` : `
 사용자 시도 이력·표현·단위 규칙 (MANDATORY):
 - 사용자가 "이미 해봤다·바꿔도 차이 없었다·효과 없었다"고 적은 조치는 다시 권하지 마라. 그 사실을 근거로 원인 순위를 조정하고, 권고에서 빼거나 "이미 시도, 효과 없음"이라고 명시하라.
@@ -335,6 +341,12 @@ USER TRIALS, WORDING, AND UNITS (MANDATORY):
 - 배럴 존: 존 번호 방향은 기계마다 다르다(Zone1이 노즐 쪽일 수도 호퍼 쪽일 수도 있다). 존 번호만으로 "역구배·순구배"를 단정하지 마라. 온도 구배가 중요하면 확인 항목으로 제시하라.
 - 유리섬유(GF) 강화 등급: 공급사 용융 권장 범위는 보통 비강화 등급보다 10~20°C 높다. 열분해 온도 미만이면, 비강화 상한을 넘었다는 이유만으로 GF 등급의 멜트 하향을 권하지 마라.
 - 수지 수치가 수지 노트와 "가공윈도우 사전 대조"에서 다르면 가공윈도우 사전 대조 값을 따른다.
+- priority 1은 작업자가 지금 사출기 앞에서 할 수 있는 일(점검·퍼지·측정·셋팅 하나)이어야 한다. 분해·부품 교체·금형 수정은 escalation이나 마지막 순위로 보낸다.
+- 간헐 불량(N샷에 1개)이면 변경 효과를 판정할 샷 수를 최소 N의 3배로 제시하라.
+- 입력에 없는 기준값(예: 이전 로트 피크압)을 지어내지 마라. 모르면 "측정값 없음"이라고 적어라.
+- urgency는 priority 순서를 따른다: priority 1은 now 또는 next_shot, root 조치는 뒤로.
+- 휨 방향: 평판 제품은 더 뜨거운 금형 쪽으로 휜다(그쪽이 늦게 식어 더 많이 수축).
+- 문장은 짧고 쉬운 말로 쓴다. 원인 설명 한 줄은 현장 말로.
 `}
 
 STEP 4: SPECIFIC RECOMMENDATIONS
@@ -531,6 +543,37 @@ function defectTypeEn(v?: string): string {
   if (!v) return '';
   const m = v.match(/\(([^()]*[A-Za-z][^()]*)\)/);
   return m ? m[1] : optEn(v);
+}
+
+// 단정 표현 후처리. 지시문으로 막아도 모델이 "확진·confirmed·validated"를 쓰는 경우가 남아(페르소나 재평가
+// 2026-10-21: Sarah 결과에 confirmed 7회, validated window) 응답 문자열에서 직접 바꾼다. defect_type은 그대로 둔다.
+function softenOverclaim(text: string): string {
+  return text
+    .replace(/(거의\s*)?확(진|정)(적이다|된다|이다)/g, '가능성이 높다')
+    .replace(/\b(is|are|was|were)\s+confirmed\s+by\b/gi, '$1 strongly supported by')
+    .replace(/(거의\s*)?확진(적으로|적|됨)?/g, '가능성 높음')
+    .replace(/확정(적으로|적|됨)/g, '가능성 높음')
+    .replace(/(원인|분류|추정)\s*확정/g, '$1 가능성 높음')
+    .replace(/\b(is|are|was|were|be|been)\s+confirmed\b/gi, '$1 highly likely')
+    .replace(/(?<!\b(?:if|once|until|unless|when|after|before)\s)\bconfirmed\b/gi, 'highly likely')
+    .replace(/\bconfirms\b/gi, 'strongly suggests')
+    .replace(/\bdefinitively\b|\bdefinitely\b/gi, 'most likely')
+    .replace(/\bvalidated\b/gi, 'supplier-recommended');
+}
+function softenDeep(v: unknown): unknown {
+  if (typeof v === 'string') return softenOverclaim(v);
+  if (Array.isArray(v)) return v.map(softenDeep);
+  if (v && typeof v === 'object') {
+    return Object.fromEntries(Object.entries(v as Record<string, unknown>).map(([k, x]) => [k, k === 'defect_type' ? x : softenDeep(x)]));
+  }
+  return v;
+}
+// 사용자가 이미 해본 조치를 설명에서 뽑는다. 지시문 규칙만으로는 "보압 시간 늘려도 차이 없음"인데 같은 조치를
+// 다시 권하는 일이 남아서(정 공장장 재평가) 해당 문장을 따로 강조해 넘긴다.
+function extractTriedActions(desc?: string): string[] {
+  if (!desc) return [];
+  const re = /(늘려도|올려도|낮춰도|내려도|바꿔도|줄여도|높여도|키워도|해봤|해 봤|시도했|시도해|효과\s*(가\s*)?없|차이\s*(가\s*)?없|변화\s*(가\s*)?없|안\s*변|already tried|\btried\b|no (difference|change|effect|improvement)|did ?n[o']t (help|work|change)|still the same|made no difference)/i;
+  return desc.split(/(?<=[.!?。])\s+|\n+/).map(x => x.trim()).filter(x => x && re.test(x)).slice(0, 4);
 }
 
 export async function POST(request: NextRequest) {
@@ -730,6 +773,11 @@ export async function POST(request: NextRequest) {
       }
     }
 
+    const rawFiller = resinInfo?.filler;
+    const fillerSet = !!rawFiller && rawFiller !== '없음' && rawFiller.toLowerCase() !== 'none';
+    const fillerEff = fillerSet
+      ? rawFiller
+      : (/\bgf\b|\bglass\b|gf\s*-?\d+|유리섬유/i.test(`${resinInfo?.resinDetail || ''} ${resinInfo?.resinGrade || ''} ${resinInfo?.resinType || ''}`) ? 'GF(유리섬유)' : rawFiller);
     const s = { ...(settings || {}) };
     const a = { ...(advSettings || {}) };
     const divide = pressureUnit === 'bar' || pressureUnit === 'kgf/cm2' || pressureUnit === 'kgf';
@@ -750,12 +798,23 @@ export async function POST(request: NextRequest) {
     for (const k of ['nozzleTemp', 'zone1Temp', 'zone2Temp', 'zone3Temp', 'zone4Temp', 'moldTempFixed', 'moldTempMoving'] as const) s[k] = toC(s[k]);
     for (const k of ['dryTemp', 'hrManifoldTemp', 'hrNozzle1Temp', 'hrNozzle2Temp', 'hrNozzle3Temp', 'hrNozzle4Temp'] as const) a[k] = toC(a[k]);
     for (const k of ['injPressure1', 'holdPressure', 'backPressure'] as const) s[k] = toMPa(s[k]);
+    // 프롬프트 표시용: "100 bar (= 10 MPa)". 환산값만 보이면 모델이 권장값도 MPa로 적었다(김 반장 재평가).
+    const pShow = (k: 'injPressure1' | 'holdPressure' | 'backPressure') => {
+      const raw = settings?.[k];
+      if (!raw) return '-';
+      return pressureUnit && pressureUnit !== 'MPa' ? `${raw} ${pressureUnit} (= ${s[k]} MPa)` : `${s[k]} MPa`;
+    };
+    const tried = extractTriedActions(defectDescription);
+    const triedEn = tried.length ? `\n\n## Already tried by the user (do NOT recommend again)\n${tried.map(t => `- "${t}"`).join('\n')}\nDo not put these changes (the same parameter in the same direction) back into recommendations. Use them only as evidence for the cause (e.g., longer hold time did nothing → the gate likely froze first).` : '';
+    const triedKo = tried.length ? `\n\n## 사용자가 이미 해본 조치 (재권고 금지)\n${tried.map(t => `- "${t}"`).join('\n')}\n위 조치(같은 파라미터를 같은 방향으로 바꾸는 것)를 recommendations에 다시 넣지 마라. 원인 판단의 근거로만 써라(예: 보압 시간을 늘려도 그대로면 게이트가 먼저 굳었을 가능성).` : '';
+    const injMPa = parseFloat(s.injPressure1 ?? '');
+    const hydraulicSuspect = isFinite(injMPa) && injMPa > 0 && injMPa < 30;
     for (const k of ['vpTransferPressure', 'actualPeakPressure', 'maxInjPressure'] as const) a[k] = toMPa(a[k]);
 
     // KB 수치 대조(가이드레일). spec 있는 수지만, 없으면 빈 문자열(기존 동작 유지).
     const resinSpec = getResinSpec(resinInfo?.resinType || '');
     const kbCompare = resinSpec
-      ? formatKbCompare(resinSpec, checkSettings(resinSpec, s, a, resinInfo?.filler))
+      ? formatKbCompare(resinSpec, checkSettings(resinSpec, s, a, fillerEff))
       : '';
     // 수지 심층 KB Phase 0(resin-mechanism-schema-v1) — mechanism 필드가 채워진 수지만 텍스트 반환,
     // 현재는 52종 전부 미채움이라 항상 빈 문자열(0토큰, 기존 동작 무영향). 값은 Phase 1에서 채워진다.
@@ -765,7 +824,7 @@ export async function POST(request: NextRequest) {
       resinSpec,
       s,
       a,
-      resinInfo?.filler,
+      fillerEff,
     );
 
     // 금형·기계 해석 가이드레일 — 입력된 항목 관련 규칙만 생성
@@ -887,7 +946,7 @@ export async function POST(request: NextRequest) {
 
     // 권장B: 닦임 감지 시 mold_deposit 가이드 병행 주입
     const depositGuide = surfaceDepositGuard
-      ? formatDefectGuide('금형 석출', resinSpec, s, a, resinInfo?.filler)
+      ? formatDefectGuide('금형 석출', resinSpec, s, a, fillerEff)
       : '';
 
     const noImageGuard = safeImages.length === 0 ? (isEn ? `[No image — text-based estimation mode]
@@ -919,11 +978,11 @@ ${noImageGuard}Please systematically analyze the following injection molding def
 
 ## Defect Information
 - Defect type: ${defectTypeEn(defectType) || 'Photo analysis required'}
-- Defect description: ${defectDescription || 'None'}
+- Defect description: ${defectDescription || 'None'}${triedEn}
 
 ## Resin Information
 - Resin type: ${optEn(resinInfo?.resinType) || 'Not entered'}
-- Filler: ${optEn(resinInfo?.filler) || 'None'}${resinInfo?.fillerContent ? ` ${resinInfo.fillerContent}%` : ''}
+- Filler: ${optEn(fillerEff) || 'None'}${resinInfo?.fillerContent ? ` ${resinInfo.fillerContent}%` : ''}
 - Flame retardant grade: ${optEn(resinInfo?.flameRetardant) || 'None'}${resinInfo?.flameRetardantThickness ? ` @ ${resinInfo.flameRetardantThickness}mm certified thickness` : ''}
 - Resin detail: ${resinInfo?.resinDetail || 'None'}
 - Resin grade: ${resinInfo?.resinGrade || 'None'}
@@ -931,12 +990,12 @@ ${noImageGuard}Please systematically analyze the following injection molding def
 ## Basic Injection Machine Settings
 - Injection temperature: Nozzle ${s.nozzleTemp || '-'}℃, Z1 ${s.zone1Temp || '-'}℃, Z2 ${s.zone2Temp || '-'}℃, Z3 ${s.zone3Temp || '-'}℃, Z4 ${s.zone4Temp || '-'}℃
 - Mold temperature: Fixed side ${s.moldTempFixed || '-'}℃, Moving side ${s.moldTempMoving || '-'}℃
-- Injection pressure: 1st ${s.injPressure1 || '-'} MPa, Holding ${s.holdPressure || '-'} MPa
+- Injection pressure: 1st ${pShow('injPressure1')}, Holding ${pShow('holdPressure')}
 - Injection speed: 1st ${s.injSpeed1 || '-'}%, 2nd ${s.injSpeed2 || '-'}%
 - Holding time: ${s.holdTime || '-'}sec, Cooling time: ${s.coolTime || '-'}sec, Injection time: ${s.injTime || '-'}sec
 - Metering: ${s.metering || '-'}mm, Cushion (set): ${s.cushion || '-'}mm
-- Back pressure: ${s.backPressure || '-'} MPa, Screw RPM: ${s.screwRpm || '-'}rpm, Clamp force: ${s.clampForce || '-'}ton
-- (Pressure input unit: ${pressureUnit || 'MPa'}, converted internally to MPa. Write recommended pressures in ${pressureUnit || 'MPa'}.)${isF ? '\n- (Temperature input unit: °F, converted above to °C. Write every recommended temperature as °C with °F in parentheses, e.g. "300°C (572°F)".)' : ''}
+- Back pressure: ${pShow('backPressure')}, Screw RPM: ${s.screwRpm || '-'}rpm, Clamp force: ${s.clampForce || '-'}ton
+- (Pressure input unit: ${pressureUnit || 'MPa'}, converted internally to MPa. Write recommended pressures in ${pressureUnit || 'MPa'}.)${isF ? '\n- (Temperature input unit: °F, converted above to °C. Write every recommended temperature as °C with °F in parentheses, e.g. "300°C (572°F)".)' : ''}${hydraulicSuspect ? `\n- ⚠ Injection pressure ${s.injPressure1} MPa is too low for plastic pressure. The screen value is very likely HYDRAULIC pressure (plastic ≈ hydraulic × 8-15). Say this in the result and judge only the hold/injection ratio.` : ''}
 
 ${(a.vpTransferPos || a.vpTransferPressure || a.preInjectDecompDist || a.postMeterDecompDist) ? `## V/P Transfer & Decompression (Suck-back)
 - V/P transfer position: ${a.vpTransferPos || '-'}mm, V/P transfer pressure: ${a.vpTransferPressure || '-'} MPa
@@ -1006,11 +1065,11 @@ ${noImageGuard}다음 사출 불량 정보를 Scientific Molding 방법론으로
 
 ## 불량 정보
 - 불량 유형: ${defectType || '사진 분석 필요'}
-- 불량 설명: ${defectDescription || '없음'}
+- 불량 설명: ${defectDescription || '없음'}${triedKo}
 
 ## 수지 정보
 - 수지 종류: ${resinInfo?.resinType || '미입력'}
-- 강화재: ${resinInfo?.filler || '없음'}${resinInfo?.fillerContent ? ` ${resinInfo.fillerContent}%` : ''}
+- 강화재: ${fillerEff || '없음'}${resinInfo?.fillerContent ? ` ${resinInfo.fillerContent}%` : ''}
 - 난연 등급: ${resinInfo?.flameRetardant || '없음'}${resinInfo?.flameRetardantThickness ? ` @ ${resinInfo.flameRetardantThickness}mm 인증 두께` : ''}
 - 수지 상세: ${resinInfo?.resinDetail || '없음'}
 - 수지 Grade: ${resinInfo?.resinGrade || '없음'}
@@ -1018,12 +1077,12 @@ ${noImageGuard}다음 사출 불량 정보를 Scientific Molding 방법론으로
 ## 사출기 기본 세팅값
 - 사출 온도: 노즐 ${s.nozzleTemp || '-'}℃, Z1 ${s.zone1Temp || '-'}℃, Z2 ${s.zone2Temp || '-'}℃, Z3 ${s.zone3Temp || '-'}℃, Z4 ${s.zone4Temp || '-'}℃
 - 금형 온도: 고정측 ${s.moldTempFixed || '-'}℃, 가동측 ${s.moldTempMoving || '-'}℃
-- 사출 압력: 1차 ${s.injPressure1 || '-'} MPa, 보압 ${s.holdPressure || '-'} MPa
+- 사출 압력: 1차 ${pShow('injPressure1')}, 보압 ${pShow('holdPressure')}
 - 사출 속도: 1차 ${s.injSpeed1 || '-'}%, 2차 ${s.injSpeed2 || '-'}%
 - 보압 시간: ${s.holdTime || '-'}sec, 냉각 시간: ${s.coolTime || '-'}sec, 사출 시간: ${s.injTime || '-'}sec
 - 계량: ${s.metering || '-'}mm, 쿠션(설정): ${s.cushion || '-'}mm
-- 배압: ${s.backPressure || '-'} MPa, 스크류 회전수: ${s.screwRpm || '-'}rpm, 형체력: ${s.clampForce || '-'}ton
-- (압력 입력 단위: ${pressureUnit || 'MPa'}, 내부 MPa 환산 적용. 권장 압력은 ${pressureUnit || 'MPa'} 단위로 적어라.)${isF ? '\n- (온도 입력 단위: °F, 위 값은 °C로 환산함. 권장 온도는 모두 °C 뒤 괄호에 °F를 함께 적어라. 예: "300°C (572°F)")' : ''}
+- 배압: ${pShow('backPressure')}, 스크류 회전수: ${s.screwRpm || '-'}rpm, 형체력: ${s.clampForce || '-'}ton
+- (압력 입력 단위: ${pressureUnit || 'MPa'}, 내부 MPa 환산 적용. 권장 압력은 ${pressureUnit || 'MPa'} 단위로 적어라.)${isF ? '\n- (온도 입력 단위: °F, 위 값은 °C로 환산함. 권장 온도는 모두 °C 뒤 괄호에 °F를 함께 적어라. 예: "300°C (572°F)")' : ''}${hydraulicSuspect ? `\n- ⚠ 사출압 ${s.injPressure1} MPa는 수지압으로 보기에 너무 낮다. 화면 값은 유압일 가능성이 높다(수지압 ≈ 유압 × 8~15). 결과에 이 점을 적고 보압/사출압 비율로만 판단하라.` : ''}
 
 ${(a.vpTransferPos || a.vpTransferPressure || a.preInjectDecompDist || a.postMeterDecompDist) ? `## V/P 전환 & 감압(석백)
 - V/P 전환 위치: ${a.vpTransferPos || '-'}mm, V/P 전환 압력: ${a.vpTransferPressure || '-'} MPa
@@ -1139,6 +1198,8 @@ CRITICAL: Your entire response must be ONLY the JSON object. No text before or a
         };
       }
     }
+
+    if (!parseFallback) result = softenDeep(result) as typeof result;
 
     const u = response.usage;
     result._debug = {
