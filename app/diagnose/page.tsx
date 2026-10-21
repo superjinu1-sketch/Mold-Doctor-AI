@@ -1383,7 +1383,7 @@ function DiagnoseContent() {
               onClick={() => loadSample(i)}
               className="shrink-0 bg-surface-sunken hover:bg-brand-tint text-muted hover:text-brand-ink border border-border hover:border-[var(--brand-border)] px-3 py-2.5 rounded-lg text-sm font-medium transition-colors whitespace-nowrap min-h-[44px] flex items-center"
             >
-              {c.label} — {t(c.defectTypeKey)}
+              {c.label} · {t(c.defectTypeKey)}
             </button>
           ))}
         </div>

@@ -15,17 +15,17 @@ export const SAMPLE_DEMO_RESULT = {
   causes: [
     {
       rank: 1, category: "Material", probability: 55,
-      description: "잔류 수분에 의한 가스 발생 — 간헐적 패턴과 일치",
-      scientific_reasoning: "PA66 GF33%의 평형 수분율은 RH50%에서 약 2.5%. 열풍식 건조는 노점 관리 불가로 수분 0.1%+ 잔류 가능. 285°C에서 아미드 결합 가수분해 → CO2/NH3 가스 생성 → 게이트 부근 실버 스트릭. 간헐적(5샷 중 1회)인 이유는 호퍼 내 수지 체류시간 불균일로 수분 편차 발생 때문.",
+      description: "잔류 수분에 의한 가스 발생, 간헐적 패턴과 일치",
+      scientific_reasoning: "PA66 GF33%의 평형 수분율은 RH50%에서 약 2.5%. 열풍식 건조는 노점 관리 불가로 수분 0.1%+ 잔류 가능. 285°C에서 잔류 수분이 수증기가 되어 표면으로 끌려나오고(게이트 부근 실버 스트릭), 아미드 결합 가수분해로 분자량도 떨어진다. 간헐적(5샷 중 1회)인 이유는 호퍼 내 수지 체류시간 불균일로 수분 편차 발생 때문.",
       evidence: "건조 조건 미입력. 노즐 285°C는 PA66 가수분해 임계 온도 범위 내. 불량이 게이트 부근에서 시작 = 게이트 통과 시 전단으로 가스 팽창 일치.",
       elimination: "온도·속도·보압은 모두 프로세스 윈도우 내. 유일하게 미확인 항목이 건조 조건이므로 1순위. 체크링 문제라면 쿠션 불안정이 동반되나 현재 쿠션 5mm 설정값은 이상 없음.",
-      verification: "호퍼 투입 직전 수지 수분 측정. 0.08% 이하 → 건조 원인 아님, 2순위 확인. 0.1% 이상 → 제습식 건조기 80°C 4hr 이상 재건조 후 재시도. 은줄 소멸 시 건조 원인 확진."
+      verification: "호퍼 투입 직전 수지 수분 측정. 0.08% 이하 → 건조 원인 아님, 2순위 확인. 0.1% 이상 → 제습식 건조기 80°C 4hr 이상 재건조 후 재시도. 재건조 후 은줄이 사라지면 건조 원인일 가능성이 높다."
     },
     {
       rank: 2, category: "Machine", probability: 30,
       description: "체크링 간헐 슬리핑으로 사출량 불안정 → 가스 혼입",
       scientific_reasoning: "체크링 마모 또는 이물 끼임 시 역류 발생 → 사출 개시 초기 압력 불안정 → 게이트 부근 용융 선단에 공기/가스 혼입. 5샷 중 1회 불규칙 패턴은 체크링 간헐 슬리핑의 전형적 거동.",
-      evidence: "불량 빈도 5샷 중 1회로 불규칙. 계량 85mm, 쿠션 5mm 설정이나 실제 쿠션 변동 여부 미확인. 배압 5MPa은 PA66 GF33% 기준 낮은 편 — 계량 불안정 가능성.",
+      evidence: "불량 빈도 5샷 중 1회로 불규칙. 계량 85mm, 쿠션 5mm 설정이나 실제 쿠션 변동 여부 미확인. 배압 5MPa은 PA66 GF33% 기준 낮은 편이라 계량 불안정 가능성.",
       elimination: "건조가 정상임이 확인될 경우 체크링이 1순위. 간헐적 패턴은 기계적 마모의 특징. 온도·속도 조건은 정상이므로 열적 원인 배제.",
       verification: "연속 20샷 쿠션 실측 기록. 변동 ±2mm 이상 → 체크링 슬리핑 의심, 분해 점검. 변동 ±1mm 이내 → 체크링 정상, 3순위 검토."
     },
@@ -66,23 +66,23 @@ export const SAMPLE_DEMO_RESULT_EN = {
     melt_temp: { status: "ok", note: "Nozzle 285°C, within recommended 260-290°C" },
     mold_temp: { status: "ok", note: "80°C, within GF33% recommended range" },
     injection_speed: { status: "ok", note: "60%/40% staged speed appropriate" },
-    pack_pressure: { status: "ok", note: "Hold 80MPa, 67% of 120MPa fill pressure — appropriate" },
+    pack_pressure: { status: "ok", note: "Hold 80MPa, 67% of 120MPa fill pressure, appropriate" },
     drying: { status: "warning", note: "Drying conditions not entered, needs confirmation" }
   },
   causes: [
     {
       rank: 1, category: "Material", probability: 55,
-      description: "Gas from residual moisture — consistent with the intermittent pattern",
-      scientific_reasoning: "PA66 GF33% equilibrium moisture is ~2.5% at RH50%. Hot-air drying cannot control dew point, so 0.1%+ residual moisture is possible. At 285°C, amide-bond hydrolysis generates CO2/NH3 gas, producing silver streak near the gate. The intermittent occurrence (1 in 5 shots) comes from uneven resin residence time in the hopper causing moisture variation.",
+      description: "Gas from residual moisture, consistent with the intermittent pattern",
+      scientific_reasoning: "PA66 GF33% equilibrium moisture is ~2.5% at RH50%. Hot-air drying cannot control dew point, so 0.1%+ residual moisture is possible. At 285°C, residual water turns to steam that is dragged to the surface, and amide-bond hydrolysis also lowers molecular weight, producing silver streak near the gate. The intermittent occurrence (1 in 5 shots) comes from uneven resin residence time in the hopper causing moisture variation.",
       evidence: "Drying conditions not entered. Nozzle 285°C is within the PA66 hydrolysis threshold range. The defect originating near the gate matches gas expansion from shear as material passes the gate.",
       elimination: "Temperature, speed, and hold pressure are all within the process window. The only unverified item is drying, so it ranks #1. A check-ring issue would be accompanied by cushion instability, but the current 5mm cushion setpoint shows no abnormality.",
-      verification: "Measure resin moisture just before hopper feed. ≤0.08% → not drying-related, check #2. ≥0.1% → re-dry with a desiccant dryer 80°C 4hr+ and retry. Silver streak disappearing confirms drying as the root cause."
+      verification: "Measure resin moisture just before hopper feed. ≤0.08% → not drying-related, check #2. ≥0.1% → re-dry with a desiccant dryer 80°C 4hr+ and retry. If the silver streak disappears after redrying, drying is highly likely the root cause."
     },
     {
       rank: 2, category: "Machine", probability: 30,
       description: "Unstable shot volume from intermittent check-ring slippage → gas entrainment",
       scientific_reasoning: "Check-ring wear or trapped debris causes backflow, making pressure unstable at injection start and entraining air/gas in the melt front near the gate. The irregular 1-in-5-shot pattern is typical of intermittent check-ring slippage.",
-      evidence: "Defect frequency is irregular at 1 in 5 shots. Metering 85mm, cushion 5mm setpoint, but actual cushion variation is unverified. Back pressure 5MPa is on the low side for PA66 GF33% — possible metering instability.",
+      evidence: "Defect frequency is irregular at 1 in 5 shots. Metering 85mm, cushion 5mm setpoint, but actual cushion variation is unverified. Back pressure 5MPa is on the low side for PA66 GF33%, so metering may be unstable instability.",
       elimination: "If drying is confirmed normal, the check-ring becomes #1. An intermittent pattern is characteristic of mechanical wear. Temperature and speed are normal, so thermal causes are excluded.",
       verification: "Record actual cushion over 20 consecutive shots. Variation ≥±2mm → suspect check-ring slippage; disassemble and inspect. Variation within ±1mm → check-ring normal, examine #3."
     },
@@ -96,7 +96,7 @@ export const SAMPLE_DEMO_RESULT_EN = {
     }
   ],
   recommendations: [
-    { priority: 1, parameter: "Verify drying conditions and switch to a desiccant dryer", current: "Not entered (drying conditions unknown)", recommended: "Desiccant dryer 80°C, 4-6hr, dew point ≤ -30°C", reason: "PA66 GF33% requires moisture ≤0.08%. Hot-air dryers cannot control dew point.", expected_result: "Expect a significant reduction in silver streak frequency near the gate", risk: "Production wait from increased drying time", interaction_note: "Melt viscosity changes after drying — fine-tune hold pressure" },
+    { priority: 1, parameter: "Verify drying conditions and switch to a desiccant dryer", current: "Not entered (drying conditions unknown)", recommended: "Desiccant dryer 80°C, 4-6hr, dew point ≤ -30°C", reason: "PA66 GF33% requires moisture ≤0.08%. Hot-air dryers cannot control dew point.", expected_result: "Expect a significant reduction in silver streak frequency near the gate", risk: "Production wait from increased drying time", interaction_note: "Melt viscosity changes after drying, so fine-tune hold pressure" },
     { priority: 2, parameter: "Back pressure", current: "5 MPa", recommended: "8-12 MPa", reason: "Higher back pressure improves metering uniformity and compresses/expels gas.", expected_result: "Cushion stabilizes, intermittent silver streak decreases", risk: "Possible GF fiber breakage; caution above 10MPa", interaction_note: "Keep screw speed at 80rpm and re-measure cushion variation" },
     { priority: 3, parameter: "Injection speed stage 1", current: "60%", recommended: "40-50% (decelerate through the gate)", reason: "Suppress shear heating near the gate and prevent air entrainment.", expected_result: "Observable improvement in silver streak location near the gate", risk: "Possible short shot; injection pressure monitoring required", interaction_note: "Confirm fill completes within the 120MPa stage-1 pressure limit" },
     { priority: 4, parameter: "Check-ring inspection", current: "Not inspected", recommended: "Measure cushion over 20 shots; disassemble and inspect if variation ≥±2mm", reason: "An intermittent pattern is typical of check-ring wear. If condition adjustments don't resolve it, the cause is mechanical.", expected_result: "Intermittent silver streak pattern resolves as cushion stabilizes", risk: "Production stop required for disassembly inspection", interaction_note: "If no cushion variation, judge the check-ring normal and examine mold venting" }
@@ -106,7 +106,7 @@ export const SAMPLE_DEMO_RESULT_EN = {
     after_changes: ["Confirm cushion stability over 10 shots after the back-pressure change", "Re-measure silver streak frequency after the drying change", "Confirm fill pattern after the injection speed change"],
     escalation: ["If 1-in-5-shot persists after drying + back-pressure adjustment, disassemble the check-ring", "If concentrated in one cavity, add a vent to that cavity", "If unresolved after 3 adjustments, consider changing gate location/size"]
   },
-  resin_specific_notes: "PA66 GF33% is highly hygroscopic; desiccant drying is mandatory. Excessive back pressure causes GF breakage — beware of reduced mechanical strength.",
+  resin_specific_notes: "PA66 GF33% is highly hygroscopic; desiccant drying is mandatory. Excessive back pressure causes GF breakage; watch for reduced mechanical strength.",
   drying_assessment: "Drying conditions not entered. Recommend desiccant drying 80°C/4hr+, dew point ≤ -30°C.",
   tier: "simple",
   round: 1,
