@@ -603,9 +603,13 @@ export default function DiagnosisResultPanel({ result, onSavePDF, round = 1, fol
     drying: t('summary.pw_dry'),
   };
 
-  // 결론 카드용: "지금 바꿀 셋팅" 상위 1~3개 (변경 필요한 것 우선, 없으면 상위 3). 데이터 가공 없음.
-  const changedRecs = recommendations.filter(r => r.current !== r.recommended && r.direction !== 'same');
-  const topActions = (changedRecs.length > 0 ? changedRecs : recommendations).slice(0, 3);
+  // 결론 카드용: "지금 할 일" 1~3개. 1순위 권고는 점검(direction 'same': 퍼지·벤트 청소·단위 확인 등)이어도
+  // 항상 맨 앞에 둔다. 예전엔 값이 바뀌는 권고만 골라서 진짜 첫 행동이 빠지고 근거 약한 값만 남았다
+  // (페르소나 평가 2026-10-20: 김 반장·박 사원·Mike). 나머지 자리는 값이 바뀌는 권고로 채운다.
+  const orderedRecs = [...recommendations].sort((a, b) => (a.priority ?? 99) - (b.priority ?? 99));
+  const firstRec = orderedRecs[0];
+  const changedRecs = orderedRecs.filter(r => r !== firstRec && r.current !== r.recommended && r.direction !== 'same');
+  const topActions = firstRec ? [firstRec, ...changedRecs].slice(0, 3) : [];
   const topCause = causes[0]?.description;
 
   return (
@@ -708,16 +712,28 @@ export default function DiagnosisResultPanel({ result, onSavePDF, round = 1, fol
           <div className="mt-4">
             <div className="text-xs font-bold text-faint uppercase tracking-wider mb-2">{t('conclusion.actions')}</div>
             <div className="space-y-2">
-              {topActions.map((rec, i) => (
-                <div key={i} className="bg-surface-sunken rounded-[var(--radius-card)] p-3 border border-[var(--brand-border)]">
-                  <div className="font-semibold text-muted text-body mb-0.5">{rec.parameter}</div>
-                  <div className="flex items-start gap-1.5">
-                    <span className="text-muted text-body min-w-0 break-words">{rec.current || '-'}</span>
-                    <span className="text-faint shrink-0">→</span>
-                    <span className="text-ink font-bold text-body flex items-start gap-1 min-w-0 break-words"><DirectionArrow direction={rec.direction} />{rec.recommended}</span>
+              {topActions.map((rec, i) => {
+                const isCheck = rec.direction === 'same' || rec.current === rec.recommended;
+                return (
+                  <div key={i} className="bg-surface-sunken rounded-[var(--radius-card)] p-3 border border-[var(--brand-border)]">
+                    <div className="flex items-center gap-2 mb-0.5 flex-wrap">
+                      <span className="shrink-0 inline-flex items-center justify-center w-6 h-6 rounded-full bg-brand text-on-brand text-[length:var(--text-label)] font-bold">{i + 1}</span>
+                      <span className="font-semibold text-muted text-[length:var(--text-body)] min-w-0 break-words">{rec.parameter}</span>
+                      {isCheck && <span className="text-[length:var(--text-label)] px-2 py-0.5 rounded-full bg-brand-tint text-brand-ink font-medium">{t('conclusion.check_first')}</span>}
+                    </div>
+                    {isCheck ? (
+                      <p className="text-ink font-bold text-[length:var(--text-body)] break-words">{rec.recommended}</p>
+                    ) : (
+                      <div className="flex items-start gap-1.5">
+                        <span className="text-muted text-[length:var(--text-body)] min-w-0 break-words">{rec.current || '-'}</span>
+                        <span className="text-faint shrink-0">→</span>
+                        <span className="text-ink font-bold text-[length:var(--text-body)] flex items-start gap-1 min-w-0 break-words"><DirectionArrow direction={rec.direction} />{rec.recommended}</span>
+                      </div>
+                    )}
                   </div>
-                </div>
-              ))}
+                );
+              })}
+              {topActions.length > 1 && <p className="text-[length:var(--text-label)] text-faint">{t('conclusion.one_at_a_time')}</p>}
             </div>
           </div>
         )}

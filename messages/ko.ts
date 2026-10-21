@@ -554,7 +554,9 @@ export const ko: Record<string, string> = {
   /* Additional notes */
   'notes.section_title': '수지·건조·금형 노트',
   'conclusion.cause': '핵심 원인',
-  'conclusion.actions': '지금 바꿀 세팅',
+  'conclusion.actions': '지금 할 일 (순서대로)',
+  'conclusion.check_first': '먼저 확인',
+  'conclusion.one_at_a_time': '한 번에 하나씩 바꾸고, 결과를 본 뒤 다음으로 넘어가세요.',
   'notes.resin': '수지 특성 주의사항',
   'notes.drying': '건조 조건 평가',
   'notes.advice': '추가 조언',

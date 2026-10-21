@@ -543,7 +543,9 @@ export const en: Record<string, string> = {
 
   'notes.section_title': 'Resin / Drying / Mold Notes',
   'conclusion.cause': 'Key cause',
-  'conclusion.actions': 'Change these now',
+  'conclusion.actions': 'Do this now, in order',
+  'conclusion.check_first': 'Check first',
+  'conclusion.one_at_a_time': 'Change one thing at a time and check the result before the next.',
   'notes.resin': 'Resin-Specific Notes',
   'notes.drying': 'Drying Assessment',
   'notes.advice': 'Additional Advice',
