@@ -133,6 +133,9 @@ function parseAIResponse(rawText: string) {
 }
 
 // --- Constants (values stay in Korean for API compatibility) ---
+// 셋팅값 용어 풀이 항목(messages의 glossary.<key>.term / .def)
+const GLOSSARY_KEYS = ['zone', 'inj_pressure', 'hold_pressure', 'hold_time', 'inj_speed', 'vp', 'metering', 'cushion', 'back_pressure', 'suckback', 'cool_time'] as const;
+
 const DEFECT_TYPES = [
   '미성형 (Short Shot)', '플래시 (Flash)', '싱크마크 (Sink Mark)', '웰드라인 (Weld Line)',
   '버닝/가스마크 (Burn Mark)', '은줄 (Silver Streak)', '변색 (Discoloration)', '크랙 (Crack)',
@@ -1787,6 +1790,20 @@ function DiagnoseContent() {
             )}
           </div>
           <div className="space-y-5">
+            {/* 용어 풀이: 칸마다 아이콘을 달면 모바일에서 복잡해져 한 곳에 접어 둔다(페르소나 평가 박 사원). */}
+            <details className="rounded-xl border border-border bg-surface-sunken">
+              <summary className="cursor-pointer list-none min-h-[var(--touch-min)] px-4 flex items-center text-[length:var(--text-body)] font-semibold text-brand-ink">
+                {t('glossary.toggle')}
+              </summary>
+              <dl className="px-4 pb-4 space-y-2">
+                {GLOSSARY_KEYS.map(k => (
+                  <div key={k}>
+                    <dt className="text-[length:var(--text-body)] font-semibold text-ink">{t(`glossary.${k}.term`)}</dt>
+                    <dd className="text-[length:var(--text-body)] text-muted">{t(`glossary.${k}.def`)}</dd>
+                  </div>
+                ))}
+              </dl>
+            </details>
             <div className="flex items-center gap-2 flex-wrap">
               <span className="text-faint text-sm">{t('step3.temp_unit')}</span>
               {(['C', 'F'] as const).map(u => (
