@@ -132,7 +132,7 @@ export const ko: Record<string, string> = {
   'auth.signout': '로그아웃',
   'auth.signing_in': '로그인 중...',
   'auth.callback_loading': '로그인 처리 중...',
-  'auth.login_required': '로그인 후 이용할 수 있습니다. 구글 로그인 창으로 이동합니다.',
+  'auth.login_required': '로그인 후 이용할 수 있습니다. 로그인해도 입력한 내용은 그대로 남아요.',
   'auth.login': '로그인',
   'auth.signup': '회원가입',
   'auth.email': '이메일',

@@ -131,7 +131,7 @@ export const en: Record<string, string> = {
   'auth.signout': 'Sign out',
   'auth.signing_in': 'Signing in...',
   'auth.callback_loading': 'Completing sign-in...',
-  'auth.login_required': 'Please sign in to continue. Redirecting to Google login.',
+  'auth.login_required': 'Please sign in to continue. Your inputs stay as they are.',
   'auth.login': 'Log in',
   'auth.signup': 'Sign up',
   'auth.email': 'Email',

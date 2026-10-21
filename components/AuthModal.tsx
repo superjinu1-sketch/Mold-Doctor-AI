@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLocale } from '@/contexts/LocaleContext';
 import Logo from './Logo';
+import { isAndroidApp } from '@/lib/platform';
 
 function GoogleIcon() {
   return (
@@ -102,6 +103,34 @@ export default function AuthModal({ open, onClose }: { open: boolean; onClose: (
           <p className="text-body text-muted">{t('auth.subtitle')}</p>
         </div>
 
+        {/* 소셜 로그인을 맨 위에: 대부분 구글로 가입하는데 이메일 칸 아래에 있어 찾기 어려웠다(재평가 김 반장). */}
+        {/* 구글 로그인 — 유지(삭제 금지) */}
+        <button
+          type="button"
+          onClick={() => signInWithGoogle()}
+          className="w-full flex items-center justify-center gap-2 bg-surface hover:bg-surface-sunken text-ink border border-border-strong rounded-[var(--radius-cta)] min-h-[var(--touch-cta)] text-body font-semibold transition-colors"
+        >
+          <GoogleIcon />
+          {t('auth.signin')}
+        </button>
+
+        {/* Apple 로그인 — App Store 4.8(제3자 로그인 동등 제공 의무, iOS·웹). 안드로이드 앱에서는 숨긴다(재평가 김 반장). HIG 준수: 검정 배경/흰 로고+텍스트 */}
+        {!isAndroidApp() && (
+        <button
+          type="button"
+          onClick={() => signInWithApple()}
+          className="w-full flex items-center justify-center gap-2 bg-[var(--apple-btn)] hover:bg-[var(--apple-btn-pressed)] text-[var(--on-brand)] rounded-[var(--radius-cta)] min-h-[var(--touch-cta)] text-body font-semibold transition-colors"
+        >
+          <AppleIcon />
+          {t('auth.signin_apple')}
+        </button>
+        )}
+        <div className="flex items-center gap-3">
+          <div className="flex-1 h-px bg-border" />
+          <span className="text-label text-faint">{t('auth.or')}</span>
+          <div className="flex-1 h-px bg-border" />
+        </div>
+
         <div className="space-y-3">
           <div>
             <label htmlFor="auth-email" className="block text-label font-medium text-muted mb-1">{t('auth.email')}</label>
@@ -158,31 +187,6 @@ export default function AuthModal({ open, onClose }: { open: boolean; onClose: (
           {t('auth.browse_sample')}
         </button>
 
-        <div className="flex items-center gap-3">
-          <div className="flex-1 h-px bg-border" />
-          <span className="text-label text-faint">{t('auth.or')}</span>
-          <div className="flex-1 h-px bg-border" />
-        </div>
-
-        {/* 구글 로그인 — 유지(삭제 금지) */}
-        <button
-          type="button"
-          onClick={() => signInWithGoogle()}
-          className="w-full flex items-center justify-center gap-2 bg-surface hover:bg-surface-sunken text-ink border border-border-strong rounded-[var(--radius-cta)] min-h-[var(--touch-cta)] text-body font-semibold transition-colors"
-        >
-          <GoogleIcon />
-          {t('auth.signin')}
-        </button>
-
-        {/* Apple 로그인 — App Store 4.8(제3자 로그인 동등 제공 의무). HIG 준수: 검정 배경/흰 로고+텍스트 */}
-        <button
-          type="button"
-          onClick={() => signInWithApple()}
-          className="w-full flex items-center justify-center gap-2 bg-[var(--apple-btn)] hover:bg-[var(--apple-btn-pressed)] text-[var(--on-brand)] rounded-[var(--radius-cta)] min-h-[var(--touch-cta)] text-body font-semibold transition-colors"
-        >
-          <AppleIcon />
-          {t('auth.signin_apple')}
-        </button>
       </div>
     </div>
   );
