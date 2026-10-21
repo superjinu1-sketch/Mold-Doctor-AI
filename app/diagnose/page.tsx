@@ -136,10 +136,10 @@ function parseAIResponse(rawText: string) {
 const DEFECT_TYPES = [
   '미성형 (Short Shot)', '플래시 (Flash)', '싱크마크 (Sink Mark)', '웰드라인 (Weld Line)',
   '버닝/가스마크 (Burn Mark)', '은줄 (Silver Streak)', '변색 (Discoloration)', '크랙 (Crack)',
-  '휨/변형 (Warpage)', '기포 (Void/Bubble)', '젯팅 (Jetting)', '기타 (직접 입력)',
+  '휨/변형 (Warpage)', '기포 (Void/Bubble)', '젯팅 (Jetting)', '흑점 (Black Specks)', '기타 (직접 입력)',
 ];
 
-// 불량 가이드 slug(lib/defectGuide.ts id) → 폼 불량 유형. 폼 목록에 있는 11종만 직접 매핑한다.
+// 불량 가이드 slug(lib/defectGuide.ts id) → 폼 불량 유형. 폼 목록에 있는 12종만 직접 매핑한다.
 const GUIDE_SLUG_TO_DEFECT: Record<string, string> = {
   'short-shot': '미성형 (Short Shot)',
   'flash': '플래시 (Flash)',
@@ -152,6 +152,7 @@ const GUIDE_SLUG_TO_DEFECT: Record<string, string> = {
   'warpage': '휨/변형 (Warpage)',
   'void': '기포 (Void/Bubble)',
   'jetting': '젯팅 (Jetting)',
+  'black-specks': '흑점 (Black Specks)',
 };
 
 const DEFECT_KEY_MAP: Record<string, string> = {
@@ -166,6 +167,7 @@ const DEFECT_KEY_MAP: Record<string, string> = {
   '휨/변형 (Warpage)': 'defect.warpage',
   '기포 (Void/Bubble)': 'defect.void',
   '젯팅 (Jetting)': 'defect.jetting',
+  '흑점 (Black Specks)': 'defect.black_specks',
   '기타 (직접 입력)': 'defect.custom',
 };
 
@@ -1551,6 +1553,33 @@ function DiagnoseContent() {
         <FormSection step={2} title={t('step2.title')} open={openSection === 2}
           complete={!!(resinType || customResin)}
           onToggle={() => setOpenSection(s => (s === 2 ? null : 2))}>
+          {/* 필수 수지 선택: 항상 보이게(예전엔 "그레이드명이 없나요?" 링크 뒤에 숨어 있었다, 페르소나 평가 2026-10-20 김 반장) */}
+          <div className="mb-4">
+            <label className={labelCls}>{t('step2.resin_label')} <span className="text-danger">*</span></label>
+            <select
+              className={selectCls}
+              value={resinType}
+              onChange={(e) => setResinType(e.target.value)}
+            >
+              <option value="">{t('step2.resin_placeholder')}</option>
+              {RESIN_OPTIONS.map(group => (
+                <optgroup key={group.group} label={t(group.groupKey)}>
+                  {group.options.map(opt => (
+                    <option key={opt} value={opt}>
+                      {opt === '기타 (직접 입력)'
+                        ? t('resin.custom_option')
+                        : locale === 'en'
+                          ? (RESIN_OPTION_EN_LABEL[opt] ?? opt)
+                          : opt}
+                    </option>
+                  ))}
+                </optgroup>
+              ))}
+            </select>
+            {resinType === '기타 (직접 입력)' && (
+              <input type="text" className={`${inputCls} mt-2`} placeholder={t('step2.resin_custom')} value={customResin} onChange={(e) => setCustomResin(e.target.value)} />
+            )}
+          </div>
           {/* 포대 라벨 사진 자동 입력 */}
           <button
             type="button"
@@ -1607,32 +1636,6 @@ function DiagnoseContent() {
             </button>
           ) : (
             <div className="grid sm:grid-cols-2 gap-4">
-              <div className="sm:col-span-2">
-                <label className={labelCls}>{t('step2.resin_label')} <span className="text-danger">*</span></label>
-                <select
-                  className={selectCls}
-                  value={resinType}
-                  onChange={(e) => setResinType(e.target.value)}
-                >
-                  <option value="">{t('step2.resin_placeholder')}</option>
-                  {RESIN_OPTIONS.map(group => (
-                    <optgroup key={group.group} label={t(group.groupKey)}>
-                      {group.options.map(opt => (
-                        <option key={opt} value={opt}>
-                          {opt === '기타 (직접 입력)'
-                            ? t('resin.custom_option')
-                            : locale === 'en'
-                              ? (RESIN_OPTION_EN_LABEL[opt] ?? opt)
-                              : opt}
-                        </option>
-                      ))}
-                    </optgroup>
-                  ))}
-                </select>
-                {resinType === '기타 (직접 입력)' && (
-                  <input type="text" className={`${inputCls} mt-2`} placeholder={t('step2.resin_custom')} value={customResin} onChange={(e) => setCustomResin(e.target.value)} />
-                )}
-              </div>
               <div>
                 <label className={labelCls}>{t('step2.filler_label')}</label>
                 <select className={selectCls} value={filler} onChange={(e) => setFiller(e.target.value)}>
@@ -2278,7 +2281,7 @@ function DiagnoseContent() {
           <div className="max-w-5xl mx-auto px-3 sm:px-4 py-3 flex items-center gap-3">
             <div className="flex-1 min-w-0 text-sm leading-tight">
               {!effectiveDefectType
-                ? <span className="text-warn font-medium">{t('step1.defect_required_gate')}</span>
+                ? <span className="text-muted font-medium">{t('step1.defect_required_gate')}</span>
                 : user
                   ? (
                     <span className="text-faint flex items-center gap-1 flex-wrap">

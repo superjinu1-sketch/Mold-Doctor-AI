@@ -96,7 +96,8 @@ export async function POST(request: NextRequest) {
 
 ${VISUAL_DIFFERENTIAL}
 
-후보 12종(en): Short Shot, Flash, Sink Mark, Weld Line, Burn Mark, Silver Streak, Discoloration, Crack, Warpage, Void/Bubble, Jetting, Other
+후보 13종(en): Short Shot, Flash, Sink Mark, Weld Line, Burn Mark, Silver Streak, Discoloration, Crack, Warpage, Void/Bubble, Jetting, Black Specks, Other
+(Black Specks = 흑점: 표면이나 내부의 작은 검은 입자. 넓은 면적 변색은 Discoloration)
 규칙: 불명확하거나 판독 어려우면 confidence='low'. 사출 불량이 안 보이면 defect_type을 비우고 confidence='low'.
 en 값은 위 후보 목록 문자열을 그대로 사용하세요.
 JSON 객체 하나만 반환(머리말·설명·코드펜스 없이 첫 글자가 '{'로 시작):
