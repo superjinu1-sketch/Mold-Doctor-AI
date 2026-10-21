@@ -10,6 +10,7 @@ import { getAppVersionInfo } from '@/lib/appVersion';
 import { supabase } from '@/lib/supabase/client';
 import { onUpgradeRequired } from '@/lib/updateGateBus';
 import { performAndroidImmediateUpdate } from '@/lib/appUpdate';
+import { useLocale } from '@/contexts/LocaleContext';
 
 interface GateState {
   storeUrl: string;
@@ -20,8 +21,11 @@ interface GateState {
 }
 
 const DEFAULT_MESSAGE = '앱이 개선되어 이전 버전은 더 이상 사용할 수 없습니다. 업데이트 후 계속 이용해 주세요. 저장된 기록은 그대로 유지됩니다.';
+const DEFAULT_MESSAGE_EN = 'This version of the app is no longer supported. Please update to keep using it. Your saved records stay as they are.';
 
 export default function UpdateGate() {
+  const { locale } = useLocale();
+  const isEn = locale === 'en';
   const [gate, setGate] = useState<GateState | null>(null);
 
   const checkFromServer = useCallback(async () => {
@@ -89,16 +93,17 @@ export default function UpdateGate() {
   return (
     <div className="fixed inset-0 z-[200] bg-canvas flex items-center justify-center p-4">
       <div className="ui-card ui-card-lg p-6 max-w-sm w-full text-center">
-        <h2 className="text-[length:var(--text-h2)] font-bold text-ink mb-3">업데이트가 필요합니다</h2>
-        <p className="text-body text-muted mb-6">{gate.message || DEFAULT_MESSAGE}</p>
+        <h2 className="text-[length:var(--text-h2)] font-bold text-ink mb-3">{isEn ? 'Update required' : '업데이트가 필요합니다'}</h2>
+        {/* 서버 메시지는 한국어로 관리되므로 영어 사용자에게는 영어 기본 문구를 보여준다. */}
+        <p className="text-body text-muted mb-6">{isEn ? DEFAULT_MESSAGE_EN : (gate.message || DEFAULT_MESSAGE)}</p>
         <button
           type="button"
           onClick={() => void handleUpdate()}
           className="w-full min-h-[var(--touch-cta)] rounded-[var(--radius-cta)] bg-brand hover:bg-brand-ink text-on-brand font-bold text-body transition-colors"
         >
-          업데이트하기
+          {isEn ? 'Update' : '업데이트하기'}
         </button>
-        <p className="text-[length:var(--text-label)] text-faint mt-4">현재 버전: {gate.currentVersion} ({gate.currentBuild})</p>
+        <p className="text-[length:var(--text-label)] text-faint mt-4">{isEn ? 'Current version' : '현재 버전'}: {gate.currentVersion} ({gate.currentBuild})</p>
       </div>
     </div>
   );

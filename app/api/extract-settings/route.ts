@@ -121,6 +121,7 @@ export async function POST(request: NextRequest) {
   "moldTempFixed": "",
   "moldTempMoving": "",
   "pressureUnit": "",
+  "tempUnit": "",
   "injPressure1": "",
   "holdPressure": "",
   "injSpeed1": "",
@@ -142,7 +143,8 @@ export async function POST(request: NextRequest) {
 - 존이 5개 이상이면 노즐 + 노즐에 가까운 전방 4개 존을 nozzleTemp~zone4Temp로 매핑하라.
 - moldTempFixed: 고정측 금형온도 (℃)
 - moldTempMoving: 가동측 금형온도 (℃)
-- pressureUnit: 화면에 표시된 압력 단위. 압력 항목 헤더/옆의 [bar], [MPa], [kgf/cm²] 표기를 그대로 읽어 "bar" | "MPa" | "kgf/cm2" 중 하나로 반환. 판단 불가 시 "".
+- pressureUnit: 화면에 표시된 압력 단위. 압력 항목 헤더/옆의 [bar], [MPa], [kgf/cm²], [psi] 표기를 그대로 읽어 "bar" | "MPa" | "kgf/cm2" | "psi" 중 하나로 반환. 판단 불가 시 "".
+- tempUnit: 화면 온도 단위. [°F]/℉ 표기가 있거나 배럴 온도가 400 이상(예 480~620)이면 "F", [°C]/℃이거나 일반적인 섭씨 범위면 "C". 판단 불가 시 "". 온도 값은 화면 숫자 그대로 반환(환산하지 말 것).
 - 중요: 압력 값(injPressure1·holdPressure·backPressure)은 화면에 보이는 숫자 그대로 반환하라(단위 환산하지 말 것). 환산은 앱이 한다.
 - injPressure1: 1차 사출압력 (화면 단위 그대로)
 - holdPressure: 보압 (화면 단위 그대로)

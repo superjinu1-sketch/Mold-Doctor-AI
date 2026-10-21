@@ -264,6 +264,16 @@ function DiagnoseContent() {
   const [authOpen, setAuthOpen] = useState(false);
   // 이 화면에서 로그인 창을 열 때는 항상 복귀 경로를 함께 기억한다(로그인 후 홈이 아닌 이 화면으로).
   const openLogin = () => { setAuthReturn('/diagnose'); setAuthOpen(true); };
+  // 온도 입력 단위(°C/°F). 서버가 °F를 °C로 환산해 분석한다. 미국 사용자용(페르소나 평가 2026-10-20 Mike).
+  // 선택은 이 기기에 기억한다(정적 내보내기 하이드레이션 불일치를 피하려고 마운트 후 읽는다).
+  const [tempUnit, setTempUnitState] = useState<'C' | 'F'>('C');
+  useEffect(() => {
+    try { if (localStorage.getItem('molddoctor_temp_unit') === 'F') setTempUnitState('F'); } catch { /* ignore */ }
+  }, []);
+  const setTempUnit = (u: 'C' | 'F') => {
+    setTempUnitState(u);
+    try { localStorage.setItem('molddoctor_temp_unit', u); } catch { /* ignore */ }
+  };
   const [settings, setSettings] = useState({
     nozzleTemp: '', zone1Temp: '', zone2Temp: '', zone3Temp: '', zone4Temp: '',
     moldTempFixed: '', moldTempMoving: '',
@@ -413,6 +423,8 @@ function DiagnoseContent() {
     if (!res.ok) return { filled: 0, status: res.status };
     const extracted = await res.json();
     const filledKeys: string[] = [];
+    // 화면 온도 단위(°F 사출기)는 상태 갱신 함수 밖에서 반영한다.
+    if (extracted.tempUnit === 'F' || extracted.tempUnit === 'C') setTempUnit(extracted.tempUnit);
     setSettings(prev => {
       const updated = { ...prev };
       for (const key of Object.keys(extracted)) {
@@ -422,7 +434,7 @@ function DiagnoseContent() {
           filledKeys.push(key);
         }
       }
-      if (extracted.pressureUnit && ['bar', 'MPa', 'kgf/cm2'].includes(extracted.pressureUnit)) {
+      if (extracted.pressureUnit && ['bar', 'MPa', 'kgf/cm2', 'psi'].includes(extracted.pressureUnit)) {
         updated.pressureUnit = extracted.pressureUnit;
       }
       return updated;
@@ -549,6 +561,7 @@ function DiagnoseContent() {
           if (ri.resinDetail) setResinDetail(ri.resinDetail);
           if (ri.resinGrade) setResinGrade(ri.resinGrade);
           if (bi.settings) setSettings(prev => ({ ...prev, ...bi.settings }));
+          if (bi.tempUnit === 'F' || bi.tempUnit === 'C') setTempUnit(bi.tempUnit);
           if (bi.advSettings) setAdvSettings(prev => ({ ...prev, ...bi.advSettings }));
           const mi = bi.moldInfo || {};
           if (mi.moldType) setMoldType(mi.moldType);
@@ -1081,6 +1094,7 @@ function DiagnoseContent() {
         settings,
         advSettings,
         pressureUnit: settings.pressureUnit,
+        tempUnit,
         moldInfo: { moldType, gateType, cavities, runnerType },
         productInfo: { weight, wallThicknessMin, wallThicknessMax, notes: productNotes },
         // 서버 한도는 5장(초과 시 413). 후속 라운드에서 기존+새 사진이 5장을 넘으면 가장 오래된 것부터 뺀다.
@@ -1173,6 +1187,7 @@ function DiagnoseContent() {
             settings: { ...settings },
             advSettings: { ...advSettings },
             pressureUnit: settings.pressureUnit,
+            tempUnit,
             moldInfo: { moldType, gateType, cavities, runnerType },
             productInfo: { weight, wallThicknessMin, wallThicknessMax, notes: productNotes },
             locale,
@@ -1669,7 +1684,7 @@ function DiagnoseContent() {
               </div>
               <div>
                 <label className={labelCls}>{t('step2.filler_pct')}</label>
-                <input type="text" inputMode="numeric" className={inputCls} placeholder={t('step2.filler_placeholder')} value={fillerContent} onChange={(e) => setFillerContent(e.target.value)} />
+                <input type="text" inputMode="decimal" className={inputCls} placeholder={t('step2.filler_placeholder')} value={fillerContent} onChange={(e) => setFillerContent(e.target.value)} />
               </div>
               <div>
                 <label className={labelCls}>{t('step2.fr_label')}</label>
@@ -1772,13 +1787,26 @@ function DiagnoseContent() {
             )}
           </div>
           <div className="space-y-5">
+            <div className="flex items-center gap-2 flex-wrap">
+              <span className="text-faint text-sm">{t('step3.temp_unit')}</span>
+              {(['C', 'F'] as const).map(u => (
+                <button key={u} type="button"
+                  onClick={() => setTempUnit(u)}
+                  className={`min-h-[44px] px-4 rounded-lg border text-sm font-bold transition-colors ${
+                    tempUnit === u
+                      ? 'bg-brand-tint text-brand-ink border-[var(--brand-border)]'
+                      : 'bg-surface text-muted border-border hover:border-border-strong'}`}>
+                  {u === 'C' ? '℃' : '℉'}
+                </button>
+              ))}
+            </div>
             <div>
               <label className={labelCls}>{t('step3.temp_label')}</label>
               <div className="grid grid-cols-3 sm:grid-cols-5 gap-2">
                 {tempZones.map(({ key, label }) => (
                   <div key={key}>
                     <div className={`text-xs mb-1 text-center ${extractedFields.has(key) ? 'text-brand-ink/70 font-semibold' : 'text-faint'}`}>{label}{extractedFields.has(key) && ' ✓'}</div>
-                    <input type="text" inputMode="numeric" className={settingInputCls(key)} placeholder="℃" value={settings[key as keyof typeof settings]} onChange={(e) => setSetting(key, e.target.value)} />
+                    <input type="text" inputMode="decimal" className={settingInputCls(key)} placeholder={tempUnit === 'F' ? '℉' : '℃'} value={settings[key as keyof typeof settings]} onChange={(e) => setSetting(key, e.target.value)} />
                   </div>
                 ))}
               </div>
@@ -1789,14 +1817,14 @@ function DiagnoseContent() {
                 {moldTempFields.map(({ key, label }) => (
                   <div key={key}>
                     <div className={`text-xs mb-1 ${extractedFields.has(key) ? 'text-brand-ink/70 font-semibold' : 'text-faint'}`}>{label}{extractedFields.has(key) && ' ✓'}</div>
-                    <input type="text" inputMode="numeric" className={settingInputCls(key)} placeholder="℃" value={settings[key as keyof typeof settings]} onChange={(e) => setSetting(key, e.target.value)} />
+                    <input type="text" inputMode="decimal" className={settingInputCls(key)} placeholder={tempUnit === 'F' ? '℉' : '℃'} value={settings[key as keyof typeof settings]} onChange={(e) => setSetting(key, e.target.value)} />
                   </div>
                 ))}
               </div>
             </div>
             <div className="flex items-center gap-2 mb-2">
               <span className="text-faint text-sm">{t('step3.pressure_unit')}</span>
-              {(['bar', 'MPa'] as const).map(u => (
+              {(['bar', 'MPa', 'psi'] as const).map(u => (
                 <button key={u} type="button"
                   onClick={() => setSettings(prev => ({ ...prev, pressureUnit: u }))}
                   className={`min-h-[44px] px-4 rounded-lg border text-sm font-bold transition-colors ${
@@ -1811,7 +1839,7 @@ function DiagnoseContent() {
               {machineParams.map(({ key, label, placeholder }) => (
                 <div key={key}>
                   <div className={`text-xs mb-1 ${extractedFields.has(key) ? 'text-brand-ink/70 font-semibold' : 'text-faint'}`}>{label}{extractedFields.has(key) && ' ✓'}</div>
-                  <input type="text" inputMode="numeric" className={settingInputCls(key)} placeholder={placeholder} value={settings[key as keyof typeof settings]} onChange={(e) => setSetting(key, e.target.value)} />
+                  <input type="text" inputMode="decimal" className={settingInputCls(key)} placeholder={placeholder} value={settings[key as keyof typeof settings]} onChange={(e) => setSetting(key, e.target.value)} />
                 </div>
               ))}
             </div>
@@ -1854,7 +1882,7 @@ function DiagnoseContent() {
                     ].map(({ key, label, placeholder }) => (
                       <div key={key}>
                         <div className="text-[length:var(--text-label)] text-faint mb-1">{label}</div>
-                        <input type="text" inputMode="numeric" className={inputCls} placeholder={placeholder} value={advSettings[key as keyof typeof advSettings]} onChange={(e) => setAdvSetting(key, e.target.value)} />
+                        <input type="text" inputMode="decimal" className={inputCls} placeholder={placeholder} value={advSettings[key as keyof typeof advSettings]} onChange={(e) => setAdvSetting(key, e.target.value)} />
                       </div>
                     ))}
                   </div>
@@ -1873,7 +1901,7 @@ function DiagnoseContent() {
                     ].map(({ key, label, placeholder }) => (
                       <div key={key}>
                         <div className="text-[length:var(--text-label)] text-faint mb-1">{label}</div>
-                        <input type="text" inputMode="numeric" className={inputCls} placeholder={placeholder} value={advSettings[key as keyof typeof advSettings]} onChange={(e) => setAdvSetting(key, e.target.value)} />
+                        <input type="text" inputMode="decimal" className={inputCls} placeholder={placeholder} value={advSettings[key as keyof typeof advSettings]} onChange={(e) => setAdvSetting(key, e.target.value)} />
                       </div>
                     ))}
                   </div>
@@ -1885,11 +1913,11 @@ function DiagnoseContent() {
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                     <div>
                       <div className="text-xs text-muted mb-1">{t('adv.dry_temp')}</div>
-                      <input type="text" inputMode="numeric" className={inputCls} placeholder="℃" value={advSettings.dryTemp} onChange={(e) => setAdvSetting('dryTemp', e.target.value)} />
+                      <input type="text" inputMode="decimal" className={inputCls} placeholder={tempUnit === 'F' ? '℉' : '℃'} value={advSettings.dryTemp} onChange={(e) => setAdvSetting('dryTemp', e.target.value)} />
                     </div>
                     <div>
                       <div className="text-xs text-muted mb-1">{t('adv.dry_time')}</div>
-                      <input type="text" inputMode="numeric" className={inputCls} placeholder="hr" value={advSettings.dryTime} onChange={(e) => setAdvSetting('dryTime', e.target.value)} />
+                      <input type="text" inputMode="decimal" className={inputCls} placeholder="hr" value={advSettings.dryTime} onChange={(e) => setAdvSetting('dryTime', e.target.value)} />
                     </div>
                     <div>
                       <div className="text-xs text-muted mb-1">{t('adv.dryer_type')}</div>
@@ -1901,7 +1929,7 @@ function DiagnoseContent() {
                     </div>
                     <div>
                       <div className="text-xs text-muted mb-1">{t('adv.moisture')}</div>
-                      <input type="text" inputMode="numeric" className={inputCls} placeholder="%" value={advSettings.moistureContent} onChange={(e) => setAdvSetting('moistureContent', e.target.value)} />
+                      <input type="text" inputMode="decimal" className={inputCls} placeholder="%" value={advSettings.moistureContent} onChange={(e) => setAdvSetting('moistureContent', e.target.value)} />
                     </div>
                   </div>
                 </div>
@@ -1919,8 +1947,8 @@ function DiagnoseContent() {
                         { key: 'hrNozzle4Temp', label: t('adv.hr_nozzle4') },
                       ].map(({ key, label }) => (
                         <div key={key}>
-                          <div className="text-[length:var(--text-label)] text-faint mb-1">{label} (℃)</div>
-                          <input type="text" inputMode="numeric" className={inputCls} placeholder="℃" value={advSettings[key as keyof typeof advSettings]} onChange={(e) => setAdvSetting(key, e.target.value)} />
+                          <div className="text-[length:var(--text-label)] text-faint mb-1">{label} ({tempUnit === 'F' ? '℉' : '℃'})</div>
+                          <input type="text" inputMode="decimal" className={inputCls} placeholder={tempUnit === 'F' ? '℉' : '℃'} value={advSettings[key as keyof typeof advSettings]} onChange={(e) => setAdvSetting(key, e.target.value)} />
                         </div>
                       ))}
                       <div>
@@ -1940,7 +1968,7 @@ function DiagnoseContent() {
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                     <div>
                       <div className="text-xs text-muted mb-1">{t('adv.regrind_ratio')}</div>
-                      <input type="text" inputMode="numeric" className={inputCls} placeholder="%" value={advSettings.regrindRatio} onChange={(e) => setAdvSetting('regrindRatio', e.target.value)} />
+                      <input type="text" inputMode="decimal" className={inputCls} placeholder="%" value={advSettings.regrindRatio} onChange={(e) => setAdvSetting('regrindRatio', e.target.value)} />
                     </div>
                     <div>
                       <div className="text-xs text-muted mb-1">{t('adv.color_type')}</div>
@@ -1954,7 +1982,7 @@ function DiagnoseContent() {
                     {advSettings.colorType !== '없음' && (
                       <div>
                         <div className="text-[length:var(--text-label)] text-faint mb-1">{t('adv.color_ratio')}</div>
-                        <input type="text" inputMode="numeric" className={inputCls} placeholder="%" value={advSettings.mbRatio} onChange={(e) => setAdvSetting('mbRatio', e.target.value)} />
+                        <input type="text" inputMode="decimal" className={inputCls} placeholder="%" value={advSettings.mbRatio} onChange={(e) => setAdvSetting('mbRatio', e.target.value)} />
                       </div>
                     )}
                   </div>
@@ -1970,15 +1998,15 @@ function DiagnoseContent() {
                     </div>
                     <div>
                       <div className="text-xs text-muted mb-1">{t('adv.screw_dia')}</div>
-                      <input type="text" inputMode="numeric" className={inputCls} placeholder="mm" value={advSettings.screwDiameter} onChange={(e) => setAdvSetting('screwDiameter', e.target.value)} />
+                      <input type="text" inputMode="decimal" className={inputCls} placeholder="mm" value={advSettings.screwDiameter} onChange={(e) => setAdvSetting('screwDiameter', e.target.value)} />
                     </div>
                     <div>
                       <div className="text-xs text-muted mb-1">{t('adv.max_clamp')}</div>
-                      <input type="text" inputMode="numeric" className={inputCls} placeholder="ton" value={advSettings.maxClampForce} onChange={(e) => setAdvSetting('maxClampForce', e.target.value)} />
+                      <input type="text" inputMode="decimal" className={inputCls} placeholder="ton" value={advSettings.maxClampForce} onChange={(e) => setAdvSetting('maxClampForce', e.target.value)} />
                     </div>
                     <div>
                       <div className="text-xs text-muted mb-1">{t('adv.max_pressure')}</div>
-                      <input type="text" inputMode="numeric" className={inputCls} placeholder={settings.pressureUnit || 'MPa'} value={advSettings.maxInjPressure} onChange={(e) => setAdvSetting('maxInjPressure', e.target.value)} />
+                      <input type="text" inputMode="decimal" className={inputCls} placeholder={settings.pressureUnit || 'MPa'} value={advSettings.maxInjPressure} onChange={(e) => setAdvSetting('maxInjPressure', e.target.value)} />
                     </div>
                   </div>
                   <div>
@@ -2024,7 +2052,7 @@ function DiagnoseContent() {
             </div>
             <div>
               <label className={labelCls}>{t('step4.cavities')}</label>
-              <input type="text" inputMode="numeric" className={inputCls} placeholder={t('step4.cavities_placeholder')} value={cavities} onChange={(e) => setCavities(e.target.value)} />
+              <input type="text" inputMode="decimal" className={inputCls} placeholder={t('step4.cavities_placeholder')} value={cavities} onChange={(e) => setCavities(e.target.value)} />
             </div>
             <div>
               <label className={labelCls}>{t('step4.runner')}</label>
@@ -2036,14 +2064,14 @@ function DiagnoseContent() {
             </div>
             <div>
               <label className={labelCls}>{t('step4.weight')}</label>
-              <input type="text" inputMode="numeric" className={inputCls} placeholder={t('step4.weight_placeholder')} value={weight} onChange={(e) => setWeight(e.target.value)} />
+              <input type="text" inputMode="decimal" className={inputCls} placeholder={t('step4.weight_placeholder')} value={weight} onChange={(e) => setWeight(e.target.value)} />
             </div>
             <div>
               <label className={labelCls}>{t('step4.wall')}</label>
               <div className="flex gap-2 items-center">
-                <input type="text" inputMode="numeric" className={inputCls} placeholder={t('step4.wall_min')} value={wallThicknessMin} onChange={(e) => setWallThicknessMin(e.target.value)} />
+                <input type="text" inputMode="decimal" className={inputCls} placeholder={t('step4.wall_min')} value={wallThicknessMin} onChange={(e) => setWallThicknessMin(e.target.value)} />
                 <span className="text-faint">~</span>
-                <input type="text" inputMode="numeric" className={inputCls} placeholder={t('step4.wall_max')} value={wallThicknessMax} onChange={(e) => setWallThicknessMax(e.target.value)} />
+                <input type="text" inputMode="decimal" className={inputCls} placeholder={t('step4.wall_max')} value={wallThicknessMax} onChange={(e) => setWallThicknessMax(e.target.value)} />
               </div>
             </div>
             <div className="sm:col-span-2">

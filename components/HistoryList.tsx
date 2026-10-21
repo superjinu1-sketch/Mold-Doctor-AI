@@ -8,6 +8,12 @@ import { ReportModal } from '@/components/ResolutionReport';
 import SaveAsWorkStandardModal from '@/components/SaveAsWorkStandardModal';
 import { canSaveAsWorkStandard, getLedgerSavedAt, markLedgerSaved } from '@/lib/diagnoseToLedger';
 import { IconCheckSquare } from '@/components/icons';
+import { TEMP_FIELDS, MOLD_TEMP_FIELDS, MACHINE_PARAM_FIELDS } from '@/lib/machineSettingsFields';
+
+// 기록 카드의 조치 전 조건: 내부 키(coolTime 등) 대신 화면 라벨로 보여준다. 단위 키는 값 옆 표기로만 쓴다.
+const SETTING_LABEL_KEY: Record<string, string> = Object.fromEntries(
+  [...TEMP_FIELDS, ...MOLD_TEMP_FIELDS, ...MACHINE_PARAM_FIELDS].map(f => [f.key, f.labelKey]),
+);
 import type { HistoryRecord } from '@/lib/history-sync';
 
 function SeverityBadge({ severity }: { severity?: string }) {
@@ -216,9 +222,9 @@ export default function HistoryList({ records }: { records: HistoryRecord[] }) {
                 <div>
                   <div className="text-xs font-bold text-faint uppercase tracking-wider mb-2">{t('history.before_settings')}</div>
                   <div className="grid grid-cols-2 gap-1">
-                    {Object.entries(r.beforeSettings).filter(([, v]) => v).slice(0, 8).map(([k, v]) => (
+                    {Object.entries(r.beforeSettings).filter(([k, v]) => v && SETTING_LABEL_KEY[k]).slice(0, 8).map(([k, v]) => (
                       <div key={k} className="text-sm text-muted">
-                        <span className="text-faint">{k}: </span>{v}
+                        <span className="text-faint">{t(SETTING_LABEL_KEY[k])}: </span>{v}
                       </div>
                     ))}
                   </div>

@@ -13,11 +13,11 @@ import { reportClientError } from '@/lib/observability/client';
 import { supabase } from '@/lib/supabase/client';
 
 const creditPacks = [
-  { productId: 'credits_single_1',    nameKo: '싱글',     nameEn: 'Single',   credits: 1,   priceKo: '₩1,000',  priceEn: '₩1,000',  perKo: '크레딧당 ₩1,000', perEn: '₩1,000 / credit', recommended: false },
-  { productId: 'credits_starter_5',   nameKo: '스타터',   nameEn: 'Starter',  credits: 5,   priceKo: '₩4,500',  priceEn: '₩4,500',  perKo: '크레딧당 ₩900',   perEn: '₩900 / credit',   recommended: false },
-  { productId: 'credits_standard_20', nameKo: '스탠다드', nameEn: 'Standard', credits: 20,  priceKo: '₩16,000', priceEn: '₩16,000', perKo: '크레딧당 ₩800',   perEn: '₩800 / credit',   recommended: true  },
-  { productId: 'credits_pro_50',      nameKo: '프로',     nameEn: 'Pro',      credits: 50,  priceKo: '₩35,000', priceEn: '₩35,000', perKo: '크레딧당 ₩700',   perEn: '₩700 / credit',   recommended: false },
-  { productId: 'credits_bulk_100',    nameKo: '벌크',     nameEn: 'Bulk',     credits: 100, priceKo: '₩70,000', priceEn: '₩70,000', perKo: '크레딧당 ₩700',   perEn: '₩700 / credit',   recommended: false },
+  { productId: 'credits_single_1',    nameKo: '싱글',     nameEn: 'Single',   credits: 1,   priceKo: '₩1,000',   perKo: '크레딧당 ₩1,000', recommended: false },
+  { productId: 'credits_starter_5',   nameKo: '스타터',   nameEn: 'Starter',  credits: 5,   priceKo: '₩4,500',   perKo: '크레딧당 ₩900',     recommended: false },
+  { productId: 'credits_standard_20', nameKo: '스탠다드', nameEn: 'Standard', credits: 20,  priceKo: '₩16,000', perKo: '크레딧당 ₩800',     recommended: true  },
+  { productId: 'credits_pro_50',      nameKo: '프로',     nameEn: 'Pro',      credits: 50,  priceKo: '₩35,000', perKo: '크레딧당 ₩700',     recommended: false },
+  { productId: 'credits_bulk_100',    nameKo: '벌크',     nameEn: 'Bulk',     credits: 100, priceKo: '₩70,000', perKo: '크레딧당 ₩700',     recommended: false },
 ];
 
 // 구매 성공 후 웹훅 적립 지연 흡수 — 3초 간격 최대 5회 재조회, 잔액 변화 감지 시 종료.
@@ -155,7 +155,7 @@ export default function PricingPage() {
           <h1 className="text-4xl font-bold text-ink mb-4">{t('pricing.h1')}</h1>
           <p className="text-muted text-base">{t('pricing.sub')}</p>
           <p className="text-muted text-base mt-1">
-            {locale === 'en' ? 'Expert-grade AI estimates, from ₩700 per credit' : '전문 지식이 얹힌 AI 추정, 크레딧당 ₩700부터'}
+            {locale === 'en' ? 'Expert-grade AI estimates, paid per estimate with credits' : '전문 지식이 얹힌 AI 추정, 크레딧당 ₩700부터'}
           </p>
         </div>
 
@@ -198,15 +198,18 @@ export default function PricingPage() {
                   <div className={`text-3xl font-bold mb-0.5 ${pack.recommended ? 'text-brand-ink' : 'text-ink'}`}>
                     {pack.credits}
                     <span className="text-base font-semibold text-muted ml-1">
-                      {locale === 'en' ? 'credits' : '크레딧'}
+                      {locale === 'en' ? (pack.credits === 1 ? 'credit' : 'credits') : '크레딧'}
                     </span>
                   </div>
                   <div className="text-xl font-bold text-ink mt-1">
-                    {native && storePrices[pack.productId] ? storePrices[pack.productId] : (locale === 'en' ? pack.priceEn : pack.priceKo)}
+                    {native && storePrices[pack.productId]
+                      ? storePrices[pack.productId]
+                      : (locale === 'en' ? 'Price shown in your app store' : pack.priceKo)}
                   </div>
-                  <div className="text-xs text-faint mt-1">
-                    {locale === 'en' ? pack.perEn : pack.perKo}
-                  </div>
+                  {/* 크레딧당 가격은 원화 기준이라 영어(해외 스토어 통화)에서는 숨긴다. 스토어 가격만 보여준다. */}
+                  {locale !== 'en' && (
+                    <div className="text-xs text-faint mt-1">{pack.perKo}</div>
+                  )}
                 </div>
                 <div className="px-5 pb-5">
                   {native ? (

@@ -644,13 +644,13 @@ export async function POST(request: NextRequest) {
       // ────────────────────────────────────────────────────
     }
     const {
-      defectType, defectDescription, resinInfo, settings, advSettings, pressureUnit, moldInfo, productInfo, images, moldDrawings,
+      defectType, defectDescription, resinInfo, settings, advSettings, pressureUnit, tempUnit, moldInfo, productInfo, images, moldDrawings,
       isFollowUp, previousDiagnosis, actionsTaken, changeDescription, round: bodyRound, locale,
     }: {
   defectType?: string; defectDescription?: string;
   resinInfo?: { resinType?: string; filler?: string; fillerContent?: string; flameRetardant?: string; flameRetardantThickness?: string; flameRetardantType?: string; resinDetail?: string; resinGrade?: string };
   settings?: Record<string, string>; advSettings?: Record<string, string>;
-  pressureUnit?: string;
+  pressureUnit?: string; tempUnit?: string;
   moldInfo?: Record<string, string>; productInfo?: Record<string, string>;
   images?: { mediaType: string; data: string }[];
   moldDrawings?: { mediaType: string; data: string }[];
@@ -733,11 +733,22 @@ export async function POST(request: NextRequest) {
     const s = { ...(settings || {}) };
     const a = { ...(advSettings || {}) };
     const divide = pressureUnit === 'bar' || pressureUnit === 'kgf/cm2' || pressureUnit === 'kgf';
+    const isPsi = pressureUnit === 'psi';
     const toMPa = (v?: string) => {
       const n = parseFloat(v ?? '');
       if (!isFinite(n)) return v ?? '';
+      if (isPsi) return String(Math.round(n * 0.00689476 * 100) / 100);
       return divide ? String(Math.round((n / 10) * 100) / 100) : (v ?? '');
     };
+    // 온도: 앱에서 °F를 고른 사용자는 °F로 입력한다. 분석·KB 대조는 모두 °C 기준이므로 여기서 환산한다.
+    const isF = tempUnit === 'F';
+    const toC = (v?: string) => {
+      const n = parseFloat(v ?? '');
+      if (!isF || !isFinite(n)) return v ?? '';
+      return String(Math.round(((n - 32) / 1.8) * 10) / 10);
+    };
+    for (const k of ['nozzleTemp', 'zone1Temp', 'zone2Temp', 'zone3Temp', 'zone4Temp', 'moldTempFixed', 'moldTempMoving'] as const) s[k] = toC(s[k]);
+    for (const k of ['dryTemp', 'hrManifoldTemp', 'hrNozzle1Temp', 'hrNozzle2Temp', 'hrNozzle3Temp', 'hrNozzle4Temp'] as const) a[k] = toC(a[k]);
     for (const k of ['injPressure1', 'holdPressure', 'backPressure'] as const) s[k] = toMPa(s[k]);
     for (const k of ['vpTransferPressure', 'actualPeakPressure', 'maxInjPressure'] as const) a[k] = toMPa(a[k]);
 
@@ -925,7 +936,7 @@ ${noImageGuard}Please systematically analyze the following injection molding def
 - Holding time: ${s.holdTime || '-'}sec, Cooling time: ${s.coolTime || '-'}sec, Injection time: ${s.injTime || '-'}sec
 - Metering: ${s.metering || '-'}mm, Cushion (set): ${s.cushion || '-'}mm
 - Back pressure: ${s.backPressure || '-'} MPa, Screw RPM: ${s.screwRpm || '-'}rpm, Clamp force: ${s.clampForce || '-'}ton
-- (Pressure input unit: ${pressureUnit || 'MPa'}, converted internally to MPa)
+- (Pressure input unit: ${pressureUnit || 'MPa'}, converted internally to MPa)${isF ? '\n- (Temperature input unit: °F, converted above to °C. Write every recommended temperature as °C with °F in parentheses, e.g. "300°C (572°F)".)' : ''}
 
 ${(a.vpTransferPos || a.vpTransferPressure || a.preInjectDecompDist || a.postMeterDecompDist) ? `## V/P Transfer & Decompression (Suck-back)
 - V/P transfer position: ${a.vpTransferPos || '-'}mm, V/P transfer pressure: ${a.vpTransferPressure || '-'} MPa
@@ -1012,7 +1023,7 @@ ${noImageGuard}다음 사출 불량 정보를 Scientific Molding 방법론으로
 - 보압 시간: ${s.holdTime || '-'}sec, 냉각 시간: ${s.coolTime || '-'}sec, 사출 시간: ${s.injTime || '-'}sec
 - 계량: ${s.metering || '-'}mm, 쿠션(설정): ${s.cushion || '-'}mm
 - 배압: ${s.backPressure || '-'} MPa, 스크류 회전수: ${s.screwRpm || '-'}rpm, 형체력: ${s.clampForce || '-'}ton
-- (압력 입력 단위: ${pressureUnit || 'MPa'}, 내부 MPa 환산 적용)
+- (압력 입력 단위: ${pressureUnit || 'MPa'}, 내부 MPa 환산 적용)${isF ? '\n- (온도 입력 단위: °F, 위 값은 °C로 환산함. 권장 온도는 모두 °C 뒤 괄호에 °F를 함께 적어라. 예: "300°C (572°F)")' : ''}
 
 ${(a.vpTransferPos || a.vpTransferPressure || a.preInjectDecompDist || a.postMeterDecompDist) ? `## V/P 전환 & 감압(석백)
 - V/P 전환 위치: ${a.vpTransferPos || '-'}mm, V/P 전환 압력: ${a.vpTransferPressure || '-'} MPa
