@@ -196,7 +196,7 @@ export const HYGROSCOPICITY_GUARD = `[흡습성 정확성 — 반드시 준수]
 // 프롬프트 버전 — FIXED_FRAMEWORK·VISUAL_DIFFERENTIAL·HYGROSCOPICITY_GUARD 등
 // 모델 입력에 들어가는 지시문이 바뀔 때마다 bump한다. 진단 레코드에 기록되어
 // "어느 프롬프트로 나온 답인가"를 사후 추적하는 근거가 된다.
-export const PROMPT_VERSION = 'v21';
+export const PROMPT_VERSION = 'v21b';
 
 // client_id·session_id 형식 검증(call-interruption-data-loss-fix-v1 Part A) —
 // lib/history-sync.ts의 동명 정규식과 동일 패턴 유지.
@@ -324,12 +324,6 @@ USER TRIALS, WORDING, AND UNITS (MANDATORY):
 - Barrel zones: machines number zones differently (Zone1 may be at the nozzle or at the hopper). Do not infer a "reverse" or "forward" barrel profile from zone numbers alone; if the profile matters, list it as a check.
 - Glass-filled grades: supplier melt ranges for GF grades usually sit about 10-20°C above the unfilled grade. Below the degradation temperature, do not recommend lowering the melt of a GF grade just because it exceeds the unfilled upper limit.
 - If resin numbers differ between the resin note and the process-window cross-check ("가공윈도우 사전 대조"), use the cross-check values.
-- Priority 1 must be something the operator can do now at the machine (a check, a purge, a measurement, or one setting). Disassembly, part replacement and mold rework go to escalation or the last priority.
-- Intermittent defects (1 in N shots): ask for at least 3 x N shots before judging a change.
-- Never invent baseline values that are not in the input (for example a previous lot's peak pressure); write "not measured" instead.
-- urgency follows the priority order: priority 1 is now or next_shot; root actions come last.
-- Warpage direction: a flat part bows toward the hotter mold side (that side cools later and shrinks more).
-- Plain English: keep sentences under 20 words, scientific_reasoning at most 3 short sentences, everyday words in glosses, and write °C after every temperature.
 ` : `
 사용자 시도 이력·표현·단위 규칙 (MANDATORY):
 - 사용자가 "이미 해봤다·바꿔도 차이 없었다·효과 없었다"고 적은 조치는 다시 권하지 마라. 그 사실을 근거로 원인 순위를 조정하고, 권고에서 빼거나 "이미 시도, 효과 없음"이라고 명시하라.
@@ -341,12 +335,6 @@ USER TRIALS, WORDING, AND UNITS (MANDATORY):
 - 배럴 존: 존 번호 방향은 기계마다 다르다(Zone1이 노즐 쪽일 수도 호퍼 쪽일 수도 있다). 존 번호만으로 "역구배·순구배"를 단정하지 마라. 온도 구배가 중요하면 확인 항목으로 제시하라.
 - 유리섬유(GF) 강화 등급: 공급사 용융 권장 범위는 보통 비강화 등급보다 10~20°C 높다. 열분해 온도 미만이면, 비강화 상한을 넘었다는 이유만으로 GF 등급의 멜트 하향을 권하지 마라.
 - 수지 수치가 수지 노트와 "가공윈도우 사전 대조"에서 다르면 가공윈도우 사전 대조 값을 따른다.
-- priority 1은 작업자가 지금 사출기 앞에서 할 수 있는 일(점검·퍼지·측정·셋팅 하나)이어야 한다. 분해·부품 교체·금형 수정은 escalation이나 마지막 순위로 보낸다.
-- 간헐 불량(N샷에 1개)이면 변경 효과를 판정할 샷 수를 최소 N의 3배로 제시하라.
-- 입력에 없는 기준값(예: 이전 로트 피크압)을 지어내지 마라. 모르면 "측정값 없음"이라고 적어라.
-- urgency는 priority 순서를 따른다: priority 1은 now 또는 next_shot, root 조치는 뒤로.
-- 휨 방향: 평판 제품은 더 뜨거운 금형 쪽으로 휜다(그쪽이 늦게 식어 더 많이 수축).
-- 문장은 짧고 쉬운 말로 쓴다. 원인 설명 한 줄은 현장 말로.
 `}
 
 STEP 4: SPECIFIC RECOMMENDATIONS
