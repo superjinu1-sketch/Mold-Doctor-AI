@@ -552,7 +552,7 @@ export const en: Record<string, string> = {
   'result.next_3': 'If solved, save these as this machine work standard',
   'result.next_3_sub': 'Saved conditions build up as per-machine history, and you can start the next estimate from them',
   'result.machine_ref': 'Started from the current work standard of {label}',
-  'cause.tell_prefix': 'Tell: ',
+  'cause.tell_prefix': 'Quick check: ',
 
   'checklist.title': 'Field Checklist',
   'checklist.before': 'Before Changes',
