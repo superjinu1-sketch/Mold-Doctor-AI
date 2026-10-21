@@ -24,7 +24,7 @@ export const HELP_KB: HelpKbItem[] = [
     keywordsKo: ['사진 없이', '사진 없어도', '사진 안', '촬영 못'],
     keywordsEn: ['without photo', 'no photo', 'skip photo', 'no picture'],
     answerKo: '사진 없이도 진단됩니다. 사진 단계를 건너뛰고 불량 유형을 직접 선택한 뒤 증상을 설명하면 됩니다. 다만 은줄·버닝 같은 표면 불량은 사진이 있으면 더 정확합니다.',
-    answerEn: 'Yes, you can diagnose without photos. Skip the photo step, pick the defect type manually and describe the symptom. Surface defects (splay, burn) are more accurate with photos.',
+    answerEn: 'Yes, you can get an estimate without photos. Skip the photo step, pick the defect type manually and describe the symptom. Surface defects (splay, burn) are more accurate with photos.',
   },
   {
     id: 'photo_tips',
@@ -38,7 +38,7 @@ export const HELP_KB: HelpKbItem[] = [
     keywordsKo: ['크레딧', '무료로', '요금', '비용', '가격'],
     keywordsEn: ['credit', 'free', 'cost', 'price', 'how much'],
     answerKo: '진단 1건에 1크레딧이 사용되고, 가입하면 5크레딧이 무료로 제공됩니다. 무료 도구 4종(작업표준 저장소·시사출 체크리스트·수지 라이브러리·불량 가이드)은 크레딧을 쓰지 않습니다.',
-    answerEn: 'One diagnosis uses 1 credit. You get 5 free credits at sign-up. The four free tools (Work Standards, Tryout Checklist, Resin Library, Defect Guide) never use credits.',
+    answerEn: 'One estimate uses 1 credit. You get 5 free credits at sign-up. The four free tools (Work Standards, Tryout Checklist, Resin Library, Defect Guide) never use credits.',
   },
   {
     id: 'topup',
@@ -94,14 +94,14 @@ export const HELP_KB: HelpKbItem[] = [
     keywordsKo: ['해결됨', '해결 표시', '해결 처리'],
     keywordsEn: ['resolved', 'mark resolved', 'mark as resolved'],
     answerKo: '결과 화면에서 \'해결됨\'을 표시하면 이력에 기록되고, 확정된 조건은 작업표준 저장소로 바로 저장할 수 있습니다. 같은 불량이 재발했을 때 지난 해결책을 바로 찾을 수 있습니다.',
-    answerEn: 'Mark a diagnosis as Resolved to record it in your history, and save the confirmed settings straight into Work Standards. Next time the same defect appears, the fix is one tap away.',
+    answerEn: 'Mark an estimate as Resolved to record it in your history, and save the confirmed settings straight into Work Standards. Next time the same defect appears, the fix is one tap away.',
   },
   {
     id: 'history',
     keywordsKo: ['이력', '히스토리', '지난 진단', '기록 어디'],
     keywordsEn: ['history', 'past diagnosis', 'where records', 'diagnosis history'],
     answerKo: '마이페이지에서 과거 진단 이력을 볼 수 있습니다. 계정에 저장되므로 기기를 바꿔도 로그인하면 그대로 유지됩니다.',
-    answerEn: 'Open My Page for your diagnosis history. It is stored in your account, so it survives device changes — just log in.',
+    answerEn: 'Open My Page for your estimate history. It is stored in your account, so it survives device changes; just log in.',
   },
   {
     id: 'pdf_export',
@@ -150,7 +150,7 @@ export const HELP_KB: HelpKbItem[] = [
     keywordsKo: ['샘플', '체험', '로그인 없이', '미리보기'],
     keywordsEn: ['sample', 'try demo', 'without login', 'preview', 'demo'],
     answerKo: '로그인 없이 \'예시로 빠르게 체험\'에서 샘플 진단(PA66 은줄)을 볼 수 있습니다. 실제 진단은 가입 후 무료 5크레딧으로 시작하세요.',
-    answerEn: 'Without logging in you can view a sample diagnosis (PA66 silver streak). For real diagnoses, sign up and use your 5 free credits.',
+    answerEn: 'Without logging in you can view a sample estimate (PA66 silver streak). For real estimates, sign up and use your 5 free credits.',
   },
   {
     id: 'login',
@@ -171,7 +171,7 @@ export const HELP_KB: HelpKbItem[] = [
     keywordsKo: ['싱크마크 왜', '미성형 원인', '웰드라인 없애', '불량 해결', '어떻게 고치', '원인이 뭐'],
     keywordsEn: ['why sink mark', 'short shot cause', 'remove weld line', 'fix defect', 'how to fix', 'what is the cause', 'how do i fix'],
     answerKo: '성형 기술 질문은 도움말보다 진단 기능이 정확합니다. 사진과 세팅값을 넣으면 원인 랭킹과 권장 세팅을 받을 수 있어요. 아래 버튼으로 바로 시작하세요.',
-    answerEn: 'For molding questions, the diagnosis feature is the right tool — photos and settings in, ranked causes and recommended settings out. Start below.',
+    answerEn: 'For molding questions, the estimate feature is the right tool: photos and settings in, ranked causes and recommended settings out. Start below.',
     cta: 'diagnose',
   },
   {
