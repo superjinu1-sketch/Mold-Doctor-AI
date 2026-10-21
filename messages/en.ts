@@ -493,7 +493,7 @@ export const en: Record<string, string> = {
   'demo.notice': 'This is a sample preview. Run a real analysis with your own photo and settings to ask follow-up questions.',
   'chat.error': 'An error occurred while getting a chat response.',
   'chat.send': 'Send',
-  'chat.q1': ': how does changing to  affect cycle time?',
+  'chat.q1': 'Will changing {param} to {value} affect cycle time?',
   'chat.q2': ': how do I verify this first, step by step?',
   'chat.q3': 'What changes if I switch to a different resin under these conditions?',
 

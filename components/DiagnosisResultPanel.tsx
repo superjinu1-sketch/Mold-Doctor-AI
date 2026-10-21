@@ -484,7 +484,8 @@ export default function DiagnosisResultPanel({ result, onSavePDF, round = 1, fol
 
   const suggestedQuestions: string[] = [];
   if (recommendations[0]) {
-    suggestedQuestions.push(`${recommendations[0].parameter}${t('chat.q1')}`);
+    // 권장값을 함께 넣는다(예전 영어 문구는 "changing to  affect"처럼 값이 빠졌다, 재평가 Sarah).
+    suggestedQuestions.push(t('chat.q1').replace('{param}', recommendations[0].parameter).replace('{value}', recommendations[0].recommended || ''));
   }
   if (causes[0]) {
     suggestedQuestions.push(`${causes[0].description}${t('chat.q2')}`);

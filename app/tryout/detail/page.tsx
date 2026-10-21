@@ -100,7 +100,7 @@ function TryoutDetailContent() {
       await new Promise<void>(r => requestAnimationFrame(() => requestAnimationFrame(() => r())));
       if (cancelled || !printRef.current || !record) return;
       try {
-        await exportSectionsToPdf([[printRef.current]], `mold-doctor-시사출-${record.mold_name.replace(/\s/g, '-')}-${Date.now()}.pdf`);
+        await exportSectionsToPdf([[printRef.current]], `mold-doctor-tryout-${record.mold_name.replace(/\s/g, '-')}-${Date.now()}.pdf`);
       } catch (e) {
         reportClientError('tryout.exportPdf', e);
         alert(t('tryout.pdf_error'));

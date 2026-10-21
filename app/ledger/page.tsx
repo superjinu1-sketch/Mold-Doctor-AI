@@ -61,7 +61,7 @@ export default function LedgerPage() {
         if (!container) return;
         const pageEls = Array.from(container.children) as HTMLElement[];
         const sections = pageEls.map(el => [el]);
-        await exportSectionsToPdf(sections, `mold-doctor-조건대장-${Date.now()}.pdf`);
+        await exportSectionsToPdf(sections, `mold-doctor-work-standards-${Date.now()}.pdf`);
       } catch (e) {
         reportClientError('ledger.exportPdf', e);
         alert(t('ledger.pdf_error'));
