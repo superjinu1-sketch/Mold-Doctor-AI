@@ -2191,7 +2191,7 @@ function DiagnoseContent() {
               onRetryInput={handleRetryInput}
               onNewEstimate={handleNewEstimate}
               resinType={resinType === '기타 (직접 입력)' ? customResin : resinType}
-              machineSettings={{ ...settings, ...advSettings }}
+              machineSettings={{ ...settings, ...advSettings, tempUnit }}
               sessionId={sessionId}
               defectPhotos={result.beforePhoto ? [result.beforePhoto] : images.map(img => img.base64)}
               pdfExporting={pdfExporting}

@@ -616,11 +616,37 @@ export default function DiagnosisResultPanel({ result, onSavePDF, round = 1, fol
   const firstRec = orderedRecs[0];
   const changedRecs = orderedRecs.filter(r => r !== firstRec && r.current !== r.recommended && r.direction !== 'same');
   const topActions = firstRec ? [firstRec, ...changedRecs].slice(0, 3) : [];
+  const pdfSettingsLine = (() => {
+    const ms = machineSettings ?? {};
+    const tU = ms.tempUnit === 'F' ? '℉' : '℃';
+    const pU = typeof ms.pressureUnit === 'string' && ms.pressureUnit ? ms.pressureUnit : 'MPa';
+    const unit = (k: string) => (/Temp$/.test(k) ? tU : ['injPressure1', 'holdPressure', 'backPressure'].includes(k) ? pU : '');
+    return AFTER_FIELDS
+      .filter(f => typeof ms[f.key] === 'string' && (ms[f.key] as string).trim() !== '' && ms[f.key] !== '없음')
+      .slice(0, 14)
+      .map(f => `${t(f.labelKey)} ${ms[f.key]}${unit(f.key)}`)
+      .join(', ');
+  })();
   const topCause = causes[0]?.description;
 
   return (
     <PdfExportContext.Provider value={pdfExporting}>
     <div className="space-y-5">
+      {/* PDF 저장 시에만 넣는 머리말: 날짜·수지·불량·입력 조건. 예전 결과 PDF는 화면 캡처뿐이라
+          언제 어떤 조건의 결과인지 남지 않았다(페르소나 평가 이 대리·Sarah). */}
+      {pdfExporting && (
+        <div className="bg-surface rounded-2xl p-4 border border-border">
+          <div className="text-[length:var(--text-subhead)] font-bold text-ink">{t('pdf.header_title')}</div>
+          <div className="text-[length:var(--text-body)] text-muted mt-1">
+            {new Date().toLocaleString(locale === 'en' ? 'en-US' : 'ko-KR', { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
+          </div>
+          <div className="text-[length:var(--text-body)] text-ink mt-2">
+            {t('pdf.header_defect')}: {locale === 'en' ? (result.defect_type?.en || result.defect_type?.ko) : (result.defect_type?.ko || result.defect_type?.en)}
+            {resinType ? ` · ${t('pdf.header_resin')}: ${resinType}` : ''}
+          </div>
+          {pdfSettingsLine && <div className="text-[length:var(--text-body)] text-muted mt-1 break-words">{t('pdf.header_inputs')}: {pdfSettingsLine}</div>}
+        </div>
+      )}
       {/* Follow-up Timeline */}
       {followUpHistory.length > 0 && (
         <div className="bg-surface rounded-2xl p-4 border border-border overflow-x-auto">

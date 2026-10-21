@@ -32,7 +32,9 @@ const SETTINGS_LABELS: Record<string, string> = {
   moldTempFixed: '금형(고)', moldTempMoving: '금형(동)',
   injPressure1: '사출압', holdPressure: '보압',
   injSpeed1: '사출속도1', injSpeed2: '사출속도2',
-  holdTime: '보압시간', coolTime: '냉각시간', backPressure: '배압', screwRpm: 'RPM',
+  holdTime: '보압시간', coolTime: '냉각시간', injTime: '사출시간', metering: '계량', cushion: '쿠션',
+  backPressure: '배압', screwRpm: 'RPM', clampForce: '형체력',
+  dryTemp: '건조 온도', dryTime: '건조 시간', dryerType: '건조기', moistureContent: '수분율',
 };
 
 const SETTINGS_LABELS_EN: Record<string, string> = {
@@ -40,8 +42,25 @@ const SETTINGS_LABELS_EN: Record<string, string> = {
   moldTempFixed: 'Mold (Fixed)', moldTempMoving: 'Mold (Moving)',
   injPressure1: 'Inj. Pressure', holdPressure: 'Hold Pressure',
   injSpeed1: 'Inj. Speed 1', injSpeed2: 'Inj. Speed 2',
-  holdTime: 'Hold Time', coolTime: 'Cooling Time', backPressure: 'Back Pressure', screwRpm: 'RPM',
+  holdTime: 'Hold Time', coolTime: 'Cooling Time', injTime: 'Injection Time', metering: 'Metering', cushion: 'Cushion',
+  backPressure: 'Back Pressure', screwRpm: 'RPM', clampForce: 'Clamp Force',
+  dryTemp: 'Drying Temp', dryTime: 'Drying Time', dryerType: 'Dryer', moistureContent: 'Moisture',
 };
+
+const DRYER_EN: Record<string, string> = { 제습식: 'Desiccant', 열풍식: 'Hot-air', 없음: 'None' };
+
+// 표 값 옆 단위. 온도·압력은 기록 당시 입력 단위(beforeInput)를 따른다. 팀장 보고용으로 단위 없는 숫자만 남던 문제(페르소나 평가 이 대리).
+function unitFor(key: string, tempUnit: string, pressureUnit: string): string {
+  if (/Temp$/.test(key)) return tempUnit === 'F' ? '℉' : '℃';
+  if (['injPressure1', 'holdPressure', 'backPressure'].includes(key)) return pressureUnit || 'MPa';
+  if (['holdTime', 'coolTime', 'injTime'].includes(key)) return 's';
+  if (key === 'dryTime') return 'h';
+  if (['injSpeed1', 'injSpeed2', 'moistureContent'].includes(key)) return '%';
+  if (['metering', 'cushion'].includes(key)) return 'mm';
+  if (key === 'screwRpm') return 'rpm';
+  if (key === 'clampForce') return 'ton';
+  return '';
+}
 
 function ResolvedLabel({ s, isEn }: { s?: boolean | string; isEn: boolean }) {
   if (s === true || s === 'solved') return <span style={{ color: '#047857', fontWeight: 700 }}>{isEn ? '✓ Resolved' : '✓ 완전 해결'}</span>;
@@ -81,8 +100,20 @@ export function ReportLayout({ record, authorName, companyName, locale }: Report
     return [...(c.before_changes ?? []), ...(c.after_changes ?? [])];
   })();
 
+  // 조치 전 값: 기본 셋팅(beforeSettings) + 건조 등 고급 입력(beforeInput.advSettings). 예전엔 건조 조건이 빠져
+  // 건조 대책(예: 4h→8h)이 보고서에 남지 않았다.
+  const bi = (record.beforeInput ?? {}) as { advSettings?: Record<string, string>; tempUnit?: string; pressureUnit?: string };
+  const before: Record<string, string> = { ...(bi.advSettings ?? {}), ...(record.beforeSettings ?? {}) };
+  const tempUnit = bi.tempUnit ?? 'C';
+  const pressureUnit = bi.pressureUnit ?? (record.beforeSettings?.pressureUnit as string | undefined) ?? '';
+  const fmt = (k: string, v?: string) => {
+    if (!v || v === '없음') return '—';
+    if (k === 'dryerType') return isEn ? (DRYER_EN[v] ?? v) : v;
+    const u = unitFor(k, tempUnit, pressureUnit);
+    return u ? `${v} ${u}` : v;
+  };
   const settingKeys = Object.keys(SETTINGS_LABELS);
-  const beforeKeys = settingKeys.filter(k => record.beforeSettings?.[k]);
+  const beforeKeys = settingKeys.filter(k => before[k] && before[k] !== '없음');
   const afterKeys  = settingKeys.filter(k => record.afterSettings?.[k]);
   const allKeys    = Array.from(new Set([...beforeKeys, ...afterKeys]));
 
@@ -182,8 +213,8 @@ export function ReportLayout({ record, authorName, companyName, locale }: Report
               </thead>
               <tbody>
                 {allKeys.map(k => {
-                  const bv = record.beforeSettings?.[k] ?? '—';
-                  const av = record.afterSettings?.[k] ?? '—';
+                  const bv = fmt(k, before[k]);
+                  const av = fmt(k, record.afterSettings?.[k]);
                   const changed = bv !== av && av !== '—';
                   return (
                     <tr key={k} style={{ borderBottom: '1px solid #E3E6EA', background: changed ? '#F0FAF5' : undefined }}>
