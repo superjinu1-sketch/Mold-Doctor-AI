@@ -384,7 +384,11 @@ export default function DiagnosisResultPanel({ result, onSavePDF, round = 1, fol
   const [standardModalOpen, setStandardModalOpen] = useState(false);
   const [standardSaved, setStandardSaved] = useState(false);
   // 사용자가 조치 전에 실제로 값을 넣었던 항목만 확인 대상(빈 항목은 표시하지 않음).
+  // 처음에 비워 둔 칸은 보통 조치와 무관하지만, 건조 조건·수분율은 대책이 되는 경우가 많아 항상 입력할 수 있게 둔다
+  // (재평가 이 대리: 수분 0.18→0.07%를 남길 칸이 없었다).
+  const ALWAYS_AFTER = ['dryTemp', 'dryTime', 'moistureContent'];
   const filledAfterFields = AFTER_FIELDS.filter(f => {
+    if (ALWAYS_AFTER.includes(f.key)) return true;
     const v = machineSettings?.[f.key];
     return typeof v === 'string' ? v.trim() !== '' : v !== undefined && v !== null && v !== '';
   });
@@ -1133,7 +1137,9 @@ export default function DiagnosisResultPanel({ result, onSavePDF, round = 1, fol
                 </div>
                 {/* 조치 후 조건 확인(growth P0) — "해결"일 때만. 확인 체크한 값만 저장되고, 체크 없이 저장하면
                     afterSettings가 붙지 않아 작업표준 저장 게이트가 정직하게 닫힌다. */}
-                {resolvedStatus === 'solved' && filledAfterFields.length > 0 && (
+                {/* 조치 후 조건 확인: "해결"과 "부분 개선" 모두 입력 가능(보고서에 대책을 남기려고, 재평가 이 대리).
+                    작업표준 저장은 canSaveAsWorkStandard가 계속 "완전 해결"만 허용한다. */}
+                {(resolvedStatus === 'solved' || resolvedStatus === 'partial') && filledAfterFields.length > 0 && (
                   <div className="rounded-xl border border-border">
                     <button
                       type="button"
@@ -1235,7 +1241,7 @@ export default function DiagnosisResultPanel({ result, onSavePDF, round = 1, fol
                       // 확인 체크한 "해결" 기록만 조치 후 조건을 싣는다. 단위(pressureUnit)는 실제 값이 하나라도
                       // 있을 때만 덧붙인다(단위만으로 게이트가 열리면 안 됨).
                       let afterArg: Record<string, string> | undefined;
-                      if (resolvedStatus === 'solved' && afterConfirmed) {
+                      if ((resolvedStatus === 'solved' || resolvedStatus === 'partial') && afterConfirmed) {
                         const vals = Object.fromEntries(
                           Object.entries(afterValues).map(([k, v]) => [k, v.trim()] as const).filter(([, v]) => v !== ''),
                         );
