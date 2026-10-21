@@ -127,7 +127,7 @@ export default function HomeClient({ notes }: { notes: HomeNoteCard[] }) {
 
             {/* 축적 라인(app-home-redesign-v1 §카피) — "학습/개인화" 금지 카피 준수, 데이터가
                 쌓인다는 사실만 진술(진단 엔진이 저장 이력을 입력으로 쓰지 않음, 과장 금지). */}
-            <p className="text-muted text-label font-semibold mt-4">{t('home.accum_line')}</p>
+            <p className="text-muted text-body font-semibold mt-4">{t('home.accum_line')}</p>
             <div className="mt-4">
               <StoreBadges variant="badges" locale={locale} />
             </div>
@@ -143,27 +143,27 @@ export default function HomeClient({ notes }: { notes: HomeNoteCard[] }) {
             <Link href="/ledger" className="ui-card p-4 h-full flex flex-col items-start gap-1 hover:border-[var(--brand-border)] transition-colors">
               <IconClipboard size={24} className="text-brand" />
               <span className="font-bold text-ink text-body break-keep">{t('landing.tool_ledger_title')}</span>
-              <span className="text-muted text-label leading-snug">{t('landing.tool_ledger_desc')}</span>
+              <span className="text-muted text-body leading-snug">{t('landing.tool_ledger_desc')}</span>
             </Link>
             <Link href="/tryout" className="ui-card p-4 h-full flex flex-col items-start gap-1 hover:border-[var(--brand-border)] transition-colors">
               <IconCheckSquare size={24} className="text-brand" />
               <span className="font-bold text-ink text-body break-keep">{t('landing.tool_tryout_title')}</span>
-              <span className="text-muted text-label leading-snug">{t('landing.tool_tryout_desc')}</span>
+              <span className="text-muted text-body leading-snug">{t('landing.tool_tryout_desc')}</span>
             </Link>
             <Link href={locale === 'en' ? '/en/resins' : '/resins'} className="ui-card p-4 h-full flex flex-col items-start gap-1 hover:border-[var(--brand-border)] transition-colors">
               <IconFlask size={24} className="text-brand" />
               <span className="font-bold text-ink text-body break-keep">{t('landing.tool_resins_title')}</span>
-              <span className="text-muted text-label leading-snug">{t('landing.tool_resins_desc')}</span>
+              <span className="text-muted text-body leading-snug">{t('landing.tool_resins_desc')}</span>
             </Link>
           </div>
-          <Link href="/tools" className="text-brand hover:text-brand-ink text-label font-bold mt-4 min-h-[44px] flex items-center">{t('landing.tools_all_link')}</Link>
+          <Link href="/tools" className="text-brand hover:text-brand-ink text-body font-bold mt-4 min-h-[44px] flex items-center">{t('landing.tools_all_link')}</Link>
 
           {/* 최근 추정 → /history. 기존 "전체 기록 보기"(history.view_all) 패턴 재사용 — 단,
               라이브 건수 표시는 이 컴포넌트에 없던 신규 데이터 페칭이 필요해(가드: 로직·데이터
               무변경) 넣지 않음. 카운트가 꼭 필요하면 후속 mandate로 서버 컴포넌트 prop 전달 검토. */}
           <Link href="/history" className="ui-card mt-3 flex items-center justify-between px-4 py-3.5 hover:border-[var(--brand-border)] transition-colors">
             <span className="font-bold text-ink text-body">{t('account.history')}</span>
-            <span className="text-brand font-bold text-label">{t('history.view_all')} →</span>
+            <span className="text-brand font-bold text-body">{t('history.view_all')} →</span>
           </Link>
         </div>
 
@@ -178,7 +178,7 @@ export default function HomeClient({ notes }: { notes: HomeNoteCard[] }) {
             전환을 검토한다. */}
         <div className="max-w-2xl mx-auto" ref={notesSectionRef}>
           <p className="text-[19px] font-semibold text-brand mt-10 mb-1.5 tracking-[-.02em]">{t('landing.notes_title')}</p>
-          <p className="text-muted text-label mb-4">{t('landing.notes_sub')}</p>
+          <p className="text-muted text-body mb-4">{t('landing.notes_sub')}</p>
           <div className="flex flex-col gap-2.5 mb-3">
             {pageNotes.map((n, i) => {
               const title = isEn ? n.title : (n.titleKo ?? n.title);

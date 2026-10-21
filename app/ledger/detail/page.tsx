@@ -399,7 +399,7 @@ function LedgerMachineDetailContent() {
         {/* D1: 작업표준이 0건이면 AI 추정 CTA 카드 자체가 없다(current = standards[0]).
             없는 이력을 있는 척하지 않고, 여기 저장하면 무엇이 열리는지만 한 줄로 안내한다. */}
         {standards.length === 0 && (
-          <p className="text-faint text-label mb-4">{t('ledger.accum_hint_zero')}</p>
+          <p className="text-faint text-body mb-4">{t('ledger.accum_hint_zero')}</p>
         )}
 
         {/* 사진 → OCR */}

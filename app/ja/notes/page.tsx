@@ -42,9 +42,9 @@ export default function NotesIndexPageJa() {
 
       {/* 디스클레이머 — 오역 한계 안내, 목록 상시 노출(ja-notes-axis-v1) */}
       <div className="ui-card bg-surface-sunken p-4 mb-6">
-        <p className="font-bold text-label text-ink mb-1">{JA_DISCLAIMER_TITLE}</p>
-        <p className="text-muted text-label leading-relaxed">{JA_DISCLAIMER_BODY}</p>
-        <Link href="/en/notes" className="inline-block text-brand hover:text-brand-ink text-label font-medium mt-2 min-h-[44px] items-center">
+        <p className="font-bold text-body text-ink mb-1">{JA_DISCLAIMER_TITLE}</p>
+        <p className="text-muted text-body leading-relaxed">{JA_DISCLAIMER_BODY}</p>
+        <Link href="/en/notes" className="inline-block text-brand hover:text-brand-ink text-body font-medium mt-2 min-h-[44px] items-center">
           English version →
         </Link>
       </div>

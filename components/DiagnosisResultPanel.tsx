@@ -171,7 +171,7 @@ function CauseCard({ cause, defaultOpen = false }: { cause: CauseItem; defaultOp
       {/* D — 감별 한 줄(the tell): 1순위에만, 항상 노출 */}
       {rank === 1 && (cause.verification || cause.elimination) && (
         <div className="px-3 sm:px-4 pt-2">
-          <p className="text-[length:var(--text-label)] text-brand-ink bg-brand-tint rounded-lg px-2.5 py-1.5 max-w-[68ch]">
+          <p className="text-[length:var(--text-body)] text-brand-ink bg-brand-tint rounded-lg px-2.5 py-1.5 max-w-[68ch]">
             <span className="font-bold">{t('cause.tell_prefix')}</span>{cause.verification || cause.elimination}
           </p>
         </div>
@@ -494,7 +494,7 @@ export default function DiagnosisResultPanel({ result, onSavePDF, round = 1, fol
           {t('fallback.unreadable_body')}<br />
           {t('fallback.unreadable_detail')}
         </p>
-        <p className="text-faint text-[length:var(--text-label)]">{summary}</p>
+        <p className="text-faint text-[length:var(--text-body)]">{summary}</p>
         <button type="button" onClick={onResolved}
           className="mx-auto mt-2 flex items-center gap-2 bg-[var(--warn-bg)] hover:bg-[var(--warn-bg)] text-warn border border-[var(--warn-border)] px-5 py-3 rounded-xl text-base font-bold transition-colors min-h-[var(--touch-cta)]">
           {t('fallback.unreadable_btn')}
@@ -512,7 +512,7 @@ export default function DiagnosisResultPanel({ result, onSavePDF, round = 1, fol
         <p className="text-muted text-base leading-relaxed">
           {t('fallback.nodefect_body')}
         </p>
-        <p className="text-faint text-[length:var(--text-label)]">{summary}</p>
+        <p className="text-faint text-[length:var(--text-body)]">{summary}</p>
         <button type="button" onClick={onResolved}
           className="mx-auto mt-2 flex items-center gap-2 bg-brand-tint hover:bg-brand-tint text-brand-ink border border-[var(--brand-border)] px-5 py-3 rounded-xl text-base font-bold transition-colors min-h-[var(--touch-cta)]">
           {t('fallback.nodefect_btn')}
@@ -575,10 +575,10 @@ export default function DiagnosisResultPanel({ result, onSavePDF, round = 1, fol
             </p>
           )}
           {extractedCause && (
-            <p className="text-muted text-[length:var(--text-label)] px-3">{t('fallback.parse_cause_prefix')}{extractedCause}</p>
+            <p className="text-muted text-[length:var(--text-body)] px-3">{t('fallback.parse_cause_prefix')}{extractedCause}</p>
           )}
 
-          <p className="text-muted text-[length:var(--text-label)] mt-4">{t('fallback.parse_body')}</p>
+          <p className="text-muted text-[length:var(--text-body)] mt-4">{t('fallback.parse_body')}</p>
         </div>
 
         <button
@@ -651,7 +651,7 @@ export default function DiagnosisResultPanel({ result, onSavePDF, round = 1, fol
             <p className="font-bold text-danger text-sm">
               {locale === 'ko' ? `${round}${t('banner.repeat_title')}` : t('banner.repeat_title')}
             </p>
-            <p className="text-danger/80 text-xs mt-1">{t('banner.repeat_body')}</p>
+            <p className="text-danger/80 text-[length:var(--text-body)] mt-1">{t('banner.repeat_body')}</p>
           </div>
         </div>
       )}
@@ -835,10 +835,10 @@ export default function DiagnosisResultPanel({ result, onSavePDF, round = 1, fol
                   <span className="text-faint shrink-0">→</span>
                   <span className="text-brand font-bold text-body flex items-start gap-1 min-w-0 break-words"><DirectionArrow direction={rec.direction} />{rec.recommended}</span>
                 </div>
-                <p className="text-[length:var(--text-label)] text-muted">{rec.reason}</p>
-                {rec.expected_result && <p className="text-[length:var(--text-label)] text-muted bg-brand-tint rounded px-2 py-1 mt-1">{t('rec.expected_prefix')}{rec.expected_result}</p>}
-                {rec.interaction_note && <p className="text-[length:var(--text-label)] text-muted bg-surface-sunken rounded px-2 py-1 mt-1">{t('rec.check_prefix')}{rec.interaction_note}</p>}
-                {rec.risk && <p className="text-[length:var(--text-label)] text-warn bg-[var(--warn-bg)] rounded px-2 py-1 mt-1">{t('rec.risk_prefix')}{rec.risk}</p>}
+                <p className="text-[length:var(--text-body)] text-muted">{rec.reason}</p>
+                {rec.expected_result && <p className="text-[length:var(--text-body)] text-muted bg-brand-tint rounded px-2 py-1 mt-1">{t('rec.expected_prefix')}{rec.expected_result}</p>}
+                {rec.interaction_note && <p className="text-[length:var(--text-body)] text-muted bg-surface-sunken rounded px-2 py-1 mt-1">{t('rec.check_prefix')}{rec.interaction_note}</p>}
+                {rec.risk && <p className="text-[length:var(--text-body)] text-warn bg-[var(--warn-bg)] rounded px-2 py-1 mt-1">{t('rec.risk_prefix')}{rec.risk}</p>}
               </div>
             ))}
           </div>
@@ -913,7 +913,7 @@ export default function DiagnosisResultPanel({ result, onSavePDF, round = 1, fol
                     const iconMap = { ok: '✓', warning: '⚠', critical: '✕' };
                     const c = colorMap[val.status as keyof typeof colorMap] || colorMap.warning;
                     return (
-                      <div key={key} className={`flex items-start gap-2 text-xs p-2 rounded-lg border ${c}`}>
+                      <div key={key} className={`flex items-start gap-2 text-[length:var(--text-body)] p-2 rounded-lg border ${c}`}>
                         <span className="font-bold shrink-0">{iconMap[val.status as keyof typeof iconMap]} {processWindowLabelMap[key] || key}</span>
                         <span>{val.note}</span>
                       </div>
@@ -991,7 +991,7 @@ export default function DiagnosisResultPanel({ result, onSavePDF, round = 1, fol
                         </div>
                         <div className="flex-1 min-w-0">
                           <p className="text-ink font-semibold text-base leading-snug">{item.action}</p>
-                          <p className="text-muted text-[length:var(--text-label)] mt-1">{item.why}</p>
+                          <p className="text-muted text-[length:var(--text-body)] mt-1">{item.why}</p>
                         </div>
                       </div>
                     );
@@ -1110,7 +1110,7 @@ export default function DiagnosisResultPanel({ result, onSavePDF, round = 1, fol
                     </button>
                     {afterOpen && (
                       <div className="px-3 pb-3 space-y-3">
-                        <p className="text-faint text-[length:var(--text-label)]">{t('resolve.after_hint')}</p>
+                        <p className="text-faint text-[length:var(--text-body)]">{t('resolve.after_hint')}</p>
                         <div className="grid grid-cols-2 gap-2">
                           {filledAfterFields.map(f => (
                             <label key={f.key} className="block min-w-0">
@@ -1158,7 +1158,7 @@ export default function DiagnosisResultPanel({ result, onSavePDF, round = 1, fol
                     <IconCamera size={16} />
                     <span>{afterPhoto ? t('history.after_photo') + ' ✓' : t('history.after_photo_label')}</span>
                   </button>
-                  <p className="text-faint text-xs mt-1 px-1">{t('history.after_photo_help')}</p>
+                  <p className="text-faint text-[length:var(--text-body)] mt-1 px-1">{t('history.after_photo_help')}</p>
                   <input
                     ref={afterPhotoRef}
                     type="file"

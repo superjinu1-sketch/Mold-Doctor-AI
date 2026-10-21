@@ -231,3 +231,15 @@ button:not(:disabled):not(.ui-cta):active,
     border-top: 1px solid var(--border); padding-top: 18px;
   }
 }
+
+/* ─── 글자 크기 유틸리티 ─────────────────────────────────────────────────── */
+/* :root의 --text-* 토큰은 @theme에 연결돼 있지 않아 `text-label`·`text-body` 클래스가 CSS로
+   생성되지 않았다(라벨이 13px 대신 주변 크기로 보임, ui-ux-recheck-2026-10-20). 같은 이름으로
+   @theme에 넣으면 :root 토큰과 순환 참조가 되므로 @utility로 직접 정의한다. */
+@utility text-label { font-size: var(--text-label); }
+@utility text-body { font-size: var(--text-body); }
+@utility text-subhead { font-size: var(--text-subhead); }
+@utility text-num { font-size: var(--text-num); }
+@utility text-h3 { font-size: var(--text-h3); }
+@utility text-h2 { font-size: var(--text-h2); }
+@utility text-h1 { font-size: var(--text-h1); }

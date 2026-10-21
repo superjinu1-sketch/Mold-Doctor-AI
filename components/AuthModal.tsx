@@ -99,7 +99,7 @@ export default function AuthModal({ open, onClose }: { open: boolean; onClose: (
         <div className="flex flex-col items-center text-center gap-2 pt-2">
           <Logo size={44} showWord={false} />
           <h2 className="text-h3 font-bold text-ink">Mold Doctor</h2>
-          <p className="text-label text-muted">{t('auth.subtitle')}</p>
+          <p className="text-body text-muted">{t('auth.subtitle')}</p>
         </div>
 
         <div className="space-y-3">

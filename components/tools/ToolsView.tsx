@@ -57,7 +57,7 @@ export default function ToolsView() {
               >
                 <Icon size={24} className="text-brand" />
                 <span className="font-bold text-ink text-body break-keep">{tool.title}</span>
-                <span className="text-muted text-label leading-snug">{tool.desc}</span>
+                <span className="text-muted text-body leading-snug">{tool.desc}</span>
               </Link>
             );
           })}

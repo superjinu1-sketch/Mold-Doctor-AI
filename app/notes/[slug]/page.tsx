@@ -107,7 +107,7 @@ export default async function NoteDetailPageKo({ params }: { params: Promise<{ s
         {/* 미번역 폴백 배너 — KO 원고 없으면 EN 본문 위에 상시 노출 */}
         {!koNote && (
           <div className="max-w-[65ch] ui-card bg-surface-sunken p-4 mb-6">
-            <p className="text-muted text-label leading-relaxed">{KO_FALLBACK_NOTICE}</p>
+            <p className="text-muted text-body leading-relaxed">{KO_FALLBACK_NOTICE}</p>
           </div>
         )}
 

@@ -110,7 +110,7 @@ export default function AccountPage() {
             <div className="border-t border-border mt-4 pt-3">
               {!deleteOpen ? (
                 <div className="flex items-center justify-between gap-3">
-                  <p className="text-label text-faint">{t('account.delete_desc')}</p>
+                  <p className="text-body text-faint">{t('account.delete_desc')}</p>
                   <button
                     type="button"
                     onClick={() => setDeleteOpen(true)}
@@ -173,7 +173,7 @@ export default function AccountPage() {
               <div className="text-label text-faint mb-1">{t('account.credit_balance')}</div>
               <div className="text-[length:var(--text-h2)] font-black text-ink tabular-nums">{credits ?? 5}</div>
               {credits === null && (
-                <div className="text-label text-faint mt-0.5">{t('account.credit_new_hint')}</div>
+                <div className="text-body text-faint mt-0.5">{t('account.credit_new_hint')}</div>
               )}
             </div>
             <a
