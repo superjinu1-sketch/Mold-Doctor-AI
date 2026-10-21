@@ -61,11 +61,14 @@ export default function RootLayout({
         {/* 정적 생성 시 <html lang="ko">가 /en/*·/ja/* 페이지에도 그대로 박힌다(App Router는 <html>이
             루트 레이아웃 1곳뿐). head 파싱 시점에 즉시 교정 — useEffect는 렌더 후라 늦다.
             file://로 서빙되는 Capacitor 앱은 location.pathname이 다르게 나올 수 있으나 에러 없이
-            무해하게 스킵된다(앱은 SEO 대상이 아님). /ja/*는 ja-notes-axis-v1. */}
+            무해하게 스킵된다(앱은 SEO 대상이 아님). /ja/*는 ja-notes-axis-v1.
+            그 외 경로는 LocaleProvider와 같은 규칙(저장값 → 기기 언어)으로 영어 사용자를 미리 판정해
+            data-locale-pending을 붙인다 → 정적 HTML의 한국어가 한 번 그려졌다 바뀌는 깜빡임을 가린다.
+            LocaleProvider가 en 렌더 후 해제, JS 실패 대비 2.5초 뒤 자동 해제. */}
         {/* eslint-disable-next-line react/no-danger */}
         <script
           dangerouslySetInnerHTML={{
-            __html: `if(location.pathname.startsWith('/en'))document.documentElement.lang='en';else if(location.pathname.startsWith('/ja'))document.documentElement.lang='ja'`,
+            __html: `(function(){var d=document.documentElement,p=location.pathname;if(p.startsWith('/en')){d.lang='en';return}if(p.startsWith('/ja')){d.lang='ja';return}try{var s=null;try{s=localStorage.getItem('molddoctor_locale')}catch(e){}var l=(s==='en'||s==='ko')?s:(((navigator.languages&&navigator.languages[0])||navigator.language||'').toLowerCase().startsWith('ko')?'ko':'en');if(l==='en'){d.lang='en';d.setAttribute('data-locale-pending','');setTimeout(function(){d.removeAttribute('data-locale-pending')},2500)}}catch(e){}})()`,
           }}
         />
         {/* Pretendard Variable — Korean-first sans-serif */}

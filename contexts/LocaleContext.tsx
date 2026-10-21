@@ -58,6 +58,12 @@ export function LocaleProvider({ children }: { children: ReactNode }) {
     document.documentElement.lang = locale;
   }, [locale, pathname]);
 
+  // layout.tsx 인라인 스크립트가 영어 사용자에게 붙인 data-locale-pending(첫 화면 한국어 깜빡임 가림)을
+  // en 렌더가 커밋된 뒤 해제한다.
+  useEffect(() => {
+    if (locale === 'en') document.documentElement.removeAttribute('data-locale-pending');
+  }, [locale]);
+
   const t = (key: string): string =>
     MESSAGES[locale][key] ?? MESSAGES['ko'][key] ?? key;
 
