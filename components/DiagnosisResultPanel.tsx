@@ -621,9 +621,12 @@ export default function DiagnosisResultPanel({ result, onSavePDF, round = 1, fol
     const tU = ms.tempUnit === 'F' ? '℉' : '℃';
     const pU = typeof ms.pressureUnit === 'string' && ms.pressureUnit ? ms.pressureUnit : 'MPa';
     const unit = (k: string) => (/Temp$/.test(k) ? tU : ['injPressure1', 'holdPressure', 'backPressure'].includes(k) ? pU : '');
-    return AFTER_FIELDS
+    // 건조·실측값을 앞에 둔다(은줄 보고서의 핵심 줄이 뒤로 밀려 잘리지 않게, 재평가 이 대리).
+    const FIRST = ['dryTemp', 'dryTime', 'dryerType', 'moistureContent', 'actualCushion', 'actualPeakPressure', 'actualPartWeight'];
+    const ordered = [...AFTER_FIELDS].sort((x, y) => (FIRST.includes(x.key) ? 0 : 1) - (FIRST.includes(y.key) ? 0 : 1));
+    return ordered
       .filter(f => typeof ms[f.key] === 'string' && (ms[f.key] as string).trim() !== '' && ms[f.key] !== '없음')
-      .slice(0, 14)
+      .slice(0, 20)
       .map(f => `${t(f.labelKey)} ${ms[f.key]}${unit(f.key)}`)
       .join(', ');
   })();
@@ -635,7 +638,7 @@ export default function DiagnosisResultPanel({ result, onSavePDF, round = 1, fol
       {/* PDF 저장 시에만 넣는 머리말: 날짜·수지·불량·입력 조건. 예전 결과 PDF는 화면 캡처뿐이라
           언제 어떤 조건의 결과인지 남지 않았다(페르소나 평가 이 대리·Sarah). */}
       {pdfExporting && (
-        <div className="bg-surface rounded-2xl p-4 border border-border">
+        <div data-pdf-block className="bg-surface rounded-2xl p-4 border border-border">
           <div className="text-[length:var(--text-subhead)] font-bold text-ink">{t('pdf.header_title')}</div>
           <div className="text-[length:var(--text-body)] text-muted mt-1">
             {new Date().toLocaleString(locale === 'en' ? 'en-US' : 'ko-KR', { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
