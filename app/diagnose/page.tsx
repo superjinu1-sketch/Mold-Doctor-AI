@@ -1818,7 +1818,7 @@ function DiagnoseContent() {
               ))}
             </div>
             <div>
-              <label className={labelCls}>{t('step3.temp_label')}</label>
+              <label className={labelCls}>{t('step3.temp_label').replace(/[(（]\s*(℃|°C)\s*[)）]/, `(${tempUnit === 'F' ? '℉' : '℃'})`)}</label>
               <div className="grid grid-cols-3 sm:grid-cols-5 gap-2">
                 {tempZones.map(({ key, label }) => (
                   <div key={key}>
@@ -1829,7 +1829,7 @@ function DiagnoseContent() {
               </div>
             </div>
             <div>
-              <label className={labelCls}>{t('step3.mold_temp')}</label>
+              <label className={labelCls}>{t('step3.mold_temp').replace(/[(（]\s*(℃|°C)\s*[)）]/, `(${tempUnit === 'F' ? '℉' : '℃'})`)}</label>
               <div className="grid grid-cols-2 gap-2">
                 {moldTempFields.map(({ key, label }) => (
                   <div key={key}>
