@@ -2542,5 +2542,2036 @@
       "severity": "medium",
       "trap": "수지 온도가 올라 점도가 높아진다는 식의 물리 방향 오류를 1순위로 내면 실패. 유압유 온도 상승에 따른 사출 응답 변화는 정당한 원인으로 인정. 원인 확인 없이 사출압만 올리라는 권고는 감점."
     }
+  },
+  {
+    "id": "cov-ps-burn-rib-vent-clog",
+    "source": "coverage-v1 2026-10-21",
+    "title": "GPPS 케이스 리브 끝 탄화 — 장기 연속생산 중 벤트 막힘",
+    "difficulty": "basic",
+    "description": "PS 충전 말단 리브 끝 버닝. 점진 악화 + 고정 위치 + 온도 정상 = 벤트 막힘.",
+    "input": {
+      "defect_type": "버닝/가스마크 (Burn Mark)",
+      "resin_type": "PS",
+      "resin_detail": "GPPS 범용",
+      "machine_settings": {
+        "nozzle_temp": 210,
+        "zone1_temp": 215,
+        "zone2_temp": 205,
+        "zone3_temp": 195,
+        "zone4_temp": 185,
+        "mold_temp_fixed": 35,
+        "mold_temp_moving": 35,
+        "injection_pressure": 90,
+        "holding_pressure": 45,
+        "injection_speed_1": 70,
+        "back_pressure": 5,
+        "screw_rpm": 90,
+        "holding_time": 3,
+        "cooling_time": 12,
+        "clamp_force": 150
+      },
+      "mold_info": {
+        "mold_type": "2판",
+        "gate_type": "사이드",
+        "cavity_count": 4,
+        "runner_type": "콜드"
+      },
+      "defect_description": "화장품 케이스 리브 끝(충전이 제일 마지막에 끝나는 곳)에 검게 탄 자국. 4캐비티 모두 같은 위치, 매 샷 발생. 3주째 금형 청소 없이 연속 생산 중인데 처음엔 없다가 1주 전부터 점점 진해짐. 온도·속도 조건은 처음부터 동일.",
+      "locale": "ko"
+    },
+    "expected": {
+      "root_cause": "충전 말단(리브 끝) 벤트 막힘 — 3주 연속 생산으로 휘발분·탄화물이 벤트에 퇴적, 갇힌 공기가 단열압축되어 탄화(디젤 효과). 배럴 210℃는 PS 권장 180~240℃ 안이라 열분해 아님. 점진 악화 + 4캐비티 동일 위치(충전 말단)가 결정적 단서.",
+      "key_recommendations": [
+        "금형 벤트(특히 리브 끝 충전 말단) 청소 및 정기 청소 주기 설정",
+        "벤트 깊이·배출 경로 확인·보강(비결정성 PS 약 0.025~0.04mm, 리브 끝은 이젝터 핀 간극·벤트 핀 활용)",
+        "충전 말단 구간 사출속도 다단 감속(70→40~50%)",
+        "배럴 온도는 정상 범위라 하향 불필요"
+      ],
+      "expected_phase": "filling",
+      "severity": "high",
+      "trap": null,
+      "confidence": "high"
+    }
+  },
+  {
+    "id": "cov-hips-flowmark-slowfill-cold",
+    "source": "coverage-v1 2026-10-21",
+    "title": "HIPS 후면 커버 물결형 흐름자국 — 저속 충전 + 저온",
+    "difficulty": "basic",
+    "description": "HIPS 흐름자국. 사출속도 과저 + 금형·멜트온도 하한부 = 선단 점진 고화.",
+    "input": {
+      "defect_type": "기타 (직접 입력)",
+      "resin_type": "PS",
+      "resin_detail": "HIPS (내충격 PS)",
+      "machine_settings": {
+        "nozzle_temp": 200,
+        "zone1_temp": 200,
+        "zone2_temp": 195,
+        "zone3_temp": 190,
+        "zone4_temp": 180,
+        "mold_temp_fixed": 20,
+        "mold_temp_moving": 20,
+        "injection_pressure": 70,
+        "holding_pressure": 40,
+        "injection_speed_1": 20,
+        "back_pressure": 5,
+        "screw_rpm": 80,
+        "holding_time": 4,
+        "cooling_time": 15
+      },
+      "mold_info": {
+        "mold_type": "2판",
+        "gate_type": "사이드",
+        "cavity_count": 1
+      },
+      "product_info": {
+        "wall_thickness_min": 2,
+        "wall_thickness_max": 2.5
+      },
+      "defect_description": "흐름자국(Flow Mark). 가전 후면 커버, 게이트에서 바깥쪽으로 물결 모양 줄무늬가 유동 방향을 따라 퍼짐. 손으로 닦아도 안 지워지고 표면이 살짝 울퉁불퉁. 불량률 약 20%, 선별 출하 중. 다른 제품 조건표를 그대로 가져와 씀.",
+      "locale": "ko"
+    },
+    "expected": {
+      "root_cause": "사출속도 과저(20%) + 금형온도(20℃, HIPS 권장 20~50℃ 하한)와 멜트온도(약 200℃, 권장 180~240℃ 하단) 낮음 → 유동 선단이 진행 중 점진 고화되어 물결 자국. 닦아도 안 지워짐 = 구조적 흐름자국(석출 아님).",
+      "key_recommendations": [
+        "사출속도 상향(20→45~60%)",
+        "금형온도 상향(20→40~50℃)",
+        "멜트온도 상향(200→220~230℃)",
+        "조정 후 잔존 시 게이트 크기·위치 검토"
+      ],
+      "expected_phase": "filling",
+      "phase_also_accept": [
+        "cooling"
+      ],
+      "severity": "medium",
+      "trap": null,
+      "confidence": "high"
+    }
+  },
+  {
+    "id": "cov-hips-gateblush-pingate",
+    "source": "coverage-v1 2026-10-21",
+    "title": "HIPS 핀게이트 주변 뿌연 흐림 — 소게이트 고속 통과",
+    "difficulty": "basic",
+    "description": "HIPS 게이트 블러시. 0.8mm 핀게이트 + 90% 고속 + 금형온도 낮음.",
+    "input": {
+      "defect_type": "기타 (직접 입력)",
+      "resin_type": "PS",
+      "resin_detail": "HIPS (내충격 PS)",
+      "machine_settings": {
+        "nozzle_temp": 220,
+        "zone1_temp": 225,
+        "zone2_temp": 215,
+        "zone3_temp": 205,
+        "zone4_temp": 195,
+        "mold_temp_fixed": 30,
+        "mold_temp_moving": 30,
+        "injection_pressure": 95,
+        "holding_pressure": 50,
+        "injection_speed_1": 90,
+        "back_pressure": 5,
+        "screw_rpm": 90,
+        "holding_time": 3,
+        "cooling_time": 12
+      },
+      "mold_info": {
+        "mold_type": "3판",
+        "gate_type": "핀포인트 0.8mm",
+        "cavity_count": 4
+      },
+      "defect_description": "게이트 블러시(Gate Blush). 핀포인트 게이트 바로 주변 반경 10mm 정도가 뿌옇고 광택 없는 무늬. 닦아도 안 지워짐. 그 바깥은 정상 광택. 4캐비티 모두 비슷하고 불량률 약 15%로 선별 중.",
+      "locale": "ko"
+    },
+    "expected": {
+      "root_cause": "작은 핀게이트(0.8mm)를 고속(90%)으로 통과하며 게이트 직후 과전단·급감압 + 금형온도 낮음(30℃) → 게이트 주변 스킨 손상·광택 저하. 닦아도 안 지워짐 = 석출 아님.",
+      "key_recommendations": [
+        "게이트 통과 구간 1단 사출속도 감속(90→30~40%) 후 다단 증속",
+        "금형온도 상향(30→40~50℃)",
+        "게이트 확대(0.8→1.0~1.2mm) 또는 게이트 랜드 단축(근본)",
+        "멜트온도 소폭 상향(220→230℃) 검토"
+      ],
+      "expected_phase": "filling",
+      "severity": "medium",
+      "trap": null,
+      "confidence": "high"
+    }
+  },
+  {
+    "id": "cov-hips-deepcup-sticking-vacuum",
+    "source": "coverage-v1 2026-10-21",
+    "title": "HIPS 깊은 컵 코어 부착 — 진공 + 구배 부족",
+    "difficulty": "basic",
+    "description": "HIPS 깊은 컵이 코어에 붙어 이젝터에 바닥 변형. 에어 블로우 없음, 구배 0.5°.",
+    "input": {
+      "defect_type": "기타 (직접 입력)",
+      "resin_type": "PS",
+      "resin_detail": "HIPS (내충격 PS)",
+      "machine_settings": {
+        "nozzle_temp": 220,
+        "zone1_temp": 225,
+        "zone2_temp": 215,
+        "zone3_temp": 205,
+        "zone4_temp": 195,
+        "mold_temp_fixed": 30,
+        "mold_temp_moving": 30,
+        "injection_pressure": 85,
+        "holding_pressure": 55,
+        "injection_speed_1": 60,
+        "back_pressure": 5,
+        "screw_rpm": 90,
+        "holding_time": 4,
+        "cooling_time": 10
+      },
+      "mold_info": {
+        "mold_type": "2판",
+        "gate_type": "핀포인트",
+        "cavity_count": 2
+      },
+      "product_info": {
+        "wall_thickness_min": 1.2,
+        "wall_thickness_max": 1.5
+      },
+      "defect_description": "이형 불량(Sticking). 깊이 80mm 컵이 코어에 꽉 붙어서 이젝터 핀으로 밀면 바닥이 하얗게 늘어나거나 찌그러짐. 10샷 중 2~3샷. 코어 쪽에 에어 블로우(공기 유입) 장치 없음, 탈형 구배 0.5°.",
+      "locale": "ko"
+    },
+    "expected": {
+      "root_cause": "깊은 컵 코어 이형 시 코어-제품 사이 진공 형성 + 탈형 구배 부족(0.5°) → 이형 저항 과대, 이젝터 핀 국부 하중으로 바닥 백화·변형. 성형 온도는 정상 범위.",
+      "key_recommendations": [
+        "코어 선단에 에어 포펫·에어 블로우를 추가해 진공 해제(근본)",
+        "탈형 구배 확대(1° 이상) 및 코어 연마 방향(이형 방향) 확인",
+        "이젝터 핀 대신 스트리퍼 플레이트·대면적 이젝션 검토",
+        "보압 과다 여부 확인 후 소폭 하향(55→45MPa), 코어 냉각 강화"
+      ],
+      "expected_phase": "ejection",
+      "severity": "medium",
+      "trap": null,
+      "confidence": "medium"
+    }
+  },
+  {
+    "id": "cov-hdpe-lid-warp-asym-cooling",
+    "source": "coverage-v1 2026-10-21",
+    "title": "HDPE 사각 뚜껑 휨 — 고정/가동 금형온도 20℃ 차",
+    "difficulty": "basic",
+    "description": "HDPE 평판 뚜껑 휨. 고정 25℃ / 가동 45℃ 비대칭 냉각, 뜨거운 쪽으로 오목.",
+    "input": {
+      "defect_type": "휨/변형 (Warpage)",
+      "resin_type": "PE(HDPE)",
+      "resin_detail": "HDPE 사출 그레이드",
+      "machine_settings": {
+        "nozzle_temp": 230,
+        "zone1_temp": 230,
+        "zone2_temp": 220,
+        "zone3_temp": 210,
+        "zone4_temp": 200,
+        "mold_temp_fixed": 25,
+        "mold_temp_moving": 45,
+        "injection_pressure": 80,
+        "holding_pressure": 45,
+        "injection_speed_1": 55,
+        "back_pressure": 4,
+        "screw_rpm": 80,
+        "holding_time": 6,
+        "cooling_time": 18
+      },
+      "mold_info": {
+        "mold_type": "2판",
+        "gate_type": "다이렉트(센터)",
+        "cavity_count": 1
+      },
+      "product_info": {
+        "wall_thickness_min": 2,
+        "wall_thickness_max": 2
+      },
+      "defect_description": "300mm 사각 뚜껑(살두께 2mm 균일)이 이형 후 모서리가 들려 휨. 매 샷 같은 방향으로 가동측 쪽이 오목해짐. 휨량 약 1.5mm(규격 0.8mm), 약 30%가 규격 초과. 고정측은 칠러 25℃, 가동측은 별도 온조기 45℃로 운전 중.",
+      "locale": "ko"
+    },
+    "expected": {
+      "root_cause": "고정/가동 금형온도 차 20℃(25/45℃) → 두께 방향 비대칭 냉각·결정화. 뜨거운 가동측이 더 늦게 식고 더 수축해 그쪽으로 오목하게 휨. HDPE 고수축(1.5~3.0%)이 휨을 증폭. 살두께 균일이라 두께 편차 원인은 후순위.",
+      "key_recommendations": [
+        "고정·가동 금형온도 차를 5℃ 이내로 맞춤(예: 양측 35~40℃)",
+        "가동측 온조기·냉각수 유량·회로 점검(왜 따로 45℃인지 확인)",
+        "냉각시간 연장(18→22~25초) 후 휨량 재측정",
+        "보압·보압시간은 균일 유지, 그래도 남으면 리브·게이트 설계 검토"
+      ],
+      "expected_phase": "cooling",
+      "severity": "medium",
+      "trap": null,
+      "confidence": "high"
+    }
+  },
+  {
+    "id": "cov-hdpe-handle-vacuumvoid-dried-trap",
+    "source": "coverage-v1 2026-10-21",
+    "title": "HDPE 두꺼운 손잡이 내부 보이드 — 건조해봤지만 무효(비흡습)",
+    "difficulty": "hard",
+    "description": "HDPE 10mm 후육부 진공 보이드. 사용자가 수분으로 보고 건조해봤으나 무효. 얇은 쪽 게이트 + 보압 낮고 짧음.",
+    "input": {
+      "defect_type": "기포 (Void/Bubble)",
+      "resin_type": "PE(HDPE)",
+      "resin_detail": "HDPE",
+      "machine_settings": {
+        "nozzle_temp": 220,
+        "zone1_temp": 225,
+        "zone2_temp": 215,
+        "zone3_temp": 205,
+        "zone4_temp": 195,
+        "mold_temp_fixed": 30,
+        "mold_temp_moving": 30,
+        "injection_pressure": 75,
+        "holding_pressure": 35,
+        "injection_speed_1": 50,
+        "back_pressure": 5,
+        "screw_rpm": 80,
+        "holding_time": 3,
+        "cooling_time": 40,
+        "drying_temp": 80,
+        "drying_time": 3,
+        "dryer_type": "열풍식"
+      },
+      "mold_info": {
+        "mold_type": "2판",
+        "gate_type": "사이드 2mm",
+        "cavity_count": 2
+      },
+      "product_info": {
+        "wall_thickness_min": 3,
+        "wall_thickness_max": 10
+      },
+      "defect_description": "공구 손잡이 두꺼운 부분(10mm) 단면을 자르면 가운데에 공기방울 같은 빈 구멍. 표면 싱크는 거의 없음. 절단 검사에서 약 25% 발견. 수분 때문인 줄 알고 원료를 80℃ 3시간 건조해 봤는데 그대로. 게이트는 얇은 쪽(3mm) 끝에 있음.",
+      "locale": "ko"
+    },
+    "expected": {
+      "root_cause": "진공 보이드(수축 공동) — HDPE는 비흡습이라 수분 원인 아님(건조 무효가 확인). 10mm 후육부를 얇은 3mm쪽 게이트로 충전해 게이트가 먼저 동결되고, 보압 낮음(35MPa)·보압시간 짧음(3초)으로 내부 수축을 보상하지 못함. 표면 스킨이 먼저 굳어 싱크 대신 내부 공동으로 나타남.",
+      "key_recommendations": [
+        "보압 상향(35→50~60MPa) 및 보압시간을 게이트 실(seal)까지 연장(Gate Seal Study, 3→8~12초)",
+        "가열 시험으로 진공 보이드 확인(가열 시 꺼지면 진공, 부풀면 가스)",
+        "게이트를 두꺼운 부위 쪽으로 이동하거나 게이트 확대(근본)",
+        "후육부 코어링(살빼기) 설계 검토, 건조는 불필요"
+      ],
+      "expected_phase": "packing",
+      "severity": "medium",
+      "trap": "수분·가스 기포로 보고 건조 강화나 배압 상향을 1순위로 내면 실패(HDPE 비흡습, 건조 무효 이미 확인). 냉각시간 연장만 권고하는 것도 감점.",
+      "hallucination_forbidden": [
+        "HDPE 가수분해",
+        "건조 시간·온도 연장을 1순위로"
+      ],
+      "confidence": "high"
+    }
+  },
+  {
+    "id": "cov-en-hdpe-cap-hotrunner-stringing",
+    "source": "coverage-v1 2026-10-21",
+    "title": "[EN locale] HDPE 캡 핫러너 게이트 실끌림 — 게이트 팁 과열",
+    "difficulty": "basic",
+    "description": "HDPE 8캐비티 핫러너 캡 게이트 실끌림. 기계 노즐 아닌 게이트에서 발생, 팁 260℃.",
+    "input": {
+      "defect_type": "기타 (직접 입력)",
+      "resin_type": "PE(HDPE)",
+      "resin_detail": "HDPE closure grade",
+      "machine_settings": {
+        "nozzle_temp": 230,
+        "zone1_temp": 230,
+        "zone2_temp": 220,
+        "zone3_temp": 210,
+        "zone4_temp": 200,
+        "mold_temp_fixed": 20,
+        "mold_temp_moving": 20,
+        "injection_pressure": 90,
+        "holding_pressure": 50,
+        "injection_speed_1": 70,
+        "back_pressure": 4,
+        "screw_rpm": 120,
+        "holding_time": 2,
+        "cooling_time": 6
+      },
+      "mold_info": {
+        "mold_type": "hot runner",
+        "gate_type": "hot tip (open gate)",
+        "cavity_count": 8,
+        "runner_type": "핫"
+      },
+      "defect_description": "Stringing: thin hair-like strings hang from the gate vestige of bottle caps. About 30% of caps need hand trimming. The machine nozzle is clean, the strings come from the hot runner gates, not the sprue. Hot runner tip temperature is set at 260°C, manifold at 230°C.",
+      "locale": "en"
+    },
+    "expected": {
+      "root_cause": "Hot runner gate tip too hot (260°C, above the manifold and above the HDPE melt window of about 200-250°C) and/or not enough cooling at the gate, so the gate is still molten when the mold opens and the melt is pulled into strings. The strings come from the gates, so the machine nozzle is not the cause.",
+      "key_recommendations": [
+        "Lower the hot runner tip temperature in steps (260→about 235-240°C), watch for frozen gates or short shots",
+        "Improve gate area cooling (check the gate cooling insert and water flow near the gates)",
+        "Add a small decompression (suck-back) after metering, a few mm only, to relieve melt pressure at the gates",
+        "Slightly extend cooling time or mold-open delay if strings remain"
+      ],
+      "expected_phase": "ejection",
+      "severity": "medium",
+      "trap": null,
+      "confidence": "high"
+    }
+  },
+  {
+    "id": "cov-en-hdpe-cap-dim-afternoon-coolant",
+    "source": "coverage-v1 2026-10-21",
+    "title": "[EN locale] HDPE 캡 오후 치수 드리프트 — 냉각수 온도 상승",
+    "difficulty": "hard",
+    "description": "HDPE 캡 외경이 오후에만 작아짐. 조건 무변경, 중앙 칠러 냉각수 온도가 오후에 상승.",
+    "input": {
+      "defect_type": "기타 (직접 입력)",
+      "resin_type": "PE(HDPE)",
+      "resin_detail": "HDPE closure grade",
+      "machine_settings": {
+        "nozzle_temp": 230,
+        "zone1_temp": 230,
+        "zone2_temp": 220,
+        "zone3_temp": 210,
+        "zone4_temp": 200,
+        "mold_temp_fixed": 20,
+        "mold_temp_moving": 20,
+        "injection_pressure": 90,
+        "holding_pressure": 55,
+        "injection_speed_1": 70,
+        "back_pressure": 4,
+        "screw_rpm": 120,
+        "holding_time": 4,
+        "cooling_time": 5,
+        "metering": 40,
+        "cushion": 5
+      },
+      "mold_info": {
+        "mold_type": "2-plate",
+        "gate_type": "hot tip",
+        "cavity_count": 16,
+        "runner_type": "핫"
+      },
+      "defect_description": "Dimensional instability: cap outside diameter is in spec every morning, but from about 1 pm it drifts 0.12-0.15 mm undersize and about 25% of afternoon parts fail. Next morning it is fine again. No setting changes, same resin lot, cushion is stable shot to shot. QC always measures 1 hour after molding. Mold coolant comes from a central chiller set at 20°C; it is midsummer and the maintenance team says the chiller struggles in the afternoon.",
+      "locale": "en"
+    },
+    "expected": {
+      "root_cause": "Mold coolant temperature drift: the central chiller cannot hold 20°C in the afternoon heat, so the mold surface runs warmer, the HDPE crystallizes more and shrinks more, and the cap comes out smaller. The settings, resin lot and cushion are stable and measurement timing is fixed, so the process and material are not the drivers.",
+      "key_recommendations": [
+        "Log coolant supply/return temperature and mold surface temperature morning vs afternoon to confirm the drift",
+        "Restore cooling capacity: dedicated chiller or closed-loop temperature control at the setpoint, check flow rate and scale in the circuits",
+        "Do not compensate by changing hold pressure each afternoon until the coolant is stable, then re-verify dimensions",
+        "Keep measurement timing standardized (HDPE keeps shrinking for about 24-48 h after molding)"
+      ],
+      "expected_phase": "cooling",
+      "phase_also_accept": [
+        "packing"
+      ],
+      "severity": "medium",
+      "trap": "Recommending hold pressure or cooling time changes as the first fix, or blaming the material lot, without checking the coolant temperature drift that matches the time-of-day pattern.",
+      "confidence": "high"
+    }
+  },
+  {
+    "id": "cov-ldpe-flash-hotmelt",
+    "source": "coverage-v1 2026-10-21",
+    "title": "LDPE 마개 전둘레 플래시 — 멜트온도 과고로 점도 저하",
+    "difficulty": "basic",
+    "description": "LDPE 플래시. 멜트 240℃(권장 160~210 초과) + 보압 높음. 신규 금형, 형체력 충분.",
+    "input": {
+      "defect_type": "플래시 (Flash)",
+      "resin_type": "PE(LDPE)",
+      "resin_detail": "LDPE",
+      "machine_settings": {
+        "nozzle_temp": 240,
+        "zone1_temp": 240,
+        "zone2_temp": 235,
+        "zone3_temp": 225,
+        "zone4_temp": 210,
+        "mold_temp_fixed": 30,
+        "mold_temp_moving": 30,
+        "injection_pressure": 80,
+        "holding_pressure": 60,
+        "injection_speed_1": 70,
+        "back_pressure": 4,
+        "screw_rpm": 90,
+        "holding_time": 5,
+        "cooling_time": 10,
+        "clamp_force": 80,
+        "max_clamp_force": 100
+      },
+      "mold_info": {
+        "mold_type": "2판",
+        "gate_type": "사이드",
+        "cavity_count": 4
+      },
+      "defect_description": "LDPE 마개 파팅라인 전체 둘레에 얇은 버. 신규 금형이고 파팅면 맞춤은 정상 확인. 형체력은 투영면적 대비 충분(기계 최대 100톤 중 80톤). 약 40% 트리밍 필요. 다른 PE 제품 조건표를 기준으로 온도를 높게 잡음.",
+      "locale": "ko"
+    },
+    "expected": {
+      "root_cause": "멜트온도 과고(240℃, LDPE 권장 160~210℃ 초과)로 점도가 과도하게 낮아짐 + 보압 높음(사출압의 75%) → 파팅면 미세 간극 침투. 신규 금형·형체력 충분 = 금형 마모·형체력 부족 아님.",
+      "key_recommendations": [
+        "배럴·노즐 온도 하향(240→190~200℃)",
+        "보압 하향(60→35~45MPa) 및 V/P 전환 앞당김",
+        "사출압·사출속도 소폭 하향",
+        "형체력은 이미 충분, 형체력 증가로 해결하려 하지 말 것"
+      ],
+      "expected_phase": "packing",
+      "phase_also_accept": [
+        "filling"
+      ],
+      "severity": "medium",
+      "trap": null,
+      "confidence": "high"
+    }
+  },
+  {
+    "id": "cov-tpe-grip-sticking-polished",
+    "source": "coverage-v1 2026-10-21",
+    "title": "연질 TPE 그립 경면 캐비티 부착 — 금형온도 과고 + 경면",
+    "difficulty": "basic",
+    "description": "쇼어 40A TPE가 경면 캐비티에 붙어 이젝터 핀에 늘어남. 금형 55℃(권장 20~50 초과).",
+    "input": {
+      "defect_type": "기타 (직접 입력)",
+      "resin_type": "TPE",
+      "resin_detail": "SEBS계 TPE 쇼어 40A",
+      "machine_settings": {
+        "nozzle_temp": 200,
+        "zone1_temp": 200,
+        "zone2_temp": 195,
+        "zone3_temp": 185,
+        "zone4_temp": 175,
+        "mold_temp_fixed": 55,
+        "mold_temp_moving": 55,
+        "injection_pressure": 50,
+        "holding_pressure": 30,
+        "injection_speed_1": 40,
+        "back_pressure": 3,
+        "screw_rpm": 60,
+        "holding_time": 3,
+        "cooling_time": 12
+      },
+      "mold_info": {
+        "mold_type": "2판",
+        "gate_type": "사이드",
+        "cavity_count": 2
+      },
+      "defect_description": "이형 불량(Sticking). 부드러운 그립이 경면 연마한 캐비티에 달라붙어서 이젝터 핀이 제품을 찌르고 늘어난 자국이 남음. 약 20% 발생. 캐비티는 거울처럼 광택 연마, 이젝터는 지름 4mm 핀 4개.",
+      "locale": "ko"
+    },
+    "expected": {
+      "root_cause": "연질 TPE + 경면 캐비티의 진공 밀착 + 금형온도 과고(55℃, TPE 권장 20~50℃ 초과)로 이형 시점에 제품이 아직 연함 → 작은 이젝터 핀 국부 하중으로 찔림·늘어남.",
+      "key_recommendations": [
+        "금형온도 하향(55→30~40℃) 및 냉각시간 연장",
+        "캐비티 표면을 경면 대신 미세 텍스처(블라스트·방전 표면)로 바꿔 진공 밀착 해소",
+        "작은 핀 대신 대면적 이젝터(스트리퍼·블레이드)·에어 이젝션 적용",
+        "탈형 구배 확대, 보압 과다 시 하향"
+      ],
+      "expected_phase": "ejection",
+      "severity": "medium",
+      "trap": null,
+      "confidence": "medium"
+    }
+  },
+  {
+    "id": "cov-tpe-overmold-abs-peel-grade",
+    "source": "coverage-v1 2026-10-21",
+    "title": "TPE 2차 사출 그립이 ABS에서 박리 — PP용 그레이드 사용",
+    "difficulty": "hard",
+    "description": "ABS 기재 위 TPE 오버몰드 전수 박리. PP 접착용 SEBS 그레이드. 멜트·속도 상향 무효, 계면 깨끗이 분리.",
+    "input": {
+      "defect_type": "기타 (직접 입력)",
+      "resin_type": "TPE",
+      "resin_detail": "SEBS계 범용 TPE (PP 접착용 그레이드), 기재 ABS",
+      "machine_settings": {
+        "nozzle_temp": 225,
+        "zone1_temp": 225,
+        "zone2_temp": 215,
+        "zone3_temp": 205,
+        "zone4_temp": 195,
+        "mold_temp_fixed": 40,
+        "mold_temp_moving": 40,
+        "injection_pressure": 60,
+        "holding_pressure": 35,
+        "injection_speed_1": 60,
+        "back_pressure": 3,
+        "screw_rpm": 60,
+        "holding_time": 3,
+        "cooling_time": 15
+      },
+      "mold_info": {
+        "mold_type": "인서트 오버몰드",
+        "gate_type": "사이드",
+        "cavity_count": 2
+      },
+      "defect_description": "박리(접착 불량). ABS 손잡이 위에 2차 사출한 TPE 그립이 손으로 당기면 깔끔하게 벗겨짐. 전수 발생. 멜트온도를 210→225℃로 올리고 사출속도도 올렸지만 차이 없음. 벗겨진 면을 보면 ABS 쪽에 TPE가 전혀 안 남음. TPE는 기존 PP 손잡이 제품에 쓰던 같은 그레이드.",
+      "locale": "ko"
+    },
+    "expected": {
+      "root_cause": "재료 상용성 불일치 — PP 접착용 SEBS계 TPE는 ABS와 계면 접착이 되지 않음. ABS·PC 접착용으로 개질된 TPE 그레이드가 필요. 조건 상향 무효 + ABS 면에 TPE 잔류 없음(계면 깨끗이 분리)이 결정적 단서.",
+      "key_recommendations": [
+        "ABS 접착용 TPE 그레이드로 교체(근본, 재료 공급사 확인)",
+        "교체 전 기재 표면 오염(이형제·유분·지문) 배제, 기재 보관·취급 확인",
+        "교체 후 기재 예열·TPE 멜트온도 권장 상단·금형온도로 접착 최적화",
+        "기계적 인터록(관통홀·언더컷) 설계 병행 검토"
+      ],
+      "expected_phase": "material",
+      "severity": "high",
+      "trap": "멜트온도·사출속도·보압 등 성형조건 상향을 1순위로 내면 실패(이미 무효). 재료 상용성(그레이드 선택) 축이 정답.",
+      "confidence": "high"
+    }
+  },
+  {
+    "id": "cov-tpe-seal-flash-lowviscosity",
+    "source": "coverage-v1 2026-10-21",
+    "title": "TPE 패킹 플래시 — 형체력 올려도 무효(전단담화 점도 저하)",
+    "difficulty": "hard",
+    "description": "TPE 패킹 파팅라인·이젝터 핀 버. 고속·고압 충전으로 점도 급감. 사용자는 형체력 상향을 시도.",
+    "input": {
+      "defect_type": "플래시 (Flash)",
+      "resin_type": "TPE",
+      "resin_detail": "SEBS계 TPE 쇼어 60A",
+      "machine_settings": {
+        "nozzle_temp": 215,
+        "zone1_temp": 215,
+        "zone2_temp": 205,
+        "zone3_temp": 195,
+        "zone4_temp": 185,
+        "mold_temp_fixed": 35,
+        "mold_temp_moving": 35,
+        "injection_pressure": 90,
+        "holding_pressure": 60,
+        "injection_speed_1": 85,
+        "back_pressure": 3,
+        "screw_rpm": 60,
+        "holding_time": 4,
+        "cooling_time": 15,
+        "clamp_force": 100,
+        "max_clamp_force": 120
+      },
+      "mold_info": {
+        "mold_type": "2판",
+        "gate_type": "사이드",
+        "cavity_count": 4
+      },
+      "defect_description": "TPE 패킹 부품 파팅라인과 이젝터 핀 주변에 얇은 버. 약 30% 트리밍 필요. 금형은 예전에 PP용으로 쓰던 것을 그대로 이관. 형체력을 70→100톤으로 올려봤는데 효과 미미.",
+      "locale": "ko"
+    },
+    "expected": {
+      "root_cause": "TPE는 전단담화가 커서 고속(85%) 충전 시 점도가 크게 떨어지고, 높은 사출압·보압(보압이 사출압의 67%)과 겹쳐 PP 기준으로 맞춘 파팅면·이젝터 핀 미세 간극에 침투. 형체력 부족이 아니라 충전 에너지 과다 + 간극이 TPE에 비해 큼.",
+      "key_recommendations": [
+        "사출속도 하향(85→40~50%), 사출압·보압 하향(보압 60→30~40MPa)",
+        "V/P 전환 앞당김(충전 95~98% 지점에서 전환)",
+        "멜트온도 하향(215→190~200℃)",
+        "파팅면·이젝터 핀 간극을 TPE 기준으로 축소(금형 보정, 근본)"
+      ],
+      "expected_phase": "packing",
+      "phase_also_accept": [
+        "filling"
+      ],
+      "severity": "medium",
+      "trap": "형체력 추가 상향을 1순위로 내면 실패(이미 효과 미미). 충전 속도·압력 과다와 금형 간극이 정답 축.",
+      "confidence": "high"
+    }
+  },
+  {
+    "id": "cov-en-tpu-splay-nodryer",
+    "source": "coverage-v1 2026-10-21",
+    "title": "[EN locale] TPU 시계줄 은줄·기포 — 건조 없이 투입",
+    "difficulty": "basic",
+    "description": "TPU 미건조 수분 은줄. 개봉 하루 지난 봉투에서 바로 호퍼 투입, 퍼지물 발포.",
+    "input": {
+      "defect_type": "은줄 (Silver Streak)",
+      "resin_type": "TPU",
+      "resin_detail": "Polyether TPU, Shore 85A",
+      "machine_settings": {
+        "nozzle_temp": 210,
+        "zone1_temp": 210,
+        "zone2_temp": 205,
+        "zone3_temp": 195,
+        "zone4_temp": 185,
+        "mold_temp_fixed": 35,
+        "mold_temp_moving": 35,
+        "injection_pressure": 70,
+        "holding_pressure": 40,
+        "injection_speed_1": 40,
+        "back_pressure": 4,
+        "screw_rpm": 60,
+        "holding_time": 4,
+        "cooling_time": 20,
+        "dryer_type": "없음"
+      },
+      "defect_description": "Silver streaks and small bubbles spread over the whole surface of a watch strap, on about 1 in 3 parts. Material comes from a bag opened yesterday and is fed straight into the hopper, no dryer. Purged melt looks foamy.",
+      "locale": "en"
+    },
+    "expected": {
+      "root_cause": "Moisture splay: TPU is hygroscopic and the resin is not dried at all (opened bag, fed directly). The foamy purge confirms moisture. Barrel and mold temperatures are within the TPU window.",
+      "key_recommendations": [
+        "Dry the TPU in a desiccant (dehumidifying) dryer at about 90°C for 2-4 h, or per the grade datasheet, and verify low residual moisture before molding",
+        "Use a hopper dryer or sealed feed to prevent re-absorption, and reseal opened bags",
+        "Purge the barrel and discard the first shots after dried material arrives",
+        "Do not raise barrel temperature to try to drive off moisture; the temperatures are already normal"
+      ],
+      "expected_phase": "material",
+      "severity": "medium",
+      "trap": null,
+      "confidence": "high"
+    }
+  },
+  {
+    "id": "cov-pet-gf30-coldmold-dull",
+    "source": "coverage-v1 2026-10-21",
+    "title": "PET GF30 표면 무광·섬유 비침 — 금형온도 80℃(권장 130~140)",
+    "difficulty": "basic",
+    "description": "PET GF30 표면 거침·광택 불량. 금형온도가 결정화 온도보다 크게 낮음.",
+    "input": {
+      "defect_type": "기타 (직접 입력)",
+      "resin_type": "PET",
+      "resin_detail": "PET GF30",
+      "machine_settings": {
+        "nozzle_temp": 280,
+        "zone1_temp": 285,
+        "zone2_temp": 280,
+        "zone3_temp": 270,
+        "zone4_temp": 260,
+        "mold_temp_fixed": 80,
+        "mold_temp_moving": 80,
+        "injection_pressure": 100,
+        "holding_pressure": 60,
+        "injection_speed_1": 70,
+        "back_pressure": 5,
+        "screw_rpm": 80,
+        "holding_time": 8,
+        "cooling_time": 20,
+        "drying_temp": 120,
+        "drying_time": 4,
+        "dryer_type": "제습식"
+      },
+      "defect_description": "표면 광택 불량. PET GF30 부품 표면이 거칠고 하얗게 유리섬유가 비쳐 보이며 광택이 없음. 약 30%가 외관 불합격. 금형은 온수식 온조기로 80℃. 건조는 120℃ 4시간 제습식.",
+      "locale": "ko"
+    },
+    "expected": {
+      "root_cause": "금형온도 과저 — 80℃는 PET 권장 130~140℃보다 크게 낮아 표층이 급랭되어 결정화가 부족하고 수지 리치 표층이 형성되지 않음 → 섬유 노출·광택 불량. 미결정 부품은 이후 고온 사용 시 후결정화·후수축 우려. 건조는 정상.",
+      "key_recommendations": [
+        "금형온도 상향(80→130~140℃, 오일식 온조기 또는 카트리지 히터)",
+        "금형 표면 실측으로 설정값과 실제 온도 차이 확인",
+        "금형온도 상향 후 냉각시간 재설정(결정화 완료 확인)",
+        "건조(120℃ 4시간 제습식)와 배럴 온도는 현 상태 유지"
+      ],
+      "expected_phase": "cooling",
+      "phase_also_accept": [
+        "filling"
+      ],
+      "severity": "medium",
+      "trap": null,
+      "confidence": "high"
+    }
+  },
+  {
+    "id": "cov-en-pet-hotair-dryer-hydrolysis",
+    "source": "coverage-v1 2026-10-21",
+    "title": "[EN locale] PET GF30 스냅 파단 — 열풍 건조기 + 여름 다습(가수분해)",
+    "difficulty": "hard",
+    "description": "PET 스냅핏 조립 파단, 7월부터. 건조 온도·시간은 데이터시트대로지만 열풍식 건조기. 은줄 없음.",
+    "input": {
+      "defect_type": "크랙 (Crack)",
+      "resin_type": "PET",
+      "resin_detail": "PET GF30",
+      "machine_settings": {
+        "nozzle_temp": 280,
+        "zone1_temp": 285,
+        "zone2_temp": 280,
+        "zone3_temp": 270,
+        "zone4_temp": 260,
+        "mold_temp_fixed": 135,
+        "mold_temp_moving": 135,
+        "injection_pressure": 100,
+        "holding_pressure": 60,
+        "injection_speed_1": 65,
+        "back_pressure": 5,
+        "screw_rpm": 80,
+        "holding_time": 8,
+        "cooling_time": 20,
+        "drying_temp": 120,
+        "drying_time": 4,
+        "dryer_type": "열풍식"
+      },
+      "defect_description": "Snap-fit hooks crack and break during assembly, about 8% of parts. It started in July; the same settings worked fine through the spring. The dryer is a hot-air (non-desiccant) dryer at 120°C for 4 h, which matches the datasheet temperature and time. No silver streaks are visible on the parts.",
+      "locale": "en"
+    },
+    "expected": {
+      "root_cause": "Hydrolysis from residual moisture. A hot-air dryer heats ambient air and cannot reach the low dew point PET needs (residual moisture about 0.02% or lower); in humid summer air it leaves too much water even at 120°C/4 h. Molding wet PET cuts molecular weight, so the snap-fits become brittle. No splay does not mean the resin was dry.",
+      "key_recommendations": [
+        "Switch to a desiccant (dehumidifying) dryer, dew point about -40°C, 120°C for 4-6 h; verify moisture about 0.02% or lower before molding",
+        "Quarantine parts molded since July and check impact/strength; hydrolysis damage is not recovered by re-drying",
+        "Keep dried resin sealed or hopper-dried to avoid re-absorption",
+        "Do not try to fix it with hold pressure, mold temperature or ejection changes"
+      ],
+      "expected_phase": "material",
+      "severity": "high",
+      "trap": "Drying temperature and time match the datasheet, so a model that marks drying OK and blames residual stress, hold pressure or ejection fails. The clues are the hot-air dryer and the onset in humid summer.",
+      "confidence": "high"
+    }
+  },
+  {
+    "id": "cov-pps-flash-vent-too-deep",
+    "source": "coverage-v1 2026-10-21",
+    "title": "PPS GF40 벤트 위치에만 버 — 벤트 0.03mm 재가공 후 발생",
+    "difficulty": "hard",
+    "description": "PPS 플래시가 벤트 위치와 일치. 금형 보수 때 벤트 0.03mm 가공. 형체력 상향 무효.",
+    "input": {
+      "defect_type": "플래시 (Flash)",
+      "resin_type": "PPS",
+      "resin_detail": "PPS GF40",
+      "machine_settings": {
+        "nozzle_temp": 320,
+        "zone1_temp": 320,
+        "zone2_temp": 315,
+        "zone3_temp": 305,
+        "zone4_temp": 295,
+        "mold_temp_fixed": 140,
+        "mold_temp_moving": 140,
+        "injection_pressure": 90,
+        "holding_pressure": 50,
+        "injection_speed_1": 70,
+        "back_pressure": 3,
+        "screw_rpm": 60,
+        "holding_time": 3,
+        "cooling_time": 15,
+        "drying_temp": 130,
+        "drying_time": 3,
+        "dryer_type": "제습식",
+        "clamp_force": 120,
+        "max_clamp_force": 150
+      },
+      "mold_info": {
+        "mold_type": "2판",
+        "gate_type": "사이드",
+        "cavity_count": 2
+      },
+      "defect_description": "센서 하우징 충전 말단 쪽 몇 군데에만 얇은 날개 같은 버. 버 위치가 금형 벤트 가공 위치와 정확히 일치하고 다른 파팅면엔 버 없음. 금형 보수 때 벤트를 깊이 0.03mm로 새로 가공한 뒤부터 발생. 형체력을 100→120톤으로 올려도 그대로. 매 샷 후가공 트리밍으로 출하 중.",
+      "locale": "ko"
+    },
+    "expected": {
+      "root_cause": "벤트 깊이 과대 — PPS는 용융 점도가 매우 낮아 0.03mm 벤트로 수지가 흘러 들어감. PPS 벤트 깊이는 통상 약 0.01mm 안팎(대략 0.015mm 이하)으로 얕게 가공. 벤트는 설계상 열린 틈이라 형체력과 무관(형체력 상향 무효가 증거).",
+      "key_recommendations": [
+        "벤트 깊이를 PPS 기준(약 0.01mm 안팎)으로 재가공(인서트 교체·용접 후 재가공), 폭·릴리프 확보",
+        "재가공 전 임시로 충전 말단 사출속도·보압 소폭 하향",
+        "형체력은 원래 값(100톤)으로 복귀(과형체는 벤트 압착·금형 부담)",
+        "재가공 후 가스·버닝 재발 여부 감시"
+      ],
+      "expected_phase": "filling",
+      "phase_also_accept": [
+        "packing"
+      ],
+      "severity": "medium",
+      "trap": "형체력·사출압 조정을 1순위로 내면 실패(형체력 상향 이미 무효, 버 위치 = 벤트 위치). 벤트 깊이(금형) 축이 정답.",
+      "confidence": "high"
+    }
+  },
+  {
+    "id": "cov-pps-coldslug-lownozzle",
+    "source": "coverage-v1 2026-10-21",
+    "title": "PPS GF40 게이트부 콜드슬러그 — 노즐 290℃ + 슬러그웰 없음",
+    "difficulty": "basic",
+    "description": "PPS 콜드슬러그. 노즐 290℃(권장 300~340 미달), 140℃ 금형에 노즐 상시 접촉, 콜드슬러그웰 없음.",
+    "input": {
+      "defect_type": "기타 (직접 입력)",
+      "resin_type": "PPS",
+      "resin_detail": "PPS GF40",
+      "machine_settings": {
+        "nozzle_temp": 290,
+        "zone1_temp": 320,
+        "zone2_temp": 315,
+        "zone3_temp": 305,
+        "zone4_temp": 295,
+        "mold_temp_fixed": 140,
+        "mold_temp_moving": 140,
+        "injection_pressure": 95,
+        "holding_pressure": 50,
+        "injection_speed_1": 70,
+        "back_pressure": 3,
+        "screw_rpm": 60,
+        "holding_time": 3,
+        "cooling_time": 15,
+        "drying_temp": 130,
+        "drying_time": 3,
+        "dryer_type": "제습식"
+      },
+      "mold_info": {
+        "mold_type": "2판",
+        "gate_type": "사이드",
+        "cavity_count": 4,
+        "runner_type": "콜드"
+      },
+      "defect_description": "콜드슬러그(Cold Slug). 커넥터 게이트 근처에 광택이 다른 작은 덩어리 자국과 그 뒤로 짧은 꼬리 무늬. 약 10% 발생. 콜드 러너(스프루→러너→사이드게이트) 금형인데 러너 끝에 콜드슬러그웰이 없음. 노즐은 사이클 내내 스프루 부시에 붙여 둠.",
+      "locale": "ko"
+    },
+    "expected": {
+      "root_cause": "노즐 온도 낮음(290℃, PPS 권장 멜트 300~340℃ 미달) + 140℃ 금형에 노즐 상시 접촉으로 열 손실 → 결정화가 빠른 PPS가 노즐 선단에서 고화, 다음 샷에 덩어리로 유입. 슬러그를 잡아줄 콜드슬러그웰이 없어 캐비티까지 도달.",
+      "key_recommendations": [
+        "노즐 온도 상향(290→310~320℃), 실끌림·드룰이 생기지 않는 범위에서",
+        "스프루·러너 끝에 콜드슬러그웰 추가(근본)",
+        "노즐 후퇴(스프루 브레이크) 사용으로 노즐-금형 접촉 열손실 감소",
+        "노즐 히터·열전대 점검(실측 온도 확인)"
+      ],
+      "expected_phase": "filling",
+      "severity": "medium",
+      "trap": null,
+      "confidence": "high"
+    }
+  },
+  {
+    "id": "cov-peek-amorphous-skin-discolor-trap",
+    "source": "coverage-v1 2026-10-21",
+    "title": "PEEK 부시 갈색 반투명 — 변색 아닌 결정화 부족(금형 140℃)",
+    "difficulty": "hard",
+    "description": "PEEK 표면이 갈색 반투명. 사용자는 열분해로 보고 배럴 하향(무효). 금형 140℃는 Tg 근처 미만.",
+    "input": {
+      "defect_type": "변색 (Discoloration)",
+      "resin_type": "PEEK",
+      "resin_detail": "비강화 PEEK",
+      "machine_settings": {
+        "nozzle_temp": 380,
+        "zone1_temp": 385,
+        "zone2_temp": 375,
+        "zone3_temp": 365,
+        "zone4_temp": 355,
+        "mold_temp_fixed": 140,
+        "mold_temp_moving": 140,
+        "injection_pressure": 110,
+        "holding_pressure": 70,
+        "injection_speed_1": 60,
+        "back_pressure": 3,
+        "screw_rpm": 50,
+        "holding_time": 6,
+        "cooling_time": 20,
+        "drying_temp": 150,
+        "drying_time": 3,
+        "dryer_type": "제습식"
+      },
+      "defect_description": "원래 베이지색 불투명이어야 하는 PEEK 부시가 표면이 갈색 반투명에 광택 있게 나옴. 얇은 부위와 표면층이 특히 심하고, 약 30%가 색상 기준 불합격. 열분해인 줄 알고 배럴 온도를 395→380℃로 내렸는데 변화 없음. 금형은 온유기 140℃ 설정.",
+      "locale": "ko"
+    },
+    "expected": {
+      "root_cause": "열변색이 아니라 결정화 부족(비정질 스킨) — 금형 140℃는 PEEK 권장 160~200℃ 미달이고 유리전이온도(약 143℃) 근처 아래라 표층이 급랭되어 비정질(갈색 반투명)로 고화. 얇은 부위·표층 집중 + 배럴 하향 무효가 열분해 배제 단서.",
+      "key_recommendations": [
+        "금형온도 상향(140→170~190℃, 오일식 온조기 상한 또는 카트리지 히터)",
+        "금형 표면 실측으로 실제 온도 확인(설정값보다 낮은 경우 많음)",
+        "배럴 온도는 PEEK 권장(360~400℃) 내 원래 수준으로 복귀, 추가 하향은 충전에 불리",
+        "응급 대책으로 후처리 어닐링(결정화)은 가능하나 치수 변화 확인 필요"
+      ],
+      "expected_phase": "cooling",
+      "phase_also_accept": [
+        "filling"
+      ],
+      "severity": "medium",
+      "trap": "열분해·체류 변색으로 보고 배럴 온도 추가 하향·퍼지를 1순위로 내면 실패(이미 무효). 금형온도(결정화도) 축이 정답.",
+      "confidence": "high"
+    }
+  },
+  {
+    "id": "cov-en-pei-splay-underdried",
+    "source": "coverage-v1 2026-10-21",
+    "title": "[EN locale] PEI 은줄 — PC 건조 조건(120℃ 2h) 재사용",
+    "difficulty": "basic",
+    "description": "PEI 수분 은줄. 권장 약 150℃ 4~6h 대비 120℃ 2h로 건조 부족.",
+    "input": {
+      "defect_type": "은줄 (Silver Streak)",
+      "resin_type": "PEI",
+      "resin_detail": "Unfilled PEI (amber)",
+      "machine_settings": {
+        "nozzle_temp": 360,
+        "zone1_temp": 365,
+        "zone2_temp": 355,
+        "zone3_temp": 345,
+        "zone4_temp": 335,
+        "mold_temp_fixed": 150,
+        "mold_temp_moving": 150,
+        "injection_pressure": 120,
+        "holding_pressure": 70,
+        "injection_speed_1": 55,
+        "back_pressure": 4,
+        "screw_rpm": 60,
+        "holding_time": 5,
+        "cooling_time": 20,
+        "drying_temp": 120,
+        "drying_time": 2,
+        "dryer_type": "제습식"
+      },
+      "defect_description": "Silver streaks spread across the whole amber part surface, on about 1 in 4 parts. We dried in the desiccant dryer at 120°C for 2 h because we reused the PC drying schedule.",
+      "locale": "en"
+    },
+    "expected": {
+      "root_cause": "Insufficient drying: PEI needs about 150°C for 4-6 h; 120°C for 2 h (a PC-style schedule) leaves moisture, which flashes to steam and causes splay. Barrel and mold temperatures are within the PEI window.",
+      "key_recommendations": [
+        "Dry at about 150°C for 4-6 h in a desiccant dryer (dew point about -40°C), and verify residual moisture per the datasheet before molding",
+        "Check dryer hopper size vs throughput so the resin actually gets the full drying time",
+        "Purge the wet material from the barrel and discard the first shots",
+        "No change needed to barrel or mold temperatures"
+      ],
+      "expected_phase": "material",
+      "severity": "medium",
+      "trap": null,
+      "confidence": "high"
+    }
+  },
+  {
+    "id": "cov-pcabs-delam-pingate-shear",
+    "source": "coverage-v1 2026-10-21",
+    "title": "PC/ABS 게이트 근처 껍질 박리 — 소게이트 과전단 + 저금형온도",
+    "difficulty": "basic",
+    "description": "PC/ABS 박리가 게이트 근처에만. 원료 변경 없음, 0.6mm 핀게이트 + 95% 고속 + 금형 50℃.",
+    "input": {
+      "defect_type": "기타 (직접 입력)",
+      "resin_type": "PC/ABS",
+      "resin_detail": "PC/ABS 버진 100%",
+      "machine_settings": {
+        "nozzle_temp": 255,
+        "zone1_temp": 260,
+        "zone2_temp": 250,
+        "zone3_temp": 240,
+        "zone4_temp": 230,
+        "mold_temp_fixed": 50,
+        "mold_temp_moving": 50,
+        "injection_pressure": 120,
+        "holding_pressure": 60,
+        "injection_speed_1": 95,
+        "back_pressure": 5,
+        "screw_rpm": 70,
+        "holding_time": 4,
+        "cooling_time": 15,
+        "drying_temp": 105,
+        "drying_time": 4,
+        "dryer_type": "제습식"
+      },
+      "mold_info": {
+        "mold_type": "3판",
+        "gate_type": "핀포인트 0.6mm",
+        "cavity_count": 4
+      },
+      "defect_description": "박리(Delamination). 게이트 근처 표면이 얇은 껍질처럼 일어나고 손톱으로 긁으면 벗겨짐. 게이트에서 멀어지면 정상. 약 20% 발생. 원료·재생재·색상 변경 없음(버진 100%), 같은 기계에서 다른 수지 작업 이력도 없음.",
+      "locale": "ko"
+    },
+    "expected": {
+      "root_cause": "충전 중 과전단 — 0.6mm 핀게이트를 95% 고속으로 통과하며 PC/ABS 블렌드 상이 늘어나 층상 구조가 되고, 금형온도 낮음(50℃, 권장 70~100℃)으로 스킨이 급랭되어 게이트 근방 표층 박리. 원료·재생재 변경 없음 = 이종수지 오염 가능성 낮음.",
+      "key_recommendations": [
+        "게이트 통과 구간 사출속도 감속(95→40~60%, 다단)",
+        "금형온도 상향(50→70~80℃)",
+        "게이트 확대(0.6→1.0mm 이상)",
+        "멜트온도 소폭 상향(255→265℃, 280℃ 미만 유지)"
+      ],
+      "expected_phase": "filling",
+      "severity": "medium",
+      "trap": null,
+      "confidence": "medium"
+    }
+  },
+  {
+    "id": "cov-pcabs-splay-monday-restart",
+    "source": "coverage-v1 2026-10-21",
+    "title": "PC/ABS 월요일 아침만 은줄 — 주말 호퍼 원료 재흡습",
+    "difficulty": "hard",
+    "description": "PC/ABS 은줄이 월요일 재가동 첫 1~2시간만. 건조 조건 정상이지만 주말 동안 건조기 꺼진 호퍼 원료가 재흡습.",
+    "input": {
+      "defect_type": "은줄 (Silver Streak)",
+      "resin_type": "PC/ABS",
+      "resin_detail": "PC/ABS",
+      "machine_settings": {
+        "nozzle_temp": 260,
+        "zone1_temp": 265,
+        "zone2_temp": 255,
+        "zone3_temp": 245,
+        "zone4_temp": 235,
+        "mold_temp_fixed": 80,
+        "mold_temp_moving": 80,
+        "injection_pressure": 100,
+        "holding_pressure": 55,
+        "injection_speed_1": 60,
+        "back_pressure": 5,
+        "screw_rpm": 70,
+        "holding_time": 5,
+        "cooling_time": 20,
+        "drying_temp": 105,
+        "drying_time": 4,
+        "dryer_type": "제습식"
+      },
+      "defect_description": "노트북 하단 커버. 평일엔 문제없다가 월요일 아침 첫 1~2시간만 은줄이 표면 전체에 퍼져 나옴. 주말엔 건조기와 사출기 모두 끄고 호퍼에 원료를 남겨둔 채 퇴근. 월요일 아침 건조기와 사출기를 같이 켜고 승온·퍼지 후 바로 생산 시작. 조건은 평일과 동일.",
+      "locale": "ko"
+    },
+    "expected": {
+      "root_cause": "주말 동안 꺼진 건조기·호퍼 안에 남은 원료가 재흡습 → 월요일 재가동 직후 충분히 재건조되지 않은 원료로 성형해 수분 은줄. 건조 조건(105℃ 4시간 제습식) 자체는 정상이지만 재가동 직후 원료에는 그 시간이 적용되지 않음. 요일·재가동 시간대 패턴이 결정적 단서.",
+      "key_recommendations": [
+        "월요일 재가동 시 호퍼·건조기 원료를 100~110℃에서 3~4시간 재건조 후 생산 시작(또는 주말 동안 건조기 저온 유지 운전)",
+        "재가동 직후 생산분 격리 후 물성(충격) 확인(PC계는 가수분해로 외관 양품이어도 물성 저하 가능)",
+        "수분계로 잔류수분 0.02% 이하 확인 후 투입",
+        "성형 조건 변경은 불필요"
+      ],
+      "expected_phase": "material",
+      "severity": "medium",
+      "trap": "건조 조건이 정상이라고 수분을 배제하고 열분해·전단을 1순위로 내면 실패. 재가동 직후에만 나오는 패턴이 원료 재흡습을 가리킴.",
+      "confidence": "high"
+    }
+  },
+  {
+    "id": "cov-pcabs-record-groove-slowcold",
+    "source": "coverage-v1 2026-10-21",
+    "title": "PC/ABS 게이트 중심 동심원 홈 — 저속 + 저금형온도",
+    "difficulty": "basic",
+    "description": "PC/ABS 레코드홈. 사출속도 20%, 금형 55℃(권장 70~100), 멜트 하한부.",
+    "input": {
+      "defect_type": "기타 (직접 입력)",
+      "resin_type": "PC/ABS",
+      "resin_detail": "PC/ABS",
+      "machine_settings": {
+        "nozzle_temp": 245,
+        "zone1_temp": 250,
+        "zone2_temp": 240,
+        "zone3_temp": 230,
+        "zone4_temp": 220,
+        "mold_temp_fixed": 55,
+        "mold_temp_moving": 55,
+        "injection_pressure": 80,
+        "holding_pressure": 45,
+        "injection_speed_1": 20,
+        "back_pressure": 5,
+        "screw_rpm": 70,
+        "holding_time": 5,
+        "cooling_time": 18,
+        "drying_temp": 105,
+        "drying_time": 4,
+        "dryer_type": "제습식"
+      },
+      "mold_info": {
+        "mold_type": "2판",
+        "gate_type": "다이렉트(센터)",
+        "cavity_count": 1
+      },
+      "defect_description": "레코드홈(Record Groove). 게이트를 중심으로 동심원 모양의 가는 홈이 레코드판처럼 퍼짐. 손톱에 살짝 걸리는 미세 요철이고 닦아도 안 지워짐. 외관 A면이라 약 25% 선별.",
+      "locale": "ko"
+    },
+    "expected": {
+      "root_cause": "사출속도 과저(20%) + 금형온도 낮음(55℃, PC/ABS 권장 70~100℃) + 멜트온도 권장 하한 근방(245℃, 권장 240~280℃) → 유동 선단이 금형 벽에서 간헐적으로 멈췄다 진행(stick-slip)하며 동심원 홈 형성.",
+      "key_recommendations": [
+        "사출속도 상향(20→50~60%)",
+        "금형온도 상향(55→75~85℃)",
+        "멜트온도 상향(245→260~265℃)",
+        "그래도 남으면 게이트 확대 검토"
+      ],
+      "expected_phase": "filling",
+      "phase_also_accept": [
+        "cooling"
+      ],
+      "severity": "medium",
+      "trap": null,
+      "confidence": "high"
+    }
+  },
+  {
+    "id": "cov-pcpbt-yellowing-residence-bigbarrel",
+    "source": "coverage-v1 2026-10-21",
+    "title": "PC/PBT 백색 부품 황변 — 대형 배럴 소샷 체류 과다",
+    "difficulty": "basic",
+    "description": "PC/PBT 전체 황변. 450톤기에 120g 샷, 사이클 70초. 체류시간 과다.",
+    "input": {
+      "defect_type": "변색 (Discoloration)",
+      "resin_type": "PC/PBT",
+      "resin_detail": "PC/PBT 백색",
+      "machine_settings": {
+        "nozzle_temp": 270,
+        "zone1_temp": 275,
+        "zone2_temp": 270,
+        "zone3_temp": 260,
+        "zone4_temp": 250,
+        "mold_temp_fixed": 70,
+        "mold_temp_moving": 70,
+        "injection_pressure": 90,
+        "holding_pressure": 50,
+        "injection_speed_1": 55,
+        "back_pressure": 5,
+        "screw_rpm": 60,
+        "holding_time": 8,
+        "cooling_time": 40,
+        "metering": 18,
+        "drying_temp": 120,
+        "drying_time": 4,
+        "dryer_type": "제습식"
+      },
+      "defect_description": "흰색 자동차 내장 부품 전체가 약간 누렇게 변색. 450톤 사출기(스크류 지름 80mm)에 소형 제품(제품+런너 120g)을 올림, 계량 18mm. 사이클 70초. 위치와 관계없이 전체적으로 누렇고 사이클이 길어질수록 심함. 색차 측정에서 약 30%가 기준 초과.",
+      "locale": "ko"
+    },
+    "expected": {
+      "root_cause": "체류 과다 열변색 — 대형 배럴(80mm)에 120g 샷이라 샷이 배럴 용량의 약 10% 미만, 체류시간이 사이클의 10배 이상(약 15분 이상). 275℃ 근방에서 장시간 체류해 PC/PBT가 열산화 황변. 전체 균일 + 사이클 길수록 악화가 체류 단서. 배럴 온도 자체는 권장(250~280℃) 안.",
+      "key_recommendations": [
+        "샷이 배럴 용량의 20~80%가 되는 적정 크기 사출기로 이관(근본)",
+        "당장은 배럴 중간·후단 존 5~10℃ 하향(275→265℃, 하한 250℃ 유지)",
+        "사이클 단축 검토, 배압·스크류 RPM 과다 여부 확인",
+        "변색분 퍼지 후 색차 재확인"
+      ],
+      "expected_phase": "material",
+      "severity": "medium",
+      "trap": null,
+      "confidence": "high"
+    }
+  },
+  {
+    "id": "cov-asa-gloss-coldmold-lowpack",
+    "source": "coverage-v1 2026-10-21",
+    "title": "ASA 실외 하우징 광택 얼룩 — 금형 40℃ + 보압 낮음",
+    "difficulty": "basic",
+    "description": "ASA 광택 불균일. 금형 40℃(권장 50~80 미달) + 보압 사출압의 39%.",
+    "input": {
+      "defect_type": "기타 (직접 입력)",
+      "resin_type": "ASA",
+      "resin_detail": "ASA 실외용",
+      "machine_settings": {
+        "nozzle_temp": 240,
+        "zone1_temp": 245,
+        "zone2_temp": 235,
+        "zone3_temp": 225,
+        "zone4_temp": 215,
+        "mold_temp_fixed": 40,
+        "mold_temp_moving": 40,
+        "injection_pressure": 90,
+        "holding_pressure": 35,
+        "injection_speed_1": 50,
+        "back_pressure": 5,
+        "screw_rpm": 70,
+        "holding_time": 3,
+        "cooling_time": 20,
+        "drying_temp": 80,
+        "drying_time": 3,
+        "dryer_type": "제습식"
+      },
+      "defect_description": "광택 불균일. 실외용 하우징 외관면, 게이트 부근은 광택이 나는데 게이트에서 먼 쪽과 끝단은 무광으로 얼룩덜룩. 닦아도 안 지워짐. 약 20% 외관 불합격.",
+      "locale": "ko"
+    },
+    "expected": {
+      "root_cause": "금형온도 과저(40℃, ASA 권장 50~80℃ 미달) + 보압 낮음(35MPa, 사출압의 약 39%) → 게이트에서 먼 쪽일수록 표면이 금형면을 충분히 복제하기 전에 고화되어 광택 저하. 닦아도 안 지워짐 = 석출 아님.",
+      "key_recommendations": [
+        "금형온도 상향(40→60~70℃)",
+        "보압 상향(35→50~60MPa) 및 보압시간 확인",
+        "외관면 통과 구간 사출속도 균일화(속도 전환점은 비외관부로)",
+        "냉각회로 유량·온도 편차 점검(금형면 편차 5℃ 이내)"
+      ],
+      "expected_phase": "filling",
+      "phase_also_accept": [
+        "cooling",
+        "packing"
+      ],
+      "severity": "medium",
+      "trap": null,
+      "confidence": "high"
+    }
+  },
+  {
+    "id": "cov-en-asa-blackspecks-colorchange",
+    "source": "coverage-v1 2026-10-21",
+    "title": "[EN locale] ASA 흑→백 색상 전환 후 흑점 — 퍼지 부족",
+    "difficulty": "basic",
+    "description": "ASA 흑색에서 백색으로 전환 직후 흑점. 3샷만 퍼지. 시간이 지나며 감소.",
+    "input": {
+      "defect_type": "흑점 (Black Specks)",
+      "resin_type": "ASA",
+      "resin_detail": "ASA, white",
+      "machine_settings": {
+        "nozzle_temp": 240,
+        "zone1_temp": 245,
+        "zone2_temp": 235,
+        "zone3_temp": 225,
+        "zone4_temp": 215,
+        "mold_temp_fixed": 60,
+        "mold_temp_moving": 60,
+        "injection_pressure": 90,
+        "holding_pressure": 50,
+        "injection_speed_1": 55,
+        "back_pressure": 5,
+        "screw_rpm": 70,
+        "holding_time": 5,
+        "cooling_time": 20,
+        "drying_temp": 80,
+        "drying_time": 3,
+        "dryer_type": "제습식"
+      },
+      "defect_description": "Small black specks scattered randomly on white outdoor cover parts, about 1 in 10 parts. It started right after we switched this machine from black ASA to white ASA this morning. We purged with about 3 shots of white material. The specks are getting fewer over the day but have not stopped.",
+      "locale": "en"
+    },
+    "expected": {
+      "root_cause": "Residual black material and degraded residue from the previous run left in the screw flights, check ring and nozzle. A dark-to-light color change needs a much more thorough purge than 3 shots; the falling rate over the day confirms carry-over.",
+      "key_recommendations": [
+        "Purge thoroughly with a purging compound or many more shots, varying back pressure and screw speed during the purge, and purge the nozzle",
+        "If specks persist, pull and clean the screw, check ring and nozzle tip, and inspect for wear or dead spots",
+        "Check hopper, dryer and conveying lines for leftover black pellets",
+        "Process settings are within the ASA window, no change needed"
+      ],
+      "expected_phase": "material",
+      "severity": "medium",
+      "trap": null,
+      "confidence": "high"
+    }
+  },
+  {
+    "id": "cov-asa-burn-after-clamp-increase",
+    "source": "coverage-v1 2026-10-21",
+    "title": "ASA 커버 말단 탄화 — 버 잡으려 형체력 최대로 올린 직후",
+    "difficulty": "hard",
+    "description": "형체력 250→350톤(최대) 상향 직후 충전 말단 버닝. 과형체로 벤트 압착.",
+    "input": {
+      "defect_type": "버닝/가스마크 (Burn Mark)",
+      "resin_type": "ASA",
+      "resin_detail": "ASA",
+      "machine_settings": {
+        "nozzle_temp": 245,
+        "zone1_temp": 245,
+        "zone2_temp": 235,
+        "zone3_temp": 225,
+        "zone4_temp": 215,
+        "mold_temp_fixed": 60,
+        "mold_temp_moving": 60,
+        "injection_pressure": 95,
+        "holding_pressure": 50,
+        "injection_speed_1": 60,
+        "back_pressure": 5,
+        "screw_rpm": 70,
+        "holding_time": 5,
+        "cooling_time": 25,
+        "clamp_force": 350,
+        "max_clamp_force": 350,
+        "drying_temp": 80,
+        "drying_time": 3,
+        "dryer_type": "제습식"
+      },
+      "mold_info": {
+        "mold_type": "2판",
+        "gate_type": "사이드",
+        "cavity_count": 1
+      },
+      "defect_description": "외장 커버 충전 말단 모서리에 갈색~검은 탄 자국, 매 샷. 지난주 파팅라인 버를 잡으려고 형체력을 250→350톤(기계 최대)으로 올린 뒤부터 생김. 버는 없어졌는데 탄 자국이 새로 생김. 배럴 온도·속도는 그대로. 투영면적 기준 필요 형체력은 약 220톤으로 계산됨.",
+      "locale": "ko"
+    },
+    "expected": {
+      "root_cause": "과형체로 파팅면 벤트가 눌려(압착) 배출이 막힘 → 충전 말단 공기가 갇혀 단열압축 탄화(디젤 효과). 형체력 상향 직후 발생이라는 시점 단서가 결정적. 필요 형체력 약 220톤인데 버가 났다면 원래 원인은 형체력 부족이 아니라 과압·V/P 지연 쪽일 가능성.",
+      "key_recommendations": [
+        "형체력을 필요 최소 수준(약 220~250톤)으로 원복",
+        "벤트 상태 점검·청소, 압착 흔적이 있으면 재가공",
+        "버는 형체력 대신 V/P 전환 앞당김·보압 하향으로 대응",
+        "충전 말단 사출속도 다단 감속"
+      ],
+      "expected_phase": "filling",
+      "severity": "high",
+      "trap": "열분해로 보고 배럴 온도만 내리거나, 사출속도만 낮추고 형체력 350톤을 그대로 두는 권고는 실패. 형체력 상향 직후 발생이 핵심 단서(과형체 → 벤트 압착).",
+      "confidence": "high"
+    }
+  },
+  {
+    "id": "cov-san-ejector-crack-shortcool",
+    "source": "coverage-v1 2026-10-21",
+    "title": "투명 SAN 용기 이젝터 핀 주변 크랙 — 냉각시간 단축 후",
+    "difficulty": "basic",
+    "description": "SAN 이젝터 크랙. 냉각 12→6초 단축, 구배 0.5°, 이형 즉시 발생.",
+    "input": {
+      "defect_type": "크랙 (Crack)",
+      "resin_type": "SAN",
+      "resin_detail": "투명 SAN",
+      "machine_settings": {
+        "nozzle_temp": 230,
+        "zone1_temp": 235,
+        "zone2_temp": 225,
+        "zone3_temp": 215,
+        "zone4_temp": 205,
+        "mold_temp_fixed": 50,
+        "mold_temp_moving": 50,
+        "injection_pressure": 90,
+        "holding_pressure": 60,
+        "injection_speed_1": 60,
+        "back_pressure": 5,
+        "screw_rpm": 70,
+        "holding_time": 4,
+        "cooling_time": 6,
+        "drying_temp": 80,
+        "drying_time": 3,
+        "dryer_type": "제습식"
+      },
+      "defect_description": "투명 화장품 용기 바닥 이젝터 핀 4곳 주변에 방사형 미세 크랙. 성형 직후 이형할 때 이미 생김. 약 15% 발생. 탈형 구배 0.5°. 사이클을 줄이려고 냉각시간을 12→6초로 줄인 뒤부터 시작.",
+      "locale": "ko"
+    },
+    "expected": {
+      "root_cause": "냉각 부족 상태의 조기 이형 + 탈형 구배 부족(0.5°) → 이형 저항이 큰 상태에서 취성이 큰 SAN에 이젝터 핀 국부 하중이 걸려 핀 주변 크랙. 냉각시간 단축 시점과 일치, 이형 즉시 발생이 단서.",
+      "key_recommendations": [
+        "냉각시간 원복·연장(6→12초 이상)",
+        "이젝터 속도 감속, 이젝터 면적 확대(핀→슬리브·스트리퍼)",
+        "보압 과다 여부 확인 후 소폭 하향(이형 저항 감소)",
+        "탈형 구배 확대·코어 연마(근본)"
+      ],
+      "expected_phase": "ejection",
+      "severity": "high",
+      "trap": null,
+      "confidence": "high"
+    }
+  },
+  {
+    "id": "cov-san-hotrunner-cavity3-yellow",
+    "source": "coverage-v1 2026-10-21",
+    "title": "투명 SAN 8캐비티 중 3번만 황변 — 핫러너 노즐 국부 과열",
+    "difficulty": "hard",
+    "description": "SAN 핫러너 한 캐비티만 황변·갈색줄. 배럴 하향 무효, 다른 캐비티 충전만 악화. 표시온도 정상.",
+    "input": {
+      "defect_type": "변색 (Discoloration)",
+      "resin_type": "SAN",
+      "resin_detail": "투명 SAN",
+      "machine_settings": {
+        "nozzle_temp": 220,
+        "zone1_temp": 220,
+        "zone2_temp": 215,
+        "zone3_temp": 205,
+        "zone4_temp": 195,
+        "mold_temp_fixed": 50,
+        "mold_temp_moving": 50,
+        "injection_pressure": 95,
+        "holding_pressure": 55,
+        "injection_speed_1": 60,
+        "back_pressure": 5,
+        "screw_rpm": 70,
+        "holding_time": 4,
+        "cooling_time": 12,
+        "drying_temp": 80,
+        "drying_time": 3,
+        "dryer_type": "제습식"
+      },
+      "mold_info": {
+        "mold_type": "핫러너",
+        "gate_type": "오픈 게이트",
+        "cavity_count": 8,
+        "runner_type": "핫"
+      },
+      "defect_description": "투명 SAN 8캐비티 핫러너 금형 중 3번 캐비티 제품만 누렇게 변색되고 가끔 갈색 줄이 섞임. 나머지 7개는 정상. 배럴 온도를 235→220℃로 낮춰봤는데 3번만 그대로이고 다른 캐비티는 오히려 충전이 빠듯해짐. 핫러너 컨트롤러 3번 존 설정 230℃, 표시도 230℃. 3번 존 출력(%)은 다른 존보다 눈에 띄게 높음.",
+      "locale": "ko"
+    },
+    "expected": {
+      "root_cause": "3번 핫러너 노즐(드롭) 국부 과열 — 열전대 이탈·접촉 불량·위치 이상으로 표시값은 230℃지만 실제는 과열(출력%가 다른 존보다 높은 것이 증거), 또는 노즐 내부 정체부에서 체류 열화. 배럴 하향 무효 + 단일 캐비티 국한이 전체 배럴 열분해를 배제.",
+      "key_recommendations": [
+        "3번 노즐 실제 온도를 외부 접촉식 온도계로 측정해 표시값과 비교",
+        "3번 존 열전대 위치·접촉·배선 점검(인접 존과 교차 결선 여부 포함), 이상 시 교체",
+        "히터 저항 측정, 3번 노즐 내부 탄화·정체부 청소",
+        "배럴 온도는 원래(235℃)로 복귀"
+      ],
+      "expected_phase": "material",
+      "phase_also_accept": [
+        "filling"
+      ],
+      "severity": "medium",
+      "trap": "전체 배럴 열분해·체류로 보고 배럴 온도를 더 내리라는 권고를 1순위로 내면 실패(이미 무효, 다른 캐비티 충전 악화). 해당 핫러너 존 하드웨어 축이 정답.",
+      "confidence": "high"
+    }
+  },
+  {
+    "id": "cov-pmma-blackspecks-overnight-idle",
+    "source": "coverage-v1 2026-10-21",
+    "title": "PMMA 도광판 흑점 — 야간 고온 대기 후 아침 재가동 직후 집중",
+    "difficulty": "hard",
+    "description": "PMMA 흑점이 아침 재가동 후 2~3시간에 집중. 히터 켠 채 8시간 대기. 원료·건조 정상.",
+    "input": {
+      "defect_type": "흑점 (Black Specks)",
+      "resin_type": "PMMA(아크릴)",
+      "resin_detail": "광학용 PMMA (도광판)",
+      "machine_settings": {
+        "nozzle_temp": 245,
+        "zone1_temp": 250,
+        "zone2_temp": 240,
+        "zone3_temp": 230,
+        "zone4_temp": 220,
+        "mold_temp_fixed": 70,
+        "mold_temp_moving": 70,
+        "injection_pressure": 110,
+        "holding_pressure": 70,
+        "injection_speed_1": 50,
+        "back_pressure": 6,
+        "screw_rpm": 60,
+        "holding_time": 8,
+        "cooling_time": 30,
+        "drying_temp": 80,
+        "drying_time": 4,
+        "dryer_type": "제습식"
+      },
+      "defect_description": "도광판에 작은 검은 점·갈색 점이 섞여 나옴. 야간 8시간 동안 사출기를 히터 켠 채(설정 온도 그대로) 대기시켜 두고, 아침 재가동 후 첫 2~3시간에 집중됨. 오후엔 거의 없음. 원료는 같은 로트, 건조 80℃ 4시간 제습식 정상.",
+      "locale": "ko"
+    },
+    "expected": {
+      "root_cause": "장시간 고온 대기(8시간, 설정 온도 유지) 중 배럴·스크류·체크링·노즐 정체부에서 PMMA가 열분해·탄화 → 재가동 후 탄화물이 간헐적으로 떨어져 나와 흑점. 재가동 직후 집중·오후 소멸 패턴이 체류 탄화를 가리킴. 원료 로트·건조는 정상.",
+      "key_recommendations": [
+        "야간 대기 시 배럴 온도를 수지 공급사 권장 대기 온도로 낮추거나, 배럴을 비우고 정지",
+        "재가동 시 충분한 퍼지(퍼징 컴파운드 또는 다수 샷) 후 첫 생산분 검사 강화",
+        "지속되면 스크류·체크링·노즐 팁 인발 점검·청소(탄화 퇴적·마모 확인)",
+        "호퍼·건조기·이송 라인 이물 점검"
+      ],
+      "expected_phase": "material",
+      "severity": "medium",
+      "trap": "원료 오염·건조를 1순위로 지목하거나 성형 조건(온도·속도) 조정으로 해결하려 하면 감점. 시간대(재가동 직후) 패턴이 고온 대기 체류 탄화를 가리킴.",
+      "confidence": "high"
+    }
+  },
+  {
+    "id": "cov-en-pmma-jetting-small-sidegate",
+    "source": "coverage-v1 2026-10-21",
+    "title": "[EN locale] PMMA 렌즈 커버 제팅 — 1mm 사이드게이트에서 4mm 공간으로 고속 분사",
+    "difficulty": "basic",
+    "description": "PMMA 제팅. 사출속도 90% + 작은 게이트가 두꺼운 빈 공간을 정면으로 향함.",
+    "input": {
+      "defect_type": "젯팅 (Jetting)",
+      "resin_type": "PMMA(아크릴)",
+      "resin_detail": "Optical PMMA",
+      "machine_settings": {
+        "nozzle_temp": 245,
+        "zone1_temp": 250,
+        "zone2_temp": 240,
+        "zone3_temp": 230,
+        "zone4_temp": 220,
+        "mold_temp_fixed": 70,
+        "mold_temp_moving": 70,
+        "injection_pressure": 120,
+        "holding_pressure": 70,
+        "injection_speed_1": 90,
+        "back_pressure": 5,
+        "screw_rpm": 60,
+        "holding_time": 8,
+        "cooling_time": 35,
+        "drying_temp": 80,
+        "drying_time": 4,
+        "dryer_type": "제습식"
+      },
+      "mold_info": {
+        "mold_type": "2-plate",
+        "gate_type": "side gate 1.0 mm",
+        "cavity_count": 2
+      },
+      "product_info": {
+        "wall_thickness_min": 4,
+        "wall_thickness_max": 4
+      },
+      "defect_description": "Clear PMMA lens cover, 4 mm thick. A wavy worm-like line starts at the small side gate and snakes across the part. Parts are sorted and about 30% are rejected. The gate is 1 mm thick and fires straight into the open 4 mm cavity with nothing in front of it.",
+      "locale": "en"
+    },
+    "expected": {
+      "root_cause": "Jetting: high first-stage speed (90%) pushes the melt through a small 1 mm gate straight into an open 4 mm cavity, so it squirts as a free jet that folds over itself instead of forming a flow front. Melt and mold temperatures are within the PMMA window.",
+      "key_recommendations": [
+        "Slow the first stage through the gate (e.g. 90→20-30%), then speed up once a flow front has formed (multi-stage profile)",
+        "Change the gate: larger tab or fan gate, or relocate it so the melt hits a wall or pin (root fix, mold)",
+        "Raise melt temperature slightly within the window (e.g. 245→255°C) as a secondary help",
+        "Mold temperature is in range, no change needed"
+      ],
+      "expected_phase": "filling",
+      "severity": "medium",
+      "trap": null,
+      "confidence": "high"
+    }
+  },
+  {
+    "id": "cov-mppe-shortshot-abs-settings",
+    "source": "coverage-v1 2026-10-21",
+    "title": "m-PPE TV 백커버 끝단 미성형 — ABS 조건표 재사용(멜트·금형온도 과저)",
+    "difficulty": "basic",
+    "description": "m-PPE 미성형. 멜트 250℃(권장 260~300 미달) + 금형 60℃(권장 80~100 미달), 피크압이 한계 근접.",
+    "input": {
+      "defect_type": "미성형 (Short Shot)",
+      "resin_type": "m-PPE",
+      "resin_detail": "m-PPE (PPE/PS 변성, 비강화)",
+      "machine_settings": {
+        "nozzle_temp": 250,
+        "zone1_temp": 255,
+        "zone2_temp": 245,
+        "zone3_temp": 235,
+        "zone4_temp": 225,
+        "mold_temp_fixed": 60,
+        "mold_temp_moving": 60,
+        "injection_pressure": 120,
+        "holding_pressure": 60,
+        "injection_speed_1": 60,
+        "back_pressure": 5,
+        "screw_rpm": 70,
+        "holding_time": 5,
+        "cooling_time": 25,
+        "actual_peak_pressure": 130,
+        "max_inj_pressure": 140,
+        "drying_temp": 80,
+        "drying_time": 3,
+        "dryer_type": "제습식"
+      },
+      "product_info": {
+        "wall_thickness_min": 1.8,
+        "wall_thickness_max": 2.5
+      },
+      "defect_description": "TV 백커버(살두께 1.8mm) 끝단 얇은 그릴부가 덜 채워짐. 매 샷 같은 위치, 전수 발생. ABS 제품 조건표를 거의 그대로 가져와 셋업함. 최대 사출압 140MPa 중 피크 130MPa까지 도달.",
+      "locale": "ko"
+    },
+    "expected": {
+      "root_cause": "멜트온도 과저(250℃, m-PPE 권장 260~300℃ 미달) + 금형온도 낮음(60℃, 권장 80~100℃) → ABS보다 점도가 높은 m-PPE가 충분히 흐르지 못해 피크압이 한계(130/140MPa)에 닿는 압력 제한 충전. ABS 조건표 재사용이 원인.",
+      "key_recommendations": [
+        "멜트온도 상향(250→280~290℃)",
+        "금형온도 상향(60→80~90℃)",
+        "온도 정상화 후 사출속도 재설정, 충전 말단 벤트 확인",
+        "압력만 더 올리지 말 것(이미 한계 근접)"
+      ],
+      "expected_phase": "filling",
+      "severity": "high",
+      "trap": null,
+      "confidence": "high"
+    }
+  },
+  {
+    "id": "cov-ppo-gf-burn-blind-boss",
+    "source": "coverage-v1 2026-10-21",
+    "title": "PPO GF20 막힌 보스 바닥 탄화 — 공기 배출 경로 없음",
+    "difficulty": "basic",
+    "description": "PPO 막힌 보스(깊이 15mm) 바닥에만 버닝. 보스 바닥에 벤트·이젝터 핀 없음.",
+    "input": {
+      "defect_type": "버닝/가스마크 (Burn Mark)",
+      "resin_type": "PPE/PPO",
+      "resin_detail": "PPO GF20",
+      "machine_settings": {
+        "nozzle_temp": 290,
+        "zone1_temp": 295,
+        "zone2_temp": 285,
+        "zone3_temp": 275,
+        "zone4_temp": 265,
+        "mold_temp_fixed": 90,
+        "mold_temp_moving": 90,
+        "injection_pressure": 110,
+        "holding_pressure": 60,
+        "injection_speed_1": 75,
+        "back_pressure": 5,
+        "screw_rpm": 60,
+        "holding_time": 5,
+        "cooling_time": 20,
+        "drying_temp": 90,
+        "drying_time": 3,
+        "dryer_type": "제습식"
+      },
+      "defect_description": "바닥이 막힌 깊이 15mm 보스 끝(바닥)에만 검게 탄 자국과 살짝 덜 찬 기미. 매 샷. 보스 바닥 쪽엔 벤트나 이젝터 핀이 없음. 다른 부위는 정상.",
+      "locale": "ko"
+    },
+    "expected": {
+      "root_cause": "막힌 깊은 보스 바닥의 공기 갇힘 — 배출 경로(벤트·핀 간극)가 없어 충전 말단 공기가 단열압축되어 탄화(디젤 효과)와 미충전. 배럴 온도는 PPO 권장(260~300℃) 안이라 열분해 아님. 국부·고정 위치가 단서.",
+      "key_recommendations": [
+        "보스 코어핀을 이젝터 핀·벤트 핀 구조로 바꿔 바닥 공기를 간극으로 배출(근본)",
+        "또는 보스 바닥에 다공성(소결) 벤트 인서트 설치",
+        "임시로 보스 충전 구간 사출속도 다단 감속",
+        "배럴 온도는 정상 범위라 하향 불필요"
+      ],
+      "expected_phase": "filling",
+      "severity": "high",
+      "trap": null,
+      "confidence": "high"
+    }
+  },
+  {
+    "id": "cov-pa12-boss-sink-holdtime",
+    "source": "coverage-v1 2026-10-21",
+    "title": "PA12 클립 두꺼운 보스 싱크 — 보압시간 2초(게이트 미실)",
+    "difficulty": "basic",
+    "description": "PA12 보스 싱크. 보압시간 늘릴수록 중량 계속 증가 = 게이트 실 전에 보압 종료.",
+    "input": {
+      "defect_type": "싱크마크 (Sink Mark)",
+      "resin_type": "PA12",
+      "resin_detail": "PA12 비강화",
+      "machine_settings": {
+        "nozzle_temp": 220,
+        "zone1_temp": 220,
+        "zone2_temp": 215,
+        "zone3_temp": 205,
+        "zone4_temp": 195,
+        "mold_temp_fixed": 50,
+        "mold_temp_moving": 50,
+        "injection_pressure": 80,
+        "holding_pressure": 35,
+        "injection_speed_1": 60,
+        "back_pressure": 4,
+        "screw_rpm": 70,
+        "holding_time": 2,
+        "cooling_time": 20,
+        "drying_temp": 75,
+        "drying_time": 4,
+        "dryer_type": "제습식"
+      },
+      "mold_info": {
+        "mold_type": "2판",
+        "gate_type": "사이드 1.5mm",
+        "cavity_count": 4
+      },
+      "product_info": {
+        "wall_thickness_min": 2,
+        "wall_thickness_max": 6
+      },
+      "defect_description": "연료 라인 클립의 두꺼운 보스(6mm) 반대쪽 표면에 움푹한 싱크. 약 25% 불합격. 보압시간 2초. 시험 삼아 보압시간을 늘려보니 늘릴수록 제품 무게가 계속 증가함.",
+      "locale": "ko"
+    },
+    "expected": {
+      "root_cause": "보압시간 부족(게이트가 굳기 전에 보압 종료) + 보압 낮음(35MPa, 사출압의 약 44%) → 결정성 PA12 두꺼운 보스(6mm)의 수축을 보상하지 못함. 보압시간을 늘릴수록 중량이 계속 증가 = 게이트 미실의 직접 증거.",
+      "key_recommendations": [
+        "Gate Seal Study로 보압시간 연장(2초 → 중량이 안정되는 시점 + 1~2초, 대략 6~10초 예상)",
+        "보압 상향(35→45~55MPa, 사출압의 50~70%)",
+        "그래도 남으면 보스 코어링(살빼기) 설계 검토",
+        "냉각시간 연장만으로 해결하려 하지 말 것"
+      ],
+      "expected_phase": "packing",
+      "severity": "medium",
+      "trap": null,
+      "confidence": "high"
+    }
+  },
+  {
+    "id": "cov-en-pa46-splay-openbag-hotair",
+    "source": "coverage-v1 2026-10-21",
+    "title": "[EN locale] PA46 GF30 은줄 — 개봉 방치 원료 + PA66 건조 스케줄(열풍 4h)",
+    "difficulty": "basic",
+    "description": "PA46 수분 은줄. 주말 동안 개봉 방치, 열풍식 80℃ 4시간. PA46은 흡습이 매우 큼.",
+    "input": {
+      "defect_type": "은줄 (Silver Streak)",
+      "resin_type": "PA46",
+      "resin_detail": "PA46 GF30",
+      "machine_settings": {
+        "nozzle_temp": 315,
+        "zone1_temp": 320,
+        "zone2_temp": 315,
+        "zone3_temp": 305,
+        "zone4_temp": 295,
+        "mold_temp_fixed": 130,
+        "mold_temp_moving": 130,
+        "injection_pressure": 110,
+        "holding_pressure": 60,
+        "injection_speed_1": 65,
+        "back_pressure": 4,
+        "screw_rpm": 70,
+        "holding_time": 4,
+        "cooling_time": 12,
+        "drying_temp": 80,
+        "drying_time": 4,
+        "dryer_type": "열풍식"
+      },
+      "defect_description": "Silver streaks over the whole surface of a connector housing, on about 40% of parts. The material came from a bag left open on the shop floor over the weekend. We dried it at 80°C for 4 h in a hot-air dryer, the same schedule we use for PA66.",
+      "locale": "en"
+    },
+    "expected": {
+      "root_cause": "Moisture splay: PA46 is very hygroscopic, the bag absorbed water while open over the weekend, and 4 h in a hot-air dryer cannot bring it back down. It needs a desiccant dryer and a much longer drying time for wet material. Temperatures are within the PA46 window.",
+      "key_recommendations": [
+        "Dry in a desiccant dryer (dew point about -40°C) at about 80°C; wet material from an open bag needs a long cycle, far beyond 4 h (per the resin data, up to about 16-24 h), and verify moisture per the datasheet before molding",
+        "Quarantine the affected parts and check toughness; molding wet polyamide can reduce impact strength",
+        "Keep bags sealed and load only what the dryer can handle; feed from a dried, closed hopper",
+        "Do not change barrel or mold temperatures to fix this"
+      ],
+      "expected_phase": "material",
+      "severity": "medium",
+      "trap": null,
+      "confidence": "high"
+    }
+  },
+  {
+    "id": "cov-pa6gf-bracket-warp-asym-holdtrap",
+    "source": "coverage-v1 2026-10-21",
+    "title": "PA6 GF30 평판 브래킷 휨 — 보압 올려도 무효, 금형온도 95/75℃",
+    "difficulty": "hard",
+    "description": "PA6 GF30 휨. 고정 95 / 가동 75℃ 비대칭 + 섬유배향. 사용자는 보압 60→80 상향(무효).",
+    "input": {
+      "defect_type": "휨/변형 (Warpage)",
+      "resin_type": "PA6",
+      "resin_detail": "PA6 GF30",
+      "machine_settings": {
+        "nozzle_temp": 270,
+        "zone1_temp": 270,
+        "zone2_temp": 265,
+        "zone3_temp": 255,
+        "zone4_temp": 245,
+        "mold_temp_fixed": 95,
+        "mold_temp_moving": 75,
+        "injection_pressure": 100,
+        "holding_pressure": 80,
+        "injection_speed_1": 65,
+        "back_pressure": 5,
+        "screw_rpm": 80,
+        "holding_time": 6,
+        "cooling_time": 20,
+        "drying_temp": 80,
+        "drying_time": 5,
+        "dryer_type": "제습식"
+      },
+      "mold_info": {
+        "mold_type": "2판",
+        "gate_type": "엔드 게이트 1점",
+        "cavity_count": 2
+      },
+      "product_info": {
+        "wall_thickness_min": 2.5,
+        "wall_thickness_max": 3
+      },
+      "defect_description": "길이 250mm 평판형 브래킷이 이형 후 양 끝이 고정측 방향으로 들리며 활처럼 휨. 약 30% 평탄도 규격 초과. 보압을 60→80MPa로 올려봤는데 휨량 변화 거의 없음(0.1mm 이내). 가동측 온조기는 설정해도 75℃ 이상 안 올라감.",
+      "locale": "ko"
+    },
+    "expected": {
+      "root_cause": "고정/가동 금형온도 차 20℃(95/75℃) → 두께 방향 비대칭 냉각·결정화, 뜨거운 고정측이 더 수축해 그쪽으로 휨. 여기에 GF 섬유배향에 따른 유동방향/직각방향 수축 이방성이 겹침. GF 결정성 수지에서 보압은 휨 지배 인자가 아님(상향 무효로 확인).",
+      "key_recommendations": [
+        "고정·가동 금형온도 차를 5℃ 이내로(예: 양측 85~90℃, PA6 GF 권장 80~100℃)",
+        "가동측 온조기 용량·냉각회로 유량·배관 점검(75℃ 이상 안 올라가는 원인 해소)",
+        "보압은 원래(60MPa)로 복귀, 온도 균형 후 냉각시간 조정하며 휨 재측정",
+        "그래도 남으면 게이트 위치·수 변경으로 섬유배향 제어 또는 저휨(GF+미네랄) 그레이드 검토(근본)"
+      ],
+      "expected_phase": "cooling",
+      "severity": "medium",
+      "trap": "보압·보압시간을 더 올리는 권고를 1순위로 내면 실패(이미 무효). GF 결정성 수지는 코어·캐비티 온도차가 1순위.",
+      "confidence": "high"
+    }
+  },
+  {
+    "id": "cov-pbt-gf-weld-latch-break",
+    "source": "coverage-v1 2026-10-21",
+    "title": "PBT GF30 래치 웰드라인 파단 — 멜트·금형온도 올려도 무효",
+    "difficulty": "hard",
+    "description": "PBT GF30 래치가 웰드에서 파단. 멜트·금형온도 상향 후 외관만 개선, 파단률 불변. 보압 40%.",
+    "input": {
+      "defect_type": "웰드라인 (Weld Line)",
+      "resin_type": "PBT",
+      "resin_detail": "PBT GF30",
+      "machine_settings": {
+        "nozzle_temp": 265,
+        "zone1_temp": 265,
+        "zone2_temp": 260,
+        "zone3_temp": 250,
+        "zone4_temp": 240,
+        "mold_temp_fixed": 80,
+        "mold_temp_moving": 80,
+        "injection_pressure": 100,
+        "holding_pressure": 40,
+        "injection_speed_1": 65,
+        "back_pressure": 4,
+        "screw_rpm": 70,
+        "holding_time": 4,
+        "cooling_time": 15,
+        "drying_temp": 120,
+        "drying_time": 4,
+        "dryer_type": "제습식"
+      },
+      "mold_info": {
+        "mold_type": "2판",
+        "gate_type": "사이드",
+        "cavity_count": 4
+      },
+      "defect_description": "커넥터 하우징의 래치(걸림 고리) 근처를 홀 주변 웰드라인이 지나감. 조립 시 래치가 정확히 웰드라인에서 부러짐(약 7%). 멜트온도를 250→265℃, 금형온도를 65→80℃로 올렸더니 웰드라인은 옅어졌지만 파단률은 그대로.",
+      "locale": "ko"
+    },
+    "expected": {
+      "root_cause": "GF 강화 수지 웰드 강도 저하 — 웰드면에서 섬유가 계면과 평행하게 배향되어 가로지르는 섬유가 없음. GF 수지는 멜트·금형온도가 웰드 강도에 기여가 작고(외관만 개선, 이번에 확인), 보압이 실질 인자인데 보압이 낮음(40MPa, 사출압의 40%). 근본은 웰드 위치를 래치 밖으로 옮기는 것. 조건만으로 모재 수준 회복은 안 됨.",
+      "key_recommendations": [
+        "보압 상향(40→55~70MPa) 및 보압시간을 게이트 실까지(GF 웰드 강도에 유효)",
+        "게이트 위치 변경·추가 또는 오버플로우 웰(넘침 포켓)로 웰드 위치를 래치 밖으로 이동(근본)",
+        "웰드 위치 벤트 확보(갇힌 가스 제거)",
+        "강도 검증은 외관이 아닌 래치 파단 시험으로"
+      ],
+      "expected_phase": "filling",
+      "phase_also_accept": [
+        "packing"
+      ],
+      "severity": "high",
+      "trap": "멜트·금형온도를 더 올리라는 권고를 1순위로 내면 실패(이미 무효, GF는 외관만 개선). 외관 양품이 강도 확보를 뜻하지 않음.",
+      "confidence": "high"
+    }
+  },
+  {
+    "id": "cov-pvc-fitting-overheat-hcl",
+    "source": "coverage-v1 2026-10-21",
+    "title": "경질 PVC 피팅 갈변 + 자극취 — 분해 온도 초과(HCl)",
+    "difficulty": "basic",
+    "description": "PVC 노즐 215℃(분해 210℃ 초과) + 높은 배압·RPM. 갈색 줄, 시큼한 냄새, 금속 부식.",
+    "input": {
+      "defect_type": "변색 (Discoloration)",
+      "resin_type": "PVC",
+      "resin_detail": "경질 PVC (배관 피팅)",
+      "machine_settings": {
+        "nozzle_temp": 215,
+        "zone1_temp": 215,
+        "zone2_temp": 205,
+        "zone3_temp": 195,
+        "zone4_temp": 185,
+        "mold_temp_fixed": 40,
+        "mold_temp_moving": 40,
+        "injection_pressure": 100,
+        "holding_pressure": 60,
+        "injection_speed_1": 40,
+        "back_pressure": 8,
+        "screw_rpm": 80,
+        "holding_time": 6,
+        "cooling_time": 25
+      },
+      "defect_description": "배관 엘보 피팅에 갈색 줄무늬와 누런 변색, 가끔 탄 점. 성형기 주변에서 시큼하고 코를 찌르는 냄새가 남. 노즐 주변 금속에 녹이 유난히 빨리 생김. 약 30% 불량.",
+      "locale": "ko"
+    },
+    "expected": {
+      "root_cause": "과열 열분해 — 노즐 215℃가 경질 PVC 분해 기준(약 210℃)을 넘고, 높은 배압(8MPa)·RPM(80) 전단 발열이 더해져 탈염화수소(HCl 발생) → 갈변·탄점. 자극취와 금속 부식이 HCl 발생 증거(안전 위험).",
+      "key_recommendations": [
+        "즉시 노즐·배럴 온도 하향(215→185~195℃, 분해 온도 210℃ 아래로 여유 확보)",
+        "배압·스크류 RPM 하향(전단 발열 감소, 예: 배압 8→3~5MPa, RPM 80→40~60)",
+        "분해 수지를 PVC에 맞는 퍼지재로 배출 후 노즐·체크링 점검(POM과 절대 혼용·연속 사용 금지)",
+        "환기·보호구 확보, 내식성 스크류·배럴 사용 여부 확인"
+      ],
+      "expected_phase": "material",
+      "severity": "high",
+      "trap": null,
+      "hallucination_forbidden": [
+        "POM(아세탈)으로 퍼지",
+        "건조 부족을 원인으로"
+      ],
+      "confidence": "high"
+    }
+  },
+  {
+    "id": "cov-pptalc-ejector-show-through-sinktrap",
+    "source": "coverage-v1 2026-10-21",
+    "title": "PP 탈크20 도어트림 외관면 원형 자국 — 사용자는 싱크 선택, 실제는 이젝터 마크",
+    "difficulty": "hard",
+    "description": "PP-TD20 외관면 원형 자국이 뒷면 이젝터 핀 위치와 일치. 냉각 18→10초 단축 후 발생, 보압 상향 시 악화.",
+    "input": {
+      "defect_type": "싱크마크 (Sink Mark)",
+      "resin_type": "PP",
+      "resin_detail": "PP + 탈크 20% (TD20)",
+      "machine_settings": {
+        "nozzle_temp": 230,
+        "zone1_temp": 230,
+        "zone2_temp": 220,
+        "zone3_temp": 210,
+        "zone4_temp": 200,
+        "mold_temp_fixed": 40,
+        "mold_temp_moving": 40,
+        "injection_pressure": 85,
+        "holding_pressure": 55,
+        "injection_speed_1": 55,
+        "back_pressure": 5,
+        "screw_rpm": 90,
+        "holding_time": 6,
+        "cooling_time": 10
+      },
+      "mold_info": {
+        "mold_type": "2판",
+        "gate_type": "핫러너 밸브",
+        "cavity_count": 1,
+        "runner_type": "핫"
+      },
+      "product_info": {
+        "wall_thickness_min": 2.5,
+        "wall_thickness_max": 3
+      },
+      "defect_description": "자동차 도어트림 외관면에 지름 6~8mm 둥근 자국이 군데군데. 위치를 맞춰보니 뒷면 이젝터 핀 위치와 정확히 일치하고 리브·보스 위치와는 무관. 자국은 살짝 들어가 있고 주변과 광택이 다름. 약 20% 불량. 사이클 줄이려 냉각시간을 18→10초로 줄인 뒤부터 발생. 보압을 올려봤더니 자국이 더 진해짐.",
+      "locale": "ko"
+    },
+    "expected": {
+      "root_cause": "이젝터 마크(뒷면 이젝터 핀 압흔이 외관면으로 비침) — 냉각 부족(10초)으로 제품이 아직 연한 상태에서 이젝터 핀이 밀어 국부 변형. 보압 상향은 이형 저항을 키워 악화. 위치가 리브·보스가 아니라 이젝터 핀과 일치하므로 싱크(두께부 수축)가 아님.",
+      "key_recommendations": [
+        "냉각시간 원복·연장(10→16~18초)",
+        "보압 원복·하향(이형 저항 감소)",
+        "이젝터 핀 직경·수 확대 또는 블레이드·스트리퍼로 이형 하중 분산, 이젝터 속도 감속",
+        "핀 부위 코어 냉각 강화, 탈형 구배 점검"
+      ],
+      "expected_phase": "ejection",
+      "phase_also_accept": [
+        "cooling"
+      ],
+      "severity": "medium",
+      "trap": "사용자 선택(싱크마크)을 따라 보압·보압시간 상향을 1순위로 내면 실패(보압 상향 시 악화 이미 확인). 위치가 이젝터 핀과 일치한다는 단서로 이젝터 마크로 전환해야 함.",
+      "confidence": "high"
+    }
+  },
+  {
+    "id": "cov-lcp-reflow-blister-residence",
+    "source": "coverage-v1 2026-10-21",
+    "title": "LCP SMT 커넥터 리플로우 후 블리스터 — 소샷 체류 + 재가동 로트",
+    "difficulty": "hard",
+    "description": "LCP 커넥터 리플로우 후 블리스터 약 8%. 건조 정상, 샷이 배럴의 약 10%, 재가동 직후 로트에 집중.",
+    "input": {
+      "defect_type": "기포 (Void/Bubble)",
+      "resin_type": "LCP",
+      "resin_detail": "LCP GF30 (SMT 커넥터용)",
+      "machine_settings": {
+        "nozzle_temp": 335,
+        "zone1_temp": 340,
+        "zone2_temp": 335,
+        "zone3_temp": 325,
+        "zone4_temp": 310,
+        "mold_temp_fixed": 90,
+        "mold_temp_moving": 90,
+        "injection_pressure": 100,
+        "holding_pressure": 40,
+        "injection_speed_1": 90,
+        "back_pressure": 2,
+        "screw_rpm": 80,
+        "holding_time": 2,
+        "cooling_time": 8,
+        "drying_temp": 150,
+        "drying_time": 4,
+        "dryer_type": "제습식"
+      },
+      "mold_info": {
+        "mold_type": "2판",
+        "gate_type": "서브마린",
+        "cavity_count": 8
+      },
+      "defect_description": "SMT 리플로우(피크 260℃) 후 커넥터 표면에 작은 물집(블리스터) 발생, 약 8%. 성형 직후 외관은 정상. 건조는 150℃ 4시간 제습식으로 공급사 권장대로 함. 스크류 40mm 사출기에서 샷 중량이 배럴 용량의 약 10%, 사이클 20초. 블리스터 제품은 대부분 점심·야간 정지 후 재가동 직후 로트에서 나옴.",
+      "locale": "ko"
+    },
+    "expected": {
+      "root_cause": "배럴 체류 열화로 생긴 분해 가스가 스킨 아래에 갇혔다가 리플로우 가열 때 팽창 — 샷이 배럴 용량의 약 10%라 평소에도 체류가 길고, 정지 후 재가동 시 고온에서 오래 머문 수지가 들어가 블리스터가 집중. 건조는 정상이라 수분은 후순위.",
+      "key_recommendations": [
+        "샷이 배럴 용량의 약 30~70%가 되는 작은 스크류·사출기로 변경(근본)",
+        "정지 중 배럴 온도 하향, 재가동 시 충분한 퍼지 후 생산(재가동 로트 구분 관리)",
+        "배럴 온도를 권장 범위 하단 쪽으로 조정, 고속 충전(90%)에 의한 공기 혼입과 벤트 상태 점검",
+        "재가동 로트는 리플로우 모사 블리스터 시험 후 출하"
+      ],
+      "expected_phase": "material",
+      "phase_also_accept": [
+        "filling"
+      ],
+      "severity": "medium",
+      "trap": "건조 강화를 1순위로 내면 실패(건조는 공급사 권장대로 정상). 재가동 직후 로트 집중 + 작은 샷 비율이 체류 열화를 가리킴.",
+      "confidence": "medium"
+    }
+  },
+  {
+    "id": "cov-psu-brass-insert-crack",
+    "source": "coverage-v1 2026-10-21",
+    "title": "PSU 황동 인서트 주변 방사형 크랙 — 상온 인서트 + 저금형온도",
+    "difficulty": "basic",
+    "description": "PSU 인서트 성형 크랙, 시간차 발생 포함. 인서트 예열 없음, 금형 70℃(권장 80~120 미달).",
+    "input": {
+      "defect_type": "크랙 (Crack)",
+      "resin_type": "PSU",
+      "resin_detail": "PSU 비강화",
+      "machine_settings": {
+        "nozzle_temp": 350,
+        "zone1_temp": 355,
+        "zone2_temp": 345,
+        "zone3_temp": 335,
+        "zone4_temp": 325,
+        "mold_temp_fixed": 70,
+        "mold_temp_moving": 70,
+        "injection_pressure": 110,
+        "holding_pressure": 60,
+        "injection_speed_1": 55,
+        "back_pressure": 4,
+        "screw_rpm": 60,
+        "holding_time": 5,
+        "cooling_time": 20,
+        "drying_temp": 120,
+        "drying_time": 4,
+        "dryer_type": "제습식"
+      },
+      "mold_info": {
+        "mold_type": "2판 인서트",
+        "gate_type": "사이드",
+        "cavity_count": 2
+      },
+      "defect_description": "황동 나사 인서트를 넣고 성형하는 PSU 부품. 인서트 주변에 방사형 크랙, 약 12%. 성형 직후엔 없다가 몇 시간~하루 뒤 발견되는 것도 있음. 인서트는 상온 그대로 금형에 투입. 인서트 둘레 수지 두께 1.5mm.",
+      "locale": "ko"
+    },
+    "expected": {
+      "root_cause": "금속 인서트와 수지의 열수축 차 + 상온 인서트로 계면 급랭 → 인서트 둘레에 큰 잔류 응력(후프 응력) → 비결정성 PSU가 시간차 응력 균열. 금형온도 70℃(권장 80~120℃ 미달)와 얇은 인서트 둘레 살두께(1.5mm)가 가중. 건조는 정상.",
+      "key_recommendations": [
+        "인서트 예열(금형온도 이상, 대략 100~150℃ 수준)",
+        "금형온도 상향(70→100~120℃, 잔류 응력 완화)",
+        "인서트 둘레 살두께 확대 및 인서트 널링의 날카로운 모서리 제거(근본)",
+        "보압 과다 여부 확인, 필요 시 어닐링으로 잔류 응력 제거"
+      ],
+      "expected_phase": "cooling",
+      "phase_also_accept": [
+        "packing"
+      ],
+      "severity": "high",
+      "trap": null,
+      "confidence": "high"
+    }
   }
 ]
