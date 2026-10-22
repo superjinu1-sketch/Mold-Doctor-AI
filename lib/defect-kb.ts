@@ -4,7 +4,7 @@
 // 수정 순서: taxonomy.md → 이 파일 → KB_VERSION bump → eval 회귀.
 import type { ResinSpec } from './resin-kb';
 
-export const KB_VERSION = 'defect-kb-v1.20';
+export const KB_VERSION = 'defect-kb-v1.21';
 
 export type Cause = {
   rank: number;
@@ -299,7 +299,7 @@ export const DEFECT_KB: Record<string, DefectNode> = {
   sink_mark: {
     id: 'sink_mark', nameKo: '싱크마크', nameEn: 'Sink Mark', phase: '보압',
     typicalSeverity: 'medium (외관)',
-    discriminators: '두꺼운 벽·리브·보스 이면 얕은 함몰. Void/Bubble과 감별: 가열 시 더 꺼짐=진공보이드 / 부풂=가스포켓.',
+    discriminators: '두꺼운 벽·리브·보스 이면 얕은 함몰. Void/Bubble과 감별: 가열 시 더 꺼짐=진공보이드 / 부풂=가스포켓. 이젝터 마크와 감별: 자국 위치가 리브·보스가 아니라 뒷면 이젝터 핀 위치와 일치하면 이젝터 마크(냉각 부족·조기 이젝션)다. 이때 보압↑는 이형 저항을 키워 악화시킨다.',
     causes: [
       { rank: 1, cause: '보압·보압시간 부족', category: 'Machine',
         baseProbability: 50,
@@ -827,7 +827,7 @@ export const DEFECT_KB: Record<string, DefectNode> = {
   ejector_marks: {
     id: 'ejector_marks', nameKo: '이젝터 마크', nameEn: 'Ejector Marks', phase: '이형',
     typicalSeverity: 'medium (외관)',
-    discriminators: '이젝터핀 위치 과도 함몰·자국.',
+    discriminators: '이젝터핀 위치 과도 함몰·자국. 외관면에 비쳐 싱크처럼 보여도 위치가 핀과 일치하면 이쪽. 냉각시간 단축 직후 발생, 보압↑ 시 악화가 강한 신호.',
     causes: [
       { rank: 1, cause: '조기 이젝션 + 이젝터 면적 부족', category: 'Mold',
         trigger: '냉각시간 부족. 이젝터 개수·면적.',

@@ -41,7 +41,7 @@ const resinKnowledge: Record<string, string> = {
   'PA9T': 'PA9T: semi-aromatic, Tm 300-310°C. Drying: 120°C 4hrs, low moisture absorption vs other PAs. Melt: 310-330°C. Mold: 120-140°C. Excellent flow. Common defects: flash(very good flow), weld line weakness. Key: easier to process than PA6T, less moisture sensitive.',
   'PA10T': 'PA10T: semi-aromatic, Tm 310°C. Drying: 100°C 4hrs. Melt: 310-340°C. Mold: 120-150°C. Bio-based option. Similar processing to PA9T. Key: check specific grade TDS as properties vary significantly.',
   'PA12T': 'PA12T: semi-aromatic, Tm 300°C. Drying: 80-100°C 4hrs. Melt: 300-330°C. Mold: 110-140°C. Good dimensional stability. Key: lower moisture absorption than aliphatic PAs.',
-  'PA12': 'PA12: semi-crystalline, low moisture absorption. Drying: 70-80°C 4hrs(less critical than PA6/66). Melt: 180-220°C. Mold: 40-70°C. Flexible, low shrinkage 0.5-1.5%. Common defects: sink mark, warpage(less than PA6/66). Key: most forgiving PA to process.',
+  'PA12': 'PA12: semi-crystalline (Tm ~178°C), low moisture absorption. Drying: 70-80°C 4hrs(less critical than PA6/66). Melt: 210-260°C (some grades to 290°C). Mold: 40-70°C. Flexible, low shrinkage 0.5-1.5%. Common defects: sink mark, warpage(less than PA6/66). Key: most forgiving PA to process.',
   'PA610': 'PA610: semi-crystalline, moderate moisture absorption. Drying: 80°C 4-6hrs. Melt: 220-240°C. Mold: 60-90°C. Good balance of properties. Key: less hygroscopic than PA6/66, similar processing approach.',
   'PA612': 'PA612: semi-crystalline, low moisture absorption. Drying: 80°C 4hrs. Melt: 220-240°C. Mold: 60-90°C. Better dimensional stability than PA6. Key: low moisture absorption similar to PA12.',
   'PA1010': 'PA1010: bio-based, semi-crystalline. Drying: 80°C 4hrs. Melt: 200-220°C. Mold: 60-80°C. Low moisture absorption, excellent chemical resistance. Key: sustainable option, process similar to PA12.',
@@ -196,7 +196,7 @@ export const HYGROSCOPICITY_GUARD = `[흡습성 정확성 — 반드시 준수]
 // 프롬프트 버전 — FIXED_FRAMEWORK·VISUAL_DIFFERENTIAL·HYGROSCOPICITY_GUARD 등
 // 모델 입력에 들어가는 지시문이 바뀔 때마다 bump한다. 진단 레코드에 기록되어
 // "어느 프롬프트로 나온 답인가"를 사후 추적하는 근거가 된다.
-export const PROMPT_VERSION = 'v21b';
+export const PROMPT_VERSION = 'v21c';
 
 // client_id·session_id 형식 검증(call-interruption-data-loss-fix-v1 Part A) —
 // lib/history-sync.ts의 동명 정규식과 동일 패턴 유지.
@@ -560,7 +560,8 @@ function softenDeep(v: unknown): unknown {
 // 다시 권하는 일이 남아서(정 공장장 재평가) 해당 문장을 따로 강조해 넘긴다.
 function extractTriedActions(desc?: string): string[] {
   if (!desc) return [];
-  const re = /(늘려도|올려도|낮춰도|내려도|바꿔도|줄여도|높여도|키워도|해봤|해 봤|시도했|시도해|효과\s*(가\s*)?없|차이\s*(가\s*)?없|변화\s*(가\s*)?없|안\s*변|already tried|\btried\b|no (difference|change|effect|improvement)|did ?n[o']t (help|work|change)|still the same|made no difference)/i;
+  // "올려봤는데/올려봤더니/효과 미미"처럼 '-봤-' 활용형과 약한 부정도 잡는다(cov-tpe-seal·cov-pptalc 실측 누락).
+  const re = /(늘려도|올려도|낮춰도|내려도|바꿔도|줄여도|높여도|키워도|해봤|해 봤|[가-힣]봤(는데|지만|으나|어도|더니)|시도했|시도해|효과\s*(가\s*)?(없|미미|적었|별로)|소용\s*(이\s*)?없|차이\s*(가\s*)?없|변화\s*(가\s*)?없|안\s*변|already tried|\btried\b|no (difference|change|effect|improvement)|little (effect|difference|improvement)|barely (helped|changed)|did ?n[o']t (help|work|change|improve)|still the same|made no difference)/i;
   return desc.split(/(?<=[.!?。])\s+|\n+/).map(x => x.trim()).filter(x => x && re.test(x)).slice(0, 4);
 }
 
@@ -1188,6 +1189,11 @@ CRITICAL: Your entire response must be ONLY the JSON object. No text before or a
     }
 
     if (!parseFallback) result = softenDeep(result) as typeof result;
+    // 심각도 하한(STEP 11 규칙을 코드로 강제): 탄화·크랙·취성은 high. 프롬프트 규칙만으로는
+    // medium으로 낮춰 내는 경우가 반복됐다(coverage eval 5건). 다른 유형은 손대지 않는다.
+    if (!parseFallback && /burn|diesel|crack|brittle/i.test(String(result?.defect_type?.en ?? '')) && result?.severity !== 'high') {
+      result.severity = 'high';
+    }
 
     const u = response.usage;
     result._debug = {
