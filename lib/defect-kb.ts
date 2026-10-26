@@ -4,7 +4,7 @@
 // 수정 순서: taxonomy.md → 이 파일 → KB_VERSION bump → eval 회귀.
 import type { ResinSpec } from './resin-kb';
 
-export const KB_VERSION = 'defect-kb-v1.21';
+export const KB_VERSION = 'defect-kb-v1.22';
 
 export type Cause = {
   rank: number;
@@ -70,19 +70,19 @@ export const DEFECT_KB: Record<string, DefectNode> = {
   short_shot: {
     id: 'short_shot', nameKo: '미성형', nameEn: 'Short Shot', phase: '충전',
     typicalSeverity: 'medium~high (전수 미충전·기능부품 강도 직결 시 high)',
-    discriminators: '말단·리브·보스 미충전. 단면 매끄럽고 광택=단순 미충전 / 끝단 탄화=Air Trap 겸발 / 복수 캐비티 균등=사출량·밸런스 문제.',
+    discriminators: '말단·리브·보스 미충전. 단면 매끄럽고 광택=단순 미충전 / 끝단 탄화=Air Trap 겸발 / 복수 캐비티 균등=사출량(쿠션)·공정조건 / 특정 캐비티 편중=게이트·런너 밸런스. 쿠션 0(스크류 바닥 닿음)=계량 부족 / 쇼트가 무작위로 섞이고 보압 중 스크류가 계속 전진=체크링 누설(Eastman).',
     causes: [
       { rank: 1, cause: '사출 압력·속도·멜트온도 부족', category: 'Machine',
         baseProbability: 50,
-        trigger: '충전 말단 20~30% 고저항 구간에서 압력·속도 부족',
+        trigger: '충전 말단 고저항 구간에서 압력·속도 부족',
         evidence: '사출압·속도·멜트온도 입력값. resin-kb meltC·moldC 범위 대비.',
         verification: '사출속도 10% 씩↑ 단계 테스트. 최대 캐비티압 모니터.',
         adjustment: '멜트온도↑, 사출속도↑(과하면 제팅·플래시), 사출압↑.' },
       { rank: 2, cause: '게이트·런너 과소 또는 특정캐비티 밸런스 불량', category: 'Mold',
         baseProbability: 25,
-        trigger: '특정 캐비티만 반복 미충전, 또는 게이트 단면이 벽두께 대비 과소 — 점도별 하한: 고점도(PC·PMMA 등) 60~70%, 중점도 50~60%, 저점도(PE·PA 등) 40~50%. 하한 미만이면 과소 의심.',
+        trigger: '특정 캐비티만 반복 미충전, 또는 게이트 단면이 벽두께 대비 과소. 게이트/벽두께 비는 설계 출발값 참고 범위일 뿐 출처마다 40~90%로 다르다(고점도 아크릴·경질 PVC는 상단). 이것만으로 단정하지 말 것.',
         evidence: '게이트 타입·캐비티 수. 특정 캐비티 패턴 여부.',
-        verification: '불량 캐비티 위치 기록. 런너 밸런스 검토.',
+        verification: '불량 캐비티 위치 기록. 런너 밸런스 검토. 사출압 트레이스에서 압력이 충전 초반(~20%)부터 오르면 게이트 과소 의심(Hatch, 트레이드지 단일 출처).',
         adjustment: '게이트 확대, 런너 밸런스 수정, 캐비티 수 조정.' },
       { rank: 3, cause: '금형온도 과저 또는 벤트 막힘', category: 'Mold',
         baseProbability: 15,
@@ -94,13 +94,15 @@ export const DEFECT_KB: Record<string, DefectNode> = {
     patternHints: {
       '특정 캐비티': '2순위(게이트 밸런스) 강점 분기',
       '끝단 탄화': 'Air Trap 겸발 — 벤팅 먼저 확인',
-      '배치 산발': 'Material/계량 불안정 검토',
+      '배치 산발': '쿠션 변동·체크링 누설(Machine) 먼저 확인 → 다음 Material(건조·로트 점도)',
     },
     sharedGates: ['mold_temp_insufficient'],
     priorityLogic: '특정캐비티만=Mold 우선. 전체 균등=Machine/Method. Air Trap 겸발=벤팅 먼저.',
     source: 'synthesis-1.1,taxonomy-1', confidence: 'verified',
     sourceRefs: [
-      'Plastics Technology — How to Properly Size Gates, Runners and Sprues (gate 40~70% of wall by viscosity)',
+      'Plastics Technology — How to Properly Size Gates, Runners and Sprues (gate 40~70% of wall by viscosity; body not fetch-verified 2026-10-26)',
+      'Eastman Chemical — Processing and mold design guidelines (SP-TRS-5344): leaking check valve → random short shots; short-shot remedy order starts with cushion (kb-research 2026-10-26)',
+      'B. Hatch — The troubleshooter: Sizing the gate, PlasticsToday 2003 (gate 50~90% of wall by resin; pressure rise at ~20% fill = undersized gate; single trade source)',
     ],
     verifiedAt: '2026-07-28',
   },
@@ -115,7 +117,7 @@ export const DEFECT_KB: Record<string, DefectNode> = {
         baseProbability: 55,
         trigger: '캐비티압×투영면적 > 클램프력. 사출·홀드압 과고.',
         evidence: '클램프력·사출압·홀드압 입력값.',
-        verification: '클램프력 계산: 형체력(ton) ≈ 투영면적(cm²) × 캐비티내압(kgf/cm²) ÷ 1000. 캐비티내압 미측정 시 300~500 kgf/cm² 대입(≈2~4 US ton/in²). 블루마킹(밀착패턴).',
+        verification: '클램프력 계산: 형체력(tf) ≈ 투영면적(cm²) × 캐비티내압(kgf/cm²) ÷ 1000. 캐비티내압 미측정 시 300~500 kgf/cm² 대입(≈2.1~3.6 US ton/in²). 업계 가이드(RJG 등)는 3~5 US ton/in²로 더 높고 박육일수록 상단이므로, 하한값만으로 클램프 부족을 배제하지 말 것. US ton 명판과 비교 시 tf×1.10. 블루마킹(밀착패턴).',
         adjustment: '클램프력↑(과도시 벤트 압착→Diesel 주의), 홀드압↓, V/P 전환 앞당김.' },
       { rank: 2, cause: '파팅면 마모·이물·평행도 불량', category: 'Mold',
         baseProbability: 30,
@@ -123,7 +125,7 @@ export const DEFECT_KB: Record<string, DefectNode> = {
         evidence: '게이트 타입. 불량 위치 패턴.',
         verification: '블루마킹(파팅면 밀착 패턴). 이물 육안 확인.',
         adjustment: '파팅면 재연마, 이물 제거, 이젝터핀 clearance 수정.' },
-      { rank: 3, cause: '극저점도 super EP(LCP·PPS·PA4T·PA6T) — 홀딩압·정밀도 우선', category: 'Material',
+      { rank: 3, cause: '극저점도 super EP(PPS 계열 등) — 홀딩압·정밀도 우선', category: 'Material',
         baseProbability: 10,
         trigger: 'PPS 계열 우선(저플래시 전용 그레이드가 존재할 만큼 알려진 문제). LCP는 문헌상 오히려 저플래시 특성(저전단에서 점도 급상승) — LCP에서 flash 발생 시 수지 특성이 아니라 과열·과보압·PL 정밀도를 먼저 의심. + 파팅면 전체 or 미세 버.',
         evidence: '수지 종류(resin-kb tier=super-engineering). 불량 분포.',
@@ -140,10 +142,11 @@ export const DEFECT_KB: Record<string, DefectNode> = {
       '전체 둘레': '1순위(클램프·과압) 강점 분기',
       '특정 위치': '2순위(금형마모) 강점 분기',
       '이젝터 주변': '이젝터 clearance 확인',
-      'LCP|PPS|극저점도': '3순위(super EP) — holding압↓+V/P 앞당김 우선',
+      'PPS|극저점도': '3순위(super EP) — holding압↓+V/P 앞당김 우선',
+      'LCP': '수지 특성 아님(LCP는 저플래시 수지, Celanese). ① 과보압(1순위: 보압↓·V/P 앞당김) ② 멜트온도를 권장 하한 쪽으로↓ ③ PL 정밀도·금형 조립 불일치(2순위) 순으로 의심',
     },
     sharedGates: [],
-    priorityLogic: '역설 주의: 클램프력 과도 → 벤트 압착 → Diesel 겸발. 필요최소 클램프력 사용. LCP·PPS 등 극저점도=holding압↓+V/P 전환+PL면 정밀도 우선.',
+    priorityLogic: '역설 주의: 클램프력 과도 → 벤트 압착 → Diesel 겸발. 일반론은 필요최소 클램프력. 단 PPS는 공급사가 금형 허용 범위 내 높은 형체력을 권하는 경우가 있어 클램프력↑도 1차 대책이 될 수 있다(벤트 압착은 burn 위치로 확인). PPS 등 극저점도=holding압↓+V/P 전환+PL면 정밀도. LCP flash는 수지 탓이 아니라 과열·과보압·PL 정밀도.',
     source: 'synthesis-1.2,taxonomy-2', confidence: 'verified',
     sourceRefs: [
       'KEYENCE Injection Molding Formulas — F(tf)=p(kgf/cm²)×A(cm²)÷1000, cavity pressure 300~500 kgf/cm²',
@@ -194,7 +197,7 @@ export const DEFECT_KB: Record<string, DefectNode> = {
         trigger: '멜트온도 resin-kb meltC.min 근방 또는 미달. 비강화 수지(PP·PE 등)면 본 순위 그대로 적용, GF 강화 수지면 2순위(보압)·3순위(게이트)를 상향 검토.',
         evidence: '노즐·배럴 온도 입력값. resin-kb meltC 범위 대비.',
         verification: '멜트온도 +10℃ 후 V홈 깊이 감소 확인(7→3μm 사례) — 외관 지표이며 강도 검증은 아님.',
-        adjustment: '멜트온도↑(최우선), 금형온도↑.' },
+        adjustment: '멜트온도↑(비강화 수지에서 최우선), 금형온도↑. GF 수지에서는 외관·연신 개선 목적이며 강도 개선 효과는 미미.' },
       { rank: 2, cause: '홀드압·사출속도 부족', category: 'Machine',
         baseProbability: 20,
         trigger: '홀드압 사출1차압의 50% 미만. 사출속도 느림.',
@@ -215,7 +218,7 @@ export const DEFECT_KB: Record<string, DefectNode> = {
       '파단|부러짐|강도 부족|기능 불량': 'GF 수지면 섬유 배향 단절 = 조건 조정만으로는 모재 수준 회복 불가 영역(보압↑으로 일부 개선은 가능). 게이트 위치 이동·웰드 위치 이동(금형)이 근본 대책. 조건 권고 시 한계를 명시할 것',
     },
     sharedGates: ['mold_temp_insufficient'],
-    priorityLogic: '구조적 웰드(홀·코어핀 등)=조건만으론 한계, 게이트 위치 이동이 근본. 강도·파단 요구 시나리오(기능부품·GF 수지)에서는 Mold(게이트 위치) 원인을 우선 검토 — 비강화 수지(PP·PE 등)는 멜트온도가 웰드 강도의 주요 인자(분자 확산·힐링 지배)다. GF 강화 수지는 멜트온도·금형온도의 강도 기여가 미미하고(연신·외관엔 유효) 보압↑이 강도를 실제로 개선한다. 어느 경우든 조건만으로 모재 수준 회복은 안 된다. 외관 양품 ≠ 강도 OK.',
+    priorityLogic: '구조적 웰드(홀·코어핀 등)=조건만으론 한계, 게이트 위치 이동이 근본. 강도·파단 요구 시나리오(기능부품·GF 수지)에서는 Mold(게이트 위치) 원인을 우선 검토 — 비강화 수지(PP·PE 등)는 멜트온도가 웰드 강도의 주요 인자(분자 확산·힐링 지배)다. GF 강화 수지는 멜트온도·금형온도의 강도 기여가 미미하고(연신·외관엔 유효) 보압이 웰드 강도의 최대 공정 인자다. 다만 개선폭은 한 자릿수~약 10% 수준이고 범위 안에서 비단조일 수 있다. 어느 경우든 조건만으로 모재 수준 회복은 안 된다. 외관 양품 ≠ 강도 OK.',
     source: 'synthesis-1.4,taxonomy-4', confidence: 'verified',
     sourceRefs: [
       'Polymers (MDPI) 15(20):4102 (2023) — PA6+30%GF: packing pressure dominates weld UTS; melt temp affects elongation, not UTS. Full text verified 2026-07-28',
@@ -303,13 +306,13 @@ export const DEFECT_KB: Record<string, DefectNode> = {
     causes: [
       { rank: 1, cause: '보압·보압시간 부족', category: 'Machine',
         baseProbability: 50,
-        trigger: '홀드압 < 사출1차압의 50% 또는 보압시간 < 게이트씰 시간',
+        trigger: '홀드압 < 사출1차압의 50% 또는 보압시간 < 게이트씰 시간. 여기서 1차압은 설정 한계값이 아니라 V/P 전환 시점 실측 피크 사출압(보압과 같은 표시 기준: 유압이든 수지압이든). % 규칙은 스크리닝용이며 확정은 게이트씰 시험으로.',
         evidence: '홀드압·보압시간·게이트 크기.',
-        verification: 'Gate Seal Study: 보압시간 1초씩↑ → 중량 안정 시 씰 확인. 안정 판정은 ±0.1g 또는 샷 중량의 ±0.1% 중 큰 값(소형 부품은 절대 기준, 대형 부품은 상대 기준이 맞다).',
+        verification: 'Gate Seal Study: 보압시간 1초씩↑(늘린 만큼 냉각시간에서 빼서 총 사이클 일정 유지) → 중량 안정 시 씰 확인. 핫러너·밸브게이트는 완전히 평탄해지지 않을 수 있음. 안정 판정은 ±0.1g 또는 샷 중량의 ±0.1% 중 큰 값(소형 부품은 절대 기준, 대형 부품은 상대 기준이 맞다).',
         adjustment: '보압↑(1차압의 50~80%), 보압시간↑(게이트씰까지+1~2초).' },
       { rank: 2, cause: '게이트 조기 고화', category: 'Mold',
         baseProbability: 25,
-        trigger: '게이트 과소 또는 금형온도 과저 → 게이트 동결 빠름.',
+        trigger: '게이트 과소 또는 금형온도 과저 → 게이트 동결 빠름. 감별: 설정 보압시간에서도 중량이 계속 늘면 1순위(보압 부족), 씰 시간이 짧게(조기 평탄) 나오는데 싱크가 지속되면 이 순위.',
         evidence: '게이트 타입·크기. 금형온도.',
         verification: 'Gate Seal Study로 씰 시점 확인. 게이트 확대 후 재시험.',
         adjustment: '게이트 확대, 런너 가이드 없는 부분 두께 증대.' },
@@ -318,7 +321,7 @@ export const DEFECT_KB: Record<string, DefectNode> = {
         trigger: 'PP·PA·POM·PBT 등 결정성 수지 + 두꺼운 벽.',
         evidence: '수지 종류(resin-kb crystalline 여부). 벽두께.',
         verification: '보압 충분 적용 후에도 지속=설계(coring) 검토.',
-        adjustment: '보압↑, 냉각시간↑, coring으로 벽두께 균일화.' },
+        adjustment: '보압↑, 냉각시간↑, coring으로 벽두께 균일화. 금형온도 과고도 수축을 키울 수 있다(2순위의 과저=조기 동결과 방향이 반대이니 한 방향으로만 조정하지 말 것).' },
     ],
     patternHints: {
       '리브·보스 이면': '게이트씰 우선 확인(Gate Seal Study)',
@@ -353,9 +356,9 @@ export const DEFECT_KB: Record<string, DefectNode> = {
         adjustment: '건조 규정 엄수, 배압 0.5~1MPa씩↑(가스 압축 배출).' },
       { rank: 3, cause: '배압 부족으로 탈기 불충분', category: 'Machine',
         baseProbability: 15,
-        trigger: '배압 낮음(수지압 기준 <5MPa ≈ 725psi. 유압 게이지 값과 혼동 금지). 스크루 계량 시 가스 포함.',
+        trigger: '배압이 수지 권장 하한 미만(resin-kb 값 우선, 없으면 범용 하한 수지압 3.4MPa ≈ 500psi. 유압 게이지 값과 혼동 금지). 스크루 계량 시 가스 포함. 권장대 안의 배압을 원인으로 판정하지 말 것.',
         evidence: '배압 입력값.',
-        verification: '배압 0.5~1MPa씩↑ (권장 작동대 3.4~6.9MPa = 500~1,000 psi 수지압) 후 보이드 감소 확인.',
+        verification: '배압 0.5~1MPa씩↑ 후 보이드 감소 확인. 범용 작동대 3.4~6.9MPa(500~1,000psi 수지압, RJG)는 기본값일 뿐 수지별로 다르다(예: PC Makrolon 10~20MPa 수지압, PA Zytel 저배압~무배압).',
         adjustment: '배압 소폭↑(GF 수지=섬유 파손 주의).' },
       { rank: 4, cause: '환경 온도 드리프트(낮밤 기온차) → 금형/배럴 온도 불안정', category: 'Machine',
         baseProbability: 12,
@@ -1114,7 +1117,7 @@ export function formatDefectGuide(
   }
 
   if (node.id === 'weld_line') {
-    lines.push('★ 강도·파단 요구 시나리오(기능부품·GF/필러 수지)면 금형(게이트 위치 이동·웰드 위치 이동) 대책을 권고 1순위로 명시하라. 비강화 수지(PP·PE 등)는 멜트온도가 웰드 강도의 주요 인자(분자 확산·힐링 지배)다. GF 강화 수지는 멜트온도·금형온도의 강도 기여가 미미하고(연신·외관엔 유효) 보압↑이 강도를 실제로 개선한다. 어느 경우든 조건만으로 모재 수준 회복은 안 된다 — 외관 양품 ≠ 강도 OK.');
+    lines.push('★ 강도·파단 요구 시나리오(기능부품·GF/필러 수지)면 금형(게이트 위치 이동·웰드 위치 이동) 대책을 권고 1순위로 명시하라. 비강화 수지(PP·PE 등)는 멜트온도가 웰드 강도의 주요 인자(분자 확산·힐링 지배)다. GF 강화 수지는 멜트온도·금형온도의 강도 기여가 미미하고(연신·외관엔 유효) 보압이 웰드 강도의 최대 공정 인자다. 다만 개선폭은 한 자릿수~약 10% 수준이고 범위 안에서 비단조일 수 있다. 어느 경우든 조건만으로 모재 수준 회복은 안 된다 — 외관 양품 ≠ 강도 OK.');
   }
 
   if (node.patternHints) {

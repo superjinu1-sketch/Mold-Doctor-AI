@@ -6,7 +6,7 @@ export const SAMPLE_DEMO_RESULT = {
   severity: "medium",
   summary: "간헐적 은줄, 수분·체크링 슬리핑 추정",
   process_window_check: {
-    melt_temp: { status: "ok", note: "노즐285°C, 권장 260-290°C 범위 내" },
+    melt_temp: { status: "ok", note: "노즐285°C, 권장 275-300°C 범위 내" },
     mold_temp: { status: "ok", note: "80°C, GF33% 권장 범위 내" },
     injection_speed: { status: "ok", note: "60%/40% 단계속도 적정" },
     pack_pressure: { status: "ok", note: "보압80MPa, 충진압120의 67% 적정" },
@@ -63,7 +63,7 @@ export const SAMPLE_DEMO_RESULT_EN = {
   severity: "medium",
   summary: "Intermittent silver streak; suspected moisture / check-ring slippage",
   process_window_check: {
-    melt_temp: { status: "ok", note: "Nozzle 285°C, within recommended 260-290°C" },
+    melt_temp: { status: "ok", note: "Nozzle 285°C, within recommended 275-300°C" },
     mold_temp: { status: "ok", note: "80°C, within GF33% recommended range" },
     injection_speed: { status: "ok", note: "60%/40% staged speed appropriate" },
     pack_pressure: { status: "ok", note: "Hold 80MPa, 67% of 120MPa fill pressure, appropriate" },

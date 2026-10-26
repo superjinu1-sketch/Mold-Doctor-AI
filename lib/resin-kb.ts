@@ -102,7 +102,7 @@ export const RESIN_KB: Record<string, ResinSpec> = {
     drying: { tempC: 80, hours: [4, 8], targetMoisturePct: 0.08 },
     meltC: { min: 275, max: 300, degradeAbove: 310 }, moldC: { min: 70, max: 100, gf: [80, 100] }, shrinkagePct: [1.2, 2.0],
     commonDefects: ['silver_streak', 'burn_mark', 'warpage'],
-    notes: 'PA66: narrow processing window. Moisture is almost always the #1 suspect (40%+ of silver streak). Thermal degradation above 300°C. GF grades warp from fiber orientation. Normal molding up to 305°C is possible; above 300°C minimize residence time.',
+    notes: 'PA66: narrow processing window. Moisture is almost always the #1 suspect (40%+ of silver streak). Dry to ≤0.08% as the working target; DuPont maximum is 0.2% (hydrolysis above). Melt 275-300°C; up to 305°C is possible with short residence; degradation risk rises from 310°C (DuPont HUT at 310°C: MW −6%/10min). GF grades warp from fiber orientation.',
     source: 'verified', confidence: 'verified',
     mechanism: {
       moistureMode: 'both',
