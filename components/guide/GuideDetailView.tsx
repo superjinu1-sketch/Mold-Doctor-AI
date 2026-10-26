@@ -2,7 +2,7 @@
 // 최초 HTML에 포함되어야 크롤러가 인덱싱 가능). ko/en 페이지가 locale만 다르게 넘겨 공용.
 // components/resins/ResinDetailView.tsx와 동일 패턴.
 import Link from 'next/link';
-import type { GuideDefect } from '@/lib/defectGuide';
+import { defects, type GuideDefect } from '@/lib/defectGuide';
 import type { Locale } from '@/lib/guideDisplay';
 import { getResinDisplayName } from '@/lib/resinDisplay';
 import StoreBadges from '@/components/StoreBadges';
@@ -113,6 +113,24 @@ export default function GuideDetailView({
             </div>
           </section>
         )}
+
+        {/* 다른 불량 가이드 — 가이드끼리 서로 링크(크롤러가 24종을 모두 따라가게, GSC '발견됨-미색인' 대응 2026-10-26) */}
+        <section>
+          <h2 className="text-[length:var(--text-h3)] font-bold text-ink mb-3 flex items-center gap-2">
+            <span className="text-brand-ink">◆</span> {L('다른 불량 가이드', 'Other Defect Guides')}
+          </h2>
+          <div className="flex flex-wrap gap-2">
+            {defects.filter(d => d.id !== defect.id).map(d => (
+              <Link
+                key={d.id}
+                href={`${basePath}/${d.id}`}
+                className="inline-flex items-center min-h-[44px] px-3.5 rounded-full border border-border bg-surface hover:border-[var(--brand-border)] hover:bg-brand-tint text-muted hover:text-brand-ink text-[length:var(--text-label)] font-semibold transition-colors"
+              >
+                {locale === 'en' ? d.nameEn : d.nameKo}
+              </Link>
+            ))}
+          </div>
+        </section>
 
         {/* CTA — 웹 추정 */}
         <section>

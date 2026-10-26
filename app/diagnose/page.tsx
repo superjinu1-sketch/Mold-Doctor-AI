@@ -1072,7 +1072,11 @@ function DiagnoseContent() {
     if (!isDemo && round === 1 && !preflightAcceptedRef.current) {
       const currentSettingsSnap = JSON.stringify({ nozzleTemp: settings.nozzleTemp, zone1Temp: settings.zone1Temp, zone2Temp: settings.zone2Temp, moldTempFixed: settings.moldTempFixed, injPressure1: settings.injPressure1, holdPressure: settings.holdPressure, injSpeed1: settings.injSpeed1, holdTime: settings.holdTime, coolTime: settings.coolTime });
       const hasAnySetting = Object.entries(settings).some(([k, v]) => k !== 'pressureUnit' && String(v).trim() !== '');
-      const warn = sampleSettingsSnap !== null && currentSettingsSnap === sampleSettingsSnap ? 'sample' : (!hasAnySetting ? 'empty' : null);
+      // 세션 스냅샷뿐 아니라 예시 값 자체와도 비교한다 — 새로고침·재방문으로 임시저장이 복원되면 스냅샷이 비어
+      // 경고가 빠졌다(10월 가입자 U7: PC/ABS를 PA66 예시의 노즐 285°C로 판정).
+      const isSampleSnap = (sampleSettingsSnap !== null && currentSettingsSnap === sampleSettingsSnap)
+        || SAMPLE_CASES.some(d => JSON.stringify({ nozzleTemp: d.nozzleTemp, zone1Temp: d.zone1Temp, zone2Temp: d.zone2Temp, moldTempFixed: d.moldTempFixed, injPressure1: d.injPressure1, holdPressure: d.holdPressure, injSpeed1: d.injSpeed1, holdTime: d.holdTime, coolTime: d.coolTime }) === currentSettingsSnap);
+      const warn = isSampleSnap ? 'sample' : (!hasAnySetting ? 'empty' : null);
       if (warn) {
         setPreflightWarn(warn);
         setTimeout(() => preflightRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' }), 50);
