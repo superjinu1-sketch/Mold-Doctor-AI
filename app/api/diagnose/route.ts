@@ -41,12 +41,12 @@ const resinKnowledge: Record<string, string> = {
   'PA9T': 'PA9T: semi-aromatic, Tm 300-310°C. Drying: 120°C 4hrs, low moisture absorption vs other PAs. Melt: 310-330°C. Mold: 120-140°C. Excellent flow. Common defects: flash(very good flow), weld line weakness. Key: easier to process than PA6T, less moisture sensitive.',
   'PA10T': 'PA10T: semi-aromatic, Tm 310°C. Drying: 100°C 4hrs. Melt: 310-340°C. Mold: 120-150°C. Bio-based option. Similar processing to PA9T. Key: check specific grade TDS as properties vary significantly.',
   'PA12T': 'PA12T: semi-aromatic, Tm 300°C. Drying: 80-100°C 4hrs. Melt: 300-330°C. Mold: 110-140°C. Good dimensional stability. Key: lower moisture absorption than aliphatic PAs.',
-  'PA12': 'PA12: semi-crystalline (Tm ~178°C), low moisture absorption. Drying: 70-80°C 4hrs(less critical than PA6/66). Melt: 210-260°C (some grades to 290°C). Mold: 40-70°C. Flexible, low shrinkage 0.5-1.5%. Common defects: sink mark, warpage(less than PA6/66). Key: most forgiving PA to process.',
-  'PA610': 'PA610: semi-crystalline, moderate moisture absorption. Drying: 80°C 4-6hrs. Melt: 220-240°C. Mold: 60-90°C. Good balance of properties. Key: less hygroscopic than PA6/66, similar processing approach.',
-  'PA612': 'PA612: semi-crystalline, low moisture absorption. Drying: 80°C 4hrs. Melt: 220-240°C. Mold: 60-90°C. Better dimensional stability than PA6. Key: low moisture absorption similar to PA12.',
-  'PA1010': 'PA1010: bio-based, semi-crystalline. Drying: 80°C 4hrs. Melt: 200-220°C. Mold: 60-80°C. Low moisture absorption, excellent chemical resistance. Key: sustainable option, process similar to PA12.',
-  'PA6/66': 'PA6/66 copolymer: semi-crystalline. Drying: 80°C 4-6hrs. Melt: 240-270°C. Mold: 60-90°C. Intermediate properties between PA6 and PA66. Key: broader processing window than PA66.',
-  'MXD6': 'MXD6: semi-crystalline, high Tg, high barrier. Drying: 120°C 4-6hrs. Melt: 240-270°C. Mold: 100-140°C. Used in barrier applications. Key: higher mold temp needed for good crystallinity.',
+  'PA12': 'PA12: semi-crystalline (Tm ~178°C), low moisture absorption. Drying: 80°C 4-6hrs, target moisture <0.1% (above 80°C in a dehumidifying dryer risks oxidation/yellowing; less critical than PA6/66). Melt: 210-260°C (some grades to 290°C). Mold: 30-70°C. Flexible, low shrinkage 0.5-1.5%. Common defects: sink mark, warpage(less than PA6/66). Key: most forgiving PA to process.',
+  'PA610': 'PA610: semi-crystalline, moderate moisture absorption. Drying: 80°C 3-4hrs in a dehumidifying dryer, target moisture <0.1% (an intact bag used within 2h of opening may not need drying). Melt: 240-270°C (Tm ~220°C, so 220-235°C risks unmelt). Mold: 40-90°C. Good balance of properties. Key: less hygroscopic than PA6/66, similar processing approach.',
+  'PA612': 'PA612: semi-crystalline, low moisture absorption. Drying: 80°C 2-4hrs (dehumidified), moisture ≤0.1%. Melt: 230-290°C (typ. 240-270, aim ~260). Mold: 60-90°C. Better dimensional stability than PA6. Key: low moisture absorption similar to PA12.',
+  'PA1010': 'PA1010: bio-based, semi-crystalline. Drying: 80°C 4hrs. Melt: 220-290°C (grade dependent: Evonik Terra DS 220-260, EMS Grilamid 1S 270-290; follow the grade TDS). Mold: 60-100°C. Low moisture absorption, excellent chemical resistance. Key: properties similar to PA12 but processes hotter (melt about +20-30°C vs PA12).',
+  'PA6/66': 'PA6/66 copolymer: semi-crystalline; Tm about 190-196°C for PA6-rich grades (lower than both PA6 and PA66, not in between). Drying: 80°C 4-6hrs, moisture ≤0.12% (BASF recommends 0.03-0.06%; overdrying raises melt viscosity). Melt: 240-270°C (aim ~260°C). Mold: 60-90°C. Key: broader processing window than PA66.',
+  'MXD6': 'MXD6: semi-crystalline, high Tg, high barrier. Drying: 120°C 4-6hrs (follow the grade TDS; sealed moisture-proof bags may not need drying, opened/aged bags and regrind do). Melt: 250-290°C. Mold: 120-140°C. Used in barrier applications. Key: below 120°C mold surface the part stays under-crystallized and changes size later (post-crystallization) — check mold surface ≥120°C first for warpage/dimensional drift.',
   'PBT': 'PBT: semi-crystalline, fast crystallization. Drying: 120°C 4hrs, target moisture <0.03%. Melt: 250-270°C. Mold: 60-80°C(amorphous surface)/80-100°C(crystalline surface). Shrinkage 1.5-2.2%. Common defects: warpage(fast uneven crystallization), sink mark, flash(good fluidity). Key: mold temp dramatically affects surface quality and crystallinity.',
   'PET': 'PET: semi-crystalline, slow crystallization. Drying: 120°C (110-135) 4-6hrs, desiccant dew point ≤ -20°C, target moisture <0.02%. Melt: 260-290°C. Mold: 130-140°C(crystalline)/20-30°C(amorphous/transparent). Shrinkage varies with crystallinity. Common defects: moisture → hydrolysis (brittle/impact loss, higher flow → flash/overpacking; surface can look normal or glossier, not necessarily splay), acetaldehyde generation(overheating). A hot-air dryer cannot reach the dew point needed. Key: mold temp controls crystalline vs amorphous state.',
   'PCT': 'PCT: semi-crystalline, higher heat than PBT/PET. Drying: 120°C 4hrs. Melt: 280-310°C. Mold: 100-130°C. Better heat resistance than PBT. Key: similar to PBT but higher processing temperatures.',
@@ -62,8 +62,8 @@ const resinKnowledge: Record<string, string> = {
   'PAI': 'PAI: highest performance thermoplastic. Drying: 120°C 16hrs minimum. Melt: 330-370°C. Mold: 200-230°C. Requires post-cure. Key: special equipment and processing expertise required.',
   'PI(폴리이미드)': 'PI: highest thermal performance. Processing varies by type. Key: usually requires specialized processing, consult TDS for each grade.',
   'PSU': 'PSU(Polysulfone): amorphous, transparent. Drying: 135-150°C 4hrs. Melt: 330-380°C. Mold: 120-160°C (≥138°C recommended for low stress). Common defects: stress cracking, splay(moisture). Key: chemical resistance but sensitive to certain solvents.',
-  'PPSU': 'PPSU: amorphous, highest PSU family. Drying: 150°C 4hrs. Melt: 340-380°C. Mold: 100-140°C. Key: sterilizable, medical applications, better hydrolytic stability than PSU.',
-  'PES': 'PES: amorphous. Drying: 150°C 4hrs. Melt: 340-380°C. Mold: 100-140°C. Key: similar to PPSU, high temperature performance.',
+  'PPSU': 'PPSU: amorphous, highest PSU family. Drying: 150°C 4hrs. Melt: 350-390°C. Mold: 140-180°C. Key: sterilizable, medical applications, better hydrolytic stability than PSU.',
+  'PES': 'PES: amorphous. Drying: 150°C 4hrs. Melt: 340-380°C (max ~385-390°C, residence ≤10 min). Mold: 140-180°C. Key: similar to PPSU, high temperature performance.',
   'PTFE': 'PTFE: not typically injection molded. Key: use compression sintering or RAM extrusion, not conventional IM.',
   'FEP': 'FEP: fluoropolymer, excellent chemical resistance. Melt: 300-380°C. Special equipment needed. Key: highly corrosive, requires specialized screws and barrels.',
   'PFA': 'PFA: fluoropolymer. Melt: 340-380°C. Similar to FEP but higher temperature. Key: extremely corrosive to standard equipment.',
@@ -80,17 +80,17 @@ const resinKnowledge: Record<string, string> = {
   'PVC': 'PVC: amorphous, thermal degradation risk. Drying: usually not required. Melt: flexible PVC-P 160-200°C, rigid PVC-U about 190-210°C (do not call rigid PVC at 200-210°C overheated by itself); degradation releases HCl and depends on temperature × residence (rigid ≤15 min, flexible ≤10 min). Never let PVC meet POM in a hot barrel (violent decomposition); purge with acrylic, PS or HDPE. Mold: 20-50°C. Common defects: discoloration(overheating), burn marks. Key: narrow processing window, corrosive HCl gas, requires specialized equipment.',
   'PC/ABS': 'PC/ABS: amorphous blend. Drying: 100-110°C 3-4hrs. Melt: 240-280°C. Mold: 60-90°C. Compromise between PC and ABS properties. Common defects: splay(moisture), delamination(incompatible processing), color streaks. Key: drying is critical, processing window narrower than either component alone.',
   'PC/PBT': 'PC/PBT: blend. Drying: 110°C 4hrs. Melt: 250-280°C. Mold: 60-90°C. Chemical resistance + impact. Key: needs compromise processing, PBT crystallization can cause surface issues.',
-  'PA/ABS': 'PA/ABS: two-phase blend. Drying: 80°C 4hrs. Melt: 240-270°C. Mold: 60-80°C. Impact-modified PA. Key: PA phase is hygroscopic, drying critical.',
+  'PA/ABS': 'PA/ABS: two-phase blend. Drying: 80°C 4hrs. Melt: 240-270°C. Mold: 40-80°C. Impact-modified PA. Key: PA phase is hygroscopic, drying critical.',
   'PA/PP': 'PA/PP: blend with compatibilizer. Drying: 80°C 4hrs. Melt: 230-260°C. Mold: 60-80°C. Key: potential delamination if processing is incorrect.',
-  'PPE/PA': 'PPE/PA blend: blend. Drying: 100°C 4hrs. Melt: 270-300°C. Mold: 80-100°C. Key: good combination of PPE heat resistance and PA chemical resistance.',
+  'PPE/PA': 'PPE/PA blend: blend. Drying: 100°C 3-4hrs. Melt: 270-300°C. Mold: 80-120°C. Key: good combination of PPE heat resistance and PA chemical resistance.',
   'PBT/ABS': 'PBT/ABS: blend. Drying: 120°C 3hrs. Melt: 240-270°C. Mold: 60-80°C. Key: good surface quality, chemical resistance, process at lower end to avoid ABS degradation.',
   'TPU': 'TPU: thermoplastic elastomer. Drying: 80-100°C 2-4hrs, target moisture <0.02%. Melt: 190-230°C(varies with hardness). Mold: 20-50°C. Common defects: bubbles(moisture), stringing, surface defects. Key: gentle processing, low shear, moisture sensitive.',
   'TPE': 'TPE: thermoplastic elastomer(general). Drying: per grade TDS. Melt: 180-220°C. Mold: 20-50°C. Key: low injection speed and pressure, gentle processing.',
   'TPC': 'TPC: thermoplastic copolyester elastomer. Drying: 100°C 4hrs. Melt: 220-250°C. Mold: 30-60°C. Key: good oil/chemical resistance.',
   'TPA': 'TPA: thermoplastic polyamide elastomer. Drying: 80°C 4hrs. Melt: 200-240°C. Key: similar to TPU but PA-based, moisture sensitive.',
-  'TPEE': 'TPEE: thermoplastic polyester elastomer. Drying: 100°C 4hrs. Melt: 210-240°C. Mold: 30-60°C. Key: good flex fatigue resistance.',
+  'TPEE': 'TPEE: thermoplastic polyester elastomer. Drying: 100°C 4hrs. Melt: 210-240°C. Mold: 20-60°C. Key: good flex fatigue resistance.',
   'TPV': 'TPV: thermoplastic vulcanizate. Drying: not usually required. Melt: 180-220°C (~205 typical). Mold: 20-30°C. Key: rubber-like but strongly shear-thinning — use medium-fast to fast injection speed (high shear lowers viscosity; gate shear ~10^4-10^5/s). Slow fill causes short shot/weld line/poor surface. Avoid excessive melt residence.',
-  'TPO': 'TPO: thermoplastic olefin. Drying: not required. Melt: 180-230°C. Mold: 20-50°C. Key: automotive bumper/trim applications, good impact at low temp.',
+  'TPO': 'TPO: thermoplastic olefin. Drying: normally not required (PP base); dry if talc-filled, critical appearance, dark colors, cold-storage transfer, or splay/voids seen (~80-100°C, 1-6h by grade). Melt: 200-230°C (some grades higher). Mold: 15-60°C. Key: automotive bumper/trim applications, good impact at low temp.',
   'default': 'General thermoplastic. Check material TDS for specific processing conditions. Apply standard troubleshooting: verify drying, check melt temp vs recommended range, evaluate mold temp, review fill pattern.',
 };
 
@@ -196,7 +196,7 @@ export const HYGROSCOPICITY_GUARD = `[흡습성 정확성 — 반드시 준수]
 // 프롬프트 버전 — FIXED_FRAMEWORK·VISUAL_DIFFERENTIAL·HYGROSCOPICITY_GUARD 등
 // 모델 입력에 들어가는 지시문이 바뀔 때마다 bump한다. 진단 레코드에 기록되어
 // "어느 프롬프트로 나온 답인가"를 사후 추적하는 근거가 된다.
-export const PROMPT_VERSION = 'v21f';
+export const PROMPT_VERSION = 'v21g';
 
 // client_id·session_id 형식 검증(call-interruption-data-loss-fix-v1 Part A) —
 // lib/history-sync.ts의 동명 정규식과 동일 패턴 유지.

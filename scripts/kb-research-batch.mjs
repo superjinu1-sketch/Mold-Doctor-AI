@@ -76,9 +76,10 @@ function loadResin(name) {
   return { block, line: line.trim() };
 }
 
-// custom_id 규칙(^[a-zA-Z0-9_-]{1,64}$)에 맞게 수지명을 바꾼다. "PMMA(아크릴)" → resin_PMMA, "PC/PBT" → resin_PC-PBT
+// custom_id 규칙(^[a-zA-Z0-9_-]{1,64}$)에 맞게 수지명을 바꾼다. "PMMA(아크릴)" → resin_PMMA, "PC/PBT" → resin_PC-PBT,
+// "PE(LDPE)" → resin_PE-LDPE (괄호 안이 영문이면 남긴다: PE(LDPE)·PE(LLDPE)가 같은 파일로 덮어쓰던 버그 수정).
 function resinCustomId(name) {
-  return 'resin_' + name.replace(/\(.*?\)/g, '').replace(/\//g, '-').replace(/[^A-Za-z0-9_-]/g, '');
+  return 'resin_' + name.replace(/\(([^)]*)\)/g, (_, inner) => (/^[A-Za-z0-9]+$/.test(inner) ? `-${inner}` : '')).replace(/\//g, '-').replace(/[^A-Za-z0-9_-]/g, '');
 }
 
 function buildResinPrompt(name, src, skillText) {
