@@ -4,7 +4,7 @@
 // 수정 순서: taxonomy.md → 이 파일 → KB_VERSION bump → eval 회귀.
 import type { ResinSpec } from './resin-kb';
 
-export const KB_VERSION = 'defect-kb-v1.22';
+export const KB_VERSION = 'defect-kb-v1.23';
 
 export type Cause = {
   rank: number;
@@ -376,6 +376,7 @@ export const DEFECT_KB: Record<string, DefectNode> = {
     patternHints: {
       '성형조건(보압·배압·온도·속도) 다 조정해도 무효 + 두꺼운부 + 낮밤 간헐': '공정 원인 아님 → 환경 온도드리프트·설비(스크류/노즐후퇴)·금형(코어측 벤트/오버플로우) 하드웨어 우선. 성형조건 미세조정 반복은 함정.',
       '대형기·고점도(PMMA 등)인데 배럴온도 수지 권장 하한 근처': '배럴온도 충분히 확보(수지 권장범위 상단). 과저 시 두꺼운부 충전·탈기 불리 → 보이드 가중.',
+      '가열 시 부풂 + 서크백(감압·노즐후퇴)을 늘린 뒤 발생·급증': '공기 흡입 가스 포켓 → rank5 감압 축소(드룰 방지 최소값)가 1순위. 진공 보이드가 아니므로 보압·보압시간 상향은 권하지 말 것(phase=material). 실끌림 대책은 감압 증량 대신 노즐온도↓·밸브게이트 점검.',
     },
     priorityLogic: '조건무효 시 공정 미세조정에 머물지 말고 환경(온도 드리프트)·설비(스크류·노즐후퇴)·금형(벤트/오버플로우) 하드웨어 축으로 전환. 단 보압부족(rank1)·수분(rank2) 기본 단서가 명확하면 그대로 우선.',
     sharedGates: [],
