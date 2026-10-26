@@ -132,7 +132,11 @@
 }
 
 /* ─── Base ───────────────────────────────────────────────────────────────── */
-html { -webkit-tap-highlight-color: transparent; }
+html {
+  -webkit-tap-highlight-color: transparent;
+  /* 고정 내비(h-14 = 56px + 상단 안전영역) 아래로 scrollIntoView 대상이 가려지지 않게 */
+  scroll-padding-top: calc(56px + env(safe-area-inset-top, var(--safe-area-inset-top, 0px)) + 8px);
+}
 /* 영어 사용자 첫 화면: 정적 HTML의 한국어가 보였다 바뀌지 않도록 en 렌더까지 가림(layout.tsx·LocaleContext) */
 html[data-locale-pending] body { visibility: hidden; }
 

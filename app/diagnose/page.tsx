@@ -1505,12 +1505,12 @@ function DiagnoseContent() {
               </div>
             )}
             {classifyError && (
-              <div className="mb-2 text-[length:var(--text-label)] font-medium text-warn bg-[var(--warn-bg)] border border-[var(--warn-border)] rounded-lg px-3 py-1.5">
+              <div className="mb-2 text-[length:var(--text-body)] font-medium text-warn bg-[var(--warn-bg)] border border-[var(--warn-border)] rounded-lg px-3 py-1.5">
                 {t('step1.classify_error')}
               </div>
             )}
             {classifyNeedsLogin && (
-              <div className="mb-2 flex flex-wrap items-center justify-between gap-x-3 text-[length:var(--text-label)] font-medium text-brand-ink bg-brand-tint border border-[var(--brand-border)] rounded-lg px-3 py-1">
+              <div className="mb-2 flex flex-wrap items-center justify-between gap-x-3 text-[length:var(--text-body)] font-medium text-brand-ink bg-brand-tint border border-[var(--brand-border)] rounded-lg px-3 py-1">
                 <span className="py-1.5">{t('step1.classify_login')}</span>
                 <button type="button" onClick={openLogin} className="font-bold underline underline-offset-2 min-h-[var(--touch-min)] shrink-0">
                   {t('auth.login')}
@@ -2249,7 +2249,7 @@ function DiagnoseContent() {
                     </label>
                     {action.done && (
                       <select
-                        className="mt-2 ml-9 text-base border border-border rounded-lg px-3 py-2.5 bg-surface-sunken text-ink min-h-[44px] w-full"
+                        className="mt-2 ml-9 text-base border border-border rounded-lg px-3 py-2.5 bg-surface-sunken text-ink min-h-[44px] w-[calc(100%-2.25rem)]"
                         value={action.result}
                         onChange={(e) => setFollowUpActions(prev => prev.map((a, j) => j === i ? { ...a, result: e.target.value } : a))}
                       >
@@ -2326,7 +2326,7 @@ function DiagnoseContent() {
 
             {/* Settings hint */}
             <div className="bg-surface-sunken rounded-xl p-3 border border-border">
-              <p className="text-[length:var(--text-label)] text-faint font-medium">{t('followup.settings_hint')}</p>
+              <p className="text-[length:var(--text-body)] text-muted font-medium">{t('followup.settings_hint')}</p>
             </div>
 
             <div className="flex gap-3">

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { useLocale } from '@/contexts/LocaleContext';
 import { useAuth } from '@/contexts/AuthContext';
@@ -92,6 +92,11 @@ export default function PricingPage() {
   const [purchasingId, setPurchasingId] = useState<string | null>(null);
   const [creditingId, setCreditingId] = useState<string | null>(null);
   const [purchaseMsg, setPurchaseMsg] = useState<{ tone: 'ok' | 'warn'; text: string } | null>(null);
+  // 구매 결과 문구는 팩 목록 아래에 그려져 375px에서 안 보인다 → 생기면 화면 가운데로 스크롤(ui-audit P1-5).
+  const purchaseMsgRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (purchaseMsg) purchaseMsgRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }, [purchaseMsg]);
   // 정적 export 프리렌더 시점엔 네이티브 브릿지가 없어 native=false가 고착될 수 있음 — 마운트 후 재평가로 흡수(웹은 항상 false 유지).
   const [native, setNative] = useState(false);
   useEffect(() => { setNative(isNativeApp()); }, []);
@@ -246,6 +251,8 @@ export default function PricingPage() {
           {native ? (
             purchaseMsg && (
               <div
+                ref={purchaseMsgRef}
+                role="status"
                 className={`mt-6 rounded-2xl border p-4 text-center max-w-2xl mx-auto text-sm font-medium ${
                   purchaseMsg.tone === 'ok'
                     ? 'bg-[var(--ok-bg)] border-[var(--ok-border)] text-ok'

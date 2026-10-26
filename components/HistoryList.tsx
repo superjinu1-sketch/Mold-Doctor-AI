@@ -46,8 +46,9 @@ function ResolvedBadge({ resolved, t }: { resolved?: boolean | string; t: (k: st
 }
 
 function rankAccent(rank: number) {
-  if (rank === 1) return { num: 'bg-danger text-on-brand', pct: 'text-danger', bar: 'bg-danger' };
-  if (rank === 2) return { num: 'bg-warn text-on-brand', pct: 'text-warn', bar: 'bg-warn' };
+  // 순위는 심각도가 아니다 — 위험·주의 색 대신 브랜드 농도(결과 패널 원인 순위와 동일 규칙).
+  if (rank === 1) return { num: 'bg-brand text-on-brand', pct: 'text-ink', bar: 'bg-brand' };
+  if (rank === 2) return { num: 'bg-brand-tint text-brand-ink', pct: 'text-muted', bar: 'bg-[var(--brand-border)]' };
   return { num: 'bg-[var(--border-strong)] text-ink', pct: 'text-muted', bar: 'bg-[var(--border-strong)]' };
 }
 

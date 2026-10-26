@@ -276,7 +276,7 @@ export const en: Record<string, string> = {
   'step3.camera_hint': 'Click · drag · Ctrl+V · camera · auto-fills 19 fields',
   'step3.camera_hint_mobile': 'Snap the settings sheet or pick from your album · auto-fills 19 fields',
   'step3.camera_loading': 'Reading settings...',
-  'step3.extracted_hint': 'Green border = auto-filled · Edit to clear highlight',
+  'step3.extracted_hint': 'Blue fields = auto-filled · Edit to clear highlight',
   'step3.temp_label': 'Melt Temperature (℃)',
   'step3.nozzle': 'Nozzle',
   'step3.zone1': 'Zone1',

@@ -34,6 +34,8 @@ export default function HelpWidget() {
   const [native, setNative] = useState(false);
   useEffect(() => { setNative(isNativeApp()); }, []);
   const liftForStickyCta = pathname === '/' && !user && !native;
+  // /account 하단 sticky '새로 추정'·/ledger 선택 내보내기 바와 겹치지 않게 안전영역까지 더해 올린다(ui-audit 2026-10-26 P1-3).
+  const liftForBottomBar = !!pathname && (pathname.startsWith('/account') || pathname.startsWith('/ledger'));
 
   useEffect(() => {
     listRef.current?.scrollTo({ top: listRef.current.scrollHeight, behavior: 'smooth' });
@@ -81,7 +83,7 @@ export default function HelpWidget() {
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className={`fixed right-4 z-40 flex items-center gap-2 min-h-[var(--touch-cta)] px-4 rounded-full bg-brand text-on-brand font-semibold text-body shadow-lg hover:bg-brand-ink transition-colors ${liftForStickyCta ? 'bottom-24' : 'bottom-5'}`}
+        className={`fixed right-4 z-40 flex items-center gap-2 min-h-[var(--touch-cta)] px-4 rounded-full bg-brand text-on-brand font-semibold text-body shadow-lg hover:bg-brand-ink transition-colors ${liftForBottomBar ? 'bottom-[calc(6rem+env(safe-area-inset-bottom,var(--safe-area-inset-bottom,0px)))]' : liftForStickyCta ? 'bottom-24' : 'bottom-5'}`}
         aria-label={t('help.fab')}
       >
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">

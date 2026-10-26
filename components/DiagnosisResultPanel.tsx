@@ -298,7 +298,7 @@ function ChatSection({
           </div>
         )}
         {hardBlocked ? (
-          <div className="text-center text-[length:var(--text-body)] text-faint py-2">
+          <div className="text-center text-[length:var(--text-body)] text-muted py-2">
             {t('chat.followup_hardcap')}
           </div>
         ) : (
@@ -508,7 +508,7 @@ export default function DiagnosisResultPanel({ result, onSavePDF, round = 1, fol
           {t('fallback.unreadable_body')}<br />
           {t('fallback.unreadable_detail')}
         </p>
-        <p className="text-faint text-[length:var(--text-body)]">{summary}</p>
+        <p className="text-muted text-[length:var(--text-body)]">{summary}</p>
         <button type="button" onClick={() => (onRetryInput ? onRetryInput(1) : onResolved?.())}
           className="mx-auto mt-2 flex items-center gap-2 bg-[var(--warn-bg)] hover:bg-[var(--warn-bg)] text-warn border border-[var(--warn-border)] px-5 py-3 rounded-xl text-base font-bold transition-colors min-h-[var(--touch-cta)]">
           {t('fallback.unreadable_btn')}
@@ -526,7 +526,7 @@ export default function DiagnosisResultPanel({ result, onSavePDF, round = 1, fol
         <p className="text-muted text-base leading-relaxed">
           {t('fallback.nodefect_body')}
         </p>
-        <p className="text-faint text-[length:var(--text-body)]">{summary}</p>
+        <p className="text-muted text-[length:var(--text-body)]">{summary}</p>
         <button type="button" onClick={() => (onRetryInput ? onRetryInput(1) : onResolved?.())}
           className="mx-auto mt-2 flex items-center gap-2 bg-brand-tint hover:bg-brand-tint text-brand-ink border border-[var(--brand-border)] px-5 py-3 rounded-xl text-base font-bold transition-colors min-h-[var(--touch-cta)]">
           {t('fallback.nodefect_btn')}
@@ -727,26 +727,11 @@ export default function DiagnosisResultPanel({ result, onSavePDF, round = 1, fol
             {t('summary.pdf_btn')}
           </button>
         </div>
-        <p className="text-muted text-base leading-relaxed bg-surface-sunken rounded-lg p-4 max-w-[68ch]">{summary}</p>
-        <p className="mt-3 text-faint text-[length:var(--text-label)] leading-relaxed max-w-[68ch]">{t('result.ai_guide_disclaimer')}</p>
-
-        {/* 분석한 불량 사진 (신선=업로드 / 복원=beforePhoto 1장). 값 없으면 미표시 */}
-        {defectPhotos.length > 0 && (
-          <div className="mt-3">
-            <div className="text-[length:var(--text-label)] font-bold text-brand-ink mb-1.5">{locale === 'en' ? 'Analyzed defect photo' : '분석한 불량 사진'}</div>
-            <div className="flex gap-2 flex-wrap">
-              {defectPhotos.slice(0, 4).map((p, i) => (
-                <img key={i} src={p.startsWith('data:') ? p : `data:image/jpeg;base64,${p}`} alt="" className="w-24 h-24 object-cover rounded-lg border border-border" />
-              ))}
-            </div>
-          </div>
-        )}
-
         {/* 결론: 원인 1줄 (한눈) */}
         {topCause && (
-          <div className="mt-4">
+          <div>
             <div className="text-xs font-bold text-faint uppercase tracking-wider mb-1">{t('conclusion.cause')}</div>
-            <p className="text-[length:var(--text-h2)] font-bold text-ink leading-snug">{topCause}</p>
+            <p className="text-[length:var(--text-subhead)] font-bold text-ink leading-snug">{topCause}</p>
           </div>
         )}
 
@@ -776,7 +761,22 @@ export default function DiagnosisResultPanel({ result, onSavePDF, round = 1, fol
                   </div>
                 );
               })}
-              {topActions.length > 1 && <p className="text-[length:var(--text-label)] text-faint">{t('conclusion.one_at_a_time')}</p>}
+              {topActions.length > 1 && <p className="text-[length:var(--text-body)] text-muted">{t('conclusion.one_at_a_time')}</p>}
+            </div>
+          </div>
+        )}
+
+        <p className="mt-4 text-muted text-base leading-relaxed bg-surface-sunken rounded-lg p-4 max-w-[68ch]">{summary}</p>
+        <p className="mt-3 text-faint text-[length:var(--text-label)] leading-relaxed max-w-[68ch]">{t('result.ai_guide_disclaimer')}</p>
+
+        {/* 분석한 불량 사진 (신선=업로드 / 복원=beforePhoto 1장). 값 없으면 미표시 */}
+        {defectPhotos.length > 0 && (
+          <div className="mt-3">
+            <div className="text-[length:var(--text-label)] font-bold text-brand-ink mb-1.5">{locale === 'en' ? 'Analyzed defect photo' : '분석한 불량 사진'}</div>
+            <div className="flex gap-2 flex-wrap">
+              {defectPhotos.slice(0, 4).map((p, i) => (
+                <img key={i} src={p.startsWith('data:') ? p : `data:image/jpeg;base64,${p}`} alt="" className="w-24 h-24 object-cover rounded-lg border border-border" />
+              ))}
             </div>
           </div>
         )}
@@ -1019,17 +1019,13 @@ export default function DiagnosisResultPanel({ result, onSavePDF, round = 1, fol
                 <h3 className="text-sm font-bold text-ink mb-2">{t('top5.title')}</h3>
                 <div className="space-y-3">
                   {result.top5_actions.map((item) => {
-                    const colors = [
-                      { ring: 'bg-danger', badge: 'bg-danger/20 text-danger border-[var(--danger-border)]' },
-                      { ring: 'bg-warn', badge: 'bg-warn/20 text-warn border-[var(--warn-border)]' },
-                      { ring: 'bg-warn', badge: 'bg-warn/20 text-warn border-[var(--warn-border)]' },
-                      { ring: 'bg-brand', badge: 'bg-brand-tint text-brand-ink border-[var(--brand-border)]' },
-                      { ring: 'bg-surface-sunken', badge: 'bg-surface-sunken text-faint border-border' },
-                    ];
-                    const c = colors[(item.step - 1) % colors.length];
+                    // 순서는 심각도가 아니므로 위험·주의 색을 쓰지 않는다(10/21 원인 순위와 같은 규칙, ui-audit P1-4).
+                    const c = item.step === 1
+                      ? { ring: 'bg-brand text-on-brand', badge: 'bg-surface-sunken text-ink border-[var(--brand-border)]' }
+                      : { ring: 'bg-brand-tint text-brand-ink', badge: 'bg-surface-sunken text-ink border-border' };
                     return (
                       <div key={item.step} className={`flex gap-3 p-3 rounded-xl border ${c.badge}`}>
-                        <div className={`shrink-0 w-7 h-7 rounded-full ${c.ring} flex items-center justify-center text-ink text-sm font-bold`}>
+                        <div className={`shrink-0 w-7 h-7 rounded-full ${c.ring} flex items-center justify-center text-sm font-bold`}>
                           {item.step}
                         </div>
                         <div className="flex-1 min-w-0">

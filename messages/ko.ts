@@ -277,7 +277,7 @@ export const ko: Record<string, string> = {
   'step3.camera_hint': '클릭·드래그·Ctrl+V·카메라 · 19개 항목 자동 채움',
   'step3.camera_hint_mobile': '조건표를 찍거나 앨범에서 선택 · 19개 항목 자동 채움',
   'step3.camera_loading': '세팅값 읽는 중...',
-  'step3.extracted_hint': '초록 테두리 항목 = 자동 입력됨 · 수정하면 표시 사라짐',
+  'step3.extracted_hint': '파란 칸 = 자동 입력됨 · 수정하면 표시 사라짐',
   'step3.temp_label': '사출 온도 (℃)',
   'step3.nozzle': '노즐',
   'step3.zone1': 'Zone1',
