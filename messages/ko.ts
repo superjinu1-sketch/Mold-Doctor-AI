@@ -223,6 +223,17 @@ export const ko: Record<string, string> = {
   'step1.desc_label': '불량 상황 설명 (선택)',
   'step1.desc_placeholder': '예: 5샷에 1번꼴로 발생, 특정 부위에서만, 오후에 심해짐, 조건 바꿔도 안 됨...',
   'step1.desc_hint': '상세하게 작성할수록 정확한 추정이 가능합니다',
+  'step1.desc_chips_label': '누르면 추가돼요:',
+  'step1.desc_chip_1': '5샷 중 1샷꼴',
+  'step1.desc_chip_2': '게이트 근처',
+  'step1.desc_chip_3': '충전 끝부분',
+  'step1.desc_chip_4': '오후에 심해짐',
+  'step1.desc_chip_5': '새 로트 바꾼 뒤부터',
+  'step1.desc_chip_6': '조건 바꿔봤지만 그대로',
+  'nudge.outcome_title': '지난 추정은 어떻게 됐나요?',
+  'nudge.outcome_thanks': '기록했습니다. 해결 조건은 기록에서 작업표준으로 저장할 수 있어요.',
+  'nudge.outcome_open_record': '기록 보기',
+  'nudge.outcome_later': '나중에',
 
   /* STEP 2a: Resin */
   'step2.title': '수지 정보',

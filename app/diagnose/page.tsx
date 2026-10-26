@@ -19,6 +19,7 @@ import { IconClipboard, IconCamera } from '@/components/icons';
 import { SAMPLE_CASES } from '@/lib/sampleCase';
 import { useCoarsePointer } from '@/lib/useCoarsePointer';
 import { requestInAppReviewIfEligible } from '@/lib/inAppReview';
+import OutcomeNudge from '@/components/OutcomeNudge';
 import { getGuideDefectById } from '@/lib/defectGuide';
 import { setAuthReturn } from '@/lib/authReturn';
 
@@ -1437,6 +1438,8 @@ function DiagnoseContent() {
         </div>
       </div>
 
+      {!result && <div className="mb-4"><OutcomeNudge /></div>}
+
       <div className={`space-y-4 ${!result ? 'pb-28' : ''}`}>
         {/* STEP 1: Defect Info */}
         <FormSection step={1} title={t('step1.title')} open={openSection === 1}
@@ -1593,6 +1596,23 @@ function DiagnoseContent() {
               value={defectDescription}
               onChange={(e) => setDefectDescription(e.target.value)}
             />
+            {/* 설명 빠른 입력(2026-10-26): 영어 추정 5건 중 3건이 설명 없이 제출됨 → 탭 한 번으로 핵심 단서 추가 */}
+            <div className="mt-2 flex flex-wrap items-center gap-2">
+              <span className="text-[length:var(--text-label)] text-faint">{t('step1.desc_chips_label')}</span>
+              {[1, 2, 3, 4, 5, 6].map((n) => {
+                const phrase = t(`step1.desc_chip_${n}`);
+                return (
+                  <button
+                    key={n}
+                    type="button"
+                    onClick={() => setDefectDescription(prev => (prev.includes(phrase) ? prev : (prev.trim() ? `${prev.trim()}, ${phrase}` : phrase)))}
+                    className="min-h-[var(--touch-min)] px-3 rounded-full border border-border bg-surface-sunken text-muted text-[length:var(--text-body)] hover:border-[var(--brand-border)] hover:bg-brand-tint hover:text-brand-ink transition-colors"
+                  >
+                    + {phrase}
+                  </button>
+                );
+              })}
+            </div>
             <p className="mt-1.5 text-[length:var(--text-label)] text-faint">{t('step1.desc_hint')}</p>
           </div>
         </FormSection>

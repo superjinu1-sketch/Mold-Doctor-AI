@@ -222,6 +222,17 @@ export const en: Record<string, string> = {
   'step1.desc_label': 'Defect Description (optional)',
   'step1.desc_placeholder': 'e.g. 1 in 5 shots, specific location, worsens in afternoon, persists despite condition changes...',
   'step1.desc_hint': 'More detail leads to more accurate analysis',
+  'step1.desc_chips_label': 'Tap to add:',
+  'step1.desc_chip_1': 'About 1 in 5 shots',
+  'step1.desc_chip_2': 'Near the gate',
+  'step1.desc_chip_3': 'At the end of fill',
+  'step1.desc_chip_4': 'Worse in the afternoon',
+  'step1.desc_chip_5': 'Started with a new resin lot',
+  'step1.desc_chip_6': 'Already tried changing settings, no change',
+  'nudge.outcome_title': 'How did your last estimate turn out?',
+  'nudge.outcome_thanks': 'Saved. You can turn the settings that worked into a work standard from your records.',
+  'nudge.outcome_open_record': 'Open records',
+  'nudge.outcome_later': 'Later',
 
   /* STEP 2a: Resin */
   'step2.title': 'Resin Information',
