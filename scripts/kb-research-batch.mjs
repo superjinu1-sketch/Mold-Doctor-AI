@@ -9,6 +9,7 @@
 //
 // 사용:
 //   node scripts/kb-research-batch.mjs submit --nodes black_specks,warpage --budget 10
+//   node scripts/kb-research-batch.mjs submit --resins PPS,PET --budget 10   (수지 항목 검증 모드)
 //   node scripts/kb-research-batch.mjs collect --batch <batch_id>
 import { readFileSync, writeFileSync, existsSync, mkdirSync } from 'fs';
 import { join, dirname } from 'path';
@@ -62,6 +63,48 @@ function loadNodes() {
   return { version, nodes };
 }
 
+// 수지 모드: lib/resin-kb.ts 항목 블록 + route.ts resinKnowledge 한 줄을 함께 잘라 두 출처의 일치도 검사한다.
+function loadResin(name) {
+  const kb = readFileSync(join(root, 'lib/resin-kb.ts'), 'utf-8');
+  const re = /^ {2}'([^']+)': \{ id:/gm;
+  const marks = [...kb.matchAll(re)].map(m => ({ id: m[1], at: m.index }));
+  const i = marks.findIndex(m => m.id === name);
+  if (i < 0) return null;
+  const block = kb.slice(marks[i].at, i + 1 < marks.length ? marks[i + 1].at : kb.length).trim();
+  const route = readFileSync(join(root, 'app/api/diagnose/route.ts'), 'utf-8');
+  const line = route.split('\n').find(l => l.trimStart().startsWith(`'${name}': '`)) || '(route.ts resinKnowledge 항목 없음)';
+  return { block, line: line.trim() };
+}
+
+// custom_id 규칙(^[a-zA-Z0-9_-]{1,64}$)에 맞게 수지명을 바꾼다. "PMMA(아크릴)" → resin_PMMA, "PC/PBT" → resin_PC-PBT
+function resinCustomId(name) {
+  return 'resin_' + name.replace(/\(.*?\)/g, '').replace(/\//g, '-').replace(/[^A-Za-z0-9_-]/g, '');
+}
+
+function buildResinPrompt(name, src, skillText) {
+  return [
+    `아래 절차서(kb-researcher 스킬)의 증거 규율을 그대로 따르되, 대상은 불량 노드가 아니라 수지 항목 \`${name}\` 이다.`,
+    '이 수지의 성형 조건 수치를 공급사 1차 자료(데이터시트·가공 가이드)로 검증한 검토용 후보 리포트 한 장을 작성하라.',
+    '',
+    '<procedure>', skillText, '</procedure>', '',
+    '<resin_kb_entry file="lib/resin-kb.ts">', src.block, '</resin_kb_entry>',
+    '<prompt_knowledge file="app/api/diagnose/route.ts resinKnowledge">', src.line, '</prompt_knowledge>', '',
+    '검증 대상(있는 것만): 건조 온도·시간·목표 수분, 용융(실린더) 온도 범위, 분해 온도, 금형온도(GF 포함), 수축률, 결정성 여부, 흡습성 등급, notes 안의 수치.',
+    '리포트 구성:',
+    '- §0 무료 검사: resin-kb 항목과 route.ts 문장 사이의 불일치, 항목 내부 모순, 단위 의심(°F/°C 등).',
+    '- §1 주장별 판정 표: 주장 | 현재 값(어느 파일) | 출처별 값(공급사명·문서명·URL, 페치 확인 여부) | 판정(지지/충돌/확인불가) | 제안 값.',
+    '  범용 수지는 대표 공급사 2곳 이상을 비교하고, 그레이드별 차이가 크면 "범위로 둘 것"을 제안한다.',
+    '- §2 종합 제안: confidence 제안(verified 승격 가능 여부), sourceRefs 초안, 수정 제안(오정정 방지: 1차 자료 2곳 이상 일치할 때만 수치 변경 제안).',
+    '- §3 확인 불가 항목.',
+    '',
+    '실행 조건:',
+    `- 웹 검색은 최대 ${MAX_SEARCHES}회, 웹 페치는 최대 ${MAX_FETCHES}회.`,
+    '- 페치로 실제 열어 확인하지 못한 출처는 "NOT verified"로 표기한다. DOI·서지정보·수치를 지어내지 않는다.',
+    '- 너는 파일을 쓸 수 없다. 마크다운 리포트 본문만 최종 답으로 출력하라.',
+    `- 리포트 날짜는 ${new Date().toISOString().slice(0, 10)}. 최상단 인용 블록에 "생성: API 배치(미검토 후보), 수지 모드" 한 줄을 추가하라.`,
+  ].join('\n');
+}
+
 function buildPrompt(nodeId, nodeText, kbVersion, skillText) {
   return [
     `아래 절차서(kb-researcher 스킬)를 그대로 따라 defect-kb 노드 \`${nodeId}\` 의 검토용 후보 리포트 한 장을 작성하라.`,
@@ -97,9 +140,10 @@ function costOf(usage) {
 }
 
 async function submit(client) {
-  const ids = (arg('nodes') || '').split(',').map(s => s.trim()).filter(Boolean);
+  const resinNames = (arg('resins') || '').split(',').map(s => s.trim()).filter(Boolean);
+  const ids = resinNames.length ? resinNames : (arg('nodes') || '').split(',').map(s => s.trim()).filter(Boolean);
   const budget = Number(arg('budget', '0'));
-  if (!ids.length) throw new Error('--nodes 필요');
+  if (!ids.length) throw new Error('--nodes 또는 --resins 필요');
   if (!(budget > 0)) throw new Error('--budget(USD) 필요');
 
   const worst = ids.length * WORST_CASE_PER_NODE_USD;
@@ -108,12 +152,21 @@ async function submit(client) {
   }
 
   const { version, nodes } = loadNodes();
-  const missing = ids.filter(id => !nodes[id]);
-  if (missing.length) throw new Error(`KB에 없는 노드: ${missing.join(', ')}`);
   const skillText = readFileSync(join(root, '.claude/skills/kb-researcher/SKILL.md'), 'utf-8');
+  let prompts;
+  if (resinNames.length) {
+    const srcs = Object.fromEntries(ids.map(n => [n, loadResin(n)]));
+    const missing = ids.filter(n => !srcs[n]);
+    if (missing.length) throw new Error(`resin-kb에 없는 수지: ${missing.join(', ')}`);
+    prompts = ids.map(n => ({ cid: resinCustomId(n), text: buildResinPrompt(n, srcs[n], skillText) }));
+  } else {
+    const missing = ids.filter(id => !nodes[id]);
+    if (missing.length) throw new Error(`KB에 없는 노드: ${missing.join(', ')}`);
+    prompts = ids.map(id => ({ cid: id, text: buildPrompt(id, nodes[id], version, skillText) }));
+  }
 
-  const requests = ids.map(id => ({
-    custom_id: id,
+  const requests = prompts.map(({ cid, text }) => ({
+    custom_id: cid,
     params: {
       model: MODEL,
       max_tokens: MAX_OUTPUT_TOKENS,
@@ -123,7 +176,7 @@ async function submit(client) {
         { type: 'web_search_20260209', name: 'web_search', max_uses: MAX_SEARCHES },
         { type: 'web_fetch_20260209', name: 'web_fetch', max_uses: MAX_FETCHES, max_content_tokens: MAX_FETCH_TOKENS },
       ],
-      messages: [{ role: 'user', content: buildPrompt(id, nodes[id], version, skillText) }],
+      messages: [{ role: 'user', content: text }],
     },
   }));
 
