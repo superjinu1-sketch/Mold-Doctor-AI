@@ -9,6 +9,7 @@ import { getSampleDemo } from '@/lib/sample-demo';
 import { matchesSampleCase } from '@/lib/sampleCase';
 import { reportError } from '@/lib/observability/server';
 import { checkMinVersion } from '@/lib/appVersionGate';
+import { clientPlatform } from '@/lib/clientPlatform';
 
 // JSON 문자열 값 안의 실제 줄바꿈을 공백으로 치환 (문자 단위 파싱)
 function sanitizeJsonNewlines(text: string): string {
@@ -1276,6 +1277,16 @@ CRITICAL: Your entire response must be ONLY the JSON object. No text before or a
         await supabaseAdmin.from('diagnosis_records').upsert(row, { onConflict: 'user_id,client_id' });
       } catch (e) {
         reportError('diagnose.saveRecord', e);
+      }
+      // 플랫폼은 위 row와 따로 적는다. 컬럼(0016 마이그레이션)이 아직 없으면 이 갱신만 실패하고
+      // 기록 저장은 그대로 된다. 클라 upsert는 이 컬럼을 보내지 않으므로 덮어쓰지 않는다.
+      try {
+        const { error: platErr } = await supabaseAdmin.from('diagnosis_records')
+          .update({ client_platform: clientPlatform(request) })
+          .eq('user_id', userId).eq('client_id', body.client_id);
+        if (platErr) console.warn('[diagnose.platform]', platErr.message);
+      } catch (e) {
+        console.warn('[diagnose.platform]', e);
       }
     }
 

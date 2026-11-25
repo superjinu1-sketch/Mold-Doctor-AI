@@ -17,6 +17,7 @@ import { saveDiagnosisRecord, updateResolution, type HistoryRecord } from '@/lib
 import { replaceDraftPhotos, loadDraftPhotos, clearDraftPhotos } from '@/lib/draftPhotoStore';
 import { IconClipboard, IconCamera } from '@/components/icons';
 import { SAMPLE_CASES } from '@/lib/sampleCase';
+import { checkUnits, type UnitIssue } from '@/lib/unitCheck';
 import { useCoarsePointer } from '@/lib/useCoarsePointer';
 import { requestInAppReviewIfEligible } from '@/lib/inAppReview';
 import OutcomeNudge from '@/components/OutcomeNudge';
@@ -276,7 +277,7 @@ function DiagnoseContent() {
     // 압력 단위도 기억한다. 잊고 기본값(bar)으로 두면 1800 psi가 1800 bar로 들어간다(재평가 Mike).
     try {
       const pu = localStorage.getItem('molddoctor_pressure_unit');
-      if (pu === 'bar' || pu === 'MPa' || pu === 'psi') setSettings(prev => (prev.pressureUnit ? { ...prev, pressureUnit: pu } : prev));
+      if (pu === 'bar' || pu === 'MPa' || pu === 'psi' || pu === 'kgf/cm2') setSettings(prev => (prev.pressureUnit ? { ...prev, pressureUnit: pu } : prev));
     } catch { /* ignore */ }
   }, []);
   const setTempUnit = (u: 'C' | 'F') => {
@@ -309,7 +310,8 @@ function DiagnoseContent() {
   // 유료 추정 직전 입력 점검(estimate-reliability-audit): 예시 세팅값이 그대로 남았거나(실측 21건 중 4건),
   // 세팅값이 하나도 없으면(21건 중 6건) 크레딧을 쓰기 전에 화면 안에서 한 번 알린다.
   const [sampleSettingsSnap, setSampleSettingsSnap] = useState<string | null>(null);
-  const [preflightWarn, setPreflightWarn] = useState<'sample' | 'empty' | null>(null);
+  const [preflightWarn, setPreflightWarn] = useState<'sample' | 'empty' | 'units' | null>(null);
+  const [unitIssues, setUnitIssues] = useState<UnitIssue[]>([]);
   const preflightAcceptedRef = useRef(false);
   const preflightRef = useRef<HTMLDivElement>(null);
   // D1: /ledger 설비 상세 → "이 조건으로 AI 추정" 경로에서만 채워지는 설비 컨텍스트.
@@ -1061,6 +1063,16 @@ function DiagnoseContent() {
     });
     const isDemo = demoSnapshot !== null && currentSnapshot === demoSnapshot;
 
+    // 단위 착오 점검(모든 라운드, 로그인 확인보다 먼저: 크레딧과 무관하고 로그인 전에 바로잡는 편이 낫다). 10·11월 기록 17건 중 6건이 °F를 °C로, psi를 bar로, kgf/cm²를 MPa로 넣은 값이었다.
+    if (!isDemo && !preflightAcceptedRef.current) {
+      const issues = checkUnits(settings, tempUnit, settings.pressureUnit);
+      if (issues.length) {
+        setUnitIssues(issues);
+        setPreflightWarn('units');
+        setTimeout(() => preflightRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' }), 50);
+        return;
+      }
+    }
     if (!user && !isDemo) {
       // 구글로 바로 보내지 않고 로그인 창(구글·애플·이메일)을 연다. 로그인 후엔 이 화면으로 돌아오고,
       // 입력하던 내용은 폼 임시저장(Part B)이 복원한다.
@@ -1868,16 +1880,16 @@ function DiagnoseContent() {
                 ))}
               </div>
             </div>
-            <div className="flex items-center gap-2 mb-2">
+            <div className="flex items-center gap-2 mb-2 flex-wrap">
               <span className="text-faint text-sm">{t('step3.pressure_unit')}</span>
-              {(['bar', 'MPa', 'psi'] as const).map(u => (
+              {(['bar', 'MPa', 'kgf/cm2', 'psi'] as const).map(u => (
                 <button key={u} type="button"
                   onClick={() => { setSettings(prev => ({ ...prev, pressureUnit: u })); try { localStorage.setItem('molddoctor_pressure_unit', u); } catch { /* ignore */ } }}
                   className={`min-h-[44px] px-4 rounded-lg border text-sm font-bold transition-colors ${
                     settings.pressureUnit === u
                       ? 'bg-brand-tint text-brand-ink border-[var(--brand-border)]'
                       : 'bg-surface text-muted border-border hover:border-border-strong'}`}>
-                  {u}
+                  {u === 'kgf/cm2' ? 'kgf/cm²' : u}
                 </button>
               ))}
             </div>
@@ -2174,7 +2186,55 @@ function DiagnoseContent() {
           </div>
         </FormSection>
 
-        {preflightWarn && (
+        {preflightWarn === 'units' && (
+          <div ref={preflightRef} className="bg-[var(--warn-bg)] border border-[var(--warn-border)] rounded-xl p-4 space-y-3">
+            <p className="text-warn font-bold text-base">{t('preflight.units_title')}</p>
+            {unitIssues.map((iss, i) => {
+              const fieldLabel = 'field' in iss ? t(iss.field === 'inj' ? 'step3.inj_pressure' : iss.field === 'hold' ? 'step3.hold_pressure' : 'step3.back_pressure') : '';
+              const key = iss.kind === 'temp_f' ? 'preflight.units_temp_f' : iss.kind === 'mold_temp_f' ? 'preflight.units_mold_f' : iss.kind === 'mpa_too_high' ? 'preflight.units_mpa_high' : 'preflight.units_bar_psi';
+              const fixes: { label: string; apply: () => void }[] = iss.kind === 'temp_f' || iss.kind === 'mold_temp_f'
+                ? [{ label: t('preflight.units_to').replace('{u}', '℉'), apply: () => setTempUnit('F') }]
+                : (iss.kind === 'mpa_too_high' ? (['bar', 'kgf/cm2'] as const) : (['psi'] as const)).map(u => ({
+                    label: t('preflight.units_to').replace('{u}', u === 'kgf/cm2' ? 'kgf/cm²' : u),
+                    apply: () => { setSettings(prev => ({ ...prev, pressureUnit: u })); try { localStorage.setItem('molddoctor_pressure_unit', u); } catch { /* ignore */ } },
+                  }));
+              return (
+                <div key={i} className="space-y-2">
+                  <p className="text-muted text-body">{t(key).replace('{v}', String(iss.value)).replace('{f}', fieldLabel)}</p>
+                  <div className="flex flex-col sm:flex-row gap-2">
+                    {fixes.map(f => (
+                      <button
+                        key={f.label}
+                        type="button"
+                        onClick={() => {
+                          f.apply();
+                          // 같은 종류(온도/압력) 경고는 함께 해결된 것으로 본다. 남은 게 없으면 닫는다.
+                          const isTemp = iss.kind === 'temp_f' || iss.kind === 'mold_temp_f';
+                          const rest = unitIssues.filter(x => (x.kind === 'temp_f' || x.kind === 'mold_temp_f') !== isTemp);
+                          setUnitIssues(rest);
+                          if (!rest.length) { setPreflightWarn(null); setOpenSection(3); }
+                        }}
+                        className="ui-cta flex-1 text-body"
+                      >
+                        {f.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              );
+            })}
+            <p className="text-muted text-body">{t('preflight.units_note')}</p>
+            <button
+              type="button"
+              onClick={() => { preflightAcceptedRef.current = true; setPreflightWarn(null); void handleDiagnose(); }}
+              className="w-full min-h-[var(--touch-cta)] px-4 rounded-[var(--radius-cta)] border border-border-strong text-muted hover:text-ink font-semibold text-body transition-colors"
+            >
+              {t('preflight.continue')}
+            </button>
+          </div>
+        )}
+
+        {(preflightWarn === 'sample' || preflightWarn === 'empty') && (
           <div ref={preflightRef} className="bg-[var(--warn-bg)] border border-[var(--warn-border)] rounded-xl p-4 space-y-3">
             <p className="text-warn font-bold text-base">{t(preflightWarn === 'sample' ? 'preflight.sample_title' : 'preflight.empty_title')}</p>
             <p className="text-muted text-body">{t(preflightWarn === 'sample' ? 'preflight.sample_body' : 'preflight.empty_body')}</p>
