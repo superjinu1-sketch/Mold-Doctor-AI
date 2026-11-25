@@ -4573,5 +4573,52 @@
       "trap": null,
       "confidence": "high"
     }
+  },
+  {
+    "id": "cov-pmma-crack-sparse-input",
+    "source": "현장 실입력 2026-11 (익명화, 금형온도·건조 미입력)",
+    "title": "PMMA 크랙 — 금형온도·건조 미입력, 설명 한 줄",
+    "difficulty": "hard",
+    "description": "정보가 적은 PMMA 크랙. 수분 가수분해로 설명하거나 보압 상향을 권하면 오답.",
+    "input": {
+      "defect_type": "크랙 (Crack)",
+      "resin_type": "PMMA(아크릴)",
+      "pressure_unit": "bar",
+      "machine_settings": {
+        "nozzle_temp": 230,
+        "zone1_temp": 235,
+        "zone2_temp": 230,
+        "zone3_temp": 225,
+        "zone4_temp": 215,
+        "injection_pressure": 100,
+        "holding_pressure": 30,
+        "injection_speed_1": 15,
+        "injection_speed_2": 2,
+        "holding_time": 4,
+        "cooling_time": 22,
+        "metering": 60,
+        "cushion": 3,
+        "back_pressure": 10
+      },
+      "defect_description": "아크릴 깨짐 현상",
+      "locale": "ko"
+    },
+    "expected": {
+      "root_cause": "PMMA는 비결정성 취성 수지라 크랙은 주로 잔류응력(금형온도 부족·급랭, 게이트부 과보압), 이형 응력, 시간차로 나타나는 세정제·알코올 접촉 응력균열(ESC)에서 온다. 수분은 PMMA에서 은줄·기포의 원인이지 가수분해로 인한 취화 원인이 아니다. 금형온도가 미입력이라 실측과 크랙 위치·발생 시점 확인이 먼저다.",
+      "key_recommendations": [
+        "금형온도 실측 후 PMMA 권장 범위 안에서 상향해 잔류응력 완화",
+        "크랙 위치·발생 시점 확인(이형 직후 이젝터 주변이면 이형 조건, 시간차·세정제 접촉이면 ESC)",
+        "보압은 올리지 말고 게이트부 과보압 여부 확인(필요하면 하향)",
+        "어닐링 검토, 세정제·알코올 접촉 여부 확인"
+      ],
+      "expected_phase": "packing",
+      "phase_also_accept": [
+        "cooling",
+        "ejection"
+      ],
+      "severity": "high",
+      "trap": "PMMA 크랙을 수분 가수분해로 설명하거나, 크랙 대책으로 보압을 올리라고 권고",
+      "confidence": "medium"
+    }
   }
 ]

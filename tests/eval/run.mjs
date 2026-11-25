@@ -166,6 +166,7 @@ function buildPayload(c) {
     },
     settings,
     advSettings,
+    ...(c.input.pressure_unit ? { pressureUnit: c.input.pressure_unit } : {}),
     moldInfo: {
       moldType:   mi.mold_type || '',
       gateType:   mi.gate_type || '',

@@ -4,7 +4,7 @@
 // 수정 순서: taxonomy.md → 이 파일 → KB_VERSION bump → eval 회귀.
 import type { ResinSpec } from './resin-kb';
 
-export const KB_VERSION = 'defect-kb-v1.23';
+export const KB_VERSION = 'defect-kb-v1.24';
 
 export type Cause = {
   rank: number;
@@ -426,13 +426,13 @@ export const DEFECT_KB: Record<string, DefectNode> = {
 
   // ─── 10. Crack / Crazing (크랙/균열) ──────────────────────
   crack: {
-    id: 'crack', nameKo: '크랙/균열', nameEn: 'Crack/Crazing', phase: '보압(과보압 잔류응력)/냉각·이형(이형응력·ESC)',
+    id: 'crack', nameKo: '크랙/균열', nameEn: 'Crack/Crazing', phase: '재료(가수분해: PA·PC·PBT·PET)/보압(과보압 잔류응력)/냉각·이형(이형응력·ESC)',
     typicalSeverity: 'medium~high (파단·강도 직결·안전 시 high, 외관 미세균열 medium)',
     discriminators: '이젝터핀 주변=이젝트 크랙 / 게이트 방사상=과보압 / 웰드부=후발 / 시간차+용제노출=ESC(잔류응력).',
     causes: [
       { rank: 1, cause: '미건조/가수분해 (PA·PC·PBT·PET 최다)', category: 'Material',
         baseProbability: 35,
-        trigger: '흡습성 수지(PA·PC·PBT·PET) + 건조 조건 미흡 또는 미입력.',
+        trigger: '가수분해성 수지(PA·PC·PBT·PET) + 건조 조건 미흡 또는 미입력. 이 네 계열에만 적용한다. PMMA·PS·SAN·ABS·PP 등에서 수분은 은줄·기포의 원인일 뿐 가수분해 취화로 크랙을 만들지 않으므로 이 분기를 올리지 말고 "가수분해"라고 쓰지 않는다(건조 확인은 부가 점검으로만).',
         evidence: '건조 조건. resin-kb drying 권장 대비.',
         verification: '건조 강화 후 재시험. 수분계(Karl Fischer) 측정.',
         adjustment: '건조 규정 엄수. 재생재↓(<20~30%).' },
@@ -454,9 +454,10 @@ export const DEFECT_KB: Record<string, DefectNode> = {
       '이젝터 주변': '3순위(이젝트 크랙) 강점 분기',
       '용제 접촉': '2순위(ESC) — 잔류응력 >15MPa 의심',
       '싱크마크 해결 후 발생': '2순위(과보압) 강점 분기 — 보압↓ + 금형온도↑ 병행',
+      '투명 비결정성 취성 수지(PMMA·PS·SAN)': '잔류응력(금형온도 부족·급랭·게이트부 과보압)·이형응력(3순위)·ESC(알코올·세정제 접촉)를 우선. 금형온도가 미입력이면 실측을 첫 확인 항목으로, 크랙 위치·발생 시점(이형 직후 vs 시간차)을 함께 묻는다.',
     },
     sharedGates: [],
-    priorityLogic: '건조 조건(dryTemp·dryTime)이 resin-kb 권장 범위를 충족하면 수분(1순위) 분기를 하향하고 과보압(2순위)를 우선 검토. 홀드압이 공급사 권장 상한(PC ~75%) 초과 + 시간차 발현 + 게이트 방사상 = 잔류응력 강한 의심(편광·용제 응력시험으로 확인).',
+    priorityLogic: '크랙 대책으로 보압을 올리지 않는다(잔류응력↑로 크랙을 키운다). 셋팅 점검표의 보압/사출압 비가 통상(50~75%)보다 낮게 보이거나 압력이 유압값으로 의심돼도 마찬가지다: 크랙 원인으로 보압 부족을 들지 말고 보압 상향을 권고 목록에 넣지 않는다. 싱크·보이드 동반 여부를 묻는 정도로만 다룬다. 건조 조건(dryTemp·dryTime)이 resin-kb 권장 범위를 충족하면 수분(1순위) 분기를 하향하고 과보압(2순위)를 우선 검토. 홀드압이 공급사 권장 상한(PC ~75%) 초과 + 시간차 발현 + 게이트 방사상 = 잔류응력 강한 의심(편광·용제 응력시험으로 확인).',
     source: 'synthesis-2.4,taxonomy-10', confidence: 'estimated',
   },
 
