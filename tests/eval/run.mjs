@@ -41,8 +41,12 @@ const HOST = '127.0.0.1';
 const PASS_THRESHOLD = 70;
 const INTERVAL_MS = 6000; // rate-limit 회피 간격
 const MAX_RETRIES = 5;    // 529 overloaded 재시도 (diagnose + judge 공통)
-const JUDGE_MODEL = 'claude-haiku-4-5-20251001'; // Sonnet 대비 ~1/10 비용
-const PROMPT_VERSION = 'v21h';  // 후속 라운드 셋팅 대조·보압 비 상향 제한 / 단정어 후처리·시도 이력 강조·압력 입력단위 표시·유압 경고·GF 판정 보강 → 캐시 무효화
+// 채점 모델. 11/25부터 Sonnet 5.5(Haiku 4.5 대비 2배 단가). Haiku는 '55%→40%/25%' 감속 권고를 상향으로 오독해
+// 타이거스트라이프 2문항을 오답 처리했고, 근거 없이 후한 점수를 줬다. EVAL_JUDGE_MODEL로 다른 모델과 비교 가능.
+const JUDGE_MODEL = process.env.EVAL_JUDGE_MODEL || 'claude-sonnet-5-5';
+// Haiku 4.5는 사고(thinking) 기본 꺼짐. 5세대 모델은 adaptive 사고가 기본이라 max_tokens 여유와 effort를 준다.
+const JUDGE_OPTS = /haiku-4-5/.test(JUDGE_MODEL) ? { max_tokens: 700 } : { max_tokens: 8000, output_config: { effort: 'medium' } };
+const PROMPT_VERSION = 'v21k';  // JSON 괄호 복구·confirmed 문맥 치환·박리 phase 분리·eval 기타 직접입력 이름 전송 / 스크류 주변속도 상한·기타 직접입력 노드 매칭 / PMMA 메커니즘 / 후속 라운드 셋팅 대조·보압 비 상향 제한 / 단정어 후처리·시도 이력 강조·압력 입력단위 표시·유압 경고·GF 판정 보강 → 캐시 무효화
 const CACHE_DIR = join(ROOT, 'tests/eval/.cache');
 const CACHE_TTL_MS = 7 * 24 * 3600 * 1000; // 7일
 
@@ -152,7 +156,8 @@ function buildPayload(c) {
   };
 
   return {
-    defectType: c.input.defect_type || '',
+    // 앱은 '기타 (직접 입력)'을 고르면 사용자가 쓴 이름(customDefect)을 보낸다. 리터럴을 보내면 KB 노드가 안 붙어 앱과 달라진다.
+    defectType: (/^기타/.test(c.input.defect_type || '') && c.input.custom_defect) || c.input.defect_type || '',
     defectDescription: c.input.defect_description || '',
     resinInfo: {
       resinType:   c.input.resin_type || '',
@@ -321,11 +326,11 @@ ${isImageCase && exp.hallucination_forbidden?.length ? `- 발명 금지(도면�
 ${hasTrap ? `- 오진 함정(trap): ${exp.trap}` : ''}
 
 ## 채점 기준 (총 100점, hard trap 회피 시 +10 bonus)
-1. phase 정확 (20점): AI의 defect_phase가 정답 phase와 일치하면 만점. 위 "정답으로 인정" 목록이 있으면 그 중 하나와 일치해도 만점.
+1. phase 정확 (20점): 코드가 따로 채점한다. root cause·recommendations 점수에 phase를 섞지 마라.
 2. root cause 정확도 (40점): AI가 핵심 근본 원인을 올바르게 지목했는가 (부분 점수 가능)
 3. recommendations 적합성 (30점): AI 조치가 정답 key_recommendations와 방향이 맞는가
-4. severity 정확 (10점): high/medium/low 일치
-${hasTrap ? '5. trap 회피 보너스 (10점): AI가 오진 함정을 피했는가 (건조 탓으로 돌리지 않음 등)' : ''}
+4. severity 정확 (10점): 코드가 따로 채점한다. root cause·recommendations 점수에 severity를 섞지 마라.
+${hasTrap ? '5. trap 회피 보너스 (10점): 위 "오진 함정(trap)"에 적힌 그 오류를 AI가 저질렀으면 trap_avoided=false, 저지르지 않았으면 true. trap 문장에 적히지 않은 다른 흠은 여기서 보지 말고 2~4번에서 감점하라. AI 응답에 실제로 있는 표현만 근거로 삼아라.' : ''}
 ${isImageCase ? `\n[이미지 케이스 가중] root cause·recommendations 평가 시, 위 mold_read를 모델이 도면에서 정확히 읽어 근거로 썼는지 반영하라. 그리고 발명 금지 항목(hallucination_forbidden)을 모델이 지어냈으면 최종 score에서 15~25점 감점하라.` : ''}
 
 다음 JSON으로만 응답하라 (마크다운 없이):
@@ -344,13 +349,28 @@ trap_avoided는 hard case가 아니면 null. pass = score >= 70.`;
   try {
     const res = await withRetry(() => client.messages.create({
       model: JUDGE_MODEL,
-      max_tokens: 700,
+      ...JUDGE_OPTS,
       messages: [{ role: 'user', content: prompt }],
     }), 'judge');
-    const txt = res.content[0]?.type === 'text' ? res.content[0].text.trim() : '';
+    const txt = (res.content.find(b => b.type === 'text')?.text ?? '').trim(); // 사고 블록이 앞에 올 수 있다
     const j = JSON.parse(txt.replace(/^```json\s*/i,'').replace(/\s*```$/,''));
     const ju = res.usage;
     j._judgeUsage = { in: ju.input_tokens, out: ju.output_tokens, model: JUDGE_MODEL };
+    // phase·severity는 문자열 비교라 코드로 채점한다(11/25: judge가 허용 phase를 오답 처리, 같은 응답에 68/82로 흔들림).
+    // judge는 root cause(40)·recommendations(30)·trap만 판단. 도면/사진 문항은 발명 감점 규칙이 있어 judge 총점 유지.
+    if (!isImageCase && typeof j.root_cause_score === 'number' && typeof j.rec_score === 'number') {
+      const norm = v => String(v ?? '').trim().toLowerCase();
+      const phaseOk = [exp.expected_phase, ...(exp.phase_also_accept || [])].map(norm).includes(norm(aiResult.defect_phase));
+      const sevOk = norm(aiResult.severity) === norm(exp.severity);
+      const clamp = (v, hi) => Math.max(0, Math.min(hi, v));
+      const total = (phaseOk ? 20 : 0) + clamp(j.root_cause_score, 40) + clamp(j.rec_score, 30) + (sevOk ? 10 : 0)
+        + (hasTrap && j.trap_avoided === true ? 10 : 0);
+      j.judge_raw_score = j.score;
+      j.phase_ok = phaseOk;
+      j.severity_ok = sevOk;
+      j.score = Math.min(110, total);
+      j.pass = j.score >= PASS_THRESHOLD;
+    }
     return j;
   } catch (e) {
     return { score: 0, pass: false, reasoning: `Judge 오류: ${e.message}`, phase_ok: false, trap_avoided: null };

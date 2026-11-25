@@ -4,7 +4,7 @@
 // 수정 순서: taxonomy.md → 이 파일 → KB_VERSION bump → eval 회귀.
 import type { ResinSpec } from './resin-kb';
 
-export const KB_VERSION = 'defect-kb-v1.25';
+export const KB_VERSION = 'defect-kb-v1.28';
 
 export type Cause = {
   rank: number;
@@ -566,9 +566,9 @@ export const DEFECT_KB: Record<string, DefectNode> = {
   // ── 나머지 18종 골격 (append-friendly) ──────────────────────
 
   delamination: {
-    id: 'delamination', nameKo: '박리', nameEn: 'Delamination', phase: '재료준비',
+    id: 'delamination', nameKo: '박리', nameEn: 'Delamination', phase: '재료준비(이종수지 오염·이형제)/충전(과전단·저멜트·금형 과냉 — 원료 변경 이력이 없고 게이트 근방에 몰리면 이쪽)',
     typicalSeverity: 'medium (외관). 강도 요구 부품의 층분리 파단 우려 시 high',
-    discriminators: 'fish scale 층 분리. 손톱으로 층 벗겨짐. 은선(흰 줄)과 구분.',
+    discriminators: 'fish scale 층 분리. 손톱으로 층 벗겨짐. 은선(흰 줄)과 구분. 2차 사출(오버몰드)·인서트의 계면 접착 불량은 이 노드가 아니다 — 소재 조합의 접착 적합성·1차 기재 온도·계면 온도 축으로 본다.',
     causes: [
       { rank: 1, cause: '이종수지 오염', category: 'Material',
         trigger: '재료교체 이력. 비상용 폴리머 혼입.',
@@ -1039,16 +1039,27 @@ export const DEFECT_KB: Record<string, DefectNode> = {
 
 // ── 헬퍼 ────────────────────────────────────────────────────────
 
+const compact = (v: string) => v.toLowerCase().replace(/\s+/g, '');
+
 export function getDefect(defectType: string): DefectNode | undefined {
   if (!defectType) return undefined;
   const lower = defectType.toLowerCase();
   // 직접 id 매칭
   if (DEFECT_KB[lower]) return DEFECT_KB[lower];
-  // 영문 또는 한글 이름 포함 매칭
+  // 영문 또는 한글 이름 포함 매칭(띄어쓰기 무시: '이형불량'·'치수불안정'도 같은 노드)
+  const c = compact(defectType);
   for (const node of Object.values(DEFECT_KB)) {
-    if (lower.includes(node.nameEn.toLowerCase()) || lower.includes(node.nameKo)) {
+    if (c.includes(compact(node.nameEn)) || c.includes(compact(node.nameKo))) {
       return node;
     }
+  }
+  // '기타'에 직접 쓴 이름은 노드 이름의 한쪽만 쓰는 경우가 많다('Stringing', '광택 불균일', '기포').
+  // 이름을 '/'·'·'로 나눈 부분으로 매칭. 한 글자('버'·'휨')와 3자 이하 영문('ESC')은 오매칭 위험으로 제외.
+  for (const node of Object.values(DEFECT_KB)) {
+    const parts = [...node.nameEn.split(/[/·]/), ...node.nameKo.split(/[/·]/)]
+      .map(compact)
+      .filter(p => (/^[a-z0-9 -]+$/.test(p) ? p.length >= 4 : p.length >= 2));
+    if (parts.some(p => c.includes(p))) return node;
   }
   // 현장에서 쓰는 다른 이름(정식 이름 매칭에 안 걸리는 표현만)
   for (const [id, aliases] of Object.entries(DEFECT_ALIASES)) {
@@ -1060,6 +1071,8 @@ export function getDefect(defectType: string): DefectNode | undefined {
 const DEFECT_ALIASES: Record<string, string[]> = {
   // 앱 폼 값은 '크랙 (Crack)'인데 노드 이름은 '크랙/균열'·'Crack/Crazing'이라 이름 매칭에 안 걸렸다(6/5 v1.0부터 크랙 가이드 미주입, 11/25 발견).
   crack: ['크랙', '균열', 'crack', 'crazing'],
+  // '표면 광택 불량'처럼 노드 이름 조각과 안 겹치는 직접 입력(11/25 eval cov-pet-gf30).
+  surface_gloss: ['광택'],
   black_specks: ['검은 점', '검은점', '검정 점', '검정점', '까만 점', '까만점', 'black spot', 'black dot', 'black speck'],
 };
 

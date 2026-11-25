@@ -883,8 +883,9 @@
         "필요 시 금형 표면 폴리싱"
       ],
       "expected_phase": "cooling",
-      "phase_also_accept": ["filling"],
-      "severity": "low",
+      "phase_also_accept": ["filling", "packing"],
+      "severity": "medium",
+      "severity_note": "11/25: KB surface_gloss 노드 phase '충전/보압(표면 복제)'·typicalSeverity 'medium (외관)', 앱 심각도 기준 '외관 불량으로 선별 필요 = medium'에 맞춰 low→medium, packing 허용(정답 원인에 보압 과소 포함)",
       "trap": null
     }
   },
@@ -1428,7 +1429,7 @@
     "source": "흡습성 정확성 가드 v1 — 비결정성 오개념 타깃",
     "title": "PMMA 은줄(수분 splay) — '비결정성=흡습 강함' 오개념 가드",
     "difficulty": "hard",
-    "description": "비결정성 PMMA 은줄(잔류 수분 splay). reasoning이 '비결정질이라 흡습성이 강하다'로 오설명하는지 검사. 올바른 인과 = 에스터 극성으로 중간 흡습(PA보다 낮음) + 고온 기화/가수분해 → 건조 필수.",
+    "description": "비결정성 PMMA 은줄(잔류 수분 splay). reasoning이 '비결정질이라 흡습성이 강하다'로 오설명하는지 검사. 올바른 인과 = 에스터 극성으로 중간 흡습(PA보다 낮음) + 고온에서 잔류 수분 기화(수증기) → 건조 필수. PMMA는 수분으로 가수분해되지 않는다(공급사: 강도 영향 없음).",
     "input": {
       "defect_type": "은줄 (Silver Streak)",
       "resin_type": "PMMA",
@@ -1453,16 +1454,16 @@
       "defect_description": "투명 PMMA 렌즈커버, 게이트 기점 방사상 은색·뿌연 줄무늬. 닦아도 안 지워짐. 건조 열풍식 80℃ 2h. 노즐 245℃."
     },
     "expected": {
-      "root_cause": "PMMA 잔류 수분 splay = 은줄. PMMA는 에스터 극성으로 '중간' 정도 흡습(~0.3%, 결정성 PA ~1.5~2%보다 낮음) — 비결정성이라 흡습이 강한 게 아니다. 245℃ 성형에서 잔류 수분이 기화·가수분해되어 표면 splay. 열풍식 80℃ 2h 부족 → 제습식 80℃ 4h 재건조 필요.",
+      "root_cause": "PMMA 잔류 수분 splay = 은줄. PMMA는 에스터 극성으로 '중간' 정도 흡습(~0.3%, 결정성 PA ~1.5~2%보다 낮음) — 비결정성이라 흡습이 강한 게 아니다. 245℃ 성형에서 잔류 수분이 기화(수증기)되어 표면 splay. 가수분해는 아니다(Lucite·Kuraray: 수분은 표면 결함만, 강도 영향 없음). 열풍식 80℃ 2h 부족 → 제습식 80℃ 4h 재건조 필요.",
       "key_recommendations": [
         "제습식 건조기로 80℃ 4h 재건조(노점 확인)",
         "호퍼 투입 직전 수분율 측정",
         "1차 사출속도 소폭 하향(표면 splay 완화 보조)",
-        "건조 이유는 흡습량이 아니라 잔류 수분의 고온 기화/가수분해 때문임을 명확히"
+        "건조 이유는 흡습량이 아니라 잔류 수분의 고온 기화(수증기) 때문임을 명확히"
       ],
       "expected_phase": "material",
       "severity": "high",
-      "trap": "★ '비결정질이라 흡습성이 강하다'는 틀린 인과(본 가드 직접 타깃). PMMA 흡습은 에스터 극성에 의한 '중간' 수준으로 PA보다 낮다. 올바른 설명 = 극성기 기반 중간 흡습 + 고온 기화/가수분해 → 건조 필수. 결정도를 흡습 원인으로 들면 오진."
+      "trap": "★ '비결정질이라 흡습성이 강하다'는 틀린 인과(본 가드 직접 타깃). PMMA 흡습은 에스터 극성에 의한 '중간' 수준으로 PA보다 낮다. 올바른 설명 = 극성기 기반 중간 흡습 + 고온 기화(수증기) → 건조 필수. 결정도를 흡습 원인으로 들면 오진."
     }
   },
   {
@@ -2601,6 +2602,7 @@
     "description": "HIPS 흐름자국. 사출속도 과저 + 금형·멜트온도 하한부 = 선단 점진 고화.",
     "input": {
       "defect_type": "기타 (직접 입력)",
+      "custom_defect": "흐름자국(Flow Mark)",
       "resin_type": "PS",
       "resin_detail": "HIPS (내충격 PS)",
       "machine_settings": {
@@ -2656,6 +2658,7 @@
     "description": "HIPS 게이트 블러시. 0.8mm 핀게이트 + 90% 고속 + 금형온도 낮음.",
     "input": {
       "defect_type": "기타 (직접 입력)",
+      "custom_defect": "게이트 블러시(Gate Blush)",
       "resin_type": "PS",
       "resin_detail": "HIPS (내충격 PS)",
       "machine_settings": {
@@ -2704,6 +2707,7 @@
     "description": "HIPS 깊은 컵이 코어에 붙어 이젝터에 바닥 변형. 에어 블로우 없음, 구배 0.5°.",
     "input": {
       "defect_type": "기타 (직접 입력)",
+      "custom_defect": "이형 불량(Sticking)",
       "resin_type": "PS",
       "resin_detail": "HIPS (내충격 PS)",
       "machine_settings": {
@@ -2867,6 +2871,7 @@
     "description": "HDPE 8캐비티 핫러너 캡 게이트 실끌림. 기계 노즐 아닌 게이트에서 발생, 팁 260℃.",
     "input": {
       "defect_type": "기타 (직접 입력)",
+      "custom_defect": "Stringing",
       "resin_type": "PE(HDPE)",
       "resin_detail": "HDPE closure grade",
       "machine_settings": {
@@ -2916,6 +2921,7 @@
     "description": "HDPE 캡 외경이 오후에만 작아짐. 조건 무변경, 중앙 칠러 냉각수 온도가 오후에 상승.",
     "input": {
       "defect_type": "기타 (직접 입력)",
+      "custom_defect": "Dimensional instability",
       "resin_type": "PE(HDPE)",
       "resin_detail": "HDPE closure grade",
       "machine_settings": {
@@ -3023,6 +3029,7 @@
     "description": "쇼어 40A TPE가 경면 캐비티에 붙어 이젝터 핀에 늘어남. 금형 55℃(권장 20~50 초과).",
     "input": {
       "defect_type": "기타 (직접 입력)",
+      "custom_defect": "이형 불량(Sticking)",
       "resin_type": "TPE",
       "resin_detail": "SEBS계 TPE 쇼어 40A",
       "machine_settings": {
@@ -3071,6 +3078,7 @@
     "description": "ABS 기재 위 TPE 오버몰드 전수 박리. PP 접착용 SEBS 그레이드. 멜트·속도 상향 무효, 계면 깨끗이 분리.",
     "input": {
       "defect_type": "기타 (직접 입력)",
+      "custom_defect": "박리(접착 불량)",
       "resin_type": "TPE",
       "resin_detail": "SEBS계 범용 TPE (PP 접착용 그레이드), 기재 ABS",
       "machine_settings": {
@@ -3216,6 +3224,7 @@
     "description": "PET GF30 표면 거침·광택 불량. 금형온도가 결정화 온도보다 크게 낮음.",
     "input": {
       "defect_type": "기타 (직접 입력)",
+      "custom_defect": "표면 광택 불량",
       "resin_type": "PET",
       "resin_detail": "PET GF30",
       "machine_settings": {
@@ -3367,6 +3376,7 @@
     "description": "PPS 콜드슬러그. 노즐 290℃(권장 300~340 미달), 140℃ 금형에 노즐 상시 접촉, 콜드슬러그웰 없음.",
     "input": {
       "defect_type": "기타 (직접 입력)",
+      "custom_defect": "콜드슬러그(Cold Slug)",
       "resin_type": "PPS",
       "resin_detail": "PPS GF40",
       "machine_settings": {
@@ -3514,6 +3524,7 @@
     "description": "PC/ABS 박리가 게이트 근처에만. 원료 변경 없음, 0.6mm 핀게이트 + 95% 고속 + 금형 50℃.",
     "input": {
       "defect_type": "기타 (직접 입력)",
+      "custom_defect": "박리(Delamination)",
       "resin_type": "PC/ABS",
       "resin_detail": "PC/ABS 버진 100%",
       "machine_settings": {
@@ -3611,6 +3622,7 @@
     "description": "PC/ABS 레코드홈. 사출속도 20%, 금형 55℃(권장 70~100), 멜트 하한부.",
     "input": {
       "defect_type": "기타 (직접 입력)",
+      "custom_defect": "레코드홈(Record Groove)",
       "resin_type": "PC/ABS",
       "resin_detail": "PC/ABS",
       "machine_settings": {
@@ -3712,6 +3724,7 @@
     "description": "ASA 광택 불균일. 금형 40℃(권장 50~80 미달) + 보압 사출압의 39%.",
     "input": {
       "defect_type": "기타 (직접 입력)",
+      "custom_defect": "광택 불균일",
       "resin_type": "ASA",
       "resin_detail": "ASA 실외용",
       "machine_settings": {

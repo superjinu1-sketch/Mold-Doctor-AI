@@ -9,6 +9,7 @@ export const USD_KRW = 1500;
 export const PRICE = {
   'claude-sonnet-4-6':         { in: 3,  out: 15 },
   'claude-haiku-4-5-20251001': { in: 1,  out: 5  },
+  'claude-sonnet-5-5':         { in: 2,  out: 10 },
 };
 
 // cache: read = in * 0.1, write = in * 1.25 (Anthropic 표준 비율)

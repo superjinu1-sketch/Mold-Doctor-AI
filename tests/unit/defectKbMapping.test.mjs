@@ -26,3 +26,20 @@ test('대표 매핑', () => {
   assert.equal(getDefect('버닝/가스마크 (Burn Mark)')?.id, 'air_trap_burn');
   assert.equal(getDefect('GF 표면백화 (Fiber Read-out)')?.id, 'fiber_readout');
 });
+
+test("'기타'에 직접 쓴 이름도 노드에 연결된다(이름 한쪽·띄어쓰기 차이)", () => {
+  assert.equal(getDefect('Stringing')?.id, 'stringing');
+  assert.equal(getDefect('drooling at gate')?.id, 'stringing');
+  assert.equal(getDefect('광택 불균일')?.id, 'surface_gloss');
+  assert.equal(getDefect('Gloss variation')?.id, 'surface_gloss');
+  assert.equal(getDefect('기포')?.id, 'void_bubble');
+  assert.equal(getDefect('이형불량')?.id, 'sticking');
+  assert.equal(getDefect('치수불안정')?.id, 'dimensional_instability');
+  assert.equal(getDefect('버닝 마크')?.id, 'air_trap_burn');
+});
+
+test('관계없는 문구는 연결하지 않는다', () => {
+  assert.equal(getDefect('기타 (직접 입력)'), undefined);
+  assert.equal(getDefect('게이트 주변 흐림'), undefined);
+  assert.equal(getDefect('버'), undefined);
+});

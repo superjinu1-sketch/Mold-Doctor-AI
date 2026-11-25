@@ -63,6 +63,8 @@ export interface ResinSpec {
   meltC: { min: number; max: number; degradeAbove?: number };
   moldC: { min: number; max: number; gf?: [number, number] };
   shrinkagePct?: [number, number];
+  /** 공급사 스크류 주변속도 상한(m/s). gf는 유리섬유 강화 등급 값. 공급사 2곳 이상 일치한 수지만 채운다. */
+  screwSpeedMaxMs?: { max: number; gf?: number; sources: string[] };
   commonDefects: DefectKey[];
   notes: string;
   source: 'experience' | 'verified';
@@ -77,6 +79,7 @@ export const RESIN_KB: Record<string, ResinSpec> = {
   'PA6': { id: 'PA6', tier: 'engineering', crystalline: true, hygroscopic: 'high',
     drying: { tempC: 80, hours: [4, 6], targetMoisturePct: 0.08 },
     meltC: { min: 240, max: 270, degradeAbove: 300 }, moldC: { min: 60, max: 90, gf: [80, 100] }, shrinkagePct: [0.8, 1.5],
+    screwSpeedMaxMs: { max: 0.3, gf: 0.3, sources: ['BASF Ultramid A4H·B3W·B3ZG3·A3HG6 HR processing data sheets "Peripheral screw speed ≤ 0.3 m/s"', 'LANXESS Processing data for the injection molder (LXS-HPM-006EN 2017, Durethan PA6/PA66 ±GF) "general-purpose grades 0.05-0.3 m/s"', 'DuPont Zytel Molding Guide: unreinforced max 0.4 m/s, GF max 0.15 m/s (fiber breakage) — stricter GF value noted, not used'] },
     commonDefects: ['silver_streak', 'sink_mark', 'warpage'],
     notes: 'PA6: hygroscopic, always check drying first. Moisture is the #1 cause of silver streak. Crystallization shrinkage 0.8-1.5%. GF grades warp from fiber orientation. Lower melt bound 240°C = Tm 222 + margin; below this expect unmelt/low-melt defects. Max residence ~10min at melt temp.',
     source: 'verified', confidence: 'verified',
@@ -101,6 +104,7 @@ export const RESIN_KB: Record<string, ResinSpec> = {
   'PA66': { id: 'PA66', tier: 'engineering', crystalline: true, hygroscopic: 'very-high',
     drying: { tempC: 80, hours: [4, 8], targetMoisturePct: 0.08 },
     meltC: { min: 275, max: 300, degradeAbove: 310 }, moldC: { min: 70, max: 100, gf: [80, 100] }, shrinkagePct: [1.2, 2.0],
+    screwSpeedMaxMs: { max: 0.3, gf: 0.3, sources: ['BASF Ultramid A4H·B3W·B3ZG3·A3HG6 HR processing data sheets "Peripheral screw speed ≤ 0.3 m/s"', 'LANXESS Processing data for the injection molder (LXS-HPM-006EN 2017, Durethan PA6/PA66 ±GF) "general-purpose grades 0.05-0.3 m/s"', 'DuPont Zytel Molding Guide: unreinforced max 0.4 m/s, GF max 0.15 m/s (fiber breakage) — stricter GF value noted, not used'] },
     commonDefects: ['silver_streak', 'burn_mark', 'warpage'],
     notes: 'PA66: narrow processing window. Moisture is almost always the #1 suspect (40%+ of silver streak). Dry to ≤0.08% as the working target; DuPont maximum is 0.2% (hydrolysis above). Melt 275-300°C; up to 305°C is possible with short residence; degradation risk rises from 310°C (DuPont HUT at 310°C: MW −6%/10min). GF grades warp from fiber orientation.',
     source: 'verified', confidence: 'verified',
@@ -200,6 +204,7 @@ export const RESIN_KB: Record<string, ResinSpec> = {
   'PBT': { id: 'PBT', tier: 'engineering', crystalline: true, hygroscopic: 'moderate',
     drying: { tempC: 120, hours: [4, 4], targetMoisturePct: 0.03 },
     meltC: { min: 250, max: 270, degradeAbove: 280 }, moldC: { min: 60, max: 100 }, shrinkagePct: [1.5, 2.2],
+    screwSpeedMaxMs: { max: 0.3, gf: 0.25, sources: ['DuPont Crastin PBT Molding Guide Fig. 7.3: unreinforced 0.3 m/s, glass-reinforced 0.2 m/s (shear heating, screw abrasion)', 'BASF Ultradur B 4300 G6 HR processing data sheet "Peripheral screw speed ≤ 0.25 m/s"', 'LANXESS LXS-HPM-006EN 2017 (Pocan PBT ±GF) "general-purpose grades 0.05-0.3 m/s"'] },
     commonDefects: ['warpage', 'sink_mark', 'flash'],
     notes: 'PBT: fast crystallization. Mold temp dramatically affects surface & crystallinity (60-80°C amorphous / 80-100°C crystalline). Warpage from fast uneven crystallization. Above 280°C degradation begins; ~290°C releases CO/THF fumes.',
     source: 'verified', confidence: 'verified',
@@ -262,6 +267,7 @@ export const RESIN_KB: Record<string, ResinSpec> = {
   'POM(아세탈)': { id: 'POM', tier: 'engineering', crystalline: true, hygroscopic: 'low',
     drying: { tempC: 80, hours: [2, 2], targetMoisturePct: null },
     meltC: { min: 190, max: 210, degradeAbove: 230 }, moldC: { min: 80, max: 100 }, shrinkagePct: [1.8, 2.2],
+    screwSpeedMaxMs: { max: 0.3, sources: ['DuPont Delrin Molding Guide (2006) Table 5: max screw tangential speed 0.2 (high viscosity) / 0.3 (low viscosity) / 0.15 (super-tough) m/s; "sensitive to shear"', 'BASF Ultraform H4320 AT processing data sheet "Peripheral screw speed 0.3 m/s"'] },
     commonDefects: ['sink_mark'],
     notes: 'POM(acetal): high shrinkage. Releases formaldehyde gas above 230°C → needs excellent venting, no dead spots in hot runners. Narrow processing window. Beyond 9-type: formaldehyde deposits, center-gated voids. Copolymer baseline (Korean market default). Homopolymer melt 205-225°C, hard limit 230°C; copolymer hard limit 238°C. Copolymer: avoid residence >15min above 193°C (formaldehyde).',
     source: 'verified', confidence: 'verified',
@@ -399,11 +405,22 @@ export const RESIN_KB: Record<string, ResinSpec> = {
     notes: 'ASA: outdoor UV stability better than ABS, similar processing.',
     source: 'experience', confidence: 'estimated' },
   'PMMA(아크릴)': { id: 'PMMA', tier: 'engineering', crystalline: false, hygroscopic: 'moderate',
-    drying: { tempC: 80, hours: [3, 4], targetMoisturePct: null },
+    // 목표 수분 0.1%: Lucite International(2019, 80℃ 2~4h → 0.1% 미만)·Kuraray PARAPET(일반 사출 0.1% 미만). 확인 2026-11-25.
+    drying: { tempC: 80, hours: [3, 4], targetMoisturePct: 0.1 },
     meltC: { min: 220, max: 260 }, moldC: { min: 60, max: 90 }, shrinkagePct: [0.3, 0.6],
     commonDefects: ['silver_streak'],
     notes: 'PMMA(acrylic): transparent. Optical clarity needs careful drying & clean processing. Moisture → silver streak. Beyond 9-type: crazing, bubbles, haze. Dehumidifying dryer up to 98°C, 2-3h. Mold below 60°C risks surface stress on optical faces.',
-    source: 'experience', confidence: 'estimated' },
+    source: 'experience', confidence: 'estimated',
+    mechanism: {
+      moistureMode: 'none',
+      polymerizationClass: 'addition',
+      notes: 'Wet PMMA gives surface defects (silver streaks) but part strength is not affected by the moisture level, unlike PC/PET/PA. Do not explain PMMA cracks, crazing or brittleness by moisture or by drying; strength and crack resistance are governed by molding strain (residual stress), so for cracks look at mold temperature, gate-area packing, ejection and solvent/cleaner contact (ESC). Drying stays in the answer only for silver streaks or bubbles.',
+      sourceRefs: [
+        'Lucite International, PMMA vs PC technical report (2019): "Acrylic needs drying before processing BUT part strength is not affected by the moisture level"; 2-4h at 80°C to below 0.1%; PC must be below 0.02% because moisture degrades it (verified 2026-11-25)',
+        'Kuraray PARAPET Technical Information / Injection Molding Conditions: water-absorbed resin gives surface defects such as silver streaks; moisture below 0.1%; "Molding strain greatly affects the mechanical strength and crack resistance" (verified 2026-11-25)',
+      ],
+      verifiedAt: '2026-11-25',
+    } },
   'PVC': { id: 'PVC', tier: 'commodity', crystalline: false, hygroscopic: 'none',
     drying: null, meltC: { min: 160, max: 200, degradeAbove: 210 }, moldC: { min: 20, max: 50 },
     commonDefects: ['burn_mark'],
@@ -493,7 +510,7 @@ export function getResinSpec(resinType: string): ResinSpec | null {
 
 // ── 수치 대조 (입력 셋팅값 vs KB 권장범위) ──
 // 철학 A: 코드는 객관적 앵커만 제공(가이드레일). 최종 판단은 모델이 맥락 종합.
-export type CheckStatus = 'ok' | 'low' | 'high' | 'degrade' | 'na';
+export type CheckStatus = 'ok' | 'low' | 'high' | 'degrade' | 'na' | 'verify';
 export interface SettingCheck {
   label: string;
   value: number;
@@ -572,6 +589,25 @@ export function checkSettings(
     }
   }
 
+  // 스크류 주변속도 = π × 스크류경 × rpm / 60. 공급사 상한 초과 = 전단발열(은줄·변색·분해), GF는 섬유 파손.
+  // 스크류경 미입력이면 rpm만으로는 판정할 수 없어 "몇 mm 이상이면 초과"를 알려 준다(11/25 case-006 PA6 GF 180rpm 누락).
+  const rpm = toNum(s.screwRpm);
+  if (spec.screwSpeedMaxMs && rpm !== null && rpm > 0) {
+    const gfFiller = !!filler && /gf|glass|유리/i.test(filler);
+    const lim = gfFiller && spec.screwSpeedMaxMs.gf !== undefined ? spec.screwSpeedMaxMs.gf : spec.screwSpeedMaxMs.max;
+    const grade = gfFiller ? 'GF 등급 ' : '';
+    const dia = toNum(a.screwDiameter);
+    if (dia !== null && dia > 0) {
+      const v = Math.PI * (dia / 1000) * rpm / 60;
+      out.push({ label: `스크류 주변속도(${dia}mm·${rpm}rpm)`, value: Math.round(v * 100) / 100, unit: 'm/s', rangeText: `${grade}≤${lim} m/s(공급사 상한)`, status: v > lim ? 'high' : 'ok' });
+    } else {
+      const dCrit = Math.round((lim * 60 * 1000) / (Math.PI * rpm));
+      // 스크류경을 모르면 소형기(≈25mm)에서도 넘는 경우만 '높음', 그 밖은 확인 요청.
+      const status: CheckStatus = dCrit <= 25 ? 'high' : dCrit <= 60 ? 'verify' : 'ok';
+      out.push({ label: '스크류 회전수', value: rpm, unit: 'rpm', rangeText: `${grade}주변속도 ≤${lim} m/s(공급사 상한) → 스크류경 ${dCrit}mm 이상이면 초과(스크류경 미입력)`, status });
+    }
+  }
+
   // ─── 수지무관 관계식 앵커(가이드레일 v2) — 각 입력 존재 시에만, 보수적 임계. 압력은 route에서 MPa 환산됨. ───
   // 1) 보압/사출압 비율
   const fillP = toNum(a.actualPeakPressure) ?? toNum(s.injPressure1);
@@ -622,6 +658,7 @@ const STATUS_MARK: Record<CheckStatus, string> = {
   high: '높음 ⚠',
   degrade: '상한 초과·열분해 위험 ⚠',
   na: '판정 보류(GF 등급 범위 미수록, 이 값을 하향 근거로 쓰지 말 것)',
+  verify: '스크류경에 따라 초과 가능 ⚠(스크류경 확인 요청)',
 };
 
 // 대조 결과 → 프롬프트 주입용 텍스트(가이드레일). 면책 포함.
@@ -630,10 +667,13 @@ export function formatKbCompare(spec: ResinSpec, checks: SettingCheck[]): string
   const lines = checks
     .map(c => `- ${c.label} ${c.value}${c.unit}: ${spec.id} 권장 ${c.rangeText} → ${STATUS_MARK[c.status]}`)
     .join('\n');
-  const hasFlag = checks.some(c => c.status !== 'ok' && c.status !== 'na');
-  const flagNote = hasFlag
+  const hasFlag = checks.some(c => c.status !== 'ok' && c.status !== 'na' && c.status !== 'verify');
+  const hasVerify = checks.some(c => c.status === 'verify');
+  const flagNote = (hasFlag
     ? '\n※ 위 ⚠ 항목은 가공윈도우 이탈이다. 외관·치수 불량의 직접 원인일 수 있으니 원인 후보에서 우선 검토하라.'
-    : '';
+    : '') + (hasVerify
+    ? '\n※ "초과 가능" 항목은 스크류경을 알아야 판정된다. 단정하지 말고, 해당 수치 이상의 스크류라면 전단발열 원인이 될 수 있음을 원인 검토에 포함하고 스크류경 확인을 요청하라.'
+    : '');
   return `## 가공윈도우 사전 대조 (KB 기준, 참고용)
 ${lines}${flagNote}
 ※ 일반 가공윈도우 기준이다. 등급·충전재·벽두께에 따라 적정값이 달라질 수 있어 절대 기준이 아니다. 최종 판단은 전체 맥락으로 하라.`;

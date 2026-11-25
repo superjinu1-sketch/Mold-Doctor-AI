@@ -5,6 +5,8 @@ import { tryMock } from '@/lib/mock';
 import { getResinSpec, checkSettings, formatKbCompare, formatMechanism } from '@/lib/resin-kb';
 import { formatDefectGuide, getDefect, KB_VERSION } from '@/lib/defect-kb';
 import { diffFollowUp, formatFollowUpDiff } from '@/lib/followUpDiff';
+import { repairJsonBrackets } from '@/lib/json-repair';
+import { softenDeep } from '@/lib/overclaim';
 import { supabaseAdmin } from '@/lib/supabase/server';
 import { getSampleDemo } from '@/lib/sample-demo';
 import { matchesSampleCase } from '@/lib/sampleCase';
@@ -198,7 +200,7 @@ export const HYGROSCOPICITY_GUARD = `[흡습성 정확성 — 반드시 준수]
 // 프롬프트 버전 — FIXED_FRAMEWORK·VISUAL_DIFFERENTIAL·HYGROSCOPICITY_GUARD 등
 // 모델 입력에 들어가는 지시문이 바뀔 때마다 bump한다. 진단 레코드에 기록되어
 // "어느 프롬프트로 나온 답인가"를 사후 추적하는 근거가 된다.
-export const PROMPT_VERSION = 'v21h';
+export const PROMPT_VERSION = 'v21k';
 
 // client_id·session_id 형식 검증(call-interruption-data-loss-fix-v1 Part A) —
 // lib/history-sync.ts의 동명 정규식과 동일 패턴 유지.
@@ -535,29 +537,6 @@ function defectTypeEn(v?: string): string {
   return m ? m[1] : optEn(v);
 }
 
-// 단정 표현 후처리. 지시문으로 막아도 모델이 "확진·confirmed·validated"를 쓰는 경우가 남아(페르소나 재평가
-// 2026-10-21: Sarah 결과에 confirmed 7회, validated window) 응답 문자열에서 직접 바꾼다. defect_type은 그대로 둔다.
-function softenOverclaim(text: string): string {
-  return text
-    .replace(/(거의\s*)?확(진|정)(적이다|된다|이다)/g, '가능성이 높다')
-    .replace(/\b(is|are|was|were)\s+confirmed\s+by\b/gi, '$1 strongly supported by')
-    .replace(/(거의\s*)?확진(적으로|적|됨)?/g, '가능성 높음')
-    .replace(/확정(적으로|적|됨)/g, '가능성 높음')
-    .replace(/(원인|분류|추정)\s*확정/g, '$1 가능성 높음')
-    .replace(/\b(is|are|was|were|be|been)\s+confirmed\b/gi, '$1 highly likely')
-    .replace(/(?<!\b(?:if|once|until|unless|when|after|before)\s)\bconfirmed\b/gi, 'highly likely')
-    .replace(/\bconfirms\b/gi, 'strongly suggests')
-    .replace(/\bdefinitively\b|\bdefinitely\b/gi, 'most likely')
-    .replace(/\bvalidated\b/gi, 'supplier-recommended');
-}
-function softenDeep(v: unknown): unknown {
-  if (typeof v === 'string') return softenOverclaim(v);
-  if (Array.isArray(v)) return v.map(softenDeep);
-  if (v && typeof v === 'object') {
-    return Object.fromEntries(Object.entries(v as Record<string, unknown>).map(([k, x]) => [k, k === 'defect_type' ? x : softenDeep(x)]));
-  }
-  return v;
-}
 // 사용자가 이미 해본 조치를 설명에서 뽑는다. 지시문 규칙만으로는 "보압 시간 늘려도 차이 없음"인데 같은 조치를
 // 다시 권하는 일이 남아서(정 공장장 재평가) 해당 문장을 따로 강조해 넘긴다.
 function extractTriedActions(desc?: string): string[] {
@@ -923,6 +902,20 @@ export async function POST(request: NextRequest) {
       return '';
     })();
 
+    // 0 입력값 가드 — 사출기 화면을 대기 중에 찍거나 OCR로 옮기면 실측 표시가 0으로 들어온다. 11/25 eval(pa6-metering)에서
+    // screw_rpm 0을 설정 오류로 단정하고 "0→60-80rpm"을 1순위 조치로 냈다.
+    const zeroValueGuard = (() => {
+      const zeroFields: [string | undefined, string][] = [
+        [s.screwRpm, isEn ? 'screw RPM' : '스크류 회전수'],
+        [s.injPressure1, isEn ? 'injection pressure' : '사출압'],
+        [s.injSpeed1, isEn ? 'injection speed' : '사출속도'],
+      ];
+      const zeros = zeroFields.filter(([v]) => v !== undefined && v.trim() !== '' && Number(v) === 0).map(([, n]) => n);
+      if (!zeros.length) return '';
+      return `[0 입력값 가이드]
+- ⚠ ${zeros.join('·')} 값이 0이다. 실제 성형에서 0일 수 없는 값이므로, 사출기 화면을 대기(idle) 중에 찍었거나 실측 표시 칸을 옮긴 값일 가능성이 높다. 설정 오류로 단정하거나 "0→N으로 올려라"를 1순위 조치로 내지 마라. 실제 설정값 확인을 요청하는 확인 항목으로만 다루고, 원인 분석은 나머지 입력과 증상으로 하라.`;
+    })();
+
     // 표면 잔류물 텍스처 가드 — "닦으면 옅어진다" 단서면 표면 석출(plate-out)·가스 응축·이형제를 구조적 불량보다 우선
     const surfaceDepositGuard = (() => {
       const t = defectDescription || '';
@@ -1034,7 +1027,7 @@ ${(productInfo?.weight || productInfo?.wallThicknessMin || productInfo?.wallThic
 - Wall thickness: ${productInfo?.wallThicknessMin || '-'}~${productInfo?.wallThicknessMax || '-'}mm
 - Notes: ${productInfo?.notes || 'None'}
 ` : ''}
-${defectGuide ? `${defectGuide}\n\n` : ''}${moldMachineGuard ? `${moldMachineGuard}\n\n` : ''}${defectTempGuard ? `${defectTempGuard}\n\n` : ''}${tempOrderGuard ? `${tempOrderGuard}\n\n` : ''}${surfaceDepositGuard ? `${surfaceDepositGuard}\n\n` : ''}${depositGuide ? `${depositGuide}\n\n` : ''}${kbCompare ? `${kbCompare}\n\n` : ''}${mechanismText ? `${mechanismText}\n\n` : ''}
+${defectGuide ? `${defectGuide}\n\n` : ''}${moldMachineGuard ? `${moldMachineGuard}\n\n` : ''}${defectTempGuard ? `${defectTempGuard}\n\n` : ''}${tempOrderGuard ? `${tempOrderGuard}\n\n` : ''}${zeroValueGuard ? `${zeroValueGuard}\n\n` : ''}${surfaceDepositGuard ? `${surfaceDepositGuard}\n\n` : ''}${depositGuide ? `${depositGuide}\n\n` : ''}${kbCompare ? `${kbCompare}\n\n` : ''}${mechanismText ? `${mechanismText}\n\n` : ''}
 
 ${isFollowUp && previousDiagnosis ? `
 ## Follow-up Estimate Information (Round ${round} Follow-up)
@@ -1121,7 +1114,7 @@ ${(productInfo?.weight || productInfo?.wallThicknessMin || productInfo?.wallThic
 - 벽 두께: ${productInfo?.wallThicknessMin || '-'}~${productInfo?.wallThicknessMax || '-'}mm
 - 특이사항: ${productInfo?.notes || '없음'}
 ` : ''}
-${defectGuide ? `${defectGuide}\n\n` : ''}${moldMachineGuard ? `${moldMachineGuard}\n\n` : ''}${defectTempGuard ? `${defectTempGuard}\n\n` : ''}${tempOrderGuard ? `${tempOrderGuard}\n\n` : ''}${surfaceDepositGuard ? `${surfaceDepositGuard}\n\n` : ''}${depositGuide ? `${depositGuide}\n\n` : ''}${kbCompare ? `${kbCompare}\n\n` : ''}${mechanismText ? `${mechanismText}\n\n` : ''}
+${defectGuide ? `${defectGuide}\n\n` : ''}${moldMachineGuard ? `${moldMachineGuard}\n\n` : ''}${defectTempGuard ? `${defectTempGuard}\n\n` : ''}${tempOrderGuard ? `${tempOrderGuard}\n\n` : ''}${zeroValueGuard ? `${zeroValueGuard}\n\n` : ''}${surfaceDepositGuard ? `${surfaceDepositGuard}\n\n` : ''}${depositGuide ? `${depositGuide}\n\n` : ''}${kbCompare ? `${kbCompare}\n\n` : ''}${mechanismText ? `${mechanismText}\n\n` : ''}
 
 ${isFollowUp && previousDiagnosis ? `
 ## 후속 추정 정보 (${round}차 Follow-up)
@@ -1175,6 +1168,12 @@ CRITICAL: Your entire response must be ONLY the JSON object. No text before or a
         if (!match) throw new Error('No JSON');
         result = JSON.parse(sanitizeJsonNewlines(match[0]));
       } catch {
+       try {
+        // 2.5차: 괄호 짝 오류만 복구(여분의 '}'로 루트가 일찍 닫히는 경우가 실측됨)
+        const block = rawText.match(/\{[\s\S]*\}/)?.[0] ?? rawText;
+        result = JSON.parse(repairJsonBrackets(sanitizeJsonNewlines(block)));
+        if (!Array.isArray(result?.causes)) throw new Error('repaired JSON lacks causes');
+       } catch {
         parseFallback = true;        // 3차 폴백 진입
         // 3차: 핵심 필드만 regex로 추출, raw_response fallback
         const getText = (key: string) => {
@@ -1191,6 +1190,7 @@ CRITICAL: Your entire response must be ONLY the JSON object. No text before or a
           recommendations: [],
           checklist: { before_changes: [], after_changes: [], escalation: [] },
         };
+       }
       }
     }
 
