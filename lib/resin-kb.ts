@@ -235,7 +235,8 @@ export const RESIN_KB: Record<string, ResinSpec> = {
     source: 'experience', confidence: 'estimated' },
   'PC': { id: 'PC', tier: 'engineering', crystalline: false, hygroscopic: 'high',
     drying: { tempC: 120, hours: [3, 4], targetMoisturePct: 0.02 },
-    meltC: { min: 280, max: 320, degradeAbove: 320 }, moldC: { min: 70, max: 110 }, shrinkagePct: [0.5, 0.7],
+    // gf: GF20 등급 공급사 2곳 — Covestro Makrolon 8025 금형 80~120℃, SABIC Lexan 3412R 82~116℃(180~240℉). 확인 2026-11-25.
+    meltC: { min: 280, max: 320, degradeAbove: 320 }, moldC: { min: 70, max: 110, gf: [80, 120] }, shrinkagePct: [0.5, 0.7],
     commonDefects: ['silver_streak'],
     notes: 'PC: amorphous, very high viscosity, extreme moisture sensitivity. Never mix regrind from other resins. Beyond 9-type: stress cracking from excessive pack pressure, splay, yellowing when overheated. Above 320°C or long residence time: thermal degradation + yellowing.',
     source: 'verified', confidence: 'verified',
@@ -507,11 +508,15 @@ function toNum(v: string | undefined | null): number | null {
   return Number.isFinite(n) ? n : null;
 }
 
+// 보압 상향이 대책이 아닌 불량(defect-kb 노드 id). 여기서는 보압/사출압 비가 낮아도 점검표에 올리지 않는다.
+const NO_HOLD_RAISE = new Set(['crack', 'residual_stress_esc', 'overpacking', 'flash', 'sticking', 'ejector_marks', 'gate_blush', 'parting_line_mismatch', 'stringing']);
+
 export function checkSettings(
   spec: ResinSpec,
   s: Record<string, string>,
   a: Record<string, string>,
   filler?: string,
+  defectId?: string,
 ): SettingCheck[] {
   const out: SettingCheck[] = [];
 
@@ -574,7 +579,11 @@ export function checkSettings(
   if (fillP !== null && fillP > 0 && holdP !== null) {
     const ratio = holdP / fillP;
     const status: CheckStatus = ratio < 0.30 ? 'low' : ratio > 0.85 ? 'high' : 'ok';
-    out.push({ label: '보압/사출압 비', value: Math.round(ratio * 100), unit: '%', rangeText: '50-75% 통상', status });
+    // 보압을 올리면 안 되는 불량(크랙·버·이형 등)에서는 과보압 신호(high)일 때만 보인다.
+    // 낮은 비율을 '50-75% 통상'과 나란히 두면 모델이 보압 상향을 끼워 넣었다(11/24 PMMA 크랙, KB v1.24 평가).
+    if (!(defectId && NO_HOLD_RAISE.has(defectId) && status !== 'high')) {
+      out.push({ label: '보압/사출압 비', value: Math.round(ratio * 100), unit: '%', rangeText: '50-75% 통상', status });
+    }
   }
 
   // 2) 쿠션

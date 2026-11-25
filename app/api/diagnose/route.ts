@@ -3,7 +3,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { downscaleBase64 } from '@/lib/downscale';
 import { tryMock } from '@/lib/mock';
 import { getResinSpec, checkSettings, formatKbCompare, formatMechanism } from '@/lib/resin-kb';
-import { formatDefectGuide, KB_VERSION } from '@/lib/defect-kb';
+import { formatDefectGuide, getDefect, KB_VERSION } from '@/lib/defect-kb';
+import { diffFollowUp, formatFollowUpDiff } from '@/lib/followUpDiff';
 import { supabaseAdmin } from '@/lib/supabase/server';
 import { getSampleDemo } from '@/lib/sample-demo';
 import { matchesSampleCase } from '@/lib/sampleCase';
@@ -197,7 +198,7 @@ export const HYGROSCOPICITY_GUARD = `[흡습성 정확성 — 반드시 준수]
 // 프롬프트 버전 — FIXED_FRAMEWORK·VISUAL_DIFFERENTIAL·HYGROSCOPICITY_GUARD 등
 // 모델 입력에 들어가는 지시문이 바뀔 때마다 bump한다. 진단 레코드에 기록되어
 // "어느 프롬프트로 나온 답인가"를 사후 추적하는 근거가 된다.
-export const PROMPT_VERSION = 'v21g';
+export const PROMPT_VERSION = 'v21h';
 
 // client_id·session_id 형식 검증(call-interruption-data-loss-fix-v1 Part A) —
 // lib/history-sync.ts의 동명 정규식과 동일 패턴 유지.
@@ -321,7 +322,7 @@ USER TRIALS, WORDING, AND UNITS (MANDATORY):
 - No overclaiming: never write "confirmed", "definitely", "100%", or "validated range". Write "highly likely" or "strongly suggests". A resin's recommended range is the supplier's general range, not this process's validated window.
 - One variable at a time: order recommendations so the operator changes one value at a time. Never tell them to change two values in the same step. Put the pass/fail check before moving to the next value in interaction_note.
 - First action: priority 1 must be what to actually do first. If that is a check rather than a setting change (purge, vent cleaning, measurement, unit check), keep it priority 1 with direction "same" and urgency "next_shot", and start the summary with that action.
-- Units: temperatures arrive as °C. A nozzle/barrel value of 400+ (e.g., 480-650) or a mold temperature that makes no sense for the resin was very likely typed in °F: convert with °C = (°F - 32) / 1.8, analyze with the converted value, put "confirm units" as priority 1, and write recommended values in both °C and °F. Such a value cannot be real °C (the resin would be burned black and smoking), so do NOT list °C overheating as a cause and do NOT recommend lowering the temperature, not even conditionally. Pressures may be HYDRAULIC (oil) pressure read off the machine screen; plastic pressure ≈ hydraulic × intensification ratio (typically 8-15). If injection pressure looks implausible as plastic pressure (below 30 MPa or above 300 MPa), say it may be hydraulic or a unit mix-up and judge only the hold/injection ratio, not the absolute value. Very small cushion/metering values for the machine size (e.g., cushion 0.25, metering 2.1) may be inches; say so. Pressure recommendations: because the entered pressure may be hydraulic or plastic, write recommended pressures in the SAME unit the user entered (psi, bar, MPa, kgf/cm2) as a moderate step from the current value (for example 75 psi -> 90-110 psi), never as a converted absolute target, and never more than double the current value in one step. Typical plastic back pressure is about 3-15 MPa; as hydraulic pressure about 0.3-1.5 MPa (50-200 psi).
+- Units: temperatures arrive as °C. A nozzle/barrel value of 400+ (e.g., 480-650) or a mold temperature that makes no sense for the resin was very likely typed in °F: convert with °C = (°F - 32) / 1.8, analyze with the converted value, put "confirm units" as priority 1, and write recommended values in both °C and °F. Such a value cannot be real °C (the resin would be burned black and smoking), so do NOT list °C overheating as a cause and do NOT recommend lowering the temperature, not even conditionally. Pressures may be HYDRAULIC (oil) pressure read off the machine screen; plastic pressure ≈ hydraulic × intensification ratio (typically 8-15). If injection pressure looks implausible as plastic pressure (below 30 MPa or above 300 MPa), say it may be hydraulic or a unit mix-up and judge relative values such as the hold/injection ratio, not the absolute value. A ratio below the usual 50-75% is not by itself a reason to raise hold pressure: recommend a hold raise only for defects caused by too little packing (sink, void, short shot, dimensions, poor surface replication), never for cracks, flash or ejection/sticking problems. Very small cushion/metering values for the machine size (e.g., cushion 0.25, metering 2.1) may be inches; say so. Pressure recommendations: because the entered pressure may be hydraulic or plastic, write recommended pressures in the SAME unit the user entered (psi, bar, MPa, kgf/cm2) as a moderate step from the current value (for example 75 psi -> 90-110 psi), never as a converted absolute target, and never more than double the current value in one step. Typical plastic back pressure is about 3-15 MPa; as hydraulic pressure about 0.3-1.5 MPa (50-200 psi).
 - Barrel zones: machines number zones differently (Zone1 may be at the nozzle or at the hopper). Do not infer a "reverse" or "forward" barrel profile from zone numbers alone; if the profile matters, list it as a check.
 - Glass-filled grades: supplier melt ranges for GF grades usually sit about 10-20°C above the unfilled grade. Below the degradation temperature, do not recommend lowering the melt of a GF grade just because it exceeds the unfilled upper limit.
 - If resin numbers differ between the resin note and the process-window cross-check ("가공윈도우 사전 대조"), use the cross-check values.
@@ -332,7 +333,7 @@ USER TRIALS, WORDING, AND UNITS (MANDATORY):
 - 단정 금지: "확진", "확정", "100%", "검증된 범위" 같은 말을 쓰지 마라. "가능성이 높다", "강하게 시사한다"로 쓴다. 수지 권장 범위는 공급사 일반 권장 범위이지 이 공정의 검증된 범위가 아니다.
 - 한 번에 하나: 추천은 한 번에 한 값만 바꾸도록 순서를 매겨라. 같은 단계에서 두 값을 동시에 바꾸라고 하지 마라. 다음 값으로 넘어가기 전 판정 기준을 interaction_note에 적어라.
 - 첫 행동: priority 1은 실제로 가장 먼저 할 일이다. 값 변경이 아니라 점검(퍼지·벤트 청소·측정·단위 확인)이면 priority 1, direction "same", urgency "next_shot"으로 두고 summary 첫머리에 그 행동을 적어라.
-- 단위: 온도는 °C로 받는다. 노즐·실린더 값이 400 이상(예 480~650)이거나 금형온도가 수지에 맞지 않게 높으면 °F 입력일 가능성이 높다. °C = (°F - 32) / 1.8로 환산해 분석하고, "단위 확인"을 priority 1로 두고, 권장값은 °C와 °F를 함께 적어라. 그런 값은 실제 °C일 수 없다(수지가 검게 타고 연기가 난다). °C 과열을 원인으로 올리지 말고, 조건부로라도 온도 하향을 권하지 마라. 압력은 사출기 화면의 유압(작동유) 압력일 수 있다. 수지압 ≈ 유압 × 증압비(보통 8~15배). 사출압이 수지압으로 보기에 비현실적이면(30 MPa 미만 또는 300 MPa 초과) 유압값이거나 단위 착오일 수 있다고 적고, 절대값이 아니라 보압/사출압 비율로만 판단하라. 쿠션·계량값이 사출기 규모에 비해 지나치게 작으면(예: 쿠션 0.25, 계량 2.1) 인치 입력 가능성을 적어라. 압력 권장값: 입력 압력이 유압일 수도 수지압일 수도 있으므로, 권장 압력은 사용자가 입력한 단위(psi·bar·MPa·kgf/cm2) 그대로, 현재값에서 적당한 폭으로 바꾼 값으로 적어라(예: 75 psi → 90~110 psi). 환산한 절대 목표값으로 적지 말고, 한 번에 두 배 넘게 올리지 마라. 수지 기준 배압은 보통 3~15 MPa, 유압 기준 약 0.3~1.5 MPa(50~200 psi)다.
+- 단위: 온도는 °C로 받는다. 노즐·실린더 값이 400 이상(예 480~650)이거나 금형온도가 수지에 맞지 않게 높으면 °F 입력일 가능성이 높다. °C = (°F - 32) / 1.8로 환산해 분석하고, "단위 확인"을 priority 1로 두고, 권장값은 °C와 °F를 함께 적어라. 그런 값은 실제 °C일 수 없다(수지가 검게 타고 연기가 난다). °C 과열을 원인으로 올리지 말고, 조건부로라도 온도 하향을 권하지 마라. 압력은 사출기 화면의 유압(작동유) 압력일 수 있다. 수지압 ≈ 유압 × 증압비(보통 8~15배). 사출압이 수지압으로 보기에 비현실적이면(30 MPa 미만 또는 300 MPa 초과) 유압값이거나 단위 착오일 수 있다고 적고, 절대값이 아니라 보압/사출압 비율 같은 상대값으로 판단하라. 비율이 통상(50~75%)보다 낮다는 것만으로 보압 상향을 권하지 마라. 보압 상향은 싱크·보이드·미성형·치수·표면 전사 부족처럼 보압 부족이 원인인 불량에서만 권하고, 크랙·버·이형/달라붙음 불량에는 권하지 마라. 쿠션·계량값이 사출기 규모에 비해 지나치게 작으면(예: 쿠션 0.25, 계량 2.1) 인치 입력 가능성을 적어라. 압력 권장값: 입력 압력이 유압일 수도 수지압일 수도 있으므로, 권장 압력은 사용자가 입력한 단위(psi·bar·MPa·kgf/cm2) 그대로, 현재값에서 적당한 폭으로 바꾼 값으로 적어라(예: 75 psi → 90~110 psi). 환산한 절대 목표값으로 적지 말고, 한 번에 두 배 넘게 올리지 마라. 수지 기준 배압은 보통 3~15 MPa, 유압 기준 약 0.3~1.5 MPa(50~200 psi)다.
 - 배럴 존: 존 번호 방향은 기계마다 다르다(Zone1이 노즐 쪽일 수도 호퍼 쪽일 수도 있다). 존 번호만으로 "역구배·순구배"를 단정하지 마라. 온도 구배가 중요하면 확인 항목으로 제시하라.
 - 유리섬유(GF) 강화 등급: 공급사 용융 권장 범위는 보통 비강화 등급보다 10~20°C 높다. 열분해 온도 미만이면, 비강화 상한을 넘었다는 이유만으로 GF 등급의 멜트 하향을 권하지 마라.
 - 수지 수치가 수지 노트와 "가공윈도우 사전 대조"에서 다르면 가공윈도우 사전 대조 값을 따른다.
@@ -804,7 +805,11 @@ export async function POST(request: NextRequest) {
     // KB 수치 대조(가이드레일). spec 있는 수지만, 없으면 빈 문자열(기존 동작 유지).
     const resinSpec = getResinSpec(resinInfo?.resinType || '');
     const kbCompare = resinSpec
-      ? formatKbCompare(resinSpec, checkSettings(resinSpec, s, a, fillerEff))
+      ? formatKbCompare(resinSpec, checkSettings(resinSpec, s, a, fillerEff, getDefect(defectType || '')?.id))
+      : '';
+    // 후속 라운드: 이전 권고의 현재값과 지금 셋팅을 대조(체크만 하고 값은 그대로인 조치를 '효과 없음'으로 오독 방지).
+    const followUpDiff = isFollowUp && previousDiagnosis
+      ? formatFollowUpDiff(diffFollowUp(previousDiagnosis.recommendations, settings || {}, s), isEn)
       : '';
     // 수지 심층 KB Phase 0(resin-mechanism-schema-v1) — mechanism 필드가 채워진 수지만 텍스트 반환,
     // 현재는 52종 전부 미채움이라 항상 빈 문자열(0토큰, 기존 동작 무영향). 값은 Phase 1에서 채워진다.
@@ -985,7 +990,7 @@ ${noImageGuard}Please systematically analyze the following injection molding def
 - Holding time: ${s.holdTime || '-'}sec, Cooling time: ${s.coolTime || '-'}sec, Injection time: ${s.injTime || '-'}sec
 - Metering: ${s.metering || '-'}mm, Cushion (set): ${s.cushion || '-'}mm
 - Back pressure: ${pShow('backPressure')}, Screw RPM: ${s.screwRpm || '-'}rpm, Clamp force: ${s.clampForce || '-'}ton
-- (Pressure input unit: ${pressureUnit || 'MPa'}, converted internally to MPa. Write recommended pressures in ${pressureUnit || 'MPa'}.)${isF ? '\n- (Temperature input unit: °F, converted above to °C. Write every recommended temperature as °C with °F in parentheses, e.g. "300°C (572°F)".)' : ''}${hydraulicSuspect ? `\n- ⚠ Injection pressure ${s.injPressure1} MPa is too low for plastic pressure. The screen value is very likely HYDRAULIC pressure (plastic ≈ hydraulic × 8-15). Say this in the result and judge only the hold/injection ratio.` : ''}
+- (Pressure input unit: ${pressureUnit || 'MPa'}, converted internally to MPa. Write recommended pressures in ${pressureUnit || 'MPa'}.)${isF ? '\n- (Temperature input unit: °F, converted above to °C. Write every recommended temperature as °C with °F in parentheses, e.g. "300°C (572°F)".)' : ''}${hydraulicSuspect ? `\n- ⚠ Injection pressure ${s.injPressure1} MPa is too low for plastic pressure. The screen value is very likely HYDRAULIC pressure (plastic ≈ hydraulic × 8-15). Say this in the result and judge relative values (hold/injection ratio) instead; a low ratio alone is not a reason to raise hold pressure.` : ''}
 
 ${(a.vpTransferPos || a.vpTransferPressure || a.preInjectDecompDist || a.postMeterDecompDist) ? `## V/P Transfer & Decompression (Suck-back)
 - V/P transfer position: ${a.vpTransferPos || '-'}mm, V/P transfer pressure: ${a.vpTransferPressure || '-'} MPa
@@ -1047,7 +1052,7 @@ ${(actionsTaken || []).filter(a => !a.done).map(a => `- ✗ ${a.recommendation}`
 
 ### Observed Changes After Actions
 ${changeDescription || 'None'}
-` : ''}
+${followUpDiff ? `\n${followUpDiff}\n` : ''}` : ''}
 Respond only in JSON format. Return pure JSON without markdown code blocks.
 CRITICAL: Your entire response must be ONLY the JSON object. No text before or after. No markdown. No explanation. Start with { and end with }. All string values must be on a single line — no line breaks inside string values.
     ` : `
@@ -1072,7 +1077,7 @@ ${noImageGuard}다음 사출 불량 정보를 Scientific Molding 방법론으로
 - 보압 시간: ${s.holdTime || '-'}sec, 냉각 시간: ${s.coolTime || '-'}sec, 사출 시간: ${s.injTime || '-'}sec
 - 계량: ${s.metering || '-'}mm, 쿠션(설정): ${s.cushion || '-'}mm
 - 배압: ${pShow('backPressure')}, 스크류 회전수: ${s.screwRpm || '-'}rpm, 형체력: ${s.clampForce || '-'}ton
-- (압력 입력 단위: ${pressureUnit || 'MPa'}, 내부 MPa 환산 적용. 권장 압력은 ${pressureUnit || 'MPa'} 단위로 적어라.)${isF ? '\n- (온도 입력 단위: °F, 위 값은 °C로 환산함. 권장 온도는 모두 °C 뒤 괄호에 °F를 함께 적어라. 예: "300°C (572°F)")' : ''}${hydraulicSuspect ? `\n- ⚠ 사출압 ${s.injPressure1} MPa는 수지압으로 보기에 너무 낮다. 화면 값은 유압일 가능성이 높다(수지압 ≈ 유압 × 8~15). 결과에 이 점을 적고 보압/사출압 비율로만 판단하라.` : ''}
+- (압력 입력 단위: ${pressureUnit || 'MPa'}, 내부 MPa 환산 적용. 권장 압력은 ${pressureUnit || 'MPa'} 단위로 적어라.)${isF ? '\n- (온도 입력 단위: °F, 위 값은 °C로 환산함. 권장 온도는 모두 °C 뒤 괄호에 °F를 함께 적어라. 예: "300°C (572°F)")' : ''}${hydraulicSuspect ? `\n- ⚠ 사출압 ${s.injPressure1} MPa는 수지압으로 보기에 너무 낮다. 화면 값은 유압일 가능성이 높다(수지압 ≈ 유압 × 8~15). 결과에 이 점을 적고 보압/사출압 비율 같은 상대값으로 판단하라. 비율이 낮다는 것만으로 보압 상향을 권하지 마라.` : ''}
 
 ${(a.vpTransferPos || a.vpTransferPressure || a.preInjectDecompDist || a.postMeterDecompDist) ? `## V/P 전환 & 감압(석백)
 - V/P 전환 위치: ${a.vpTransferPos || '-'}mm, V/P 전환 압력: ${a.vpTransferPressure || '-'} MPa
@@ -1134,7 +1139,7 @@ ${(actionsTaken || []).filter(a => !a.done).map(a => `- ✗ ${a.recommendation}`
 
 ### 조치 후 변화 관찰
 ${changeDescription || '없음'}
-` : ''}
+${followUpDiff ? `\n${followUpDiff}\n` : ''}` : ''}
 JSON 형식으로만 응답하세요. 마크다운 코드 블록 없이 순수 JSON만 반환하세요.
 CRITICAL: Your entire response must be ONLY the JSON object. No text before or after. No markdown. No explanation. Start with { and end with }. All string values must be on a single line — no line breaks inside string values.
     `).trim();

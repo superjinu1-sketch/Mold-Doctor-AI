@@ -4,7 +4,7 @@
 // 수정 순서: taxonomy.md → 이 파일 → KB_VERSION bump → eval 회귀.
 import type { ResinSpec } from './resin-kb';
 
-export const KB_VERSION = 'defect-kb-v1.24';
+export const KB_VERSION = 'defect-kb-v1.25';
 
 export type Cause = {
   rank: number;
@@ -601,6 +601,7 @@ export const DEFECT_KB: Record<string, DefectNode> = {
         verification: '금형온도 10°C↑ 후 개선 확인.',
         adjustment: '금형온도↑(단일 최대 효과 — GF 강화는 비강화 대비 금형온도 상단 필요: 예 PA66 비강화 ~70°C vs GF ~100°C, 공급사 가이드). 배럴온도는 공급사 권장 범위 내 유지 — GF라고 배럴을 더 올리지 마라(PA66은 비강화와 권장 멜트 동일 285~305°C, 과열은 체류 열화만 유발).' },
     ],
+    priorityLogic: '섬유 백화 대책으로 금형온도나 사출속도를 낮추지 않는다(표층이 더 빨리 굳어 섬유가 더 드러난다). 금형온도가 이미 GF 권장 범위 안(특히 상단)이면 1순위를 내리지 말고 다음 순서로 본다: 설정값이 아닌 실측 금형 표면온도(설정과 차이·국부 저온), 사출속도↑(표층이 굳기 전에 충전), 보압·보압시간이 표면 밀착에 충분한지, 멜트는 공급사 범위 안에서 유지. 박육(≤1.5mm)·핀포인트 게이트면 표층 고화가 빨라 이 순서가 더 중요하다.',
     sharedGates: ['mold_temp_insufficient'],
     source: 'synthesis-3.5,taxonomy-14', confidence: 'verified',
     sourceRefs: [
@@ -1057,6 +1058,8 @@ export function getDefect(defectType: string): DefectNode | undefined {
 }
 
 const DEFECT_ALIASES: Record<string, string[]> = {
+  // 앱 폼 값은 '크랙 (Crack)'인데 노드 이름은 '크랙/균열'·'Crack/Crazing'이라 이름 매칭에 안 걸렸다(6/5 v1.0부터 크랙 가이드 미주입, 11/25 발견).
+  crack: ['크랙', '균열', 'crack', 'crazing'],
   black_specks: ['검은 점', '검은점', '검정 점', '검정점', '까만 점', '까만점', 'black spot', 'black dot', 'black speck'],
 };
 

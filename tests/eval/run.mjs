@@ -42,7 +42,7 @@ const PASS_THRESHOLD = 70;
 const INTERVAL_MS = 6000; // rate-limit 회피 간격
 const MAX_RETRIES = 5;    // 529 overloaded 재시도 (diagnose + judge 공통)
 const JUDGE_MODEL = 'claude-haiku-4-5-20251001'; // Sonnet 대비 ~1/10 비용
-const PROMPT_VERSION = 'v21g';  // 단정어 후처리·시도 이력 강조·압력 입력단위 표시·유압 경고·GF 판정 보강 → 캐시 무효화
+const PROMPT_VERSION = 'v21h';  // 후속 라운드 셋팅 대조·보압 비 상향 제한 / 단정어 후처리·시도 이력 강조·압력 입력단위 표시·유압 경고·GF 판정 보강 → 캐시 무효화
 const CACHE_DIR = join(ROOT, 'tests/eval/.cache');
 const CACHE_TTL_MS = 7 * 24 * 3600 * 1000; // 7일
 
@@ -167,6 +167,14 @@ function buildPayload(c) {
     settings,
     advSettings,
     ...(c.input.pressure_unit ? { pressureUnit: c.input.pressure_unit } : {}),
+    // 후속 라운드 문항: 앱이 보내는 것과 같은 필드(이전 결과·체크한 조치·변화 설명)를 그대로 보낸다.
+    ...(c.input.follow_up ? {
+      isFollowUp: true,
+      round: c.input.follow_up.round ?? 2,
+      previousDiagnosis: c.input.follow_up.previous_diagnosis,
+      actionsTaken: c.input.follow_up.actions_taken ?? [],
+      changeDescription: c.input.follow_up.change_description ?? '',
+    } : {}),
     moldInfo: {
       moldType:   mi.mold_type || '',
       gateType:   mi.gate_type || '',
@@ -306,7 +314,7 @@ ${isImageCase ? `- 도면/사진 판독(mold_analysis):\n${maSummary || '(모델
 ## 정답 기준 (cases.json expected)
 - 정답 root_cause: ${exp.root_cause}
 - 정답 key_recommendations: ${exp.key_recommendations.join(', ')}
-- 정답 phase: ${exp.expected_phase}${exp.phase_also_accept?.length ? ` (이 결함은 표면 스킨 형성 단계가 본질적으로 모호 → 다음 phase도 정답으로 인정: ${exp.phase_also_accept.join(', ')})` : ''}
+- 정답 phase: ${exp.expected_phase}${exp.phase_also_accept?.length ? ` (이 문항은 결함이 형성되는 단계가 둘 이상일 수 있어 다음 phase도 정답과 똑같이 인정, 감점 없음: ${exp.phase_also_accept.join(', ')})` : ''}
 - 정답 severity: ${exp.severity}
 ${isImageCase && exp.mold_read?.length ? `- 도면에서 읽어야 할 핵심(mold_read): ${exp.mold_read.join(' / ')}` : ''}
 ${isImageCase && exp.hallucination_forbidden?.length ? `- 발명 금지(도면에 없음): ${exp.hallucination_forbidden.join(' / ')}` : ''}

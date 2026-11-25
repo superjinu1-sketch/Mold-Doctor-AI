@@ -4617,7 +4617,315 @@
         "ejection"
       ],
       "severity": "high",
-      "trap": "PMMA 크랙을 수분 가수분해로 설명하거나, 크랙 대책으로 보압을 올리라고 권고",
+      "trap": "PMMA 크랙을 수분 가수분해(분자량 저하·화학적 취화)로 설명하거나, 크랙 대책으로 보압을 올리라고 권고(건조 확인을 낮은 순위의 보조 점검으로 두는 것은 함정 아님)",
+      "confidence": "medium"
+    }
+  },
+  {
+    "id": "cov-pcgf20-readout-hot-mold",
+    "source": "현장 실입력 2026-10(익명화). 당시 결과가 금형온도·사출속도를 낮추라고 권고(오답)",
+    "title": "PC GF20 섬유 백화 — 금형온도 115℃(이미 GF 범위 상단), 박육 핀포인트",
+    "difficulty": "hard",
+    "description": "금형온도가 이미 GF PC 공급사 범위(80~120℃) 상단인 섬유 백화. 금형온도나 사출속도를 낮추라고 하면 오답.",
+    "input": {
+      "defect_type": "GF 표면백화 (Fiber Read-out)",
+      "resin_type": "PC",
+      "resin_detail": "PC GF20%",
+      "pressure_unit": "MPa",
+      "machine_settings": {
+        "nozzle_temp": 314.8,
+        "zone1_temp": 320.1,
+        "zone2_temp": 319.9,
+        "zone3_temp": 300.1,
+        "zone4_temp": 290,
+        "mold_temp_fixed": 115,
+        "mold_temp_moving": 115,
+        "injection_pressure": 280,
+        "holding_pressure": 170,
+        "injection_speed_1": 60,
+        "injection_speed_2": 75,
+        "holding_time": 1.5,
+        "cooling_time": 12,
+        "metering": 84,
+        "cushion": 5.67,
+        "back_pressure": 12,
+        "screw_rpm": 250
+      },
+      "mold_info": {
+        "mold_type": "핫러너",
+        "gate_type": "핀포인트",
+        "cavity_count": 2,
+        "runner_type": "핫"
+      },
+      "product_info": {
+        "product_weight": 20,
+        "wall_thickness_min": 1,
+        "wall_thickness_max": 1.5
+      },
+      "defect_description": "Glass 돌출",
+      "locale": "ko"
+    },
+    "expected": {
+      "root_cause": "금형온도 설정 115℃는 GF20 PC 공급사 범위(80~120℃) 상단이라 설정값만으로는 원인이 아니다. 1~1.5mm 박육·핀포인트 게이트라 표층이 빨리 굳어 섬유가 드러나는 쪽이 유력하다. 실측 금형 표면온도가 설정보다 낮은지, 충전 속도와 보압·보압시간(1.5초로 짧음)이 표면 밀착에 충분한지를 본다. 멜트는 이미 공급사 범위 상단(320℃)이라 더 올리지 않는다.",
+      "key_recommendations": [
+        "실측 금형 표면온도 확인(설정 115℃와 차이·국부 저온). 금형온도는 낮추지 않음(유지하거나 공급사 상한 120℃ 안에서 소폭 상향하는 것은 정답)",
+        "사출속도 상향(표층 고화 전 충전)",
+        "보압·보압시간(1.5초) 표면 밀착 충분한지 확인, 필요하면 보압시간 연장",
+        "멜트는 320℃ 상한이므로 유지, 건조 조건 확인(120℃ 3~4시간)"
+      ],
+      "expected_phase": "filling",
+      "phase_also_accept": [
+        "cooling",
+        "packing"
+      ],
+      "severity": "medium",
+      "trap": "금형온도를 115℃ 아래로 낮추거나 사출속도를 낮추라고 권고(115→120℃ 이내 상향은 함정 아님)",
+      "confidence": "medium"
+    }
+  },
+  {
+    "id": "followup-tpu-sink-hold-unchanged",
+    "source": "현장 실입력 2026-11 2차 라운드(익명화). 보압을 '실행함'으로 체크했지만 셋팅값은 그대로",
+    "title": "TPU 싱크 2차 — 보압 체크했지만 값 미변경",
+    "difficulty": "hard",
+    "description": "후속 라운드. 쿠션만 실제로 바뀌었고 보압은 122 그대로다. 보압 조정이 효과 없었다고 해석하면 오답.",
+    "input": {
+      "defect_type": "싱크마크 (Sink Mark)",
+      "resin_type": "TPU",
+      "resin_detail": "TPU 1185A10",
+      "pressure_unit": "MPa",
+      "machine_settings": {
+        "nozzle_temp": 214.3,
+        "zone1_temp": 214.8,
+        "zone2_temp": 213.1,
+        "zone3_temp": 193,
+        "zone4_temp": 177,
+        "mold_temp_fixed": 50,
+        "mold_temp_moving": 50,
+        "injection_pressure": 235,
+        "holding_pressure": 122,
+        "injection_speed_1": 16.5,
+        "injection_speed_2": 12.5,
+        "holding_time": 15,
+        "cooling_time": 19,
+        "metering": 100,
+        "cushion": 9.7,
+        "back_pressure": 28,
+        "screw_rpm": 80
+      },
+      "mold_info": {
+        "mold_type": "핫러너",
+        "gate_type": "사이드",
+        "cavity_count": 4,
+        "runner_type": "핫"
+      },
+      "product_info": {
+        "product_weight": 200,
+        "wall_thickness_min": 1.5,
+        "wall_thickness_max": 3.0
+      },
+      "defect_description": "제품표면에 손톱 자국같이 나옴",
+      "locale": "ko",
+      "follow_up": {
+        "round": 2,
+        "previous_diagnosis": {
+          "causes": [
+            {
+              "description": "보압 부족 및 보압시간 과다로 게이트씰 후 수축 보상 불충분",
+              "probability": 55
+            },
+            {
+              "description": "쿠션 과대로 보압 전달 손실 가능성",
+              "probability": 30
+            },
+            {
+              "description": "두꺼운 벽(3mm) 부위 냉각 부족으로 내부 수축 싱크",
+              "probability": 15
+            }
+          ],
+          "recommendations": [
+            {
+              "parameter": "쿠션 실측 편차 확인 및 계량량 조정",
+              "current": "쿠션 설정 23.2mm (통상 권장 2-8mm 초과)",
+              "recommended": "10샷 연속 쿠션 실측 후 편차 ±2mm 이내 목표, 계량량 85-90mm로 조정 시도"
+            },
+            {
+              "parameter": "보압",
+              "current": "122MPa",
+              "recommended": "135-140MPa"
+            },
+            {
+              "parameter": "건조 조건 확인",
+              "current": "건조 조건 미입력",
+              "recommended": "80-100°C, 2-4시간, 목표 수분 0.02% 미만 확인"
+            },
+            {
+              "parameter": "배압 단위 확인",
+              "current": "28.0MPa (입력값, 현실 범위 초과 의심)",
+              "recommended": "단위가 bar 또는 kgf/cm²인지 확인, 실제 MPa이면 3-5MPa로 낮출 것"
+            }
+          ]
+        },
+        "actions_taken": [
+          {
+            "recommendation": "쿠션 실측 편차 확인 및 계량량 조정",
+            "done": true,
+            "result": "쿠션 9.7로 줄임"
+          },
+          {
+            "recommendation": "보압",
+            "done": true,
+            "result": ""
+          },
+          {
+            "recommendation": "건조 조건 확인",
+            "done": false
+          },
+          {
+            "recommendation": "배압 단위 확인",
+            "done": false
+          }
+        ],
+        "change_description": "그대로 손톱 자국 남음"
+      }
+    },
+    "expected": {
+      "root_cause": "보압은 '실행함'으로 체크됐지만 입력값이 122 MPa 그대로라 보압 상향은 실제로 시험되지 않았다. 바뀐 것은 쿠션(23.2→9.7)뿐이고 그래도 싱크가 남았다. 보압 조정이 효과 없었다고 결론 내릴 근거가 없다. 보압을 실제로 올렸는지 확인하고, 게이트 씰(보압시간 단계별 중량) 시험으로 보압 전달 여부를 확인하는 것이 다음 단계다.",
+      "key_recommendations": [
+        "보압 값이 그대로(122)라는 점을 짚고, 1차 권고대로 보압을 실제로 단계 상향해 비교(보압 미적용을 원인으로 지목하고 상향을 다시 권하는 것은 정답)",
+        "게이트 씰 시험(보압시간 단계별 중량 측정)으로 보압 전달 확인",
+        "배압 단위 확인(28 MPa는 단위 착오 의심)",
+        "캐비티별 싱크 발생 위치 기록"
+      ],
+      "expected_phase": "packing",
+      "phase_also_accept": [
+        "cooling"
+      ],
+      "severity": "medium",
+      "trap": "보압 값이 바뀌지 않았는데 '보압을 조정했지만 효과가 없었다'고 해석하고 보압 상향을 배제한 채 원인을 금형·기계로만 옮김(보압 미적용을 지적하는 것은 함정 회피)",
+      "confidence": "high"
+    }
+  },
+  {
+    "id": "followup-tpu-sink-hold-raised-no-effect",
+    "source": "followup-tpu-sink-hold-unchanged의 대조 문항(보압을 실제로 올린 경우)",
+    "title": "TPU 싱크 2차 — 보압 실제 상향 후에도 그대로",
+    "difficulty": "hard",
+    "description": "후속 라운드. 보압이 122→138로 실제로 올랐는데 싱크가 그대로다. 이 경우는 보압 상향 효과 없음이 맞는 해석이다(셋팅 대조가 과하게 막지 않는지 확인).",
+    "input": {
+      "defect_type": "싱크마크 (Sink Mark)",
+      "resin_type": "TPU",
+      "resin_detail": "TPU 1185A10",
+      "pressure_unit": "MPa",
+      "machine_settings": {
+        "nozzle_temp": 214.3,
+        "zone1_temp": 214.8,
+        "zone2_temp": 213.1,
+        "zone3_temp": 193,
+        "zone4_temp": 177,
+        "mold_temp_fixed": 50,
+        "mold_temp_moving": 50,
+        "injection_pressure": 235,
+        "holding_pressure": 138,
+        "injection_speed_1": 16.5,
+        "injection_speed_2": 12.5,
+        "holding_time": 15,
+        "cooling_time": 19,
+        "metering": 100,
+        "cushion": 9.7,
+        "back_pressure": 28,
+        "screw_rpm": 80
+      },
+      "mold_info": {
+        "mold_type": "핫러너",
+        "gate_type": "사이드",
+        "cavity_count": 4,
+        "runner_type": "핫"
+      },
+      "product_info": {
+        "product_weight": 200,
+        "wall_thickness_min": 1.5,
+        "wall_thickness_max": 3.0
+      },
+      "defect_description": "제품표면에 손톱 자국같이 나옴",
+      "locale": "ko",
+      "follow_up": {
+        "round": 2,
+        "previous_diagnosis": {
+          "causes": [
+            {
+              "description": "보압 부족 및 보압시간 과다로 게이트씰 후 수축 보상 불충분",
+              "probability": 55
+            },
+            {
+              "description": "쿠션 과대로 보압 전달 손실 가능성",
+              "probability": 30
+            },
+            {
+              "description": "두꺼운 벽(3mm) 부위 냉각 부족으로 내부 수축 싱크",
+              "probability": 15
+            }
+          ],
+          "recommendations": [
+            {
+              "parameter": "쿠션 실측 편차 확인 및 계량량 조정",
+              "current": "쿠션 설정 23.2mm (통상 권장 2-8mm 초과)",
+              "recommended": "10샷 연속 쿠션 실측 후 편차 ±2mm 이내 목표, 계량량 85-90mm로 조정 시도"
+            },
+            {
+              "parameter": "보압",
+              "current": "122MPa",
+              "recommended": "135-140MPa"
+            },
+            {
+              "parameter": "건조 조건 확인",
+              "current": "건조 조건 미입력",
+              "recommended": "80-100°C, 2-4시간, 목표 수분 0.02% 미만 확인"
+            },
+            {
+              "parameter": "배압 단위 확인",
+              "current": "28.0MPa (입력값, 현실 범위 초과 의심)",
+              "recommended": "단위가 bar 또는 kgf/cm²인지 확인, 실제 MPa이면 3-5MPa로 낮출 것"
+            }
+          ]
+        },
+        "actions_taken": [
+          {
+            "recommendation": "쿠션 실측 편차 확인 및 계량량 조정",
+            "done": true,
+            "result": "쿠션 9.7로 줄임"
+          },
+          {
+            "recommendation": "보압",
+            "done": true,
+            "result": "122에서 138로 올림, 그대로"
+          },
+          {
+            "recommendation": "건조 조건 확인",
+            "done": false
+          },
+          {
+            "recommendation": "배압 단위 확인",
+            "done": false
+          }
+        ],
+        "change_description": "보압 올려도 손톱 자국 그대로"
+      }
+    },
+    "expected": {
+      "root_cause": "보압을 122→138로 실제로 올렸는데도 싱크가 그대로면 보압이 캐비티까지 전달되지 않는 쪽(게이트·핫러너 사이드게이트 조기 고화, 캐비티 편차)이 유력하다. 보압을 더 올리는 것보다 게이트 씰 시험과 게이트·핫러너 온도 점검이 먼저다.",
+      "key_recommendations": [
+        "보압을 더 올리지 말고 게이트 씰 시험(보압시간 단계별 중량)으로 게이트 고화 시점 확인",
+        "핫러너 사이드게이트·노즐 온도와 게이트 크기 점검",
+        "캐비티별 싱크 발생 위치·중량 편차 기록",
+        "배압 단위 확인"
+      ],
+      "expected_phase": "packing",
+      "phase_also_accept": [
+        "cooling"
+      ],
+      "severity": "medium",
+      "trap": "보압이 실제로 바뀌었는데 '보압이 그대로'라고 하거나, 보압을 또 올리라고 권고",
       "confidence": "medium"
     }
   }
