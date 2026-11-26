@@ -242,6 +242,8 @@ export const RESIN_KB: Record<string, ResinSpec> = {
     drying: { tempC: 120, hours: [3, 4], targetMoisturePct: 0.02 },
     // gf: GF20 등급 공급사 2곳 — Covestro Makrolon 8025 금형 80~120℃, SABIC Lexan 3412R 82~116℃(180~240℉). 확인 2026-11-25.
     meltC: { min: 280, max: 320, degradeAbove: 320 }, moldC: { min: 70, max: 110, gf: [80, 120] }, shrinkagePct: [0.5, 0.7],
+    // 확인 2026-11-26. SABIC 일반 가이드(GE Plastics Injection Moulding Mini Guide)는 0.10~0.25 m/s라 상한은 두 공급사가 겹치는 0.2.
+    screwSpeedMaxMs: { max: 0.2, sources: ['Covestro Makrolon processing guidance: peripheral screw speed 0.05-0.2 m/s', 'SABIC Material Finder, LEXAN FR LC108: "Screw speed (Circumferential speed) 0.1 - 0.2 m/s"'] },
     commonDefects: ['silver_streak'],
     notes: 'PC: amorphous, very high viscosity, extreme moisture sensitivity. Never mix regrind from other resins. Beyond 9-type: stress cracking from excessive pack pressure, splay, yellowing when overheated. Above 320°C or long residence time: thermal degradation + yellowing.',
     source: 'verified', confidence: 'verified',
@@ -603,7 +605,8 @@ export function checkSettings(
     } else {
       const dCrit = Math.round((lim * 60 * 1000) / (Math.PI * rpm));
       // 스크류경을 모르면 소형기(≈25mm)에서도 넘는 경우만 '높음', 그 밖은 확인 요청.
-      const status: CheckStatus = dCrit <= 25 ? 'high' : dCrit <= 60 ? 'verify' : 'ok';
+        // 40mm 이하 스크류(소·중형기 흔함)도 초과하는 rpm만 확인 요청. 60mm로 두면 PC 80rpm(48mm) 같은 평범한 셋팅까지 걸렸다.
+        const status: CheckStatus = dCrit <= 25 ? 'high' : dCrit <= 40 ? 'verify' : 'ok';
       out.push({ label: '스크류 회전수', value: rpm, unit: 'rpm', rangeText: `${grade}주변속도 ≤${lim} m/s(공급사 상한) → 스크류경 ${dCrit}mm 이상이면 초과(스크류경 미입력)`, status });
     }
   }

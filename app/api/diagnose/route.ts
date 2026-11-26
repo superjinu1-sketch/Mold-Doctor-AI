@@ -200,7 +200,7 @@ export const HYGROSCOPICITY_GUARD = `[흡습성 정확성 — 반드시 준수]
 // 프롬프트 버전 — FIXED_FRAMEWORK·VISUAL_DIFFERENTIAL·HYGROSCOPICITY_GUARD 등
 // 모델 입력에 들어가는 지시문이 바뀔 때마다 bump한다. 진단 레코드에 기록되어
 // "어느 프롬프트로 나온 답인가"를 사후 추적하는 근거가 된다.
-export const PROMPT_VERSION = 'v21k';
+export const PROMPT_VERSION = 'v21l';
 
 // client_id·session_id 형식 검증(call-interruption-data-loss-fix-v1 Part A) —
 // lib/history-sync.ts의 동명 정규식과 동일 패턴 유지.
@@ -916,6 +916,24 @@ export async function POST(request: NextRequest) {
 - ⚠ ${zeros.join('·')} 값이 0이다. 실제 성형에서 0일 수 없는 값이므로, 사출기 화면을 대기(idle) 중에 찍었거나 실측 표시 칸을 옮긴 값일 가능성이 높다. 설정 오류로 단정하거나 "0→N으로 올려라"를 1순위 조치로 내지 마라. 실제 설정값 확인을 요청하는 확인 항목으로만 다루고, 원인 분석은 나머지 입력과 증상으로 하라.`;
     })();
 
+    // 계량 불량(스크류 슬립) 가드 — 출처: PT "Get a Grip on Screw Slippage"(Solutia 나일론), DuPont Zytel 성형 가이드 p.16·21.
+    // docs/kb-research/metering-screw-slip-20261126.md. 11/25 eval pa6-metering에서 계량 불량을 수분·RPM으로만 봤다.
+    const meteringGuard = (() => {
+      const t = defectDescription || '';
+      const hit = /계량\s*(이|가|도)?\s*(안\s*(됨|되|돼)|불량|불안정|들쭉|편차|늦|오래|멈|정지)|계량\s*시간\s*(이|가)?\s*(길|늘|들쭉|불규칙)|스크류\s*(가\s*)?(슬립|미끄|헛돌|후퇴\s*(가\s*)?(안|불규칙|느))|screw\s*(slip|slippage|stall)|(won'?t|doesn'?t|does not|not)\s*(meter|recover)|(metering|recovery|plasticizing)\s*(?:(?:is|was|are)\s*)?(problem|issue|unstable|inconsistent|fail|erratic|time\s*(varies|unstable|too long))/i.test(t);
+      if (!hit) return '';
+      return `[계량 불량(스크류 슬립) 가이드]
+- 계량 불량과 외관 불량이 함께 있으면 두 증상을 분리해 각각 원인을 세워라. 표면 광택·번쩍임 쪽은 금형온도부터 본다(금형온도 미입력이면 확인 요청). 계량 불량을 수분 하나로 몰지 마라.
+- 스크류 슬립 원인 축(점검 순서):
+  (1) 호퍼 스로트(피드부) 냉각 — 냉각수 순환 막힘·과열이면 펠릿이 입구에서 녹아 브리징 → 공급 불규칙.
+  (2) 배압 — 과배압이면 스크류가 제자리에서 돌고 후퇴하지 못한다. 나일론(PA)은 저배압~무배압이 공급사 권장.
+  (3) 후방(피드)존 온도 방향 — 너무 낮으면 배럴 벽 용융막이 안 생겨 이송이 안 되고, 너무 높으면 조기 용융·브리징으로 공급이 불규칙해진다. 작업자가 후방존을 올렸더니 악화됐다면 과열 쪽(후방존을 되돌리고 피드부 냉각 확인), 올려서 좋아졌다면 저온 쪽. 어느 존도 수지 융점 아래로 두지 마라.
+  (4) 하드웨어 — 스크류·배럴 마모(간극 측정), 피드부가 너무 얕은 스크류(압축비), 체크링 불량(후퇴 시간 편차), 호퍼 막힘·형상(재생재 혼합 시).
+  (5) 재료 — 흡습성 수지의 수분, 펠릿 크기 불균일·미분, 활제 과다, 마스터배치 캐리어 차이.
+- 체류시간이 너무 짧으면(큰 계량량에 작은 실린더) 용융 부족으로도 슬립한다. 퍼지 실측 멜트온도가 설정보다 낮거나 마블링이 보이면 이 쪽.
+- 후방존 온도만 계속 올리는 처방은 함정이다.`;
+    })();
+
     // 표면 잔류물 텍스처 가드 — "닦으면 옅어진다" 단서면 표면 석출(plate-out)·가스 응축·이형제를 구조적 불량보다 우선
     const surfaceDepositGuard = (() => {
       const t = defectDescription || '';
@@ -1027,7 +1045,7 @@ ${(productInfo?.weight || productInfo?.wallThicknessMin || productInfo?.wallThic
 - Wall thickness: ${productInfo?.wallThicknessMin || '-'}~${productInfo?.wallThicknessMax || '-'}mm
 - Notes: ${productInfo?.notes || 'None'}
 ` : ''}
-${defectGuide ? `${defectGuide}\n\n` : ''}${moldMachineGuard ? `${moldMachineGuard}\n\n` : ''}${defectTempGuard ? `${defectTempGuard}\n\n` : ''}${tempOrderGuard ? `${tempOrderGuard}\n\n` : ''}${zeroValueGuard ? `${zeroValueGuard}\n\n` : ''}${surfaceDepositGuard ? `${surfaceDepositGuard}\n\n` : ''}${depositGuide ? `${depositGuide}\n\n` : ''}${kbCompare ? `${kbCompare}\n\n` : ''}${mechanismText ? `${mechanismText}\n\n` : ''}
+${defectGuide ? `${defectGuide}\n\n` : ''}${moldMachineGuard ? `${moldMachineGuard}\n\n` : ''}${defectTempGuard ? `${defectTempGuard}\n\n` : ''}${tempOrderGuard ? `${tempOrderGuard}\n\n` : ''}${zeroValueGuard ? `${zeroValueGuard}\n\n` : ''}${meteringGuard ? `${meteringGuard}\n\n` : ''}${surfaceDepositGuard ? `${surfaceDepositGuard}\n\n` : ''}${depositGuide ? `${depositGuide}\n\n` : ''}${kbCompare ? `${kbCompare}\n\n` : ''}${mechanismText ? `${mechanismText}\n\n` : ''}
 
 ${isFollowUp && previousDiagnosis ? `
 ## Follow-up Estimate Information (Round ${round} Follow-up)
@@ -1114,7 +1132,7 @@ ${(productInfo?.weight || productInfo?.wallThicknessMin || productInfo?.wallThic
 - 벽 두께: ${productInfo?.wallThicknessMin || '-'}~${productInfo?.wallThicknessMax || '-'}mm
 - 특이사항: ${productInfo?.notes || '없음'}
 ` : ''}
-${defectGuide ? `${defectGuide}\n\n` : ''}${moldMachineGuard ? `${moldMachineGuard}\n\n` : ''}${defectTempGuard ? `${defectTempGuard}\n\n` : ''}${tempOrderGuard ? `${tempOrderGuard}\n\n` : ''}${zeroValueGuard ? `${zeroValueGuard}\n\n` : ''}${surfaceDepositGuard ? `${surfaceDepositGuard}\n\n` : ''}${depositGuide ? `${depositGuide}\n\n` : ''}${kbCompare ? `${kbCompare}\n\n` : ''}${mechanismText ? `${mechanismText}\n\n` : ''}
+${defectGuide ? `${defectGuide}\n\n` : ''}${moldMachineGuard ? `${moldMachineGuard}\n\n` : ''}${defectTempGuard ? `${defectTempGuard}\n\n` : ''}${tempOrderGuard ? `${tempOrderGuard}\n\n` : ''}${zeroValueGuard ? `${zeroValueGuard}\n\n` : ''}${meteringGuard ? `${meteringGuard}\n\n` : ''}${surfaceDepositGuard ? `${surfaceDepositGuard}\n\n` : ''}${depositGuide ? `${depositGuide}\n\n` : ''}${kbCompare ? `${kbCompare}\n\n` : ''}${mechanismText ? `${mechanismText}\n\n` : ''}
 
 ${isFollowUp && previousDiagnosis ? `
 ## 후속 추정 정보 (${round}차 Follow-up)

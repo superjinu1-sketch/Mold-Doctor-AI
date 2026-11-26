@@ -4,7 +4,7 @@
 // 수정 순서: taxonomy.md → 이 파일 → KB_VERSION bump → eval 회귀.
 import type { ResinSpec } from './resin-kb';
 
-export const KB_VERSION = 'defect-kb-v1.28';
+export const KB_VERSION = 'defect-kb-v1.29';
 
 export type Cause = {
   rank: number;
@@ -374,7 +374,7 @@ export const DEFECT_KB: Record<string, DefectNode> = {
         adjustment: '감압을 드룰 방지 최소값까지 축소(과다 감압이 원인일 때 즉효), 스크류/체크링 점검, 보이드 고정위치면 코어측 오버플로우·가스밴트 추가.' },
     ],
     patternHints: {
-      '성형조건(보압·배압·온도·속도) 다 조정해도 무효 + 두꺼운부 + 낮밤 간헐': '공정 원인 아님 → 환경 온도드리프트·설비(스크류/노즐후퇴)·금형(코어측 벤트/오버플로우) 하드웨어 우선. 성형조건 미세조정 반복은 함정.',
+      '성형조건(보압·배압·온도·속도) 다 조정해도 무효 + 두꺼운부 + 낮밤 간헐': '공정 원인 아님 → 환경 온도드리프트·설비(스크류/노즐후퇴)·금형(코어측 벤트/오버플로우) 하드웨어 우선. 성형조건 미세조정 반복은 함정. 대형기·고점도 수지(PMMA 등)에서 배럴온도가 resin-kb 권장 하한 근처면 권장 범위 상단 쪽으로 올리는 것을 조치에 넣어라(taxonomy Void/Bubble).',
       '대형기·고점도(PMMA 등)인데 배럴온도 수지 권장 하한 근처': '배럴온도 충분히 확보(수지 권장범위 상단). 과저 시 두꺼운부 충전·탈기 불리 → 보이드 가중.',
       '가열 시 부풂 + 서크백(감압·노즐후퇴)을 늘린 뒤 발생·급증': '공기 흡입 가스 포켓 → rank5 감압 축소(드룰 방지 최소값)가 1순위. 진공 보이드가 아니므로 보압·보압시간 상향은 권하지 말 것(phase=material). 실끌림 대책은 감압 증량 대신 노즐온도↓·밸브게이트 점검.',
     },
@@ -613,7 +613,7 @@ export const DEFECT_KB: Record<string, DefectNode> = {
   surface_gloss: {
     id: 'surface_gloss', nameKo: '표면거침/광택불균일', nameEn: 'Surface Roughness/Gloss', phase: '충전/보압(표면 복제)',
     typicalSeverity: 'medium (외관)',
-    discriminators: '광택 전이(고/저광택 교대 경계선) vs 전체 거침. flow mark(유동방향 줄무늬)와 구분.',
+    discriminators: '광택 전이(고/저광택 교대 경계선) vs 전체 거침. flow mark(유동방향 줄무늬)와 구분. 분류전환: GF 강화 수지에서 유리섬유가 하얗게 비쳐 보이는 거침·광택 저하면 Fiber Read-out(GF 표면백화)으로 보고 phase는 충전(표층 형성)으로 판정한다.',
     causes: [
       { rank: 1, cause: '금형온도 과저·불균일', category: 'Mold',
         baseProbability: 55,

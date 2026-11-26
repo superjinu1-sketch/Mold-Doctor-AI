@@ -34,3 +34,15 @@ test('상한 데이터가 없는 수지와 낮은 rpm은 건드리지 않는다'
   assert.equal(find(checkSettings(RESIN_KB['ABS'], { screwRpm: '200' }, {}, '없음')), undefined);
   assert.equal(find(checkSettings(RESIN_KB['POM(아세탈)'], { screwRpm: '60' }, {}, '없음')).status, 'ok');
 });
+
+test('PC 상한 0.2 m/s(Covestro·SABIC)', () => {
+  const c = find(checkSettings(RESIN_KB['PC'], { screwRpm: '120' }, { screwDiameter: '40' }));
+  assert.equal(c.value, 0.25); // π·0.04·120/60
+  assert.equal(c.status, 'high');
+  assert.equal(find(checkSettings(RESIN_KB['PC'], { screwRpm: '80' }, { screwDiameter: '40' })).status, 'ok');
+});
+
+test('평범한 PC 80rpm은 스크류경 확인 요청을 띄우지 않는다', () => {
+  assert.equal(find(checkSettings(RESIN_KB['PC'], { screwRpm: '80' }, {})).status, 'ok');
+  assert.equal(find(checkSettings(RESIN_KB['PC'], { screwRpm: '250' }, {})).status, 'high');
+});

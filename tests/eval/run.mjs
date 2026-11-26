@@ -46,7 +46,7 @@ const MAX_RETRIES = 5;    // 529 overloaded 재시도 (diagnose + judge 공통)
 const JUDGE_MODEL = process.env.EVAL_JUDGE_MODEL || 'claude-sonnet-5-5';
 // Haiku 4.5는 사고(thinking) 기본 꺼짐. 5세대 모델은 adaptive 사고가 기본이라 max_tokens 여유와 effort를 준다.
 const JUDGE_OPTS = /haiku-4-5/.test(JUDGE_MODEL) ? { max_tokens: 700 } : { max_tokens: 8000, output_config: { effort: 'medium' } };
-const PROMPT_VERSION = 'v21k';  // JSON 괄호 복구·confirmed 문맥 치환·박리 phase 분리·eval 기타 직접입력 이름 전송 / 스크류 주변속도 상한·기타 직접입력 노드 매칭 / PMMA 메커니즘 / 후속 라운드 셋팅 대조·보압 비 상향 제한 / 단정어 후처리·시도 이력 강조·압력 입력단위 표시·유압 경고·GF 판정 보강 → 캐시 무효화
+const PROMPT_VERSION = 'v21l';  // 계량 불량(스크류 슬립) 가드·PMMA 보이드 배럴온도·GF 광택→섬유 백화 전환 / JSON 괄호 복구·confirmed 문맥 치환·박리 phase 분리·eval 기타 직접입력 이름 전송 / 스크류 주변속도 상한·기타 직접입력 노드 매칭 / PMMA 메커니즘 / 후속 라운드 셋팅 대조·보압 비 상향 제한 / 단정어 후처리·시도 이력 강조·압력 입력단위 표시·유압 경고·GF 판정 보강 → 캐시 무효화
 const CACHE_DIR = join(ROOT, 'tests/eval/.cache');
 const CACHE_TTL_MS = 7 * 24 * 3600 * 1000; // 7일
 
